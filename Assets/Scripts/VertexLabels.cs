@@ -7,6 +7,7 @@ public class VertexLabels : MonoBehaviour
     Vector3[] vertices;
     GameObject[] labels;
 
+
     void Start()
     {
         MeshFilter meshFilter = GetComponentInChildren<MeshFilter>();
@@ -34,16 +35,14 @@ public class VertexLabels : MonoBehaviour
 
     void Update()
     {
+        //Parametry obrotu dziecka MainObject czyli właściwego obiektu
+        Quaternion rotation = transform.GetChild(0).rotation;
         for (int i = 0; i < labels.Length; i++)
         {
-            Vector3 localOffset = Vector3.up * labelOffset + Vector3.right * sideOffset;
-            Vector3 worldPosition = transform.TransformPoint(vertices[i]) + transform.rotation * localOffset;
+            Vector3 rotatedVertex = rotation * vertices[i];
+            Vector3 worldPosition = transform.TransformPoint(rotatedVertex) + Vector3.up * labelOffset;
             labels[i].transform.position = worldPosition;
-
-            // Use the object's rotation directly
-            labels[i].transform.rotation = transform.rotation;
-
-            //labels[i].transform.parent = transform;
+            labels[i].transform.rotation = rotation;
         }
     }
 
