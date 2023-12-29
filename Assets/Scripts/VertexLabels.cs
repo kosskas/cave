@@ -6,7 +6,7 @@ public class VertexLabels : MonoBehaviour
     public float sideOffset = 0.1f;
     Vector3[] vertices;
     GameObject[] labels;
-
+    public Camera cam;
 
     void Start()
     {
@@ -36,7 +36,9 @@ public class VertexLabels : MonoBehaviour
     void Update()
     {
         //Parametry obrotu dziecka MainObject czyli właściwego obiektu
+        //pod 0 musi być właściwy obiekt
         Quaternion rotation = transform.GetChild(0).rotation;
+        
         for (int i = 0; i < labels.Length; i++)
         {
             Vector3 rotatedVertex = rotation * vertices[i];
@@ -44,6 +46,10 @@ public class VertexLabels : MonoBehaviour
             labels[i].transform.position = worldPosition;
             labels[i].transform.rotation = rotation;
         }
+
+        //TODO
+        //literki mają patrzec na kamere
+        //labels[i].transform.LookAt(cam.transform);
     }
 
 }
