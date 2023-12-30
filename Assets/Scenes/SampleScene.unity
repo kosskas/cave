@@ -123,6 +123,7 @@ GameObject:
   - component: {fileID: 41631946}
   - component: {fileID: 41631947}
   - component: {fileID: 41631948}
+  - component: {fileID: 41631949}
   m_Layer: 0
   m_Name: MainObject
   m_TagString: Untagged
@@ -172,6 +173,17 @@ MonoBehaviour:
   labelOffset: 0.1
   sideOffset: 0.1
   cam: {fileID: 0}
+--- !u!114 &41631949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 41631945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22b5e944fbab6ca40bba3602a8bf6650, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &94058224
 GameObject:
   m_ObjectHideFlags: 0
@@ -820,7 +832,6 @@ GameObject:
   - component: {fileID: 1345401802}
   - component: {fileID: 1345401801}
   - component: {fileID: 1345401805}
-  - component: {fileID: 1345401806}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -908,17 +919,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 10
   camera: {fileID: 1607515905}
---- !u!114 &1345401806
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1345401800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22b5e944fbab6ca40bba3602a8bf6650, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1410560367
 GameObject:
   m_ObjectHideFlags: 0
