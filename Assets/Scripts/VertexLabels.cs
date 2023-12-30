@@ -4,10 +4,10 @@ public class VertexLabels : MonoBehaviour
 {
     public float labelOffset = 0.1f;
     public float sideOffset = 0.1f;
+    public Font font;
+    public Camera cam;
     Vector3[] vertices;
     GameObject[] labels;
-    public Camera cam;
-
     void Start()
     {
         MeshFilter meshFilter = GetComponentInChildren<MeshFilter>();
@@ -24,6 +24,7 @@ public class VertexLabels : MonoBehaviour
                 textMesh.text = ((char)('A' + i)).ToString();
                 textMesh.characterSize = 0.1f;
                 textMesh.color = Color.black;
+                textMesh.font = font;
                 labels[i] = label;
             }
         }
