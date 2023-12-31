@@ -8,11 +8,13 @@ public class VertexLabels : MonoBehaviour
     public Camera cam;
     Vector3[] vertices;
     GameObject[] labels;
+    GameObject player;
     void Start()
     {
+        player = GameObject.Find("FPSPlayer");
         MeshFilter meshFilter = GetComponentInChildren<MeshFilter>();
 
-        if (meshFilter != null)
+        if (meshFilter != null && player != null)
         {
             vertices = meshFilter.mesh.vertices;
             labels = new GameObject[vertices.Length / 3];
@@ -30,7 +32,7 @@ public class VertexLabels : MonoBehaviour
         }
         else
         {
-            Debug.LogError("MeshFilter component not found!");
+            Debug.LogError("Brak obiektów potrzebnych do działania VertexLabels.cs");
         }
     }
 
@@ -45,12 +47,11 @@ public class VertexLabels : MonoBehaviour
             Vector3 rotatedVertex = rotation * vertices[i];
             Vector3 worldPosition = transform.TransformPoint(rotatedVertex) + Vector3.up * labelOffset;
             labels[i].transform.position = worldPosition;
-            labels[i].transform.rotation = rotation;
-        }
+            Vector3 directionToPlayer = (player.transform.position - labels[i].transform.position).normalized;
 
-        //TODO
-        //literki mają patrzec na kamere
-        //labels[i].transform.LookAt(cam.transform);
+            //literki są twarzą do maincamery
+            labels[i].transform.rotation = Quaternion.LookRotation(-directionToPlayer);
+        }
     }
 
 }
