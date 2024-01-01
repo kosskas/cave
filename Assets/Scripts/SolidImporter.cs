@@ -18,6 +18,10 @@ public class LabeledVertex
         Label = label;
         Vertex = vertex;
     }
+
+	public Vector3 GetVertex() {
+		return Vertex;
+	}
 }
 
 
@@ -30,7 +34,9 @@ public class SolidImporter : MonoBehaviour {
 	private int currentSolidFileIndex;
 
 	List<LabeledVertex> vertices = new List<LabeledVertex>();
-	List<string> triangles = new List<string>();
+	List<int> triangles = new List<int>();
+
+	GameObject customSolid;
 	
 
 	// Use this for initialization
@@ -38,6 +44,8 @@ public class SolidImporter : MonoBehaviour {
 		solidFiles = Directory.GetFiles(pathToFolderWithSolids, solidFileExt);
 		currentSolidFileIndex = 0;
 
+		ReadSolid();
+		CreateSolid();
 		LogStatus();
 	}
 	
@@ -45,20 +53,23 @@ public class SolidImporter : MonoBehaviour {
 	void Update () {
 		if(Input.GetKeyDown("p"))
 		{
+			DeleteSolid();
+			ClearSolid();
 			PickNextSolid();
 			ReadSolid();
+			CreateSolid();
 			LogStatus();
 
-			Debug.Log("vertices");
-			foreach (var vertex in vertices)
-			{
-				Debug.Log($"Label: {vertex.Label}, Vertex: {vertex.Vertex}");
-			}
-			Debug.Log("faces");
-			for (int i = 0; i < triangles.Count; i += 3)
-			{
-				Debug.Log($"{triangles[i]} {triangles[i + 1]} {triangles[i + 2]}");
-			}
+			// Debug.Log("vertices");
+			// foreach (var vertex in vertices)
+			// {
+			// 	Debug.Log($"Label: {vertex.Label}, Vertex: {vertex.Vertex}");
+			// }
+			// Debug.Log("faces");
+			// for (int i = 0; i < triangles.Count; i += 3)
+			// {
+			// 	Debug.Log($"{triangles[i]} {triangles[i + 1]} {triangles[i + 2]}");
+			// }
 		}
 
 	}
@@ -90,15 +101,13 @@ public class SolidImporter : MonoBehaviour {
 	}
 
 	private void ClearSolid() {
-		vertices = new List<LabeledVertex>();
-		triangles = new List<string>();
+		vertices.Clear();
+		triangles.Clear();
 	}
 
 	private void ReadSolid() {
 		if (File.Exists(GetCurrentSolid()))
         {
-			ClearSolid();
-
             using (StreamReader reader = new StreamReader(GetCurrentSolid()))
             {
 				int part = 0;
@@ -130,6 +139,7 @@ public class SolidImporter : MonoBehaviour {
 		vertices.Add(new LabeledVertex(label, new Vector3(x, y, z)));
 	}
 
+	// ! O(n)
 	private void ReadFace(string line) {
 		string[] faceData = line.Trim().Split(',');
 
@@ -143,9 +153,56 @@ public class SolidImporter : MonoBehaviour {
 		//			n-2		|	0 n-2 n-1
 		for (int ithTriange = 1; ithTriange <= faceData.Length - 2; ithTriange++)
 		{
-			triangles.Add((faceData[0]));
-			triangles.Add((faceData[ithTriange]));
-			triangles.Add((faceData[ithTriange + 1]));
+			triangles.Add(CastLabelToIndex(faceData[0]));
+			triangles.Add(CastLabelToIndex(faceData[ithTriange]));
+			triangles.Add(CastLabelToIndex(faceData[ithTriange + 1]));
+
+			// triangles.Add(CastLabelToIndex(faceData[0]));
+			// triangles.Add(CastLabelToIndex(faceData[ithTriange + 1]));
+			// triangles.Add(CastLabelToIndex(faceData[ithTriange]));
 		}
+	}
+	
+	// ! O(n)
+	private int CastLabelToIndex(string label) {
+		int ithVertex = 0;
+
+		for (; ithVertex < vertices.Count; ithVertex++) {
+			if (vertices[ithVertex].Label == label) break;
+		}
+
+		return ithVertex;
+	}
+
+	private void CreateSolid() {
+
+		// Create a new mesh
+        Mesh mesh = new Mesh();
+        
+		mesh.vertices = vertices.ConvertAll(v => v.Vertex).ToArray();
+		mesh.triangles = triangles.ToArray();
+
+        // Recalculate normals and bounds
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+
+		// Create a new GameObject to hold the custom solid
+        customSolid = new GameObject("CustomSolid");
+
+        // Add a MeshFilter component to the GameObject
+        MeshFilter meshFilter = customSolid.AddComponent<MeshFilter>();
+
+        // Add a MeshRenderer component to the GameObject
+        MeshRenderer meshRenderer = customSolid.AddComponent<MeshRenderer>();
+
+        // Set the material for the MeshRenderer (you can create your own material or use an existing one)
+        meshRenderer.material = new Material(Shader.Find("Standard"));
+
+        // Assign the generated mesh to the MeshFilter
+        meshFilter.mesh = mesh;
+	}
+
+	private void DeleteSolid() {
+		Destroy(customSolid);
 	}
 }
