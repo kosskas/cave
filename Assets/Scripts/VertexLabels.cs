@@ -41,7 +41,7 @@ public class VertexLabels : MonoBehaviour
         }
     }
 
-    public void InitLabels(string[] newlabelsnames)
+    public void InitLabels(string[] labelsnames)
     {
         //jeśli był jakiś obiekt wcześniej to usuń dane o nim
         if(labels != null)
@@ -57,13 +57,28 @@ public class VertexLabels : MonoBehaviour
         {
             vertices = meshFilter.mesh.vertices;
             labels = new GameObject[vertices.Length / 3];
+            
+            if(labelsnames == null)
+            {
+                labelsnames = new string[labels.Length];
+                for(int i = 0;i < labelsnames.Length; i++)
+                {
+                    labelsnames[i] = ((char)('A' + i)).ToString();
+                }
+                //jeśli jest więcej
+                for(int i = 26; i < labelsnames.Length; i++)
+                {
+                    char first = (char)('A' + (i - 26 / 26));
+                    char second = (char)('A' +(i - 26 % 26));
+                    labelsnames[i] = $"{first}{second}";
+                }
+            }
 
             for (int i = 0; i < vertices.Length / 3; i++)
             {
                 GameObject label = new GameObject("VertexLabel" + i);
                 TextMesh textMesh = label.AddComponent<TextMesh>();
-                ///TODO Zmienić nazwy na zgodne z wczytywanym obiektem
-                textMesh.text = ((char)('A' + i)).ToString();
+                textMesh.text = labelsnames[i];
                 textMesh.characterSize = 0.1f;
                 textMesh.color = Color.black;
                 textMesh.font = font;
