@@ -1,38 +1,26 @@
 ﻿using UnityEngine;
 
+/*
+ * Obiekt tej klasy powinien rysować litery dopiero gdy SolidImporter załaduje kształt
+ * solidImporter wywołuje InitLabels
+ * VertexLabels vl = FindObjectOfType<VertexLabels>();
+*/
 public class VertexLabels : MonoBehaviour
 {
     public float labelOffset = 0.1f;
     public float sideOffset = 0.1f;
     public Font font;
     Vector3[] vertices;
-    GameObject[] labels;
+    GameObject[] labels = null;
     GameObject player;
     void Start()
     {
         player = GameObject.Find("FPSPlayer");
-        MeshFilter meshFilter = GetComponentInChildren<MeshFilter>();
-
-        if (meshFilter != null && player != null)
+        if (player == null)
         {
-            vertices = meshFilter.mesh.vertices;
-            labels = new GameObject[vertices.Length / 3];
-
-            for (int i = 0; i < vertices.Length / 3; i++)
-            {
-                GameObject label = new GameObject("VertexLabel" + i);
-                TextMesh textMesh = label.AddComponent<TextMesh>();
-                textMesh.text = ((char)('A' + i)).ToString();
-                textMesh.characterSize = 0.1f;
-                textMesh.color = Color.black;
-                textMesh.font = font;
-                labels[i] = label;
-            }
+            Debug.LogError("Brak obiektu FPSPlayer potrzebnego do działania VertexLabels.cs");
         }
-        else
-        {
-            Debug.LogError("Brak obiektów potrzebnych do działania VertexLabels.cs");
-        }
+        InitLabels(null); //Do wywalenia
     }
 
     void Update()
@@ -50,6 +38,41 @@ public class VertexLabels : MonoBehaviour
 
             //literki są twarzą do maincamery
             labels[i].transform.rotation = Quaternion.LookRotation(-directionToPlayer);
+        }
+    }
+
+    public void InitLabels(string[] newlabelsnames)
+    {
+        //jeśli był jakiś obiekt wcześniej to usuń dane o nim
+        if(labels != null)
+        {
+            for (int i = 0; i < labels.Length; i++)
+                Destroy(labels[i]);      
+            labels = null;
+        }
+
+        MeshFilter meshFilter = GetComponentInChildren<MeshFilter>();
+
+        if (meshFilter != null)
+        {
+            vertices = meshFilter.mesh.vertices;
+            labels = new GameObject[vertices.Length / 3];
+
+            for (int i = 0; i < vertices.Length / 3; i++)
+            {
+                GameObject label = new GameObject("VertexLabel" + i);
+                TextMesh textMesh = label.AddComponent<TextMesh>();
+                ///TODO Zmienić nazwy na zgodne z wczytywanym obiektem
+                textMesh.text = ((char)('A' + i)).ToString();
+                textMesh.characterSize = 0.1f;
+                textMesh.color = Color.black;
+                textMesh.font = font;
+                labels[i] = label;
+            }
+        }
+        else
+        {
+            Debug.LogError("Brak MeshFilter potrzebnego do działania VertexLabels.cs");
         }
     }
 
