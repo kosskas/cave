@@ -46,18 +46,18 @@ public class SolidImporter : MonoBehaviour {
 			CreateSolid();
 			SetAsMainObjChild();
 			LogStatus();
-
-			// Debug.Log("vertices");
-			// foreach (var vertex in vertices)
-			// {
-			// 	Debug.Log($"Label: {vertex.Label}, Vertex: {vertex.Vertex}");
-			// }
-			// Debug.Log("faces");
-			// for (int i = 0; i < triangles.Count; i += 3)
-			// {
-			// 	Debug.Log($"{triangles[i]} {triangles[i + 1]} {triangles[i + 2]}");
-			// }
-		}
+            
+            // Debug.Log("vertices");
+            // foreach (var vertex in vertices)
+            // {
+            // 	Debug.Log($"Label: {vertex.Label}, Vertex: {vertex.Vertex}");
+            // }
+            // Debug.Log("faces");
+            // for (int i = 0; i < triangles.Count; i += 3)
+            // {
+            // 	Debug.Log($"{triangles[i]} {triangles[i + 1]} {triangles[i + 2]}");
+            // }
+        }
 
 	}
 
@@ -180,10 +180,10 @@ public class SolidImporter : MonoBehaviour {
 
 	private void CreateSolid() {
 
-		// Create labeling object
-		//VertexLabels vl = FindObjectOfType<VertexLabels>();
-
-		// Create a new mesh
+        // Create labeling object
+        VertexLabels vl = FindObjectOfType<VertexLabels>();
+        
+        // Create a new mesh
         Mesh mesh = new Mesh();
         
 		mesh.vertices = vertices.ToArray();
@@ -208,11 +208,11 @@ public class SolidImporter : MonoBehaviour {
         // Assign the generated mesh to the MeshFilter
         meshFilter.mesh = mesh;
 
-		// Set labels
-		//string[] x = vertices.ConvertAll(v => v.Label).ToArray();
-		//Debug.Log(x.Length);
-		//vl.InitLabels(vertices.ConvertAll(v => v.Label).ToArray());
-	}
+        // Set labels
+        //string[] x = vertices.ConvertAll(v => v.Label).ToArray();
+        //Debug.Log(x.Length);
+        vl.InitLabels(meshFilter, labeledVertices);
+    }
 
 	private void DeleteSolid() {
 		Destroy(customSolid);
@@ -226,5 +226,10 @@ public class SolidImporter : MonoBehaviour {
 
 	private void SetAsMainObjChild() {
 		customSolid.transform.SetParent(mainObj.transform);
-	}
+        //???
+        //customSolid.transform.position = mainObj.transform.position;
+
+        //zeruje bo było (0,2,0) nie wiem czemu
+        customSolid.transform.localPosition = Vector3.zero;
+    }
 }
