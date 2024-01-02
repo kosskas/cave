@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /*
@@ -9,9 +10,8 @@ using UnityEngine;
 public class VertexLabels : MonoBehaviour
 {
     public float labelOffset = 0.1f;
-    public float sideOffset = 0.1f;
     public Font font;
-    Vector3[] vertices;
+    Vector3[] vertices = null;
     GameObject[] labels = null;
     GameObject player;
     void Start()
@@ -21,50 +21,55 @@ public class VertexLabels : MonoBehaviour
         {
             Debug.LogError("Brak obiektu FPSPlayer potrzebnego do działania VertexLabels.cs");
         }
-        InitLabels(null); //Do wywalenia
+        InitLabels(null,null); //Do wywalenia, chyba że statyczny obiekt będzie ładowany
     }
 
     void Update()
     {
-        if (Input.GetKey("v"))
+        //Parametry obrotu dziecka MainObject czyli właściwego obiektu
+        //pod 0 musi być właściwy obiekt
+        if (labels != null && vertices != null)
         {
-            InitLabels(null);
-        }
-        if (transform.childCount > 0)
-        {
-            //Parametry obrotu dziecka MainObject czyli właściwego obiektu
-            //pod 0 musi być właściwy obiekt
-            Quaternion rotation = transform.GetChild(0).rotation;
-
+            Transform obj = transform.GetChild(0);
+            Quaternion rotation = obj.rotation;
+            
             for (int i = 0; i < labels.Length; i++)
             {
-                Vector3 rotatedVertex = rotation * vertices[i];
-                Vector3 worldPosition = transform.TransformPoint(rotatedVertex) + Vector3.up * labelOffset;
+                Vector3 rotatedVertex = (rotation * vertices[i]);
+                //Vector3 worldPosition = transform.TransformPoint(rotatedVertex) +  Vector3.up * labelOffset;
+                Vector3 worldPosition = obj.TransformPoint(rotatedVertex) +  Vector3.up * labelOffset;
                 labels[i].transform.position = worldPosition;
                 Vector3 directionToPlayer = (player.transform.position - labels[i].transform.position).normalized;
 
                 //literki są twarzą do postaci gracza
                 labels[i].transform.rotation = Quaternion.LookRotation(-directionToPlayer);
             }
-        }
+        }      
     }
 
-    public void InitLabels(string[] labelsnames)
+    public void InitLabels(MeshFilter meshFilter, Dictionary<string, Vector3> labeledVertices)
     {
         ClearLabels();
-
-        MeshFilter meshFilter = GetComponentInChildren<MeshFilter>();
-
+        if(meshFilter == null)
+        {
+            meshFilter = GetComponentInChildren<MeshFilter>();
+        }
+    
         if (meshFilter != null)
         {
-            //vertices = meshFilter.mesh.vertices;
             vertices = GetUniqueVertices(meshFilter.mesh.vertices);
-            Debug.Log(vertices.Length);
+            //Debug.Log(vertices.Length);
             labels = new GameObject[vertices.Length];
-
-            if (labelsnames == null)
+            string[] labelsnames = null;
+            if (labeledVertices == null)
                 labelsnames = GetBaseLabels();
-
+            else
+            {
+                //labelsnames = ResolveLabels(labeledVertices);
+                ResolveLabels(labeledVertices);
+            }
+            labelsnames = GetBaseLabels();
+            
             for (int i = 0; i < labels.Length; i++)
             {
                 GameObject label = new GameObject("VertexLabel" + i);
@@ -75,12 +80,27 @@ public class VertexLabels : MonoBehaviour
                 textMesh.font = font;
                 labels[i] = label;
             }
+            
         }
         else
         {
             Debug.LogError("Brak MeshFilter potrzebnego do działania VertexLabels.cs");
         }
     }
+
+    void ResolveLabels(Dictionary<string, Vector3> labeledVertices)
+    {
+        int index = 0;
+        foreach (var pair in labeledVertices)
+        {
+            string key = pair.Key;
+            Vector3 value = pair.Value;
+
+            // Tutaj możesz wykonywać operacje dla każdej pary klucz-wartość
+            Debug.Log($"Key: {key}, Value: {value}");
+        }
+    }
+
     string[] GetBaseLabels()
     {
         int MAXLABELSNUMBER = 50; //max liczba wierzchołków do nazwania
@@ -122,6 +142,11 @@ public class VertexLabels : MonoBehaviour
         }
         Vector3[] uniquevertices = new Vector3[set.Count];
         set.CopyTo(uniquevertices);
+        Debug.Log("Vectives");
+        for (int i = 0; i < uniquevertices.Length; i++)
+        {
+            Debug.Log(uniquevertices[i].ToString());
+        }
         return uniquevertices;
     }
 }
