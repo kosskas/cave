@@ -7,24 +7,6 @@ using System.Text;
 using System.Globalization;
 
 
-// Define tuple-like class
-public class LabeledVertex
-{
-    public string Label { get; set; }
-    public Vector3 Vertex { get; set; }
-
-    public LabeledVertex(string label, Vector3 vertex)
-    {
-        Label = label;
-        Vertex = vertex;
-    }
-
-	public Vector3 GetVertex() {
-		return Vertex;
-	}
-}
-
-
 public class SolidImporter : MonoBehaviour {
 
 	private const string pathToFolderWithSolids = "./Assets/Figures3D";
@@ -33,31 +15,36 @@ public class SolidImporter : MonoBehaviour {
 	private string[] solidFiles;
 	private int currentSolidFileIndex;
 
-	List<LabeledVertex> vertices = new List<LabeledVertex>();
-	List<int> triangles = new List<int>();
+	private Dictionary<string, Vector3> labeledVertices = new Dictionary<string, Vector3>();
+	private List<List<string>> faces = new List<List<string>>();
 
-	GameObject customSolid;
+	private List<Vector3> vertices = new List<Vector3>();
+	private List<int> triangles = new List<int>();
+
+	private GameObject customSolid;
+	private GameObject mainObj;
 	
 
 	// Use this for initialization
 	void Start () {
+		mainObj = GameObject.Find("MainObject");
 		solidFiles = Directory.GetFiles(pathToFolderWithSolids, solidFileExt);
 		currentSolidFileIndex = 0;
-
-		ReadSolid();
-		CreateSolid();
-		LogStatus();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if(Input.GetKeyDown("p"))
 		{
+			DeleteMainObjChild();
 			DeleteSolid();
 			ClearSolid();
 			PickNextSolid();
 			ReadSolid();
+			SetUpVertices();
+			SetUpTriangles();
 			CreateSolid();
+			SetAsMainObjChild();
 			LogStatus();
 
 			// Debug.Log("vertices");
@@ -101,6 +88,8 @@ public class SolidImporter : MonoBehaviour {
 	}
 
 	private void ClearSolid() {
+		labeledVertices.Clear();
+		faces.Clear();
 		vertices.Clear();
 		triangles.Clear();
 	}
@@ -136,50 +125,68 @@ public class SolidImporter : MonoBehaviour {
 		float y = float.Parse(vertexData[2], CultureInfo.InvariantCulture);
 		float z = float.Parse(vertexData[3], CultureInfo.InvariantCulture);
 
-		vertices.Add(new LabeledVertex(label, new Vector3(x, y, z)));
+		labeledVertices[label] = new Vector3(x, y, z);
 	}
 
-	// ! O(n)
 	private void ReadFace(string line) {
 		string[] faceData = line.Trim().Split(',');
 
-		// face is a sequence of vertices indexed from 0 to n-1
-		// used algorithm to cover face with minimal number of trangles without intersected areas
-		// - ith triangle - | - list of vertex indexes -
-		// 			1		|	0 1 2
-		//			2		|	0 2 3
-		//			3		|	0 3 4
-		//			...		|	...
-		//			n-2		|	0 n-2 n-1
-		for (int ithTriange = 1; ithTriange <= faceData.Length - 2; ithTriange++)
-		{
-			triangles.Add(CastLabelToIndex(faceData[0]));
-			triangles.Add(CastLabelToIndex(faceData[ithTriange]));
-			triangles.Add(CastLabelToIndex(faceData[ithTriange + 1]));
+		List<string> face = new List<string>();
+		Array.ForEach(faceData, label => face.Add(label));
 
-			// triangles.Add(CastLabelToIndex(faceData[0]));
-			// triangles.Add(CastLabelToIndex(faceData[ithTriange + 1]));
-			// triangles.Add(CastLabelToIndex(faceData[ithTriange]));
-		}
+		faces.Add(face);
 	}
-	
-	// ! O(n)
-	private int CastLabelToIndex(string label) {
-		int ithVertex = 0;
 
-		for (; ithVertex < vertices.Count; ithVertex++) {
-			if (vertices[ithVertex].Label == label) break;
-		}
+	/*  SetUpVertices()
+	* each face is given its own exclusive set of vertices
+	*/// O(n)
+	private void SetUpVertices() {
+		faces.ForEach( face => face.ForEach( label => vertices.Add(labeledVertices[label])));
+	}
 
-		return ithVertex;
+	/*  SetUpTriangles() 
+	* face is a sequence of n vertices indexed from 0 to n-1
+	* used algorithm to cover face with minimal number of trangles without intersected areas:
+	* - i-th triangle - | - indexes -
+	* 			1		|	0 1 2
+	*			2		|	0 2 3
+	*			3		|	0 3 4
+	*			...		|	...
+	*			n-2		|	0 n-2 n-1
+	*/// O(n)
+	private void SetUpTriangles() {
+		int startVertexIndex = 0;
+
+		faces.ForEach( face => {
+			const int firstVertexOffset = 0;
+			int secondVertexOffset = 1;
+			int thirdVertexOffset = 2;
+
+			for (int ithTriangle = 1; ithTriangle <= face.Count - 2; ithTriangle++)
+			{
+				triangles.AddRange(new List<int>{
+					startVertexIndex + firstVertexOffset,
+					startVertexIndex + secondVertexOffset,
+					startVertexIndex + thirdVertexOffset
+				});
+
+				secondVertexOffset++;
+				thirdVertexOffset++;
+			}
+
+			startVertexIndex += face.Count;
+		});
 	}
 
 	private void CreateSolid() {
 
+		// Create labeling object
+		//VertexLabels vl = FindObjectOfType<VertexLabels>();
+
 		// Create a new mesh
         Mesh mesh = new Mesh();
         
-		mesh.vertices = vertices.ConvertAll(v => v.Vertex).ToArray();
+		mesh.vertices = vertices.ToArray();
 		mesh.triangles = triangles.ToArray();
 
         // Recalculate normals and bounds
@@ -200,9 +207,24 @@ public class SolidImporter : MonoBehaviour {
 
         // Assign the generated mesh to the MeshFilter
         meshFilter.mesh = mesh;
+
+		// Set labels
+		//string[] x = vertices.ConvertAll(v => v.Label).ToArray();
+		//Debug.Log(x.Length);
+		//vl.InitLabels(vertices.ConvertAll(v => v.Label).ToArray());
 	}
 
 	private void DeleteSolid() {
 		Destroy(customSolid);
+	}
+
+	private void DeleteMainObjChild() {
+		if (mainObj.transform.childCount > 0) {
+			Destroy(mainObj.transform.GetChild(0).gameObject);
+		}
+	}
+
+	private void SetAsMainObjChild() {
+		customSolid.transform.SetParent(mainObj.transform);
 	}
 }

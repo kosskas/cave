@@ -1,19 +1,19 @@
 ###
-A 3 3 3
-B 2 3 3
-C 2 2 3
-D 3 2 3
-E 3 3 2
-F 2 3 2
-G 2 2 2
-H 3 2 2
+A 2 2 2
+B 2 2 3
+C 2 3 2
+D 2 3 3
+E 3 2 2
+F 3 2 3
+G 3 3 2
+H 3 3 3
 
 ###
-A,B,C,D
-E,F,G,H
-A,B,F,E
-B,C,G,F
+B,D,C,A
+A,C,G,E
+E,G,H,F
+F,H,D,B
 C,D,H,G
-D,A,E,H
+B,A,E,F
 
 ###
