@@ -32,7 +32,8 @@ public class VertexLabels : MonoBehaviour
         if (labels != null && vertices != null)
         {
             Transform obj = transform.GetChild(0);
-            Quaternion rotation = obj.rotation;
+            //Quaternion rotation = obj.rotation;
+            Quaternion rotation = transform.rotation;
             
             for (int i = 0; i < labels.Length; i++)
             {
