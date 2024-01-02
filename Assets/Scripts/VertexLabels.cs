@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 /*
  * Obiekt tej klasy powinien rysować litery dopiero gdy SolidImporter załaduje kształt
@@ -37,7 +38,7 @@ public class VertexLabels : MonoBehaviour
 
             for (int i = 0; i < labels.Length; i++)
             {
-                Vector3 rotatedVertex = rotation * vertices[3*i];
+                Vector3 rotatedVertex = rotation * vertices[i];
                 Vector3 worldPosition = transform.TransformPoint(rotatedVertex) + Vector3.up * labelOffset;
                 labels[i].transform.position = worldPosition;
                 Vector3 directionToPlayer = (player.transform.position - labels[i].transform.position).normalized;
@@ -50,23 +51,18 @@ public class VertexLabels : MonoBehaviour
 
     public void InitLabels(string[] labelsnames)
     {
-        //jeśli był jakiś obiekt wcześniej to usuń dane o nim
-        if(labels != null)
-        {
-            for (int i = 0; i < labels.Length; i++)
-                Destroy(labels[i]);      
-            labels = null;
-        }
+        ClearLabels();
 
         MeshFilter meshFilter = GetComponentInChildren<MeshFilter>();
 
         if (meshFilter != null)
         {
-            vertices = meshFilter.mesh.vertices;
+            //vertices = meshFilter.mesh.vertices;
+            vertices = GetUniqueVertices(meshFilter.mesh.vertices);
             Debug.Log(vertices.Length);
-            labels = new GameObject[vertices.Length / 3];
-            
-            if(labelsnames == null)
+            labels = new GameObject[vertices.Length];
+
+            if (labelsnames == null)
                 labelsnames = GetBaseLabels();
 
             for (int i = 0; i < labels.Length; i++)
@@ -105,5 +101,28 @@ public class VertexLabels : MonoBehaviour
         return labelsnames;
     }
 
+    void ClearLabels()
+    {
+        //jeśli był jakiś obiekt wcześniej to usuń dane o nim
+        if (labels != null)
+        {
+            for (int i = 0; i < labels.Length; i++)
+                Destroy(labels[i]);
+            labels = null;
+        }
+    
+    }
+
+    Vector3[] GetUniqueVertices(Vector3[] meshVertices)
+    {
+        HashSet<Vector3> set = new HashSet<Vector3>();
+        for (int i = 0; i < meshVertices.Length; i++)
+        {
+            set.Add(meshVertices[i]);
+        }
+        Vector3[] uniquevertices = new Vector3[set.Count];
+        set.CopyTo(uniquevertices);
+        return uniquevertices;
+    }
 }
 
