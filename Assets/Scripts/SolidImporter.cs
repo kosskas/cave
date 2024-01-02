@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Globalization;
-
+using System.Linq;
 
 public class SolidImporter : MonoBehaviour {
 
@@ -41,6 +41,7 @@ public class SolidImporter : MonoBehaviour {
 			ClearSolid();
 			PickNextSolid();
 			ReadSolid();
+			CentralizePosition();
 			SetUpVertices();
 			SetUpTriangles();
 			CreateSolid();
@@ -135,6 +136,21 @@ public class SolidImporter : MonoBehaviour {
 		Array.ForEach(faceData, label => face.Add(label));
 
 		faces.Add(face);
+	}
+
+	// O(2n)
+	private void CentralizePosition() {
+		Vector3 centerPoint = new Vector3(0, 0, 0);
+		int n = labeledVertices.Count;
+
+		foreach(Vector3 vertex in labeledVertices.Values)
+		{
+			centerPoint += vertex;
+		}
+
+		centerPoint /= n;
+
+		labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => entry.Value - centerPoint);
 	}
 
 	/*  SetUpVertices()
