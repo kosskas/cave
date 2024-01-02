@@ -226,5 +226,10 @@ public class SolidImporter : MonoBehaviour {
 
 	private void SetAsMainObjChild() {
 		customSolid.transform.SetParent(mainObj.transform);
+        //???
+        //customSolid.transform.position = mainObj.transform.position;
+
+        //zeruje bo było (0,2,0) nie wiem czemu
+        customSolid.transform.localPosition = Vector3.zero;
     }
 }
