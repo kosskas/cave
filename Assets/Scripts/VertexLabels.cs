@@ -25,6 +25,10 @@ public class VertexLabels : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKey("v"))
+        {
+            InitLabels(null);
+        }
         //Parametry obrotu dziecka MainObject czyli właściwego obiektu
         //pod 0 musi być właściwy obiekt
         Quaternion rotation = transform.GetChild(0).rotation;
