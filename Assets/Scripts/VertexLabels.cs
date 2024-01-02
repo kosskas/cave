@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /*
@@ -65,10 +66,9 @@ public class VertexLabels : MonoBehaviour
                 labelsnames = GetBaseLabels();
             else
             {
-                //labelsnames = ResolveLabels(labeledVertices);
-                ResolveLabels(labeledVertices);
+                labelsnames = ResolveLabels(labeledVertices);
             }
-            labelsnames = GetBaseLabels();
+           // labelsnames = GetBaseLabels();
             
             for (int i = 0; i < labels.Length; i++)
             {
@@ -88,17 +88,22 @@ public class VertexLabels : MonoBehaviour
         }
     }
 
-    void ResolveLabels(Dictionary<string, Vector3> labeledVertices)
+    string[] ResolveLabels(Dictionary<string, Vector3> labeledVertices)
     {
-        int index = 0;
+        Dictionary<Vector3, string> resolver = new Dictionary<Vector3, string>();
         foreach (var pair in labeledVertices)
         {
             string key = pair.Key;
             Vector3 value = pair.Value;
-
-            // Tutaj możesz wykonywać operacje dla każdej pary klucz-wartość
-            Debug.Log($"Key: {key}, Value: {value}");
+            resolver.Add(value, key);
+            //Debug.Log($"Key: {key}, Value: {value}");
         }
+        string[] names = new string[vertices.Length];
+        for(int i = 0; i < names.Length; i++)
+        {
+            names[i] = resolver[vertices[i]];
+        }
+        return names;
     }
 
     string[] GetBaseLabels()
