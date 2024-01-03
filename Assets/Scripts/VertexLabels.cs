@@ -10,7 +10,7 @@ using UnityEngine;
 */
 public class VertexLabels : MonoBehaviour
 {
-    public float labelOffset = 0.1f;
+    public float labelOffset = 1.0f;
     public Font font;
     Vector3[] vertices = null;
     GameObject[] labels = null;
@@ -37,7 +37,7 @@ public class VertexLabels : MonoBehaviour
             
             for (int i = 0; i < labels.Length; i++)
             {
-                Vector3 rotatedVertex = (rotation * vertices[i]);
+                Vector3 rotatedVertex = rotation * vertices[i] * (labelOffset);
                 Vector3 worldPosition = transform.TransformPoint(rotatedVertex);//+  Vector3.up * labelOffset;
                 //Vector3 worldPosition = obj.TransformPoint(rotatedVertex) +  Vector3.up * labelOffset;
                 labels[i].transform.position = worldPosition;
