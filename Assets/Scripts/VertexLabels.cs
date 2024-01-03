@@ -10,8 +10,11 @@ using UnityEngine;
 */
 public class VertexLabels : MonoBehaviour
 {
-    public float labelOffset = 1.0f;
-    public Font font;
+    [SerializeField] float labelOffset = 1.0f;
+    [SerializeField] Font font;
+    [SerializeField] Color color = Color.black;
+    [SerializeField] float characterSize = 0.1f;
+
     Vector3[] vertices = null;
     GameObject[] labels = null;
     GameObject player;
@@ -79,8 +82,8 @@ public class VertexLabels : MonoBehaviour
                 GameObject label = new GameObject("VertexLabel" + i);
                 TextMesh textMesh = label.AddComponent<TextMesh>();
                 textMesh.text = labelsnames[i];
-                textMesh.characterSize = 0.1f;
-                textMesh.color = Color.black;
+                textMesh.characterSize = characterSize;
+                textMesh.color = color;
                 textMesh.font = font;
                 labels[i] = label;
             }
