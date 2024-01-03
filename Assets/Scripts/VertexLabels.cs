@@ -29,7 +29,7 @@ public class VertexLabels : MonoBehaviour
     {
         //Parametry obrotu dziecka MainObject czyli właściwego obiektu
         //pod 0 musi być właściwy obiekt
-        if (labels != null && vertices != null)
+        if (transform.childCount > 0 && labels != null && vertices != null)
         {
             Transform obj = transform.GetChild(0);
             //Quaternion rotation = obj.rotation;
@@ -46,7 +46,11 @@ public class VertexLabels : MonoBehaviour
                 //literki są twarzą do postaci gracza
                 labels[i].transform.rotation = Quaternion.LookRotation(-directionToPlayer);
             }
-        }      
+        }
+        else
+        {
+            ClearLabels();
+        }
     }
 
     public void InitLabels(MeshFilter meshFilter, Dictionary<string, Vector3> labeledVertices)
@@ -148,11 +152,13 @@ public class VertexLabels : MonoBehaviour
         }
         Vector3[] uniquevertices = new Vector3[set.Count];
         set.CopyTo(uniquevertices);
+        /*
         Debug.Log("Vectives");
         for (int i = 0; i < uniquevertices.Length; i++)
         {
             Debug.Log(uniquevertices[i].ToString());
         }
+        */
         return uniquevertices;
     }
 }
