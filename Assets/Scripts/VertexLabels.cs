@@ -112,20 +112,21 @@ public class VertexLabels : MonoBehaviour
 
     string[] GetBaseLabels()
     {
-        int MAXLABELSNUMBER = 50; //max liczba wierzchołków do nazwania
-        //teoretyczna max liczba dla tego algorytmu to 26+26*26 = 702 wierzchołków
-        
+        int MAXLABELSNUMBER = labels.Length; //max liczba wierzchołków do nazwania
+      
         string[] labelsnames = new string[MAXLABELSNUMBER];
-        for (int i = 0; i < labelsnames.Length; i++)
+        
+        for(int i = 0; i < labelsnames.Length; i++ )
         {
-            labelsnames[i] = ((char)('A' + i)).ToString();
-        }
-        //jeśli jest więcej
-        for (int i = 26; i < labelsnames.Length; i++)
-        {
-            char first = (char)('A' + (i - 26 / 26));
-            char second = (char)('A' + (i - 26 % 26));
-            labelsnames[i] = $"{first}{second}";
+            int n = i+1;
+            string name = "";
+            do
+            {
+                n--;
+                name = ((char)('A'+n%26)).ToString() + name;
+                n /= 26;
+            } while (n > 0);
+            labelsnames[i] = name;
         }
         return labelsnames;
     }
