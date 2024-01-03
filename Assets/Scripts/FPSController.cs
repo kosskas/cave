@@ -23,7 +23,7 @@ public class FPSController : MonoBehaviour
 
     void Start()
     {
-        characterController = GetComponent<CharacterController>();
+        characterController = GetComponentInChildren<CharacterController>();
         playerCamera = GetComponentInChildren<Camera>();
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
