@@ -32,17 +32,17 @@ public class VertexLabels : MonoBehaviour
         if (transform.childCount > 0 && labels != null && vertices != null)
         {
             Transform obj = transform.GetChild(0);
-            //Quaternion rotation = obj.rotation;
-            Quaternion rotation = transform.rotation;
+            Quaternion rotation = obj.rotation;
+            //Quaternion rotation = transform.rotation;
             
             for (int i = 0; i < labels.Length; i++)
             {
                 Vector3 rotatedVertex = (rotation * vertices[i]);
-                //Vector3 worldPosition = transform.TransformPoint(rotatedVertex) +  Vector3.up * labelOffset;
-                Vector3 worldPosition = obj.TransformPoint(rotatedVertex) +  Vector3.up * labelOffset;
+                Vector3 worldPosition = transform.TransformPoint(rotatedVertex);//+  Vector3.up * labelOffset;
+                //Vector3 worldPosition = obj.TransformPoint(rotatedVertex) +  Vector3.up * labelOffset;
                 labels[i].transform.position = worldPosition;
-                Vector3 directionToPlayer = (player.transform.position - labels[i].transform.position).normalized;
-
+                Vector3 directionToPlayer = (player.transform.position- labels[i].transform.position).normalized;
+                //+Vector3.up ?
                 //literki są twarzą do postaci gracza
                 labels[i].transform.rotation = Quaternion.LookRotation(-directionToPlayer);
             }
