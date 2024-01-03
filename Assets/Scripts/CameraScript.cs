@@ -5,7 +5,7 @@ using UnityEngine;
 public class CameraScript : MonoBehaviour {
 
 	[SerializeField] GameObject cam1; //moving cam
-	[SerializeField] GameObject cam2; //static cam
+	public GameObject cam2; //static cam
 	[SerializeField] FPSController controller;
 	// Use this for initialization
 	void Start () {

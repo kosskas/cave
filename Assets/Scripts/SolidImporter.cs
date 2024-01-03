@@ -23,6 +23,8 @@ public class SolidImporter : MonoBehaviour {
 
 	private GameObject customSolid;
 	private GameObject mainObj;
+
+	
 	
 
 	// Use this for initialization
@@ -46,6 +48,8 @@ public class SolidImporter : MonoBehaviour {
 			SetUpTriangles();
 			CreateSolid();
 			SetAsMainObjChild();
+			AddCamera();
+			AddCollider();
 			LogStatus();
             
             // Debug.Log("vertices");
@@ -228,6 +232,9 @@ public class SolidImporter : MonoBehaviour {
         //string[] x = vertices.ConvertAll(v => v.Label).ToArray();
         //Debug.Log(x.Length);
         vl.InitLabels(meshFilter, labeledVertices);
+
+
+		
     }
 
 	private void DeleteSolid() {
@@ -247,5 +254,19 @@ public class SolidImporter : MonoBehaviour {
 
         //zeruje bo było (0,2,0) nie wiem czemu
         customSolid.transform.localPosition = Vector3.zero;
+    }
+
+	private void AddCamera() {
+		GameObject camObject = GameObject.Find("CameraObject");
+		CameraScript camScript = camObject.GetComponent<CameraScript>();
+		GameObject staticCam = camScript.cam2;
+		ObjectRotator rotator = customSolid.AddComponent<ObjectRotator>();
+		rotator.cam = staticCam.GetComponent<Camera>();
+
+	}
+
+	private void AddCollider()
+    {
+		MeshCollider meshColl = customSolid.AddComponent<MeshCollider>();
     }
 }
