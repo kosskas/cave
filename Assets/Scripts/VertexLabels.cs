@@ -31,6 +31,7 @@ public class VertexLabels : MonoBehaviour
         //pod 0 musi być właściwy obiekt
         if (transform.childCount > 0 && labels != null && vertices != null)
         {
+            //założenie że mesh jest wyśrodkowany wzgl 0,0,0, jeśli nie to dwie linie odkomentować
             Transform obj = transform.GetChild(0);
             Quaternion rotation = obj.rotation;
             //Quaternion rotation = transform.rotation;
@@ -38,11 +39,10 @@ public class VertexLabels : MonoBehaviour
             for (int i = 0; i < labels.Length; i++)
             {
                 Vector3 rotatedVertex = rotation * vertices[i] * (labelOffset);
-                Vector3 worldPosition = transform.TransformPoint(rotatedVertex);//+  Vector3.up * labelOffset;
-                //Vector3 worldPosition = obj.TransformPoint(rotatedVertex) +  Vector3.up * labelOffset;
+                Vector3 worldPosition = transform.TransformPoint(rotatedVertex);
+                //Vector3 worldPosition = obj.TransformPoint(rotatedVertex);
                 labels[i].transform.position = worldPosition;
-                Vector3 directionToPlayer = (player.transform.position- labels[i].transform.position).normalized;
-                //+Vector3.up ?
+                Vector3 directionToPlayer = (player.transform.position + 2*Vector3.up - labels[i].transform.position).normalized;
                 //literki są twarzą do postaci gracza
                 labels[i].transform.rotation = Quaternion.LookRotation(-directionToPlayer);
             }
@@ -73,8 +73,7 @@ public class VertexLabels : MonoBehaviour
             {
                 labelsnames = ResolveLabels(labeledVertices);
             }
-           // labelsnames = GetBaseLabels();
-            
+          
             for (int i = 0; i < labels.Length; i++)
             {
                 GameObject label = new GameObject("VertexLabel" + i);
