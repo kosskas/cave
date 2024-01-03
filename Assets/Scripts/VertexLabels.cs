@@ -46,7 +46,11 @@ public class VertexLabels : MonoBehaviour
                 //literki są twarzą do postaci gracza
                 labels[i].transform.rotation = Quaternion.LookRotation(-directionToPlayer);
             }
-        }      
+        }
+        else
+        {
+            ClearLabels();
+        }
     }
 
     public void InitLabels(MeshFilter meshFilter, Dictionary<string, Vector3> labeledVertices)
