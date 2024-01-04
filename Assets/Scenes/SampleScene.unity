@@ -155,8 +155,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e12a8a3dab468234190c00da309637dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  labelOffset: 1
+  labelOffset: 0
   font: {fileID: 0}
+  color: {r: 0, g: 0, b: 0, a: 1}
+  characterSize: 0.1
 --- !u!114 &41631949
 MonoBehaviour:
   m_ObjectHideFlags: 0

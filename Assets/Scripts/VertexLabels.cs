@@ -10,10 +10,10 @@ using UnityEngine;
 */
 public class VertexLabels : MonoBehaviour
 {
-    [SerializeField] float labelOffset = 1.0f;
-    [SerializeField] Font font;
-    [SerializeField] Color color = Color.black;
-    [SerializeField] float characterSize = 0.1f;
+    [SerializeField] public float labelOffset = 0.0f;
+    [SerializeField] public Font font;
+    [SerializeField] public Color color = Color.black;
+    [SerializeField] public float characterSize = 0.1f;
 
     Vector3[] vertices = null;
     GameObject[] labels = null;
@@ -41,7 +41,7 @@ public class VertexLabels : MonoBehaviour
             
             for (int i = 0; i < labels.Length; i++)
             {
-                Vector3 rotatedVertex = rotation * vertices[i] * (labelOffset);
+                Vector3 rotatedVertex = rotation * vertices[i] * (1.0f+labelOffset);
                 Vector3 worldPosition = transform.TransformPoint(rotatedVertex);
                 //Vector3 worldPosition = obj.TransformPoint(rotatedVertex);
                 labels[i].transform.position = worldPosition;
@@ -163,6 +163,13 @@ public class VertexLabels : MonoBehaviour
         }
         */
         return uniquevertices;
+    }
+    public void SetVars(float labelOffset, Font font, Color color, float characterSize)
+    {
+        this.labelOffset = labelOffset;
+        this.font = font;
+        this.color = color;
+        this.characterSize = characterSize;
     }
 }
 
