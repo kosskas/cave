@@ -10,7 +10,7 @@ using UnityEngine;
 */
 public class VertexLabels : MonoBehaviour
 {
-    [SerializeField] float labelOffset = 1.0f;
+    [SerializeField] float labelOffset = 0.0f;
     [SerializeField] Font font;
     [SerializeField] Color color = Color.black;
     [SerializeField] float characterSize = 0.1f;
@@ -41,7 +41,7 @@ public class VertexLabels : MonoBehaviour
             
             for (int i = 0; i < labels.Length; i++)
             {
-                Vector3 rotatedVertex = rotation * vertices[i] * (labelOffset);
+                Vector3 rotatedVertex = rotation * vertices[i] * (1.0f+labelOffset);
                 Vector3 worldPosition = transform.TransformPoint(rotatedVertex);
                 //Vector3 worldPosition = obj.TransformPoint(rotatedVertex);
                 labels[i].transform.position = worldPosition;
