@@ -164,5 +164,12 @@ public class VertexLabels : MonoBehaviour
         */
         return uniquevertices;
     }
+    public void SetVars(float labelOffset, Font font, Color color, float characterSize)
+    {
+        this.labelOffset = labelOffset;
+        this.font = font;
+        this.color = color;
+        this.characterSize = characterSize;
+    }
 }
 
