@@ -10,10 +10,10 @@ using UnityEngine;
 */
 public class VertexLabels : MonoBehaviour
 {
-    [SerializeField] float labelOffset = 0.0f;
-    [SerializeField] Font font;
-    [SerializeField] Color color = Color.black;
-    [SerializeField] float characterSize = 0.1f;
+    [SerializeField] public float labelOffset = 0.0f;
+    [SerializeField] public Font font;
+    [SerializeField] public Color color = Color.black;
+    [SerializeField] public float characterSize = 0.1f;
 
     Vector3[] vertices = null;
     GameObject[] labels = null;
