@@ -30,20 +30,17 @@ public class VertexLabels : MonoBehaviour
 
     void Update()
     {
-        //Parametry obrotu dziecka MainObject czyli właściwego obiektu
-        //pod 0 musi być właściwy obiekt
         if (labels != null && vertices != null)
         {
             //założenie że mesh jest wyśrodkowany wzgl 0,0,0, jeśli nie to dwie linie odkomentować
-           // Transform obj = transform.GetChild(0);
             //Quaternion rotation = obj.rotation;
             //Quaternion rotation = transform.rotation;
             
             for (int i = 0; i < labels.Length; i++)
             {
+                ///było rotation* vertices[i] ale już nie musi bo dziedziczy bo customSolid
                 Vector3 rotatedVertex = vertices[i] * (1.0f+labelOffset);
                 Vector3 worldPosition = transform.TransformPoint(rotatedVertex);
-                //Vector3 worldPosition = obj.TransformPoint(rotatedVertex);
                 labels[i].transform.position = worldPosition;
                 Vector3 directionToPlayer = (player.transform.position + 2*Vector3.up - labels[i].transform.position).normalized;
                 //literki są twarzą do postaci gracza
@@ -86,6 +83,8 @@ public class VertexLabels : MonoBehaviour
                 textMesh.color = color;
                 textMesh.font = font;
                 labels[i] = label;
+
+                ///podepnij pod wczytany obiekt
                 labels[i].transform.SetParent(gameObject.transform);
             }
             
@@ -156,13 +155,6 @@ public class VertexLabels : MonoBehaviour
         }
         Vector3[] uniquevertices = new Vector3[set.Count];
         set.CopyTo(uniquevertices);
-        /*
-        Debug.Log("Vectives");
-        for (int i = 0; i < uniquevertices.Length; i++)
-        {
-            Debug.Log(uniquevertices[i].ToString());
-        }
-        */
         return uniquevertices;
     }
     public void SetVars(float labelOffset, Font font, Color color, float characterSize)
