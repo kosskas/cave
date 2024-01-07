@@ -32,13 +32,10 @@ public class VertexLabels : MonoBehaviour
     {
         if (labels != null && vertices != null)
         {
-            //założenie że mesh jest wyśrodkowany wzgl 0,0,0, jeśli nie to dwie linie odkomentować
-            //Quaternion rotation = obj.rotation;
             //Quaternion rotation = transform.rotation;
-            
+            ///NOTE: Rezygnacja z używania Rotation bo labele są dziećmi CustomSolid
             for (int i = 0; i < labels.Length; i++)
             {
-                ///było rotation* vertices[i] ale już nie musi bo dziedziczy bo customSolid
                 Vector3 rotatedVertex = vertices[i] * (1.0f+labelOffset);
                 Vector3 worldPosition = transform.TransformPoint(rotatedVertex);
                 labels[i].transform.position = worldPosition;
