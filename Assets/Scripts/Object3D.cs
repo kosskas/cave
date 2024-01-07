@@ -21,6 +21,7 @@ public class Object3D : MonoBehaviour {
 		this.labeledVertices = labeledVertices;
 		CreateMesh();
 		AddVertexLabels();
+		AddCamera();
 	}
     private void CreateMesh() {
         // Create a new mesh
@@ -50,6 +51,13 @@ public class Object3D : MonoBehaviour {
 		VertexLabels vl = gameObject.AddComponent<VertexLabels>();
 		vl.InitLabels(meshFilter, labeledVertices);	
     }
-	
+	private void AddCamera(){
+		//Dodanie kamery potrzebnej do obracania
+		GameObject camObject = GameObject.Find("CameraObject");
+		CameraScript camScript = camObject.GetComponent<CameraScript>();
+		GameObject staticCam = camScript.cam2;
+		ObjectRotator rotator = gameObject.AddComponent<ObjectRotator>();
+		rotator.cam = staticCam.GetComponent<Camera>();
+	}
 
 }
