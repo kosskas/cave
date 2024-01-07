@@ -45,6 +45,9 @@ public class Object3D : MonoBehaviour {
 
         // Assign the generated mesh to the MeshFilter
         meshFilter.mesh = mesh;
+
+		//Dodanie collidera potrzebnego do obracania
+		MeshCollider meshColl = gameObject.AddComponent<MeshCollider>();
     }
     private void AddVertexLabels() {
         //Dodanie oznaczeń i wyświetlanie wierzchołków
