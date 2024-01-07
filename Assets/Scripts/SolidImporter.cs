@@ -35,7 +35,7 @@ public class SolidImporter : MonoBehaviour {
 	void Update () {
 		if(Input.GetKeyDown("p"))
 		{
-			//DeleteMainObjChild();
+			DeleteMainObjChild();
 			DeleteSolid();
 			ClearSolid();
 			PickNextSolid();
