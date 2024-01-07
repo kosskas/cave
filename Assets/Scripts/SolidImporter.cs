@@ -24,9 +24,6 @@ public class SolidImporter : MonoBehaviour {
 	private GameObject customSolid;
 	private GameObject mainObj;
 
-	
-	
-
 	// Use this for initialization
 	void Start () {
 		mainObj = GameObject.Find("MainObject");
@@ -38,7 +35,7 @@ public class SolidImporter : MonoBehaviour {
 	void Update () {
 		if(Input.GetKeyDown("p"))
 		{
-			DeleteMainObjChild();
+			//DeleteMainObjChild();
 			DeleteSolid();
 			ClearSolid();
 			PickNextSolid();
@@ -46,12 +43,9 @@ public class SolidImporter : MonoBehaviour {
 			CentralizePosition();
 			SetUpVertices();
 			SetUpTriangles();
-			CreateSolid();
-			SetAsMainObjChild();
-			AddCamera();
-			AddCollider();
+			CreateSolidObject();
 			LogStatus();
-            
+
             // Debug.Log("vertices");
             // foreach (var vertex in vertices)
             // {
@@ -66,7 +60,7 @@ public class SolidImporter : MonoBehaviour {
 
 	}
 
-	private void LogStatus() {
+    private void LogStatus() {
 		if (solidFiles.Length > 0)
 		{
 			StringBuilder infoString = new StringBuilder();
@@ -198,45 +192,19 @@ public class SolidImporter : MonoBehaviour {
 		});
 	}
 
-	private void CreateSolid() {
-
-        // Create labeling object
-        VertexLabels vl = FindObjectOfType<VertexLabels>();
-        
-        // Create a new mesh
-        Mesh mesh = new Mesh();
-        
-		mesh.vertices = vertices.ToArray();
-		mesh.triangles = triangles.ToArray();
-
-        // Recalculate normals and bounds
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-
+	private void CreateSolidObject(){
 		// Create a new GameObject to hold the custom solid
         customSolid = new GameObject("CustomSolid");
+		//Set parent as MainObject
+		customSolid.transform.SetParent(mainObj.transform);
+		//zeruje bo było (0,2,0) nie wiem czemu
+        customSolid.transform.localPosition = Vector3.zero;
 
-        // Add a MeshFilter component to the GameObject
-        MeshFilter meshFilter = customSolid.AddComponent<MeshFilter>();
+		//Dodanie Object3D - centralnej klasy która podepnie resztę komponentów
+		Object3D object3D = customSolid.AddComponent<Object3D>();
+		object3D.InitObject(vertices, triangles, labeledVertices);
 
-        // Add a MeshRenderer component to the GameObject
-        MeshRenderer meshRenderer = customSolid.AddComponent<MeshRenderer>();
-
-        // Set the material for the MeshRenderer (you can create your own material or use an existing one)
-        meshRenderer.material = new Material(Shader.Find("Standard"));
-
-        // Assign the generated mesh to the MeshFilter
-        meshFilter.mesh = mesh;
-
-        // Set labels
-        //string[] x = vertices.ConvertAll(v => v.Label).ToArray();
-        //Debug.Log(x.Length);
-        vl.InitLabels(meshFilter, labeledVertices);
-
-
-		
-    }
-
+	}
 	private void DeleteSolid() {
 		Destroy(customSolid);
 	}
@@ -246,27 +214,4 @@ public class SolidImporter : MonoBehaviour {
 			Destroy(mainObj.transform.GetChild(0).gameObject);
 		}
 	}
-
-	private void SetAsMainObjChild() {
-		customSolid.transform.SetParent(mainObj.transform);
-        //???
-        //customSolid.transform.position = mainObj.transform.position;
-
-        //zeruje bo było (0,2,0) nie wiem czemu
-        customSolid.transform.localPosition = Vector3.zero;
-    }
-
-	private void AddCamera() {
-		GameObject camObject = GameObject.Find("CameraObject");
-		CameraScript camScript = camObject.GetComponent<CameraScript>();
-		GameObject staticCam = camScript.cam2;
-		ObjectRotator rotator = customSolid.AddComponent<ObjectRotator>();
-		rotator.cam = staticCam.GetComponent<Camera>();
-
-	}
-
-	private void AddCollider()
-    {
-		MeshCollider meshColl = customSolid.AddComponent<MeshCollider>();
-    }
 }
