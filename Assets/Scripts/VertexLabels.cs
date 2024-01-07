@@ -25,23 +25,23 @@ public class VertexLabels : MonoBehaviour
         {
             Debug.LogError("Brak obiektu FPSPlayer potrzebnego do działania VertexLabels.cs");
         }
-        InitLabels(null,null); //Do wywalenia, chyba że statyczny obiekt będzie ładowany
+        //InitLabels(null,null); //Do wywalenia, chyba że statyczny obiekt będzie ładowany
     }
 
     void Update()
     {
         //Parametry obrotu dziecka MainObject czyli właściwego obiektu
         //pod 0 musi być właściwy obiekt
-        if (transform.childCount > 0 && labels != null && vertices != null)
+        if (labels != null && vertices != null)
         {
             //założenie że mesh jest wyśrodkowany wzgl 0,0,0, jeśli nie to dwie linie odkomentować
-            Transform obj = transform.GetChild(0);
-            Quaternion rotation = obj.rotation;
+           // Transform obj = transform.GetChild(0);
+            //Quaternion rotation = obj.rotation;
             //Quaternion rotation = transform.rotation;
             
             for (int i = 0; i < labels.Length; i++)
             {
-                Vector3 rotatedVertex = rotation * vertices[i] * (1.0f+labelOffset);
+                Vector3 rotatedVertex = vertices[i] * (1.0f+labelOffset);
                 Vector3 worldPosition = transform.TransformPoint(rotatedVertex);
                 //Vector3 worldPosition = obj.TransformPoint(rotatedVertex);
                 labels[i].transform.position = worldPosition;
@@ -61,7 +61,7 @@ public class VertexLabels : MonoBehaviour
         ClearLabels();
         if(meshFilter == null)
         {
-            meshFilter = GetComponentInChildren<MeshFilter>();
+            meshFilter = GetComponent<MeshFilter>();
         }
     
         if (meshFilter != null)
@@ -86,6 +86,7 @@ public class VertexLabels : MonoBehaviour
                 textMesh.color = color;
                 textMesh.font = font;
                 labels[i] = label;
+                labels[i].transform.SetParent(gameObject.transform);
             }
             
         }
