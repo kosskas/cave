@@ -5,16 +5,22 @@ using UnityEngine;
 using UnityEngineInternal;
 
 /// <summary>
-/// Centralna klasa sterująca wyświetlanym obiektem
+/// Klasa zarządzająca wyświetlanym obiektem
 /// </summary>
 public class Object3D : MonoBehaviour {
 
 	private List<Vector3> vertices = new List<Vector3>();
 	private List<int> triangles = new List<int>();
 	private Dictionary<string, Vector3> labeledVertices = new Dictionary<string, Vector3>();
-	private List<List<string>> faces = new List<List<string>>();
+	//private List<List<string>> faces = new List<List<string>>();
 	private MeshFilter meshFilter;
 
+	/// <summary>
+	/// Inicjalizuje obiekt, dodaje skrypty.
+	/// </summary>
+	/// <param name="vertices">Lista wierzchołków</param>
+	/// <param name="triangles">Lista trójkątów</param>
+	/// <param name="labeledVertices">Oznaczenia wierzchołków</param>
 	public void InitObject(List<Vector3> vertices, List<int> triangles, Dictionary<string, Vector3> labeledVertices){
 		this.vertices = vertices;
 		this.triangles = triangles;
@@ -29,6 +35,9 @@ public class Object3D : MonoBehaviour {
 		//TODO
 		//Dodanie projekcji rzutów
 	}
+	/// <summary>
+	/// Tworzy siatkę dla nowo powstałego obiektu
+	/// </summary>
     private void CreateMesh() {
         // Create a new mesh
         Mesh mesh = new Mesh();
@@ -55,13 +64,19 @@ public class Object3D : MonoBehaviour {
 		//Dodanie collidera potrzebnego do obracania
 		MeshCollider meshColl = gameObject.AddComponent<MeshCollider>();
     }
+	/// <summary>
+	/// Dodaje oznaczenia przy wyświetlaniu wierzchołków
+	/// </summary>
     private void AddVertexLabels() {
-        //Dodanie oznaczeń i wyświetlanie wierzchołków
+        
 		VertexLabels vl = gameObject.AddComponent<VertexLabels>();
 		vl.InitLabels(meshFilter, labeledVertices);	
     }
+	/// <summary>
+	/// Dodaje kamerę potrzebną do obracania
+	/// </summary>
 	private void AddCamera(){
-		//Dodanie kamery potrzebnej do obracania
+		
 		GameObject camObject = GameObject.Find("CameraObject");
 		CameraScript camScript = camObject.GetComponent<CameraScript>();
 		GameObject staticCam = camScript.cam2;
