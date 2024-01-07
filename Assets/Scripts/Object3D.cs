@@ -22,6 +22,12 @@ public class Object3D : MonoBehaviour {
 		CreateMesh();
 		AddVertexLabels();
 		AddCamera();
+		//TODO
+		//Dodanie oznaczeń i wyświetlanie krawędzi
+
+
+		//TODO
+		//Dodanie projekcji rzutów
 	}
     private void CreateMesh() {
         // Create a new mesh
