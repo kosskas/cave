@@ -22,13 +22,6 @@ public class Object3D : MonoBehaviour {
 		CreateMesh();
 		AddVertexLabels();
 	}
-
-    private void AddVertexLabels() {
-        //Dodanie oznaczeń i wyświetlanie wierzchołków
-		VertexLabels vl = gameObject.AddComponent<VertexLabels>();
-		vl.InitLabels(meshFilter, labeledVertices);	
-    }
-
     private void CreateMesh() {
         // Create a new mesh
         Mesh mesh = new Mesh();
@@ -52,7 +45,11 @@ public class Object3D : MonoBehaviour {
         // Assign the generated mesh to the MeshFilter
         meshFilter.mesh = mesh;
     }
-
+    private void AddVertexLabels() {
+        //Dodanie oznaczeń i wyświetlanie wierzchołków
+		VertexLabels vl = gameObject.AddComponent<VertexLabels>();
+		vl.InitLabels(meshFilter, labeledVertices);	
+    }
 	
 
 }
