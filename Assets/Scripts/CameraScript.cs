@@ -12,30 +12,17 @@ public class CameraScript : MonoBehaviour {
 		
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		if(Input.GetKeyDown("1"))
-        {
-			SetCam1();
-			controller.canMove = true;
-			
-        }
-		if (Input.GetKeyDown("2"))
-		{
-			SetCam2();
-			controller.canMove = false;
-		}
-	}
-
-	void SetCam1()
+	public void SetCam1()
     {
 		cam1.SetActive(true);
 		cam2.SetActive(false);
+		controller.canMove = true;
     }
 
-	void SetCam2()
+	public void SetCam2()
 	{
 		cam1.SetActive(false);
 		cam2.SetActive(true);
+		controller.canMove = false;
 	}
 }
