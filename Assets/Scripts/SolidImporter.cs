@@ -31,32 +31,28 @@ public class SolidImporter : MonoBehaviour {
 		currentSolidFileIndex = 0;
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		if(Input.GetKeyDown("p"))
-		{
-			DeleteMainObjChild();
-			DeleteSolid();
-			ClearSolid();
-			PickNextSolid();
-			ReadSolid();
-			CentralizePosition();
-			SetUpVertices();
-			SetUpTriangles();
-			CreateSolidObject();
-			LogStatus();
+	public void ImportSolid () {
+		DeleteMainObjChild();
+		DeleteSolid();
+		ClearSolid();
+		PickNextSolid();
+		ReadSolid();
+		CentralizePosition();
+		SetUpVertices();
+		SetUpTriangles();
+		CreateSolidObject();
+		LogStatus();
 
-            // Debug.Log("vertices");
-            // foreach (var vertex in vertices)
-            // {
-            // 	Debug.Log($"Label: {vertex.Label}, Vertex: {vertex.Vertex}");
-            // }
-            // Debug.Log("faces");
-            // for (int i = 0; i < triangles.Count; i += 3)
-            // {
-            // 	Debug.Log($"{triangles[i]} {triangles[i + 1]} {triangles[i + 2]}");
-            // }
-        }
+		// Debug.Log("vertices");
+		// foreach (var vertex in vertices)
+		// {
+		// 	Debug.Log($"Label: {vertex.Label}, Vertex: {vertex.Vertex}");
+		// }
+		// Debug.Log("faces");
+		// for (int i = 0; i < triangles.Count; i += 3)
+		// {
+		// 	Debug.Log($"{triangles[i]} {triangles[i + 1]} {triangles[i + 2]}");
+		// }
 
 	}
 
