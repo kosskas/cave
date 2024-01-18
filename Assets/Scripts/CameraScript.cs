@@ -6,7 +6,7 @@ public class CameraScript : MonoBehaviour {
 
 	[SerializeField] GameObject cam1; //moving cam
 	public GameObject cam2; //static cam
-	[SerializeField] FPSController controller;
+	[SerializeField] PlayerController controller;
 	// Use this for initialization
 	void Start () {
 		
