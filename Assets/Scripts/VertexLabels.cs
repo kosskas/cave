@@ -30,7 +30,7 @@ public class VertexLabels : MonoBehaviour
 
     void Update()
     {
-        if (labels != null && vertices != null)
+        if (player!=null && labels != null && vertices != null)
         {
             //Quaternion rotation = transform.rotation;
             ///NOTE: Rezygnacja z używania Rotation bo labele są dziećmi CustomSolid
