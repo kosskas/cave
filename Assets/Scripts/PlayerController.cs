@@ -1,15 +1,31 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// Klasa PlayerController jest klasą strerującą graczem w aplikacji. Obsługuje ruch gracza po mapie oraz wszelkie dodatkowe czynności inicjowane przyciskiem z klawiatury.
+/// </summary>
 [RequireComponent(typeof(CharacterController))]
-
 public class PlayerController : MonoBehaviour
 {
+    /// <summary>
+    /// Określa prędkość poruszania się gracza podczas chodzenia.
+    /// </summary>
     public float walkingSpeed = 7.5f;
+    /// <summary>
+    /// Referencja do obiektu kamery, który jest używany do sterowania widokiem gracza.
+    /// </summary>
     public Camera playerCamera;
+    /// <summary>
+    /// Określa prędkość obrotu kamery wokół osi Y i X
+    /// </summary>
     public float lookSpeed = 2.0f;
+    /// <summary>
+    /// Określa maksymalny kąt obrotu kamery wokół osi X, co pozwala na kontrolę ograniczenia skrętu w górę i w dół. 
+    /// </summary>
     public float lookXLimit = 45.0f;
+    /// <summary>
+    /// Zmienna warunkowa, określająca czy gracz może się poruszać.
+    /// </summary>
     public bool canMove = true;
     CharacterController characterController;
     Vector3 moveDirection = Vector3.zero;
@@ -31,6 +47,9 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        ////
+        /// NOTE: jedyny Input nie będący tutaj jest w pliku ObjectRotator!
+        ///
         //from CameraScript
         if(Input.GetKeyDown("1"))
         {

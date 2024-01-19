@@ -8,11 +8,26 @@ using UnityEngine;
  * solidImporter wywołuje InitLabels
  * VertexLabels vl = FindObjectOfType<VertexLabels>();
 */
+/// <summary>
+/// Klasa VertexLabels opisuje właściwości wsyświetlania informacji o wierzchołkach bryły
+/// </summary>
 public class VertexLabels : MonoBehaviour
 {
+    /// <summary>
+    /// Przesunięcie nazwy od wierzchołka
+    /// </summary>
     [SerializeField] public float labelOffset = 0.0f;
+    /// <summary>
+    /// Rodzaj fontu dla wyświetlanych nazw wierzchołków
+    /// </summary>
     [SerializeField] public Font font;
+    /// <summary>
+    /// Domyślmy kolor dla wyświetlanych nazw wierzchołków
+    /// </summary>
     [SerializeField] public Color color = Color.black;
+    /// <summary>
+    /// Rozmiar wyświetlanych nazw wierzchołków
+    /// </summary>
     [SerializeField] public float characterSize = 0.1f;
 
     Vector3[] vertices = null;
@@ -49,7 +64,25 @@ public class VertexLabels : MonoBehaviour
             ClearLabels();
         }
     }
-
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="labelOffset"></param>
+    /// <param name="font"></param>
+    /// <param name="color"></param>
+    /// <param name="characterSize"></param>
+    public void SetVars(float labelOffset, Font font, Color color, float characterSize)
+    {
+        this.labelOffset = labelOffset;
+        this.font = font;
+        this.color = color;
+        this.characterSize = characterSize;
+    }
+    /// <summary>
+    /// Inicjalizuje wyświetlanie wierzchołków bryły
+    /// </summary>
+    /// <param name="meshFilter">Siatka bryły</param>
+    /// <param name="labeledVertices">Oznaczenia wierzchołków wraz z ich współrzędnymi</param>
     public void InitLabels(MeshFilter meshFilter, Dictionary<string, Vector3> labeledVertices)
     {
         ClearLabels();
@@ -153,13 +186,6 @@ public class VertexLabels : MonoBehaviour
         Vector3[] uniquevertices = new Vector3[set.Count];
         set.CopyTo(uniquevertices);
         return uniquevertices;
-    }
-    public void SetVars(float labelOffset, Font font, Color color, float characterSize)
-    {
-        this.labelOffset = labelOffset;
-        this.font = font;
-        this.color = color;
-        this.characterSize = characterSize;
     }
 }
 
