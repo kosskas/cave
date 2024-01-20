@@ -6,23 +6,36 @@ using UnityEngine;
 
 public class VertexProjecter : MonoBehaviour {
 	// TODO
-	// Rozwiązać problem z MeshColliderem
-	// Dodać ile razy była kolizja
-	// Dodać linie
+	// [ ] Rozwiązać problem z MeshColliderem
+	// [ ] Rozwiązać problem z Colliderem gracza
+	// [ ] Dodać ile razy była kolizja
+	// [ ] Dodać linie
+	// [x] Dodac tekst
 	
 	Dictionary<string, Vector3> labeledVertices;
-	GameObject[] points;
-	public void InitVertexProjecter(Dictionary<string, Vector3> labeledVertices){
+	/// <summary>
+	/// Pierwszy to znacznik, drugi to tekst
+	/// </summary>
+	Tuple<GameObject,GameObject>[] points;
+	Object3D OBJECT3D;
+	//GameObject[] points;
+	public void InitVertexProjecter(Object3D obj ,Dictionary<string, Vector3> labeledVertices){
+		this.OBJECT3D = obj;
 		this.labeledVertices = labeledVertices;
 		CreateHitPoints();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		GenerateRays();
+		if(OBJECT3D != null){
+			GenerateRays();
+		}
 	}
 	void GenerateRays()
     {
+		/*info
+		points[k,k+1,k+2] dotyczą trzech różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
+		*/
 		int i = 0;
         foreach (var pair in labeledVertices)
         {
@@ -59,18 +72,45 @@ public class VertexProjecter : MonoBehaviour {
 		lineRenderer.SetPosition(1, hit.point);
 
 		line.transform.SetParent(gameObject.transform);
-		*/           
-            points[idx].transform.position = hit.point;
+		*/  
+			//znacznik
+            points[idx].Item1.transform.position = hit.point;
+
+			//tekst skierowany do gracza
+			points[idx].Item2.transform.position = hit.point;
+			Vector3 playerPos = OBJECT3D.player.transform.position;
+			Vector3 directionToPlayer = ( playerPos+ 2*Vector3.up - points[idx].Item2.transform.position).normalized;
+            points[idx].Item2.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
+			
         }
     }
 	private void CreateHitPoints()
     {
-		points = new GameObject[3* labeledVertices.ToArray().Length];
-        for (int i =0; i < points.Length; i++){
-			points[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-			points[i].transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
-			Destroy(points[i].GetComponent<Collider>());
-			points[i].transform.SetParent(gameObject.transform);
+		//3 bo 3 reje
+		int length = 3 * labeledVertices.ToArray().Length;
+		string[] names = labeledVertices.Keys.ToArray();
+		points = new Tuple<GameObject, GameObject>[length];
+		/*info
+		points[k,k+1,k+2] dotyczą trzech różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
+		*/
+        for (int i = 0; i < points.Length; i++){
+			//znacznik
+			GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+			marker.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+			Destroy(marker.GetComponent<Collider>());
+			marker.transform.SetParent(gameObject.transform);
+
+			//tekst
+			GameObject label = new GameObject("VertexLabel" + i);
+            TextMesh textMesh = label.AddComponent<TextMesh>();
+            textMesh.text = names[i/3];
+            textMesh.characterSize = 0.1f;
+            textMesh.color = Color.black;
+            textMesh.font = null;
+			label.transform.SetParent(gameObject.transform);
+			///
+			points[i] = new Tuple<GameObject,GameObject>(marker, label);
+
 		}
     }
 }
