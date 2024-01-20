@@ -9,32 +9,17 @@ using UnityEngineInternal;
 /// </summary>
 public class Object3D : MonoBehaviour {
 
+	/// <summary>
+	/// Referencja na obiekt gracza
+	/// </summary>
+	public GameObject player;
+
 	private List<Vector3> vertices = new List<Vector3>();
 	private List<int> triangles = new List<int>();
 	private Dictionary<string, Vector3> labeledVertices = new Dictionary<string, Vector3>();
 	//private List<List<string>> faces = new List<List<string>>();
 	private MeshFilter meshFilter;
 
-
-	void Update(){
-				// Iteruj przez każdy wierzchołek
-		/*		
-		foreach (Vector3 vertex in vertices)
-        {
-            // Ray w kierunku X
-            Ray rayX = new Ray(vertex, Vector3.right*10);
-            Debug.DrawRay(vertex, Vector3.right*10);
-
-            // Ray w kierunku Y
-            Ray rayY = new Ray(vertex, Vector3.up*10);
-            Debug.DrawRay(vertex, Vector3.up*10);
-
-            // Ray w kierunku Z
-            Ray rayZ = new Ray(vertex, Vector3.forward*10);
-            Debug.DrawRay(vertex, Vector3.forward*10);
-        }
-		*/
-	}
 	/// <summary>
 	/// Inicjalizuje obiekt, dodaje skrypty.
 	/// </summary>
@@ -42,19 +27,25 @@ public class Object3D : MonoBehaviour {
 	/// <param name="triangles">Lista trójkątów</param>
 	/// <param name="labeledVertices">Oznaczenia wierzchołków</param>
 	public void InitObject(List<Vector3> vertices, List<int> triangles, Dictionary<string, Vector3> labeledVertices){
-		this.vertices = vertices;
-		this.triangles = triangles;
-		this.labeledVertices = labeledVertices;
-		this.tag = "Solid";
-		CreateMesh();
-		AddVertexLabels();
-		AddCamera();
-		//TODO
-		//Dodanie oznaczeń i wyświetlanie krawędzi
-
-		AddRays();
-		//TODO
-		//Dodanie projekcji rzutów
+		player = GameObject.Find("FPSPlayer");
+		if(player!= null){
+			this.vertices = vertices;
+			this.triangles = triangles;
+			this.labeledVertices = labeledVertices;
+			this.tag = "Solid";
+			CreateMesh();
+			AddVertexLabels();
+			AddCamera();
+			//TODO
+			//Dodanie oznaczeń i wyświetlanie krawędzi
+					
+			//TODO
+			//Dodanie projekcji rzutów
+			AddRays();
+		}
+		else{
+			Debug.Log("Object3D nie znalazl instancji FPSPlayer");
+		}
 	}
     /// <summary>
     /// Tworzy siatkę dla nowo powstałego obiektu
@@ -91,7 +82,7 @@ public class Object3D : MonoBehaviour {
     private void AddVertexLabels() {
         
 		VertexLabels vl = gameObject.AddComponent<VertexLabels>();
-		vl.InitLabels(meshFilter, labeledVertices);	
+		vl.InitLabels(this,meshFilter, labeledVertices);	
     }
 	/// <summary>
 	/// Dodaje kamerę potrzebną do obracania
@@ -107,7 +98,7 @@ public class Object3D : MonoBehaviour {
 	private void AddRays()
     {
         VertexProjecter vp = gameObject.AddComponent<VertexProjecter>();
-		vp.InitVertexProjecter(labeledVertices);
+		vp.InitVertexProjecter(this, labeledVertices);
     }
 
 }
