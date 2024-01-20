@@ -63,16 +63,7 @@ public class VertexLabels : MonoBehaviour
         {
             ClearLabels();
         }
-    }
-    /// TODO
-    /*
-    public void SetVars(float labelOffset, Font font, Color color, float characterSize)
-    {
-        this.labelOffset = labelOffset;
-        this.font = font;
-        this.color = color;
-        this.characterSize = characterSize;
-    }*/
+    }  
     /// <summary>
     /// Inicjalizuje wyświetlanie wierzchołków bryły, dla każdego wierzchołka bryły tworzy obiekt, który będzie wyświetlał jego nazwę
     /// </summary>
@@ -184,3 +175,11 @@ public class VertexLabels : MonoBehaviour
     }
 }
 
+/*
+    public void SetVars(float labelOffset, Font font, Color color, float characterSize)
+    {
+        this.labelOffset = labelOffset;
+        this.font = font;
+        this.color = color;
+        this.characterSize = characterSize;
+    }*/
