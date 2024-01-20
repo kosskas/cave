@@ -45,6 +45,7 @@ public class Object3D : MonoBehaviour {
 		this.vertices = vertices;
 		this.triangles = triangles;
 		this.labeledVertices = labeledVertices;
+		this.tag = "Solid";
 		CreateMesh();
 		AddVertexLabels();
 		AddCamera();
