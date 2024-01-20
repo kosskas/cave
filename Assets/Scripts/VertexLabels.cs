@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting;
 using UnityEngine;
 
 /*
@@ -32,20 +33,11 @@ public class VertexLabels : MonoBehaviour
 
     Vector3[] vertices = null;
     GameObject[] labels = null;
-    GameObject player;
-    void Start()
-    {
-        player = GameObject.Find("FPSPlayer");
-        if (player == null)
-        {
-            Debug.LogError("Brak obiektu FPSPlayer potrzebnego do działania VertexLabels.cs");
-        }
-        //InitLabels(null,null); //Do wywalenia, chyba że statyczny obiekt będzie ładowany
-    }
+    Object3D OBJECT3D;
 
     void Update()
     {
-        if (player!=null && labels != null && vertices != null)
+        if (OBJECT3D!=null && labels != null && vertices != null)
         {
             //Quaternion rotation = transform.rotation;
             ///NOTE: Rezygnacja z używania Rotation bo labele są dziećmi CustomSolid
@@ -54,7 +46,8 @@ public class VertexLabels : MonoBehaviour
                 Vector3 rotatedVertex = vertices[i] * (1.0f+labelOffset);
                 Vector3 worldPosition = transform.TransformPoint(rotatedVertex);
                 labels[i].transform.position = worldPosition;
-                Vector3 directionToPlayer = (player.transform.position + 2*Vector3.up - labels[i].transform.position).normalized;
+                Vector3 playerPos = OBJECT3D.player.transform.position;
+                Vector3 directionToPlayer = (playerPos + 2*Vector3.up - labels[i].transform.position).normalized;
                 //literki są twarzą do postaci gracza
                 labels[i].transform.rotation = Quaternion.LookRotation(-directionToPlayer);
             }
@@ -67,10 +60,12 @@ public class VertexLabels : MonoBehaviour
     /// <summary>
     /// Inicjalizuje wyświetlanie wierzchołków bryły, dla każdego wierzchołka bryły tworzy obiekt, który będzie wyświetlał jego nazwę
     /// </summary>
+    /// <param name="obj">Obiekt sterujący bryłą</param>
     /// <param name="meshFilter">Siatka bryły</param>
     /// <param name="labeledVertices">Oznaczenia wierzchołków wraz z ich współrzędnymi</param>
-    public void InitLabels(MeshFilter meshFilter, Dictionary<string, Vector3> labeledVertices)
+    public void InitLabels(Object3D obj, MeshFilter meshFilter, Dictionary<string, Vector3> labeledVertices)
     {
+        this.OBJECT3D = obj;
         ClearLabels();
         if(meshFilter == null)
         {
