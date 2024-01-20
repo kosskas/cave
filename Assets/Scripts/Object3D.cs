@@ -51,49 +51,13 @@ public class Object3D : MonoBehaviour {
 		//TODO
 		//Dodanie oznaczeń i wyświetlanie krawędzi
 
-		GenerateRays();
+		AddRays();
 		//TODO
 		//Dodanie projekcji rzutów
 	}
-	void GenerateRays()
-    {
-        foreach (Vector3 vertex in vertices)
-        {
-            // Ray w kierunku X
-            Ray rayX = new Ray(vertex, Vector3.right * 10);
-            DrawRay(rayX);
-
-            // Ray w kierunku Y
-            Ray rayY = new Ray(vertex, Vector3.up * 10);
-            DrawRay(rayY);
-
-            // Ray w kierunku Z
-            Ray rayZ = new Ray(vertex, Vector3.forward * 10);
-            DrawRay(rayZ);
-        }
-    }
-    void DrawRay(Ray ray)
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
-        {
-            // Rysuj linię reprezentującą Ray
-            GameObject line = new GameObject("RayLine");
-            LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
-            lineRenderer.positionCount = 2;
-            lineRenderer.SetPosition(0, ray.origin);
-            lineRenderer.SetPosition(1, hit.point);
-
-            // Dodaj punkt w miejscu przecięcia
-            GameObject point = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            point.transform.position = hit.point;
-            point.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            Destroy(point.GetComponent<Collider>()); // Usuń collider, aby uniknąć kolizji z kolejnymi rayami
-        }
-    }
-	/// <summary>
-	/// Tworzy siatkę dla nowo powstałego obiektu
-	/// </summary>
+    /// <summary>
+    /// Tworzy siatkę dla nowo powstałego obiektu
+    /// </summary>
     private void CreateMesh() {
         // Create a new mesh
         Mesh mesh = new Mesh();
@@ -139,5 +103,10 @@ public class Object3D : MonoBehaviour {
 		ObjectRotator rotator = gameObject.AddComponent<ObjectRotator>();
 		rotator.cam = staticCam.GetComponent<Camera>();
 	}
+	private void AddRays()
+    {
+        VertexProjecter vp = gameObject.AddComponent<VertexProjecter>();
+		vp.InitVertexProjecter(labeledVertices);
+    }
 
 }
