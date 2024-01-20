@@ -6,7 +6,9 @@ using System.IO;
 using System.Text;
 using System.Globalization;
 using System.Linq;
-
+/// <summary>
+/// Klasa SolidImporter służy do parsowania i ładowania brył zapisanych w formacie wobj to aplikacji.
+/// </summary>
 public class SolidImporter : MonoBehaviour {
 
 	private const string pathToFolderWithSolids = "./Assets/Figures3D";
@@ -30,7 +32,9 @@ public class SolidImporter : MonoBehaviour {
 		solidFiles = Directory.GetFiles(pathToFolderWithSolids, solidFileExt);
 		currentSolidFileIndex = 0;
 	}
-	
+	/// <summary>
+	/// Szuka następną bryłę do załadowania w folderze i ładuje ją. W trakcie działania parsuje plik w formacie wobj, środkuje bryłę względem 0,0,0. Ładuje Object3D -centralną, klasę, która podłącza resztę komponentów
+	/// </summary>
 	public void ImportSolid () {
 		DeleteMainObjChild();
 		DeleteSolid();

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngineInternal;
 
 /// <summary>
-/// Klasa zarządzająca wyświetlanym obiektem
+/// Klasa Object3D zarządza wyświetlanym obiektem. Po załadowaniu bryły z pliku, ładuje pozostałe klasy potrzebne do działania aplikacji.
 /// </summary>
 public class Object3D : MonoBehaviour {
 

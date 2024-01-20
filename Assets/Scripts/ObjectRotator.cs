@@ -1,10 +1,16 @@
 ﻿
 using UnityEngine;
-
+/// <summary>
+/// Klasa ObjectRotator służy do obracania bryłą przez gracza, jest dołączana do obiektu ładowanej bryły.
+/// </summary>
 public class ObjectRotator : MonoBehaviour {
-
-	// Use this for initialization
-	[SerializeField] float rotationSpeed = 10f;
+	/// <summary>
+	/// Szybkość obrotu
+	/// </summary>
+	[SerializeField] public float rotationSpeed = 10f;
+	/// <summary>
+	/// Kamera potrzebna do wyliczania obrotu
+	/// </summary>
 	public Camera cam;
 	void OnMouseDrag()
     {
@@ -18,8 +24,4 @@ public class ObjectRotator : MonoBehaviour {
 
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }
