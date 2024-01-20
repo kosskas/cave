@@ -15,6 +15,26 @@ public class Object3D : MonoBehaviour {
 	//private List<List<string>> faces = new List<List<string>>();
 	private MeshFilter meshFilter;
 
+
+	void Update(){
+				// Iteruj przez każdy wierzchołek
+		/*		
+		foreach (Vector3 vertex in vertices)
+        {
+            // Ray w kierunku X
+            Ray rayX = new Ray(vertex, Vector3.right*10);
+            Debug.DrawRay(vertex, Vector3.right*10);
+
+            // Ray w kierunku Y
+            Ray rayY = new Ray(vertex, Vector3.up*10);
+            Debug.DrawRay(vertex, Vector3.up*10);
+
+            // Ray w kierunku Z
+            Ray rayZ = new Ray(vertex, Vector3.forward*10);
+            Debug.DrawRay(vertex, Vector3.forward*10);
+        }
+		*/
+	}
 	/// <summary>
 	/// Inicjalizuje obiekt, dodaje skrypty.
 	/// </summary>
@@ -31,10 +51,39 @@ public class Object3D : MonoBehaviour {
 		//TODO
 		//Dodanie oznaczeń i wyświetlanie krawędzi
 
-
+		GenerateRays();
 		//TODO
 		//Dodanie projekcji rzutów
 	}
+	void GenerateRays()
+    {
+        foreach (Vector3 vertex in vertices)
+        {
+            // Ray w kierunku X
+            Ray rayX = new Ray(vertex, Vector3.right * 10);
+            DrawIntersectionPoint(rayX);
+
+            // Ray w kierunku Y
+            Ray rayY = new Ray(vertex, Vector3.up * 10);
+            DrawIntersectionPoint(rayY);
+
+            // Ray w kierunku Z
+            Ray rayZ = new Ray(vertex, Vector3.forward * 10);
+            DrawIntersectionPoint(rayZ);
+        }
+    }
+	void DrawIntersectionPoint(Ray ray)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            // Rysuj punkt w miejscu przecięcia
+            GameObject point = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            point.transform.position = hit.point;
+            point.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+            Destroy(point.GetComponent<Collider>()); // Usuń collider, aby uniknąć kolizji z kolejnymi rayami
+        }
+    }
 	/// <summary>
 	/// Tworzy siatkę dla nowo powstałego obiektu
 	/// </summary>
