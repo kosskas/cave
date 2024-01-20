@@ -61,26 +61,33 @@ public class Object3D : MonoBehaviour {
         {
             // Ray w kierunku X
             Ray rayX = new Ray(vertex, Vector3.right * 10);
-            DrawIntersectionPoint(rayX);
+            DrawRay(rayX);
 
             // Ray w kierunku Y
             Ray rayY = new Ray(vertex, Vector3.up * 10);
-            DrawIntersectionPoint(rayY);
+            DrawRay(rayY);
 
             // Ray w kierunku Z
             Ray rayZ = new Ray(vertex, Vector3.forward * 10);
-            DrawIntersectionPoint(rayZ);
+            DrawRay(rayZ);
         }
     }
-	void DrawIntersectionPoint(Ray ray)
+    void DrawRay(Ray ray)
     {
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
         {
-            // Rysuj punkt w miejscu przecięcia
+            // Rysuj linię reprezentującą Ray
+            GameObject line = new GameObject("RayLine");
+            LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPosition(0, ray.origin);
+            lineRenderer.SetPosition(1, hit.point);
+
+            // Dodaj punkt w miejscu przecięcia
             GameObject point = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             point.transform.position = hit.point;
-            point.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+            point.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             Destroy(point.GetComponent<Collider>()); // Usuń collider, aby uniknąć kolizji z kolejnymi rayami
         }
     }
