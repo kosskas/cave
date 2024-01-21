@@ -15,12 +15,10 @@ public class ObjectProjecter : MonoBehaviour {
 	// [x] Dodac tekst
 	
 	Dictionary<string, Vector3> labeledVertices;
-	/// <summary>
-	/// Pierwszy to znacznik, drugi to tekst
-	/// </summary>
-	Projection[] points;
+	Projection[] projs;
 	Object3D OBJECT3D;
-	//GameObject[] points;
+
+	bool showlines = true;
 	public void InitVertexProjecter(Object3D obj ,Dictionary<string, Vector3> labeledVertices){
 		this.OBJECT3D = obj;
 		this.labeledVertices = labeledVertices;
@@ -31,6 +29,7 @@ public class ObjectProjecter : MonoBehaviour {
 	void Update () {
 		if(OBJECT3D != null){
 			GenerateRays();
+			//RysujRzutyNaŚcianach() TODO
 		}
 	}
 	void GenerateRays()
@@ -46,55 +45,56 @@ public class ObjectProjecter : MonoBehaviour {
  			// Ray w kierunku X
             Ray rayX = new Ray(vertex, Vector3.right*10);
             Debug.DrawRay(vertex, Vector3.right*10);
-			DrawRay(rayX,i);
+			ResolveProjection(rayX,i);
 
             // Ray w kierunku -Y
             Ray rayY = new Ray(vertex, Vector3.down*10);
             Debug.DrawRay(vertex, Vector3.down*10);
-			DrawRay(rayY,i+1);
+			ResolveProjection(rayY,i+1);
 
             // Ray w kierunku Z
             Ray rayZ = new Ray(vertex, Vector3.forward*10);
             Debug.DrawRay(vertex, Vector3.forward*10);
-			DrawRay(rayZ,i+2);
+			ResolveProjection(rayZ,i+2);
 			i+=3;
         }
 
     }
-    void DrawRay(Ray ray, int idx)
+    void ResolveProjection(Ray ray, int idx)
     {
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit) && hit.collider.tag != "Solid")
         {
-			
-            // Rysuj linię reprezentującą Ray
-			points[idx].lineRenderer.SetPosition(0, ray.origin);
-			points[idx].lineRenderer.SetPosition(1, hit.point);
-			
-		  
-			//znacznik
-            points[idx].marker.transform.position = hit.point;
-
-			//tekst skierowany do gracza
-			points[idx].label.transform.position = hit.point;
-			Vector3 playerPos = OBJECT3D.player.transform.position;
-			Vector3 directionToPlayer = ( playerPos+ 2*Vector3.up - points[idx].label.transform.position).normalized;
-            points[idx].label.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
-
-
-			
+			DrawProjection(projs[idx], ray, hit);			
         }
     }
+	
+	private void DrawProjection(Projection proj, Ray ray, RaycastHit hit){
+		//rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
+		if(showlines){
+			proj.lineRenderer.SetPosition(0, ray.origin);
+			proj.lineRenderer.SetPosition(1, hit.point);
+		}
+
+		//znacznik
+		proj.marker.transform.position = hit.point;
+
+		//tekst skierowany do gracza
+		proj.label.transform.position = hit.point;
+		Vector3 playerPos = OBJECT3D.player.transform.position;
+		Vector3 directionToPlayer = ( playerPos+ 2*Vector3.up - proj.label.transform.position).normalized;
+		proj.label.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
+	}
 	private void CreateHitPoints()
     {
-		//3 bo 3 reje
+		//3 bo 3 reje, MOZE BYĆ WIECEJ!!!
 		int length = 3 * labeledVertices.ToArray().Length;
 		string[] names = labeledVertices.Keys.ToArray();
-		points = new Projection[length];
+		projs = new Projection[length];
 		/*info
 		points[k,k+1,k+2] dotyczą trzech różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
 		*/
-        for (int i = 0; i < points.Length; i++){
+        for (int i = 0; i < projs.Length; i++){
 			//znacznik
 			GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 			marker.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
@@ -120,7 +120,7 @@ public class ObjectProjecter : MonoBehaviour {
             lineRenderer.endWidth = 0.01f;
 			line.transform.SetParent(gameObject.transform);
 			
-			points[i] = new Projection(marker, label, lineRenderer, false);
+			projs[i] = new Projection(marker, label, lineRenderer, false);
 
 		}
     }
