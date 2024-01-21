@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class VertexProjecter : MonoBehaviour {
+public class ObjectProjecter : MonoBehaviour {
+
 	// TODO
 	// [ ] Rozwiązać problem z MeshColliderem
 	// [ ] Rozwiązać problem z Colliderem gracza
@@ -16,7 +18,7 @@ public class VertexProjecter : MonoBehaviour {
 	/// <summary>
 	/// Pierwszy to znacznik, drugi to tekst
 	/// </summary>
-	Tuple<GameObject,GameObject>[] points;
+	Projection[] points;
 	Object3D OBJECT3D;
 	//GameObject[] points;
 	public void InitVertexProjecter(Object3D obj ,Dictionary<string, Vector3> labeledVertices){
@@ -43,44 +45,43 @@ public class VertexProjecter : MonoBehaviour {
 			Vector3 vertex = transform.TransformPoint(pair.Value); //magic
  			// Ray w kierunku X
             Ray rayX = new Ray(vertex, Vector3.right*10);
-            //Debug.DrawRay(vertex, Vector3.right*10);
+            Debug.DrawRay(vertex, Vector3.right*10);
 			DrawRay(rayX,i);
 
             // Ray w kierunku -Y
             Ray rayY = new Ray(vertex, Vector3.down*10);
-            //Debug.DrawRay(vertex, Vector3.down*10);
+            Debug.DrawRay(vertex, Vector3.down*10);
 			DrawRay(rayY,i+1);
 
             // Ray w kierunku Z
             Ray rayZ = new Ray(vertex, Vector3.forward*10);
-            //Debug.DrawRay(vertex, Vector3.forward*10);
+            Debug.DrawRay(vertex, Vector3.forward*10);
 			DrawRay(rayZ,i+2);
 			i+=3;
         }
+
     }
     void DrawRay(Ray ray, int idx)
     {
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit) && hit.collider.tag != "Solid")
         {
+			
             // Rysuj linię reprezentującą Ray
-			/*
-		GameObject line = new GameObject("RayLine");
-		LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
-		lineRenderer.positionCount = 2;
-		lineRenderer.SetPosition(0, ray.origin);
-		lineRenderer.SetPosition(1, hit.point);
-
-		line.transform.SetParent(gameObject.transform);
-		*/  
+			points[idx].lineRenderer.SetPosition(0, ray.origin);
+			points[idx].lineRenderer.SetPosition(1, hit.point);
+			
+		  
 			//znacznik
-            points[idx].Item1.transform.position = hit.point;
+            points[idx].marker.transform.position = hit.point;
 
 			//tekst skierowany do gracza
-			points[idx].Item2.transform.position = hit.point;
+			points[idx].label.transform.position = hit.point;
 			Vector3 playerPos = OBJECT3D.player.transform.position;
-			Vector3 directionToPlayer = ( playerPos+ 2*Vector3.up - points[idx].Item2.transform.position).normalized;
-            points[idx].Item2.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
+			Vector3 directionToPlayer = ( playerPos+ 2*Vector3.up - points[idx].label.transform.position).normalized;
+            points[idx].label.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
+
+
 			
         }
     }
@@ -89,7 +90,7 @@ public class VertexProjecter : MonoBehaviour {
 		//3 bo 3 reje
 		int length = 3 * labeledVertices.ToArray().Length;
 		string[] names = labeledVertices.Keys.ToArray();
-		points = new Tuple<GameObject, GameObject>[length];
+		points = new Projection[length];
 		/*info
 		points[k,k+1,k+2] dotyczą trzech różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
 		*/
@@ -108,8 +109,18 @@ public class VertexProjecter : MonoBehaviour {
             textMesh.color = Color.black;
             textMesh.font = null;
 			label.transform.SetParent(gameObject.transform);
-			///
-			points[i] = new Tuple<GameObject,GameObject>(marker, label);
+
+			
+			///linia
+			GameObject line = new GameObject("RayLine");
+			LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
+			lineRenderer.positionCount = 2;
+            lineRenderer.material = new Material(Shader.Find("Standard")); // Ustawienie defaultowego materiału
+            lineRenderer.startWidth = 0.01f;
+            lineRenderer.endWidth = 0.01f;
+			line.transform.SetParent(gameObject.transform);
+			
+			points[i] = new Projection(marker, label, lineRenderer, false);
 
 		}
     }

@@ -97,8 +97,8 @@ public class Object3D : MonoBehaviour {
 	}
 	private void AddRays()
     {
-        VertexProjecter vp = gameObject.AddComponent<VertexProjecter>();
-		vp.InitVertexProjecter(this, labeledVertices);
+        ObjectProjecter op = gameObject.AddComponent<ObjectProjecter>();
+		op.InitVertexProjecter(this, labeledVertices);
     }
 
 }
