@@ -8,10 +8,10 @@ using UnityEngine.UI;
 public class ObjectProjecter : MonoBehaviour {
 
 	// TODO
-	// [ ] Rozwiązać problem z MeshColliderem
+	// [x] Rozwiązać problem z MeshColliderem
 	// [ ] Rozwiązać problem z Colliderem gracza
 	// [ ] Dodać ile razy była kolizja
-	// [ ] Dodać linie
+	// [x] Dodać linie
 	// [x] Dodac tekst
 	
 	Dictionary<string, Vector3> labeledVertices;
@@ -38,6 +38,7 @@ public class ObjectProjecter : MonoBehaviour {
 		points[k,k+1,k+2] dotyczą trzech różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
 		*/
 		int i = 0;
+		this.OBJECT3D.GetComponent<MeshCollider>().enabled = false; //wyłączenie collidera bo raye go nie lubią i się z nim zderzają
         foreach (var pair in labeledVertices)
         {
 
@@ -58,15 +59,16 @@ public class ObjectProjecter : MonoBehaviour {
 			ResolveProjection(rayZ,i+2);
 			i+=3;
         }
+		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem
 
     }
     void ResolveProjection(Ray ray, int idx)
     {
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit) && hit.collider.tag != "Solid")
+        if (Physics.Raycast(ray, out hit))// && hit.collider.tag != "Solid")
         {
 			DrawProjection(projs[idx], ray, hit);			
-        }
+		}
     }
 	
 	private void DrawProjection(Projection proj, Ray ray, RaycastHit hit){
