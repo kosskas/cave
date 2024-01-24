@@ -5,19 +5,24 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ObjectProjecter : MonoBehaviour {
-
 	// TODO
 	// [x] Rozwiązać problem z MeshColliderem
 	// [ ] Rozwiązać problem z Colliderem gracza
-	// [ ] Dodać ile razy była kolizja
+	// [ ] Dodać ile razy była kolizja bool[] hits;
 	// [x] Dodać linie
 	// [x] Dodac tekst
-	
-	Dictionary<string, Vector3> labeledVertices;
-	Projection[] projs;
-	Object3D OBJECT3D;
+	// [ ] Wymuś prostopadłość do płaszczyzny
 
+public class ObjectProjecter : MonoBehaviour {	
+	Object3D OBJECT3D;
+	Dictionary<string, Vector3> labeledVertices;
+	/// <summary>
+	/// projs[k,k+1,...,k+nOfProjDirs-1] dotyczą rzutów na różne płaszczyzny tego samego wierzchołka, przez co mają taką samą nazwę
+	/// projs[k, C*k, 2C*k,...] dotyczą rzutów różnych wierzchołków na tą samą płaszczyznę dla C->(0,nOfProjDirs-1)
+	/// </summary>
+	ProjectionInfo[] projs;
+	Vector3[] rayDirections = {Vector3.right*10, Vector3.down*10, Vector3.forward*10}; //ray w kierunku: X, -Y i Z +rzekome_własne_kierunki
+	int nOfProjDirs=3; //liczba rzutni jak ww.
 	bool showlines = true;
 	public void InitVertexProjecter(Object3D obj ,Dictionary<string, Vector3> labeledVertices){
 		this.OBJECT3D = obj;
@@ -25,7 +30,6 @@ public class ObjectProjecter : MonoBehaviour {
 		CreateHitPoints();
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		if(OBJECT3D != null){
 			GenerateRays();
@@ -34,44 +38,30 @@ public class ObjectProjecter : MonoBehaviour {
 	}
 	void GenerateRays()
     {
-		/*info
-		points[k,k+1,k+2] dotyczą trzech różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
-		*/
-		int i = 0;
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = false; //wyłączenie collidera bo raye go nie lubią i się z nim zderzają
-        foreach (var pair in labeledVertices)
-        {
-
-			Vector3 vertex = transform.TransformPoint(pair.Value); //magic
- 			// Ray w kierunku X
-            Ray rayX = new Ray(vertex, Vector3.right*10);
-            Debug.DrawRay(vertex, Vector3.right*10);
-			ResolveProjection(rayX,i);
-
-            // Ray w kierunku -Y
-            Ray rayY = new Ray(vertex, Vector3.down*10);
-            Debug.DrawRay(vertex, Vector3.down*10);
-			ResolveProjection(rayY,i+1);
-
-            // Ray w kierunku Z
-            Ray rayZ = new Ray(vertex, Vector3.forward*10);
-            Debug.DrawRay(vertex, Vector3.forward*10);
-			ResolveProjection(rayZ,i+2);
-			i+=3;
-        }
+		for(int k = 0; k < nOfProjDirs; k++){
+			int i = k; //przeczytaj opis projs[] jak nie wiesz
+			foreach (var pair in labeledVertices)
+			{
+				Vector3 vertex = transform.TransformPoint(pair.Value); //magic
+				Ray ray = new Ray(vertex, rayDirections[k]);
+				Debug.DrawRay(vertex, rayDirections[k]);
+				ResolveProjection(ray,i);
+				i+=nOfProjDirs;
+			}			
+		}
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem
-
     }
     void ResolveProjection(Ray ray, int idx)
     {
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))// && hit.collider.tag != "Solid")
+        if (Physics.Raycast(ray, out hit))
         {
 			DrawProjection(projs[idx], ray, hit);			
 		}
     }
 	
-	private void DrawProjection(Projection proj, Ray ray, RaycastHit hit){
+	private void DrawProjection(ProjectionInfo proj, Ray ray, RaycastHit hit){
 		//rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
 		if(showlines){
 			proj.lineRenderer.SetPosition(0, ray.origin);
@@ -89,12 +79,11 @@ public class ObjectProjecter : MonoBehaviour {
 	}
 	private void CreateHitPoints()
     {
-		//3 bo 3 reje, MOZE BYĆ WIECEJ!!!
-		int length = 3 * labeledVertices.ToArray().Length;
+		int length = nOfProjDirs * labeledVertices.ToArray().Length;
 		string[] names = labeledVertices.Keys.ToArray();
-		projs = new Projection[length];
+		projs = new ProjectionInfo[length];
 		/*info
-		points[k,k+1,k+2] dotyczą trzech różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
+		points[k,k+1,...,k+nOfProjDirs-1] dotyczą różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
 		*/
         for (int i = 0; i < projs.Length; i++){
 			//znacznik
@@ -106,7 +95,7 @@ public class ObjectProjecter : MonoBehaviour {
 			//tekst
 			GameObject label = new GameObject("VertexLabel" + i);
             TextMesh textMesh = label.AddComponent<TextMesh>();
-            textMesh.text = names[i/3];
+            textMesh.text = names[i/nOfProjDirs]; //
             textMesh.characterSize = 0.1f;
             textMesh.color = Color.black;
             textMesh.font = null;
@@ -122,7 +111,7 @@ public class ObjectProjecter : MonoBehaviour {
             lineRenderer.endWidth = 0.01f;
 			line.transform.SetParent(gameObject.transform);
 			
-			projs[i] = new Projection(marker, label, lineRenderer, false);
+			projs[i] = new ProjectionInfo(marker, label, lineRenderer);
 
 		}
     }
