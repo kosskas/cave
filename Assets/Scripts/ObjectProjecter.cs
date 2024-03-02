@@ -31,6 +31,11 @@ public class ObjectProjecter : MonoBehaviour {
 	/// projs[k, C*k, 2C*k,...] dotyczą rzutów różnych wierzchołków na tą samą płaszczyznę dla C->(0,nOfProjDirs-1)
 	/// </summary>
 	ProjectionInfo[] projs;
+
+	/// <summary>
+	/// Lista krawędzi wyświetlanych na rzutniach
+	/// </summary>
+	List<EdgesProjectionInfo> edgesprojs = new List<EdgesProjectionInfo>();
 	/// <summary>
 	/// Kierunki promieni, prostopadłe
 	/// </summary>
@@ -54,6 +59,7 @@ public class ObjectProjecter : MonoBehaviour {
 		this.labeledVertices = labeledVertices;
 		this.edges = edges;
 		CreateHitPoints();
+		CreateEgdesProj();
 	}
 	
 	/// <summary>
@@ -63,7 +69,6 @@ public class ObjectProjecter : MonoBehaviour {
 		if(OBJECT3D != null){
 			GenerateRays();
 			DrawEgdesProjection();
-			//RysujRzutyNaŚcianach() TODO
 		}
 	}
 	/// <summary>
@@ -165,15 +170,41 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Rysuje krawiędzie miedzy wierzchołkami na rzutniach
 	/// </summary>
 	private void DrawEgdesProjection(){
-		int vertexNum = labeledVertices.ToArray().Length;
-		for(int k = 0; k < nOfProjDirs; k++){
-			for(int i = 0; i < vertexNum; i++){
-				//projs[k*i];
-			}			
+		foreach (var edgeproj in edgesprojs){
+			DrawEgdeLine(edgeproj);
 		}
 	}
+	/// <summary>
+	/// Tworzy listę linii które będą wyświetlane jako krawędzie na odpowiednich rzutniach
+	/// </summary>
+	private void CreateEgdesProj(){
+		for(int k = 0; k < nOfProjDirs; k++){
+			for(int i = k; i < projs.Length; i+=nOfProjDirs){		
+				for(int j = i; j < projs.Length; j+=nOfProjDirs){
+					foreach (var edge in edges){
+						if(edge.Item1 == projs[i].name && edge.Item2 == projs[j].name){
+							GameObject line = new GameObject("EgdeLine");
+							LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
+							lineRenderer.positionCount = 2;
+							lineRenderer.material = new Material(Shader.Find("Standard")); // Ustawienie defaultowego materiału
+							lineRenderer.startWidth = 0.01f;
+							lineRenderer.endWidth = 0.01f;
+							line.transform.SetParent(gameObject.transform);
 
-	private void DrawLine(Vector3 start, Vector3 end){
-
+							///dodaj do listy rzutowanych krawędzi
+							edgesprojs.Add(new EdgesProjectionInfo(lineRenderer,projs[i].marker, projs[j].marker));
+						}
+					}
+				}	
+			}		
+		}
+	}
+	/// <summary>
+	/// Rysuje krawędź na rzutni
+	/// </summary>
+	/// <param name="egdeproj">Informacje o rzutowanej krawędzi</param>
+	private void DrawEgdeLine(EdgesProjectionInfo egdeproj){
+		egdeproj.lineRenderer.SetPosition(0, egdeproj.start.transform.position);
+		egdeproj.lineRenderer.SetPosition(1, egdeproj.end.transform.position);
 	}
 }
