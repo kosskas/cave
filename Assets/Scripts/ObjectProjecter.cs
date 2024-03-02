@@ -7,32 +7,59 @@ using UnityEngine.UI;
 
 	// TODO
 	// [x] Rozwiązać problem z MeshColliderem
-	// [ ] Rozwiązać problem z Colliderem gracza
+	// [x] Rozwiązać problem z Colliderem gracza
 	// [ ] Dodać ile razy była kolizja bool[] hits;
 	// [x] Dodać linie
 	// [x] Dodac tekst
 	// [ ] Wymuś prostopadłość do płaszczyzny
 
 public class ObjectProjecter : MonoBehaviour {	
+	/// <summary>
+	/// Referencja na strukturę Obiekt3D
+	/// </summary>
 	Object3D OBJECT3D;
+	/// <summary>
+	/// Oznaczenia wierzchołków
+	/// </summary>
 	Dictionary<string, Vector3> labeledVertices;
+	/// <summary>
+	/// Macierz sąsiedztwa wierz.
+	/// </summary>
+	int[,] adjacencyMatrix;
 	/// <summary>
 	/// projs[k,k+1,...,k+nOfProjDirs-1] dotyczą rzutów na różne płaszczyzny tego samego wierzchołka, przez co mają taką samą nazwę
 	/// projs[k, C*k, 2C*k,...] dotyczą rzutów różnych wierzchołków na tą samą płaszczyznę dla C->(0,nOfProjDirs-1)
 	/// </summary>
 	ProjectionInfo[] projs;
+	/// <summary>
+	/// Kierunki promieni, prostopadłe
+	/// </summary>
 	Vector3[] rayDirections = {Vector3.right*10, Vector3.down*10, Vector3.forward*10}; //ray w kierunku: X, -Y i Z +rzekome_własne_kierunki
+	/// <summary>
+	/// liczba rzutni
+	/// </summary>
 	int nOfProjDirs=3; //liczba rzutni jak ww.
-	bool showlines = true;
-	public void InitVertexProjecter(Object3D obj ,Dictionary<string, Vector3> labeledVertices){
+	/// <summary>
+	/// Pokazywanie promieni rzutowania
+	/// </summary>
+	public bool showlines = true;
+	/// <summary>
+	/// Inicjuje mechanizm rzutowania
+	/// </summary>
+	/// <param name="obj">Referencja na strukturę Object3D</param>
+	/// <param name="labeledVertices">Oznaczenia wierzchołków</param>
+	/// <param name="faces"></param>
+	public void InitProjecter(Object3D obj, Dictionary<string, Vector3> labeledVertices, int[,] adjacencyMatrix){
 		this.OBJECT3D = obj;
 		this.labeledVertices = labeledVertices;
+		this.adjacencyMatrix = adjacencyMatrix;
 		CreateHitPoints();
 	}
 	
 	void Update () {
 		if(OBJECT3D != null){
 			GenerateRays();
+			DrawEgdesProjection();
 			//RysujRzutyNaŚcianach() TODO
 		}
 	}
@@ -111,8 +138,16 @@ public class ObjectProjecter : MonoBehaviour {
             lineRenderer.endWidth = 0.01f;
 			line.transform.SetParent(gameObject.transform);
 			
-			projs[i] = new ProjectionInfo(marker, label, lineRenderer);
+			projs[i] = new ProjectionInfo(marker, label, lineRenderer, names[i/nOfProjDirs]);
 
 		}
     }
+	public void DrawEgdesProjection(){
+		int vertexNum = labeledVertices.ToArray().Length;
+		for(int k = 0; k < nOfProjDirs; k++){
+			for(int i = 0; i < vertexNum; i++){
+				//projs[k*i];
+			}			
+		}
+	}
 }

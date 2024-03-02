@@ -22,15 +22,21 @@ public class ProjectionInfo
     public LineRenderer lineRenderer;
 
     /// <summary>
+    /// Nazwa
+    /// </summary>
+    public String name;
+
+    /// <summary>
     /// Konstruktor klasy RayInfo
     /// </summary>
     /// <param name="markerObject">Znacznik na planszy</param>
     /// <param name="labelObject">Tekst</param>
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
-    public ProjectionInfo(GameObject markerObject, GameObject labelObject, LineRenderer lineRendererObject)
+    public ProjectionInfo(GameObject markerObject, GameObject labelObject, LineRenderer lineRendererObject, String vertexName)
     {
         marker = markerObject;
         label = labelObject;
         lineRenderer = lineRendererObject;
+        name = vertexName;
     }
 }

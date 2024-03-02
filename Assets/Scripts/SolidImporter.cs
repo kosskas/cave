@@ -202,7 +202,7 @@ public class SolidImporter : MonoBehaviour {
 
 		//Dodanie Object3D - centralnej klasy która podepnie resztę komponentów
 		Object3D object3D = customSolid.AddComponent<Object3D>();
-		object3D.InitObject(vertices, triangles, labeledVertices);
+		object3D.InitObject(vertices, triangles,faces, labeledVertices);
 
 	}
 	private void DeleteSolid() {
