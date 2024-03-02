@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+/// <summary>
+/// Struktura zawierające informacje o rzucie wierzchołka
+/// </summary>
 public class ProjectionInfo
 {
     /// <summary>
@@ -22,15 +25,22 @@ public class ProjectionInfo
     public LineRenderer lineRenderer;
 
     /// <summary>
-    /// Konstruktor klasy RayInfo
+    /// Nazwa
+    /// </summary>
+    public String name;
+
+    /// <summary>
+    /// Konstruktor klasy ProjectionInfo
     /// </summary>
     /// <param name="markerObject">Znacznik na planszy</param>
     /// <param name="labelObject">Tekst</param>
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
-    public ProjectionInfo(GameObject markerObject, GameObject labelObject, LineRenderer lineRendererObject)
+    /// <param name="vertexName">Nazwa</param>
+    public ProjectionInfo(GameObject markerObject, GameObject labelObject, LineRenderer lineRendererObject, String vertexName)
     {
         marker = markerObject;
         label = labelObject;
         lineRenderer = lineRendererObject;
+        name = vertexName;
     }
 }

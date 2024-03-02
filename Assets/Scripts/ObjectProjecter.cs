@@ -7,35 +7,73 @@ using UnityEngine.UI;
 
 	// TODO
 	// [x] Rozwiązać problem z MeshColliderem
-	// [ ] Rozwiązać problem z Colliderem gracza
+	// [x] Rozwiązać problem z Colliderem gracza
 	// [ ] Dodać ile razy była kolizja bool[] hits;
 	// [x] Dodać linie
 	// [x] Dodac tekst
 	// [ ] Wymuś prostopadłość do płaszczyzny
 
 public class ObjectProjecter : MonoBehaviour {	
+	/// <summary>
+	/// Referencja na strukturę Obiekt3D
+	/// </summary>
 	Object3D OBJECT3D;
+	/// <summary>
+	/// Oznaczenia wierzchołków
+	/// </summary>
 	Dictionary<string, Vector3> labeledVertices;
+	/// <summary>
+	/// Lista krawędzi
+	/// </summary>
+	List<Tuple<string, string>> edges = new List<Tuple<string, string>>();
 	/// <summary>
 	/// projs[k,k+1,...,k+nOfProjDirs-1] dotyczą rzutów na różne płaszczyzny tego samego wierzchołka, przez co mają taką samą nazwę
 	/// projs[k, C*k, 2C*k,...] dotyczą rzutów różnych wierzchołków na tą samą płaszczyznę dla C->(0,nOfProjDirs-1)
 	/// </summary>
 	ProjectionInfo[] projs;
+
+	/// <summary>
+	/// Lista krawędzi wyświetlanych na rzutniach
+	/// </summary>
+	List<EdgesProjectionInfo> edgesprojs = new List<EdgesProjectionInfo>();
+	/// <summary>
+	/// Kierunki promieni, prostopadłe
+	/// </summary>
 	Vector3[] rayDirections = {Vector3.right*10, Vector3.down*10, Vector3.forward*10}; //ray w kierunku: X, -Y i Z +rzekome_własne_kierunki
+	/// <summary>
+	/// liczba rzutni
+	/// </summary>
 	int nOfProjDirs=3; //liczba rzutni jak ww.
-	bool showlines = true;
-	public void InitVertexProjecter(Object3D obj ,Dictionary<string, Vector3> labeledVertices){
+	/// <summary>
+	/// Pokazywanie promieni rzutowania
+	/// </summary>
+	public bool showlines = true;
+	/// <summary>
+	/// Inicjuje mechanizm rzutowania
+	/// </summary>
+	/// <param name="obj">Referencja na strukturę Object3D</param>
+	/// <param name="labeledVertices">Oznaczenia wierzchołków</param>
+	/// <param name="faces"></param>
+	public void InitProjecter(Object3D obj, Dictionary<string, Vector3> labeledVertices, List<Tuple<string, string>> edges){
 		this.OBJECT3D = obj;
 		this.labeledVertices = labeledVertices;
+		this.edges = edges;
 		CreateHitPoints();
+		CreateEgdesProj();
 	}
 	
+	/// <summary>
+	/// Aktualizuje rzutowanie
+	/// </summary>
 	void Update () {
 		if(OBJECT3D != null){
 			GenerateRays();
-			//RysujRzutyNaŚcianach() TODO
+			DrawEgdesProjection();
 		}
 	}
+	/// <summary>
+	/// Rzutuje wierzchołki w kierunku płaszczyzn
+	/// </summary>
 	void GenerateRays()
     {
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = false; //wyłączenie collidera bo raye go nie lubią i się z nim zderzają
@@ -52,6 +90,11 @@ public class ObjectProjecter : MonoBehaviour {
 		}
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem
     }
+	/// <summary>
+	/// Rozwiązuje projekcję rzutu
+	/// </summary>
+	/// <param name="ray">Promień</param>
+	/// <param name="idx">Indeks wierzchołka</param>
     void ResolveProjection(Ray ray, int idx)
     {
         RaycastHit hit;
@@ -60,7 +103,12 @@ public class ObjectProjecter : MonoBehaviour {
 			DrawProjection(projs[idx], ray, hit);			
 		}
     }
-	
+	/// <summary>
+	/// Rysuje wierzchołek na płaszczyźnie
+	/// </summary>
+	/// <param name="proj">Inforamcje o wierzchołku</param>
+	/// <param name="ray">Promień</param>
+	/// <param name="hit">Metadana o zderzeniu</param>
 	private void DrawProjection(ProjectionInfo proj, Ray ray, RaycastHit hit){
 		//rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
 		if(showlines){
@@ -77,6 +125,9 @@ public class ObjectProjecter : MonoBehaviour {
 		Vector3 directionToPlayer = ( playerPos+ 2*Vector3.up - proj.label.transform.position).normalized;
 		proj.label.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
 	}
+	/// <summary>
+	/// Tworzy rzuty wierzchołków
+	/// </summary>
 	private void CreateHitPoints()
     {
 		int length = nOfProjDirs * labeledVertices.ToArray().Length;
@@ -111,8 +162,49 @@ public class ObjectProjecter : MonoBehaviour {
             lineRenderer.endWidth = 0.01f;
 			line.transform.SetParent(gameObject.transform);
 			
-			projs[i] = new ProjectionInfo(marker, label, lineRenderer);
+			projs[i] = new ProjectionInfo(marker, label, lineRenderer, names[i/nOfProjDirs]);
 
 		}
     }
+	/// <summary>
+	/// Rysuje krawiędzie miedzy wierzchołkami na rzutniach
+	/// </summary>
+	private void DrawEgdesProjection(){
+		foreach (var edgeproj in edgesprojs){
+			DrawEgdeLine(edgeproj);
+		}
+	}
+	/// <summary>
+	/// Tworzy listę linii które będą wyświetlane jako krawędzie na odpowiednich rzutniach
+	/// </summary>
+	private void CreateEgdesProj(){
+		for(int k = 0; k < nOfProjDirs; k++){
+			for(int i = k; i < projs.Length; i+=nOfProjDirs){		
+				for(int j = i; j < projs.Length; j+=nOfProjDirs){
+					foreach (var edge in edges){
+						if(edge.Item1 == projs[i].name && edge.Item2 == projs[j].name){
+							GameObject line = new GameObject("EgdeLine");
+							LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
+							lineRenderer.positionCount = 2;
+							lineRenderer.material = new Material(Shader.Find("Standard")); // Ustawienie defaultowego materiału
+							lineRenderer.startWidth = 0.01f;
+							lineRenderer.endWidth = 0.01f;
+							line.transform.SetParent(gameObject.transform);
+
+							///dodaj do listy rzutowanych krawędzi
+							edgesprojs.Add(new EdgesProjectionInfo(lineRenderer,projs[i].marker, projs[j].marker));
+						}
+					}
+				}	
+			}		
+		}
+	}
+	/// <summary>
+	/// Rysuje krawędź na rzutni
+	/// </summary>
+	/// <param name="egdeproj">Informacje o rzutowanej krawędzi</param>
+	private void DrawEgdeLine(EdgesProjectionInfo egdeproj){
+		egdeproj.lineRenderer.SetPosition(0, egdeproj.start.transform.position);
+		egdeproj.lineRenderer.SetPosition(1, egdeproj.end.transform.position);
+	}
 }
