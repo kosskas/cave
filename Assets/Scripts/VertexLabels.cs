@@ -30,11 +30,21 @@ public class VertexLabels : MonoBehaviour
     /// Rozmiar wyświetlanych nazw wierzchołków
     /// </summary>
     [SerializeField] public float characterSize = 0.1f;
-
+    /// <summary>
+    /// Tablica wierzchołków
+    /// </summary>
     Vector3[] vertices = null;
+    /// <summary>
+    /// Tablica znaczników
+    /// </summary>
     GameObject[] labels = null;
+    /// <summary>
+    /// Referencja na Obiekt3D
+    /// </summary>
     Object3D OBJECT3D;
-
+    /// <summary>
+    /// Aktualizuje położenie oznaczeń wierzchołków
+    /// </summary>
     void Update()
     {
         if (OBJECT3D!=null && labels != null && vertices != null)
@@ -105,7 +115,11 @@ public class VertexLabels : MonoBehaviour
             Debug.LogError("Brak MeshFilter potrzebnego do działania VertexLabels.cs");
         }
     }
-
+    /// <summary>
+    /// Odnajduje nazwy wierzchołków
+    /// </summary>
+    /// <param name="labeledVertices">Oznaczenia wierzchołków wraz z ich położeniem</param>
+    /// <returns>Tablica nazw wierzchołków</returns>
     string[] ResolveLabels(Dictionary<string, Vector3> labeledVertices)
     {
         Dictionary<Vector3, string> resolver = new Dictionary<Vector3, string>();
@@ -123,7 +137,10 @@ public class VertexLabels : MonoBehaviour
         }
         return names;
     }
-
+    /// <summary>
+    /// Nazywa wierzchołki według domyślnego nazewnictwa
+    /// </summary>
+    /// <returns>Tablica oznaczeń zaczynającej się od "A"</returns>
     string[] GetBaseLabels()
     {
         int MAXLABELSNUMBER = labels.Length; //max liczba wierzchołków do nazwania
@@ -144,7 +161,9 @@ public class VertexLabels : MonoBehaviour
         }
         return labelsnames;
     }
-
+    /// <summary>
+    /// Czyszci oznaczenia
+    /// </summary>
     void ClearLabels()
     {
         //jeśli był jakiś obiekt wcześniej to usuń dane o nim
@@ -156,7 +175,11 @@ public class VertexLabels : MonoBehaviour
         }
     
     }
-
+    /// <summary>
+    /// Na podstawie siatki obiektu wyciąga listę wierzchołków obiektu bez powtórzeń
+    /// </summary>
+    /// <param name="meshVertices">Siatka obiektu</param>
+    /// <returns>Zwraca tablice wierzchołków obiektu bez powtórzeń</returns>
     Vector3[] GetUniqueVertices(Vector3[] meshVertices)
     {
         HashSet<Vector3> set = new HashSet<Vector3>();
