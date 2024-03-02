@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngineInternal;
 
@@ -36,9 +37,9 @@ public class Object3D : MonoBehaviour {
 
 
 	/// <summary>
-	/// Macierz sąsiedztwa wierz.
+	/// Lista krawędzi
 	/// </summary>
-	int[,] adjacencyMatrix;
+	List<Tuple<string, string>> edges = new List<Tuple<string, string>>();
 
 	/// <summary>
 	/// Inicjalizuje obiekt, dodaje skrypty.
@@ -62,7 +63,7 @@ public class Object3D : MonoBehaviour {
 					
 			//TODO
 			//Dodanie projekcji rzutów
-			
+			GetEgdesList();
 			AddRays();
 		}
 		else{
@@ -123,9 +124,28 @@ public class Object3D : MonoBehaviour {
 	private void AddRays()
     {
         ObjectProjecter op = gameObject.AddComponent<ObjectProjecter>();
-		op.InitProjecter(this, labeledVertices, adjacencyMatrix);
+		op.InitProjecter(this, labeledVertices, edges);
     }
+	/// <summary>
+	/// Tworzy listę krawędzi
+	/// </summary>
+	private void GetEgdesList(){
+		foreach (var face in faces)
+        {
+            for (int i = 0; i < face.Count; i++)
+            {
+                string vertex1 = face[i];
+                string vertex2 = face[(i + 1) % face.Count]; // Pobierz następny wierzchołek w cyklu
+                edges.Add(new Tuple<string, string>(vertex1, vertex2));
+            }
+        }
 
+        // Wyświetlenie listy krawędzi
+        foreach (var edge in edges)
+        {
+            Debug.Log(edge.Item1 + " - " + edge.Item2);
+        }
+	}
 
 
 }

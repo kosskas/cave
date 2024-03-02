@@ -23,9 +23,9 @@ public class ObjectProjecter : MonoBehaviour {
 	/// </summary>
 	Dictionary<string, Vector3> labeledVertices;
 	/// <summary>
-	/// Macierz sąsiedztwa wierz.
+	/// Lista krawędzi
 	/// </summary>
-	int[,] adjacencyMatrix;
+	List<Tuple<string, string>> edges = new List<Tuple<string, string>>();
 	/// <summary>
 	/// projs[k,k+1,...,k+nOfProjDirs-1] dotyczą rzutów na różne płaszczyzny tego samego wierzchołka, przez co mają taką samą nazwę
 	/// projs[k, C*k, 2C*k,...] dotyczą rzutów różnych wierzchołków na tą samą płaszczyznę dla C->(0,nOfProjDirs-1)
@@ -49,10 +49,10 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="obj">Referencja na strukturę Object3D</param>
 	/// <param name="labeledVertices">Oznaczenia wierzchołków</param>
 	/// <param name="faces"></param>
-	public void InitProjecter(Object3D obj, Dictionary<string, Vector3> labeledVertices, int[,] adjacencyMatrix){
+	public void InitProjecter(Object3D obj, Dictionary<string, Vector3> labeledVertices, List<Tuple<string, string>> edges){
 		this.OBJECT3D = obj;
 		this.labeledVertices = labeledVertices;
-		this.adjacencyMatrix = adjacencyMatrix;
+		this.edges = edges;
 		CreateHitPoints();
 	}
 	
@@ -86,7 +86,7 @@ public class ObjectProjecter : MonoBehaviour {
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem
     }
 	/// <summary>
-	/// Rozwiązuje 
+	/// Rozwiązuje projekcję rzutu
 	/// </summary>
 	/// <param name="ray">Promień</param>
 	/// <param name="idx">Indeks wierzchołka</param>
@@ -164,12 +164,16 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// Rysuje krawiędzie miedzy wierzchołkami na rzutniach
 	/// </summary>
-	public void DrawEgdesProjection(){
+	private void DrawEgdesProjection(){
 		int vertexNum = labeledVertices.ToArray().Length;
 		for(int k = 0; k < nOfProjDirs; k++){
 			for(int i = 0; i < vertexNum; i++){
 				//projs[k*i];
 			}			
 		}
+	}
+
+	private void DrawLine(Vector3 start, Vector3 end){
+
 	}
 }
