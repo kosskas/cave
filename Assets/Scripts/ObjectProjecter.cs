@@ -56,6 +56,9 @@ public class ObjectProjecter : MonoBehaviour {
 		CreateHitPoints();
 	}
 	
+	/// <summary>
+	/// Aktualizuje rzutowanie
+	/// </summary>
 	void Update () {
 		if(OBJECT3D != null){
 			GenerateRays();
@@ -63,6 +66,9 @@ public class ObjectProjecter : MonoBehaviour {
 			//RysujRzutyNaŚcianach() TODO
 		}
 	}
+	/// <summary>
+	/// Rzutuje wierzchołki w kierunku płaszczyzn
+	/// </summary>
 	void GenerateRays()
     {
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = false; //wyłączenie collidera bo raye go nie lubią i się z nim zderzają
@@ -79,6 +85,11 @@ public class ObjectProjecter : MonoBehaviour {
 		}
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem
     }
+	/// <summary>
+	/// Rozwiązuje 
+	/// </summary>
+	/// <param name="ray">Promień</param>
+	/// <param name="idx">Indeks wierzchołka</param>
     void ResolveProjection(Ray ray, int idx)
     {
         RaycastHit hit;
@@ -87,7 +98,12 @@ public class ObjectProjecter : MonoBehaviour {
 			DrawProjection(projs[idx], ray, hit);			
 		}
     }
-	
+	/// <summary>
+	/// Rysuje wierzchołek na płaszczyźnie
+	/// </summary>
+	/// <param name="proj">Inforamcje o wierzchołku</param>
+	/// <param name="ray">Promień</param>
+	/// <param name="hit">Metadana o zderzeniu</param>
 	private void DrawProjection(ProjectionInfo proj, Ray ray, RaycastHit hit){
 		//rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
 		if(showlines){
@@ -104,6 +120,9 @@ public class ObjectProjecter : MonoBehaviour {
 		Vector3 directionToPlayer = ( playerPos+ 2*Vector3.up - proj.label.transform.position).normalized;
 		proj.label.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
 	}
+	/// <summary>
+	/// Tworzy rzuty wierzchołków
+	/// </summary>
 	private void CreateHitPoints()
     {
 		int length = nOfProjDirs * labeledVertices.ToArray().Length;
@@ -142,6 +161,9 @@ public class ObjectProjecter : MonoBehaviour {
 
 		}
     }
+	/// <summary>
+	/// Rysuje krawiędzie miedzy wierzchołkami na rzutniach
+	/// </summary>
 	public void DrawEgdesProjection(){
 		int vertexNum = labeledVertices.ToArray().Length;
 		for(int k = 0; k < nOfProjDirs; k++){
