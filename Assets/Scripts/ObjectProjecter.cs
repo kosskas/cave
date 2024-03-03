@@ -47,7 +47,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// Pokazywanie promieni rzutowania
 	/// </summary>
-	public bool showlines = true;
+	public bool showlines = false;
 	/// <summary>
 	/// Inicjuje mechanizm rzutowania
 	/// </summary>
@@ -187,8 +187,9 @@ public class ObjectProjecter : MonoBehaviour {
 							LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
 							lineRenderer.positionCount = 2;
 							lineRenderer.material = new Material(Shader.Find("Standard")); // Ustawienie defaultowego materiału
-							lineRenderer.startWidth = 0.01f;
-							lineRenderer.endWidth = 0.01f;
+							lineRenderer.startWidth = 0.05f;
+							lineRenderer.endWidth = 0.05f;
+							lineRenderer.material.color = Color.black;
 							line.transform.SetParent(gameObject.transform);
 
 							///dodaj do listy rzutowanych krawędzi
