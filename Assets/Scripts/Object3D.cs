@@ -146,6 +146,19 @@ public class Object3D : MonoBehaviour {
             Debug.Log(edge.Item1 + " - " + edge.Item2);
         }
 	}
-
+	/// <summary>
+	/// Sprawdza czy wierzchołki sąsiadują ze sobą
+	/// </summary>
+	/// <param name="vert1Name">Nazwa pierwszego wierzchołka</param>
+	/// <param name="vert2Name">Nazwa drugiego wierzchołka</param>
+	/// <returns>True jeśli sąsiadują, False jeśli nie</returns>
+	public bool AreNeighbours(string vert1Name, string vert2Name){
+		foreach (var edge in edges){
+			if(edge.Item1 == vert1Name && edge.Item2 == vert2Name){
+				return true;
+			}
+		}
+		return false;
+	}
 
 }
