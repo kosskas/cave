@@ -47,7 +47,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// Pokazywanie promieni rzutowania
 	/// </summary>
-	public bool showlines = false;
+	public bool showlines = true;
 	/// <summary>
 	/// Inicjuje mechanizm rzutowania
 	/// </summary>
@@ -181,20 +181,18 @@ public class ObjectProjecter : MonoBehaviour {
 		for(int k = 0; k < nOfProjDirs; k++){
 			for(int i = k; i < projs.Length; i+=nOfProjDirs){		
 				for(int j = i; j < projs.Length; j+=nOfProjDirs){
-					foreach (var edge in edges){
-						if(edge.Item1 == projs[i].name && edge.Item2 == projs[j].name){
-							GameObject line = new GameObject("EgdeLine");
-							LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
-							lineRenderer.positionCount = 2;
-							lineRenderer.material = new Material(Shader.Find("Standard")); // Ustawienie defaultowego materiału
-							lineRenderer.startWidth = 0.05f;
-							lineRenderer.endWidth = 0.05f;
-							lineRenderer.material.color = Color.black;
-							line.transform.SetParent(gameObject.transform);
+					if(OBJECT3D.AreNeighbours(projs[i].name, projs[j].name)){
+						GameObject line = new GameObject("EgdeLine");
+						LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
+						lineRenderer.positionCount = 2;
+						lineRenderer.material = new Material(Shader.Find("Standard")); // Ustawienie defaultowego materiału
+						lineRenderer.startWidth = 0.05f;
+						lineRenderer.endWidth = 0.05f;
+						lineRenderer.material.color = Color.black;
+						line.transform.SetParent(gameObject.transform);
 
-							///dodaj do listy rzutowanych krawędzi
-							edgesprojs.Add(new EdgesProjectionInfo(lineRenderer,projs[i].marker, projs[j].marker));
-						}
+						///dodaj do listy rzutowanych krawędzi
+						edgesprojs.Add(new EdgesProjectionInfo(lineRenderer,projs[i].marker, projs[j].marker));
 					}
 				}	
 			}		
