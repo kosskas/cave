@@ -29,6 +29,9 @@ public class ProjectionInfo
     /// </summary>
     public String name;
 
+
+    public bool[] collids;
+
     /// <summary>
     /// Konstruktor klasy ProjectionInfo
     /// </summary>
@@ -38,6 +41,7 @@ public class ProjectionInfo
     /// <param name="vertexName">Nazwa</param>
     public ProjectionInfo(GameObject markerObject, GameObject labelObject, LineRenderer lineRendererObject, String vertexName)
     {
+        collids = new bool[ObjectProjecter.nOfProjDirs];
         marker = markerObject;
         label = labelObject;
         lineRenderer = lineRendererObject;

@@ -43,7 +43,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// liczba rzutni
 	/// </summary>
-	int nOfProjDirs=3; //liczba rzutni jak ww.
+	public const int nOfProjDirs=3; //liczba rzutni jak ww.
 	/// <summary>
 	/// Pokazywanie promieni rzutowania
 	/// </summary>
@@ -84,24 +84,39 @@ public class ObjectProjecter : MonoBehaviour {
 				Vector3 vertex = transform.TransformPoint(pair.Value); //magic
 				Ray ray = new Ray(vertex, rayDirections[k]);
 				Debug.DrawRay(vertex, rayDirections[k]);
-				ResolveProjection(ray,i);
+				RaycastHit hit;
+        		if (Physics.Raycast(ray, out hit))
+        		{
+					DrawProjection(projs[i], ray, hit);			
+				}
 				i+=nOfProjDirs;
 			}			
 		}
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem
-    }
-	/// <summary>
-	/// Rozwiązuje projekcję rzutu
-	/// </summary>
-	/// <param name="ray">Promień</param>
-	/// <param name="idx">Indeks wierzchołka</param>
-    void ResolveProjection(Ray ray, int idx)
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
-        {
-			DrawProjection(projs[idx], ray, hit);			
+
+		///test
+		for(int k = 0; k < nOfProjDirs; k++){
+			int i = k; //przeczytaj opis projs[] jak nie wiesz
+			foreach (var pair in labeledVertices)
+			{
+				Vector3 vertex = transform.TransformPoint(pair.Value); //magic
+				Ray ray = new Ray(vertex, rayDirections[k]);
+				RaycastHit hit;
+				if (Physics.Raycast(ray, out hit))
+        		{
+					if (hit.collider.CompareTag("Solid"))
+					{
+						projs[i].collids[k] = true;
+            		}
+					else
+					{
+						projs[i].collids[k] = false;
+					}		
+				}
+				i+=nOfProjDirs;
+			}			
 		}
+		
     }
 	/// <summary>
 	/// Rysuje wierzchołek na płaszczyźnie
@@ -192,7 +207,7 @@ public class ObjectProjecter : MonoBehaviour {
 							line.transform.SetParent(gameObject.transform);
 
 							///dodaj do listy rzutowanych krawędzi
-							edgesprojs.Add(new EdgesProjectionInfo(lineRenderer,projs[i].marker, projs[j].marker));
+							edgesprojs.Add(new EdgesProjectionInfo(k, lineRenderer,projs[i], projs[j]));
 						}
 					}
 				}	
@@ -204,7 +219,18 @@ public class ObjectProjecter : MonoBehaviour {
 	/// </summary>
 	/// <param name="egdeproj">Informacje o rzutowanej krawędzi</param>
 	private void DrawEgdeLine(EdgesProjectionInfo egdeproj){
-		egdeproj.lineRenderer.SetPosition(0, egdeproj.start.transform.position);
-		egdeproj.lineRenderer.SetPosition(1, egdeproj.end.transform.position);
+		Vector3 startpos = egdeproj.start.marker.transform.position;
+		Vector3 endpos = egdeproj.end.marker.transform.position;
+		if(egdeproj.start.collids[egdeproj.nOfProj] == true || egdeproj.end.collids[egdeproj.nOfProj] == true)
+		{
+			egdeproj.lineRenderer.material.color = Color.red;
+		}
+		else
+		{
+			egdeproj.lineRenderer.material.color = Color.black;
+		}
+
+		egdeproj.lineRenderer.SetPosition(0, startpos);
+		egdeproj.lineRenderer.SetPosition(1, endpos);
 	}
 }

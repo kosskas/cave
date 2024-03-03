@@ -13,7 +13,7 @@ public class EdgesProjectionInfo
     /// <summary>
     /// Tekst
     /// </summary>
-    //public GameObject label;
+    public int nOfProj;
     
     /// <summary>
     /// Linia
@@ -23,19 +23,20 @@ public class EdgesProjectionInfo
     /// <summary>
     /// Początek krawędzi
     /// </summary>
-    public GameObject start;
+    public ProjectionInfo start;
     /// <summary>
     /// Koniec krawędzi
     /// </summary>
-    public GameObject end;
+    public ProjectionInfo end;
 
     /// <summary>
     /// Konstruktor klasy EdgesProjectionInfo
     /// </summary>
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
-    public EdgesProjectionInfo(LineRenderer lineRendererObject, GameObject start, GameObject end)
+    public EdgesProjectionInfo(int nOfProj, LineRenderer lineRendererObject, ProjectionInfo start, ProjectionInfo end)
     {
-        lineRenderer = lineRendererObject;
+        this.nOfProj = nOfProj;
+        this.lineRenderer = lineRendererObject;
         this.start = start;
         this.end = end;
     }
