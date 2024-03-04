@@ -8,11 +8,11 @@ using UnityEngine.UI;
 	// TODO
 	// [x] Rozwiązać problem z MeshColliderem
 	// [x] Rozwiązać problem z Colliderem gracza
-	// [ ] Dodać ile razy była kolizja bool[] hits;
+	// [x] Dodać ile razy była kolizja bool[] hits;
 	// [x] Dodać linie
 	// [x] Dodac tekst
 	// [ ] Wymuś prostopadłość do płaszczyzny
-	// [ ] Sparapetryzować line itd..
+	// [+-] Sparapetryzować line itd..
 
 public class ObjectProjecter : MonoBehaviour {	
 	/// <summary>
@@ -32,12 +32,13 @@ public class ObjectProjecter : MonoBehaviour {
 	/// </summary>
 	List<Tuple<string, string>> edges = new List<Tuple<string, string>>();
 	/// <summary>
+	/// Tablica określająca rzut wierzchołka na rzutnie.
 	/// projs[k,k+1,...,k+nOfProjDirs-1] dotyczą rzutów na różne płaszczyzny tego samego wierzchołka, przez co mają taką samą nazwę
 	/// projs[k, C+k, 2C+k,...] dotyczą rzutów różnych wierzchołków na tą samą płaszczyznę dla C->(0,nOfProjDirs-1)
 	/// przykład: 	0: A1, 1: A2, 2: A3,
 	/// 			3: B1, 4: B2, 5: B3,
 	/// 			6: C1, 7: C2, 8: C3
-	/// , czyli punkty na rzutni "1" są pod indeksami 0,3,6 
+	/// , czyli punkty na rzutni "1" są pod indeksami 0,3,6. Wszystkie rzuty punktu "A" są pod indeksami 0,1,2.
 	/// </summary>
 	VertexProjection[] projs;
 	/// <summary>
@@ -55,7 +56,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// Pokazywanie promieni rzutowania
 	/// </summary>
-	public bool showlines = true;
+	public bool showlines = false;
 	/// <summary>
 	/// Inicjuje mechanizm rzutowania
 	/// </summary>
@@ -92,7 +93,7 @@ public class ObjectProjecter : MonoBehaviour {
 			{
 				Vector3 vertex = transform.TransformPoint(pair.Value); //transformacja wierzchołka z pliku tak aby zgadzał się z aktualną pozycją bryły (ze wzgl. jej na obrót) 
 				Ray ray = new Ray(vertex, rayDirections[k]);
-				Debug.DrawRay(vertex, rayDirections[k]);
+				//Debug.DrawRay(vertex, rayDirections[k]);
 				RaycastHit hit;
         		if (Physics.Raycast(ray, out hit))
         		{
@@ -103,18 +104,24 @@ public class ObjectProjecter : MonoBehaviour {
 		}
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem
 
-		///test
+		///sprawdzenie kolizji do zakrywania wierzch
 		for(int k = 0; k < nOfProjDirs; k++){
 			int i = k; //przeczytaj opis projs[] jak nie wiesz
 			foreach (var pair in labeledVertices)
 			{
-				Vector3 vertex = transform.TransformPoint(pair.Value); //magic
+				///offset musi być bo inaczej nie działa
+				Vector3 vertex = transform.TransformPoint(pair.Value*1.0001f);//* 1.005f; //dodaj lekki offset tak żeby nie było jakiś dziwnych kolizji
+				///
+
 				Ray ray = new Ray(vertex, rayDirections[k]);
 				RaycastHit hit;
+				//Debug.DrawRay(vertex, rayDirections[k]);
 				if (Physics.Raycast(ray, out hit))
         		{
-					if (hit.collider.CompareTag("Solid"))
+					//jeżeli ray z pktu przeleciał przez Obiekt to pkt jest zakryty
+					if (hit.collider.CompareTag("Solid")) 
 					{
+						//oznacz wg jakiej rzutni pkt jest zakryty
 						projs[i].collids[k] = true;
             		}
 					else
@@ -216,7 +223,7 @@ public class ObjectProjecter : MonoBehaviour {
 						line.transform.SetParent(gameObject.transform);
 
 						///dodaj do listy rzutowanych krawędzi
-						edgesprojs.Add(new EdgeProjection(k, lineRenderer,projs[i].marker, projs[j].marker));
+						edgesprojs.Add(new EdgeProjection(k, lineRenderer,projs[i], projs[j]));
 					}
 				}
 			}	
@@ -227,8 +234,18 @@ public class ObjectProjecter : MonoBehaviour {
 	/// </summary>
 	/// <param name="egdeproj">Informacje o rzutowanej krawędzi</param>
 	private void DrawEgdeLine(EdgeProjection egdeproj){
+		//pobierz wsp. markerów wierzchołków na rzutni
+		Vector3 point1 = egdeproj.start.marker.transform.position;
+		Vector3 point2 = egdeproj.end.marker.transform.position;
+		///jeżeli na tej samej rzutni (egdeproj.nOfProj) jeden z tych pktów jest zakryty to oznacz krawędz jako zakrytą
+		if(egdeproj.start.collids[egdeproj.nOfProj] || egdeproj.end.collids[egdeproj.nOfProj]){
+			egdeproj.lineRenderer.material.color = Color.yellow;
+		}
+		else{
+			egdeproj.lineRenderer.material.color = Color.black;
+		}
 
-		egdeproj.lineRenderer.SetPosition(0, egdeproj.start.transform.position);
-		egdeproj.lineRenderer.SetPosition(1, egdeproj.end.transform.position);
+		egdeproj.lineRenderer.SetPosition(0, point1);
+		egdeproj.lineRenderer.SetPosition(1, point2);
 	}
 }

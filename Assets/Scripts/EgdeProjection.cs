@@ -10,7 +10,7 @@ using UnityEngine.UI;
 public class EdgeProjection
 {
     /// <summary>
-    /// Tekst
+    /// Numer rzutni
     /// </summary>
     public int nOfProj;
  
@@ -20,19 +20,22 @@ public class EdgeProjection
     public LineRenderer lineRenderer;
 
     /// <summary>
-    /// Początek krawędzi
+    /// Początek krawędzi - punkt początkowy
     /// </summary>
-    public GameObject start;
+    public VertexProjection start;
     /// <summary>
-    /// Koniec krawędzi
+    /// Koniec krawędzi - punkt końcowy
     /// </summary>
-    public GameObject end;
+    public VertexProjection end;
 
     /// <summary>
-    /// Konstruktor klasy EdgeProjection
+    /// Konstruktor EdgeProjection
     /// </summary>
+    /// <param name="nOfProj">Numer rzutni</param>
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
-    public EdgeProjection(int nOfProj, LineRenderer lineRendererObject, GameObject start, GameObject end)
+    /// <param name="start">punkt początkowy</param>
+    /// <param name="end">punkt końcowy</param>
+    public EdgeProjection(int nOfProj, LineRenderer lineRendererObject, VertexProjection start, VertexProjection end)
     {
         this.nOfProj = nOfProj;
         this.lineRenderer = lineRendererObject;

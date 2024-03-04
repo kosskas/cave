@@ -9,8 +9,11 @@ using UnityEngine.UI;
 /// </summary>
 public class VertexProjection
 {
-
+    /// <summary>
+    /// Tablica określająca zakrycie wierzchołka według danej (1,2,3) rzutni
+    /// </summary>
     public bool[] collids = new bool[3];   
+    
     /// <summary>
     /// Znacznik na planszy
     /// </summary>
