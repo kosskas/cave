@@ -30,6 +30,10 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// projs[k,k+1,...,k+nOfProjDirs-1] dotyczą rzutów na różne płaszczyzny tego samego wierzchołka, przez co mają taką samą nazwę
 	/// projs[k, C+k, 2C+k,...] dotyczą rzutów różnych wierzchołków na tą samą płaszczyznę dla C->(0,nOfProjDirs-1)
+	/// przykład: 	0: A1, 1: A2, 2: A3,
+	/// 			3: B1, 4: B2, 5: B3,
+	/// 			6: C1, 7: C2, 8: C3
+	/// , czyli punkty na rzutni "1" są pod indeksami 0,3,6 
 	/// </summary>
 	VertexProjection[] projs;
 
@@ -131,7 +135,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// </summary>
 	private void CreateHitPoints()
     {
-		int length = nOfProjDirs * labeledVertices.ToArray().Length;
+		int length = nOfProjDirs * labeledVertices.ToArray().Length; //l.wierzch x liczba rzutni
 		string[] names = labeledVertices.Keys.ToArray();
 		projs = new VertexProjection[length];
 		/*info
@@ -147,7 +151,7 @@ public class ObjectProjecter : MonoBehaviour {
 			//tekst
 			GameObject label = new GameObject("VertexLabel" + i);
             TextMesh textMesh = label.AddComponent<TextMesh>();
-            textMesh.text = names[i/nOfProjDirs]; //
+            textMesh.text = names[i/nOfProjDirs]; //ta sama nazwa ale inny wymiar
             textMesh.characterSize = 0.1f;
             textMesh.color = Color.black;
             textMesh.font = null;
