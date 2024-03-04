@@ -13,7 +13,7 @@ public class ProjectionInfo
     /// <summary>
     /// Grubość linii krawędzi.
     /// </summary>
-    public float edgeLineWidth = 0.01f;
+    public float edgeLineWidth = 0.05f;
 
     /// <summary>
     /// Kolor linii krawędzi.
@@ -23,7 +23,7 @@ public class ProjectionInfo
     /// <summary>
     /// Długość linii rzutowania.
     /// </summary>
-    public float projectionLineWidth = 0.05f;
+    public float projectionLineWidth = 0.01f;
 
     /// <summary>
     /// Określa czy linie rzutowania powinny być wyświetlane.
