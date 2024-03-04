@@ -20,6 +20,10 @@ public class ObjectProjecter : MonoBehaviour {
 	/// </summary>
 	Object3D OBJECT3D;
 	/// <summary>
+	/// Dane dot. wyświetlania rzutów
+	/// </summary>
+	ProjectionInfo projectionInfo;
+	/// <summary>
 	/// Oznaczenia wierzchołków
 	/// </summary>
 	Dictionary<string, Vector3> labeledVertices;
@@ -36,7 +40,6 @@ public class ObjectProjecter : MonoBehaviour {
 	/// , czyli punkty na rzutni "1" są pod indeksami 0,3,6 
 	/// </summary>
 	VertexProjection[] projs;
-
 	/// <summary>
 	/// Lista krawędzi wyświetlanych na rzutniach
 	/// </summary>
@@ -59,10 +62,11 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="obj">Referencja na strukturę Object3D</param>
 	/// <param name="labeledVertices">Oznaczenia wierzchołków</param>
 	/// <param name="faces"></param>
-	public void InitProjecter(Object3D obj, Dictionary<string, Vector3> labeledVertices, List<Tuple<string, string>> edges){
+	public void InitProjecter(Object3D obj,ProjectionInfo projectionInfo, Dictionary<string, Vector3> labeledVertices, List<Tuple<string, string>> edges){
 		this.OBJECT3D = obj;
 		this.labeledVertices = labeledVertices;
 		this.edges = edges;
+		this.projectionInfo = projectionInfo;
 		CreateHitPoints();
 		CreateEgdesProj();
 	}
@@ -163,8 +167,8 @@ public class ObjectProjecter : MonoBehaviour {
 			LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
 			lineRenderer.positionCount = 2;
             lineRenderer.material = new Material(Shader.Find("Standard")); // Ustawienie defaultowego materiału
-            lineRenderer.startWidth = 0.01f;
-            lineRenderer.endWidth = 0.01f;
+            lineRenderer.startWidth = projectionInfo.projectionLineWidth;
+            lineRenderer.endWidth = projectionInfo.projectionLineWidth;
 			line.transform.SetParent(gameObject.transform);
 			
 			projs[i] = new VertexProjection(marker, label, lineRenderer, names[i/nOfProjDirs]);
@@ -191,9 +195,9 @@ public class ObjectProjecter : MonoBehaviour {
 						LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
 						lineRenderer.positionCount = 2;
 						lineRenderer.material = new Material(Shader.Find("Standard")); // Ustawienie defaultowego materiału
-						lineRenderer.startWidth = 0.05f;
-						lineRenderer.endWidth = 0.05f;
-						lineRenderer.material.color = Color.black;
+						lineRenderer.startWidth = projectionInfo.edgeLineWidth;
+						lineRenderer.endWidth = projectionInfo.edgeLineWidth;
+						lineRenderer.material.color = projectionInfo.edgeColor;
 						line.transform.SetParent(gameObject.transform);
 
 						///dodaj do listy rzutowanych krawędzi

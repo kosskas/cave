@@ -123,8 +123,10 @@ public class Object3D : MonoBehaviour {
 	/// </summary>
 	private void AddRays()
     {
+		ProjectionInfo projectionInfo = new ProjectionInfo(); //bazowo parametry czytane z pliku
+
         ObjectProjecter op = gameObject.AddComponent<ObjectProjecter>();
-		op.InitProjecter(this, labeledVertices, edges);
+		op.InitProjecter(this, projectionInfo, labeledVertices, edges);
     }
 	/// <summary>
 	/// Tworzy listę krawędzi

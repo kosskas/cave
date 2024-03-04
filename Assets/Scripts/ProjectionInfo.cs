@@ -23,7 +23,7 @@ public class ProjectionInfo
     /// <summary>
     /// Długość linii rzutowania.
     /// </summary>
-    public float projectionLine = 0.05f;
+    public float projectionLineWidth = 0.05f;
 
     /// <summary>
     /// Określa czy linie rzutowania powinny być wyświetlane.
@@ -40,13 +40,13 @@ public class ProjectionInfo
     /// </summary>
     /// <param name="edgeLineWidth">Grubość linii krawędzi.</param>
     /// <param name="edgeColor">Kolor linii krawędzi.</param>
-    /// <param name="projectionLine">Długość linii rzutowania.</param>
+    /// <param name="projectionLineWidth">Długość linii rzutowania.</param>
     /// <param name="showProjectionLines">Określa czy linie rzutowania powinny być wyświetlane.</param>
-    public ProjectionInfo(float edgeLineWidth, Color edgeColor, float projectionLine, bool showProjectionLines)
+    public ProjectionInfo(float edgeLineWidth, Color edgeColor, float projectionLineWidth, bool showProjectionLines)
     {
         this.edgeLineWidth = edgeLineWidth;
         this.edgeColor = edgeColor;
-        this.projectionLine = projectionLine;
+        this.projectionLineWidth = projectionLineWidth;
         this.showProjectionLines = showProjectionLines;
     }
 }
