@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// <summary>
 /// Struktura zawierające informacje o rzucie krawędzi
 /// </summary>
-public class EdgesProjectionInfo
+public class EdgeProjection
 {
    
     /// <summary>
@@ -30,10 +30,10 @@ public class EdgesProjectionInfo
     public GameObject end;
 
     /// <summary>
-    /// Konstruktor klasy EdgesProjectionInfo
+    /// Konstruktor klasy EdgeProjection
     /// </summary>
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
-    public EdgesProjectionInfo(LineRenderer lineRendererObject, GameObject start, GameObject end)
+    public EdgeProjection(LineRenderer lineRendererObject, GameObject start, GameObject end)
     {
         lineRenderer = lineRendererObject;
         this.start = start;

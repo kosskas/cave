@@ -12,6 +12,7 @@ using UnityEngine.UI;
 	// [x] Dodać linie
 	// [x] Dodac tekst
 	// [ ] Wymuś prostopadłość do płaszczyzny
+	// [ ] Sparapetryzować line itd..
 
 public class ObjectProjecter : MonoBehaviour {	
 	/// <summary>
@@ -28,14 +29,14 @@ public class ObjectProjecter : MonoBehaviour {
 	List<Tuple<string, string>> edges = new List<Tuple<string, string>>();
 	/// <summary>
 	/// projs[k,k+1,...,k+nOfProjDirs-1] dotyczą rzutów na różne płaszczyzny tego samego wierzchołka, przez co mają taką samą nazwę
-	/// projs[k, C*k, 2C*k,...] dotyczą rzutów różnych wierzchołków na tą samą płaszczyznę dla C->(0,nOfProjDirs-1)
+	/// projs[k, C+k, 2C+k,...] dotyczą rzutów różnych wierzchołków na tą samą płaszczyznę dla C->(0,nOfProjDirs-1)
 	/// </summary>
 	VertexProjection[] projs;
 
 	/// <summary>
 	/// Lista krawędzi wyświetlanych na rzutniach
 	/// </summary>
-	List<EdgesProjectionInfo> edgesprojs = new List<EdgesProjectionInfo>();
+	List<EdgeProjection> edgesprojs = new List<EdgeProjection>();
 	/// <summary>
 	/// Kierunki promieni, prostopadłe
 	/// </summary>
@@ -81,7 +82,7 @@ public class ObjectProjecter : MonoBehaviour {
 			int i = k; //przeczytaj opis projs[] jak nie wiesz
 			foreach (var pair in labeledVertices)
 			{
-				Vector3 vertex = transform.TransformPoint(pair.Value); //magic
+				Vector3 vertex = transform.TransformPoint(pair.Value); //transformacja wierzchołka z pliku tak aby zgadzał się z aktualną pozycją bryły (ze wzgl. jej na obrót) 
 				Ray ray = new Ray(vertex, rayDirections[k]);
 				Debug.DrawRay(vertex, rayDirections[k]);
 				ResolveProjection(ray,i);
@@ -192,7 +193,7 @@ public class ObjectProjecter : MonoBehaviour {
 						line.transform.SetParent(gameObject.transform);
 
 						///dodaj do listy rzutowanych krawędzi
-						edgesprojs.Add(new EdgesProjectionInfo(lineRenderer,projs[i].marker, projs[j].marker));
+						edgesprojs.Add(new EdgeProjection(lineRenderer,projs[i].marker, projs[j].marker));
 					}
 				}	
 			}		
@@ -202,7 +203,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Rysuje krawędź na rzutni
 	/// </summary>
 	/// <param name="egdeproj">Informacje o rzutowanej krawędzi</param>
-	private void DrawEgdeLine(EdgesProjectionInfo egdeproj){
+	private void DrawEgdeLine(EdgeProjection egdeproj){
 		egdeproj.lineRenderer.SetPosition(0, egdeproj.start.transform.position);
 		egdeproj.lineRenderer.SetPosition(1, egdeproj.end.transform.position);
 	}
