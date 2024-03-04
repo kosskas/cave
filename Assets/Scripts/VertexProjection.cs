@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// <summary>
 /// Struktura zawierające informacje o rzucie wierzchołka
 /// </summary>
-public class ProjectionInfo
+public class VertexProjection
 {
     /// <summary>
     /// Znacznik na planszy
@@ -30,13 +30,13 @@ public class ProjectionInfo
     public String name;
 
     /// <summary>
-    /// Konstruktor klasy ProjectionInfo
+    /// Konstruktor klasy VertexProjection
     /// </summary>
     /// <param name="markerObject">Znacznik na planszy</param>
     /// <param name="labelObject">Tekst</param>
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
     /// <param name="vertexName">Nazwa</param>
-    public ProjectionInfo(GameObject markerObject, GameObject labelObject, LineRenderer lineRendererObject, String vertexName)
+    public VertexProjection(GameObject markerObject, GameObject labelObject, LineRenderer lineRendererObject, String vertexName)
     {
         marker = markerObject;
         label = labelObject;

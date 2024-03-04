@@ -30,7 +30,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// projs[k,k+1,...,k+nOfProjDirs-1] dotyczą rzutów na różne płaszczyzny tego samego wierzchołka, przez co mają taką samą nazwę
 	/// projs[k, C*k, 2C*k,...] dotyczą rzutów różnych wierzchołków na tą samą płaszczyznę dla C->(0,nOfProjDirs-1)
 	/// </summary>
-	ProjectionInfo[] projs;
+	VertexProjection[] projs;
 
 	/// <summary>
 	/// Lista krawędzi wyświetlanych na rzutniach
@@ -109,7 +109,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="proj">Inforamcje o wierzchołku</param>
 	/// <param name="ray">Promień</param>
 	/// <param name="hit">Metadana o zderzeniu</param>
-	private void DrawProjection(ProjectionInfo proj, Ray ray, RaycastHit hit){
+	private void DrawProjection(VertexProjection proj, Ray ray, RaycastHit hit){
 		//rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
 		if(showlines){
 			proj.lineRenderer.SetPosition(0, ray.origin);
@@ -132,7 +132,7 @@ public class ObjectProjecter : MonoBehaviour {
     {
 		int length = nOfProjDirs * labeledVertices.ToArray().Length;
 		string[] names = labeledVertices.Keys.ToArray();
-		projs = new ProjectionInfo[length];
+		projs = new VertexProjection[length];
 		/*info
 		points[k,k+1,...,k+nOfProjDirs-1] dotyczą różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
 		*/
@@ -162,7 +162,7 @@ public class ObjectProjecter : MonoBehaviour {
             lineRenderer.endWidth = 0.01f;
 			line.transform.SetParent(gameObject.transform);
 			
-			projs[i] = new ProjectionInfo(marker, label, lineRenderer, names[i/nOfProjDirs]);
+			projs[i] = new VertexProjection(marker, label, lineRenderer, names[i/nOfProjDirs]);
 
 		}
     }
