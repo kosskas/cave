@@ -9,6 +9,8 @@ using UnityEngine.UI;
 /// </summary>
 public class VertexProjection
 {
+
+    public bool[] collids = new bool[3];   
     /// <summary>
     /// Znacznik na planszy
     /// </summary>

@@ -215,19 +215,19 @@ public class ObjectProjecter : MonoBehaviour {
 						lineRenderer.material.color = projectionInfo.edgeColor;
 						line.transform.SetParent(gameObject.transform);
 
-							///dodaj do listy rzutowanych krawędzi
-							edgesprojs.Add(new EdgeProjection(k, lineRenderer,projs[i].marker, projs[j].marker));
-						}
+						///dodaj do listy rzutowanych krawędzi
+						edgesprojs.Add(new EdgeProjection(k, lineRenderer,projs[i].marker, projs[j].marker));
 					}
-				}	
-			}		
-		}
+				}
+			}	
+		}		
 	}
 	/// <summary>
 	/// Rysuje krawędź na rzutni
 	/// </summary>
 	/// <param name="egdeproj">Informacje o rzutowanej krawędzi</param>
 	private void DrawEgdeLine(EdgeProjection egdeproj){
+
 		egdeproj.lineRenderer.SetPosition(0, egdeproj.start.transform.position);
 		egdeproj.lineRenderer.SetPosition(1, egdeproj.end.transform.position);
 	}

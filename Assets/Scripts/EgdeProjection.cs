@@ -9,14 +9,11 @@ using UnityEngine.UI;
 /// </summary>
 public class EdgeProjection
 {
-   
     /// <summary>
     /// Tekst
     /// </summary>
     public int nOfProj;
-
-    public bool[] collids = new bool[3];
-    
+ 
     /// <summary>
     /// Linia
     /// </summary>
@@ -25,17 +22,17 @@ public class EdgeProjection
     /// <summary>
     /// Początek krawędzi
     /// </summary>
-    public VertexProjection start;
+    public GameObject start;
     /// <summary>
     /// Koniec krawędzi
     /// </summary>
-    public VertexProjection end;
+    public GameObject end;
 
     /// <summary>
     /// Konstruktor klasy EdgeProjection
     /// </summary>
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
-    public EdgeProjection(int nOfProj, LineRenderer lineRendererObject, VertexProjection start, VertexProjection end)
+    public EdgeProjection(int nOfProj, LineRenderer lineRendererObject, GameObject start, GameObject end)
     {
         this.nOfProj = nOfProj;
         this.lineRenderer = lineRendererObject;
