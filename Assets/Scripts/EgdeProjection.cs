@@ -7,13 +7,15 @@ using UnityEngine.UI;
 /// <summary>
 /// Struktura zawierające informacje o rzucie krawędzi
 /// </summary>
-public class EdgesProjectionInfo
+public class EdgeProjection
 {
    
     /// <summary>
     /// Tekst
     /// </summary>
     public int nOfProj;
+
+    public bool[] collids = new bool[3];
     
     /// <summary>
     /// Linia
@@ -23,17 +25,17 @@ public class EdgesProjectionInfo
     /// <summary>
     /// Początek krawędzi
     /// </summary>
-    public ProjectionInfo start;
+    public VertexProjection start;
     /// <summary>
     /// Koniec krawędzi
     /// </summary>
-    public ProjectionInfo end;
+    public VertexProjection end;
 
     /// <summary>
-    /// Konstruktor klasy EdgesProjectionInfo
+    /// Konstruktor klasy EdgeProjection
     /// </summary>
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
-    public EdgesProjectionInfo(int nOfProj, LineRenderer lineRendererObject, ProjectionInfo start, ProjectionInfo end)
+    public EdgeProjection(int nOfProj, LineRenderer lineRendererObject, VertexProjection start, VertexProjection end)
     {
         this.nOfProj = nOfProj;
         this.lineRenderer = lineRendererObject;

@@ -4,47 +4,49 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+
 /// <summary>
-/// Struktura zawierające informacje o rzucie wierzchołka
+/// Zawiera informacje dot. wyświetlania rzutowanych wierzchołków i krawędzi
 /// </summary>
 public class ProjectionInfo
 {
     /// <summary>
-    /// Znacznik na planszy
+    /// Grubość linii krawędzi.
     /// </summary>
-    public GameObject marker;
-    
-    /// <summary>
-    /// Tekst
-    /// </summary>
-    public GameObject label;
-    
-    /// <summary>
-    /// Linia
-    /// </summary>
-    public LineRenderer lineRenderer;
+    public float edgeLineWidth = 0.05f;
 
     /// <summary>
-    /// Nazwa
+    /// Kolor linii krawędzi.
     /// </summary>
-    public String name;
-
-
-    public bool[] collids;
+    public Color edgeColor = Color.black;
 
     /// <summary>
-    /// Konstruktor klasy ProjectionInfo
+    /// Długość linii rzutowania.
     /// </summary>
-    /// <param name="markerObject">Znacznik na planszy</param>
-    /// <param name="labelObject">Tekst</param>
-    /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
-    /// <param name="vertexName">Nazwa</param>
-    public ProjectionInfo(GameObject markerObject, GameObject labelObject, LineRenderer lineRendererObject, String vertexName)
+    public float projectionLineWidth = 0.01f;
+
+    /// <summary>
+    /// Określa czy linie rzutowania powinny być wyświetlane.
+    /// </summary>
+    public bool showProjectionLines = false;
+
+    /// <summary>
+    /// Konstruktor bezparametrowy.
+    /// </summary>
+    public ProjectionInfo(){}
+
+    /// <summary>
+    /// Konstruktor z parametrami.
+    /// </summary>
+    /// <param name="edgeLineWidth">Grubość linii krawędzi.</param>
+    /// <param name="edgeColor">Kolor linii krawędzi.</param>
+    /// <param name="projectionLineWidth">Długość linii rzutowania.</param>
+    /// <param name="showProjectionLines">Określa czy linie rzutowania powinny być wyświetlane.</param>
+    public ProjectionInfo(float edgeLineWidth, Color edgeColor, float projectionLineWidth, bool showProjectionLines)
     {
-        collids = new bool[ObjectProjecter.nOfProjDirs];
-        marker = markerObject;
-        label = labelObject;
-        lineRenderer = lineRendererObject;
-        name = vertexName;
+        this.edgeLineWidth = edgeLineWidth;
+        this.edgeColor = edgeColor;
+        this.projectionLineWidth = projectionLineWidth;
+        this.showProjectionLines = showProjectionLines;
     }
 }
