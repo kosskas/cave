@@ -64,6 +64,11 @@ public class PlayerController : MonoBehaviour
         {
             si.ImportSolid();
         }
+
+        if(Input.GetKeyDown("o")){
+            ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+            op.SetShowingLines();
+        }
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 

@@ -56,7 +56,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// Pokazywanie promieni rzutowania
 	/// </summary>
-	public bool showlines = false;
+	bool showlines = false;
 	/// <summary>
 	/// Inicjuje mechanizm rzutowania
 	/// </summary>
@@ -78,7 +78,9 @@ public class ObjectProjecter : MonoBehaviour {
 	void Update () {
 		if(OBJECT3D != null){
 			GenerateRays();
+			ResolveCovering();
 			DrawEgdesProjection();
+
 		}
 	}
 	/// <summary>
@@ -102,8 +104,11 @@ public class ObjectProjecter : MonoBehaviour {
 				i+=nOfProjDirs;
 			}			
 		}
-		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem
+		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem		
+    }
 
+
+	private void ResolveCovering(){
 		///sprawdzenie kolizji do zakrywania wierzch
 		for(int k = 0; k < nOfProjDirs; k++){
 			int i = k; //przeczytaj opis projs[] jak nie wiesz
@@ -132,8 +137,8 @@ public class ObjectProjecter : MonoBehaviour {
 				i+=nOfProjDirs;
 			}			
 		}
-		
-    }
+	}
+
 	/// <summary>
 	/// Rysuje wierzchołek na płaszczyźnie
 	/// </summary>
@@ -247,5 +252,9 @@ public class ObjectProjecter : MonoBehaviour {
 
 		egdeproj.lineRenderer.SetPosition(0, point1);
 		egdeproj.lineRenderer.SetPosition(1, point2);
+	}
+
+	public void SetShowingLines(){
+		showlines = !showlines;
 	}
 }
