@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Viewport
   - Solid
+  - Wall
   layers:
   - Default
   - TransparentFX
