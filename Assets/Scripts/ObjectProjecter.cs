@@ -107,7 +107,9 @@ public class ObjectProjecter : MonoBehaviour {
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem		
     }
 
-
+	/// <summary>
+	/// Sprawdza kolizję do zakrywania wierzchołków
+	/// </summary>
 	private void ResolveCovering(){
 		///sprawdzenie kolizji do zakrywania wierzch
 		for(int k = 0; k < nOfProjDirs; k++){
