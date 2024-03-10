@@ -48,11 +48,12 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// Kierunki promieni, prostopadłe
 	/// </summary>
-	Vector3[] rayDirections = {Vector3.right*10, Vector3.down*10, Vector3.forward*10}; //ray w kierunku: X, -Y i Z +rzekome_własne_kierunki
+	Vector3[] rayDirections = null;
+	//Vector3[] rayDirections = {Vector3.right*10, Vector3.down*10, Vector3.forward*10}; //ray w kierunku: X, -Y i Z +rzekome_własne_kierunki
 	/// <summary>
 	/// liczba rzutni
 	/// </summary>
-	public const int nOfProjDirs=3; //liczba rzutni jak ww.
+	int nOfProjDirs; //liczba rzutni jak ww.
 	/// <summary>
 	/// Pokazywanie promieni rzutowania
 	/// </summary>
@@ -68,6 +69,8 @@ public class ObjectProjecter : MonoBehaviour {
 		this.labeledVertices = labeledVertices;
 		this.edges = edges;
 		this.projectionInfo = projectionInfo;
+
+		CreateRayDirections();
 		CreateHitPoints();
 		CreateEgdesProj();
 	}
@@ -82,6 +85,37 @@ public class ObjectProjecter : MonoBehaviour {
 			DrawEgdesProjection();
 
 		}
+	}
+
+	/// <summary>
+	/// Tworzy na podstawie pozycji ścian, wektor rzutujący
+	/// </summary>
+	void CreateRayDirections(){
+		GameObject[] walls = GameObject.FindGameObjectsWithTag("Wall");
+		int i=0;
+		nOfProjDirs = walls.Length;
+		rayDirections = new Vector3[nOfProjDirs];
+		foreach (GameObject wall in walls)
+        {
+			Transform tr = wall.transform;
+		   	Vector3 pos = tr.position;
+			Vector3 normal = tr.TransformVector(Vector3.right); //patrz w kierunku X
+			rayDirections[i++] = normal*-10f; // minus bo w przeciwnym kierunku niż patzry ściana, czyli patrzymy na ścianę
+
+        }
+	}
+
+	public void RefreshRayDirection(){
+		GameObject[] walls = GameObject.FindGameObjectsWithTag("Wall");
+		int i=0;
+		foreach (GameObject wall in walls)
+        {
+			Transform tr = wall.transform;
+		   	Vector3 pos = tr.position;
+			Vector3 normal = tr.TransformVector(Vector3.right); //patrz w kierunku X
+			rayDirections[i++] = normal*-10f; // minus bo w przeciwnym kierunku niż patzry ściana, czyli patrzymy na ścianę
+
+        }
 	}
 	/// <summary>
 	/// Rzutuje wierzchołki w kierunku płaszczyzn
@@ -255,8 +289,17 @@ public class ObjectProjecter : MonoBehaviour {
 		egdeproj.lineRenderer.SetPosition(0, point1);
 		egdeproj.lineRenderer.SetPosition(1, point2);
 	}
-
+	/// <summary>
+	/// Przełącza widoczność linii rzutujących
+	/// </summary>
 	public void SetShowingLines(){
 		showlines = !showlines;
+	}
+	/// <summary>
+	/// Zwraca liczbę rzutni na planszy
+	/// </summary>
+	/// <returns>liczba rzutni</returns>
+	public int GetNOfProjections(){
+		return nOfProjDirs;
 	}
 }

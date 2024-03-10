@@ -12,7 +12,7 @@ public class VertexProjection
     /// <summary>
     /// Tablica określająca zakrycie wierzchołka według danej (1,2,3) rzutni
     /// </summary>
-    public bool[] collids = new bool[3];   
+    public bool[] collids;   
     
     /// <summary>
     /// Znacznik na planszy
@@ -42,7 +42,9 @@ public class VertexProjection
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
     /// <param name="vertexName">Nazwa</param>
     public VertexProjection(GameObject markerObject, GameObject labelObject, LineRenderer lineRendererObject, String vertexName)
-    {
+    {  
+        ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+        collids = new bool[op.GetNOfProjections()];
         marker = markerObject;
         label = labelObject;
         lineRenderer = lineRendererObject;

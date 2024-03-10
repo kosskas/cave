@@ -69,6 +69,11 @@ public class PlayerController : MonoBehaviour
             ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
             op.SetShowingLines();
         }
+        if(Input.GetKeyDown("l")){
+            ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+            op.RefreshRayDirection();
+        }
+
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 
