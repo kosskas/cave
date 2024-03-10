@@ -14,6 +14,9 @@ using UnityEngine.UI;
 	// [ ] Wymuś prostopadłość do płaszczyzny
 	// [+-] Sparapetryzować line itd..
 
+/// <summary>
+/// Zarządza projekcją obiektu na płaszczyzny 
+/// </summary>
 public class ObjectProjecter : MonoBehaviour {	
 	/// <summary>
 	/// Referencja na strukturę Obiekt3D
