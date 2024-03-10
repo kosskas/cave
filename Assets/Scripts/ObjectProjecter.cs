@@ -88,7 +88,7 @@ public class ObjectProjecter : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Tworzy na podstawie pozycji ścian, wektor rzutujący
+	/// Tworzy na podstawie pozycji ścian, wektor rzutujący w kierunku prostopadłum do płaszczyzn
 	/// </summary>
 	void CreateRayDirections(){
 		GameObject[] walls = GameObject.FindGameObjectsWithTag("Wall");
@@ -104,7 +104,9 @@ public class ObjectProjecter : MonoBehaviour {
 
         }
 	}
-
+	/// <summary>
+	/// Odświerza rzuty w kierunku prostopadłum do płaszczyzn
+	/// </summary>
 	public void RefreshRayDirection(){
 		GameObject[] walls = GameObject.FindGameObjectsWithTag("Wall");
 		int i=0;
