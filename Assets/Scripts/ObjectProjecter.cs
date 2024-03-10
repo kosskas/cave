@@ -188,6 +188,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="hit">Metadana o zderzeniu</param>
 	private void DrawProjection(VertexProjection proj, Ray ray, RaycastHit hit){
 		//rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
+		proj.lineRenderer.enabled = showlines;
 		if(showlines){
 			proj.lineRenderer.SetPosition(0, ray.origin);
 			proj.lineRenderer.SetPosition(1, hit.point);
