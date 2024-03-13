@@ -65,6 +65,7 @@ public class Object3D : MonoBehaviour {
 			//Dodanie projekcji rzutów
 			GetEgdesList();
 			AddRays();
+
 		}
 		else{
 			Debug.Log("Object3D nie znalazl instancji FPSPlayer");
@@ -91,7 +92,12 @@ public class Object3D : MonoBehaviour {
         MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
         // Set the material for the MeshRenderer (you can create your own material or use an existing one)
-        meshRenderer.material = new Material(Shader.Find("Standard"));
+        meshRenderer.material = new Material(Shader.Find("Transparent/Diffuse"));
+		Color color = Color.white;
+        color.a = 0.5f;
+
+        // Ustawienie koloru na biały
+        meshRenderer.material.color = color;
 
         // Assign the generated mesh to the MeshFilter
         meshFilter.mesh = mesh;
