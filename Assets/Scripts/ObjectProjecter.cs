@@ -224,9 +224,9 @@ public class ObjectProjecter : MonoBehaviour {
 			//tekst
 			GameObject label = new GameObject("VertexLabel" + i);
             TextMesh textMesh = label.AddComponent<TextMesh>();
-            textMesh.text = names[i/nOfProjDirs]; //ta sama nazwa ale inny wymiar
+            textMesh.text = names[i/nOfProjDirs] + new String('\'', i%nOfProjDirs + 1); //ta sama nazwa ale inny wymiar
             textMesh.characterSize = 0.1f;
-            textMesh.color = Color.black;
+            textMesh.color = Color.white;
             textMesh.font = null;
 			label.transform.SetParent(gameObject.transform);
 
@@ -263,7 +263,7 @@ public class ObjectProjecter : MonoBehaviour {
 						GameObject line = new GameObject("EgdeLine");
 						LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
 						lineRenderer.positionCount = 2;
-						lineRenderer.material = new Material(Shader.Find("Standard")); // Ustawienie defaultowego materiału
+						lineRenderer.material = new Material(Shader.Find("Transparent/Diffuse")); // Ustawienie defaultowego materiału
 						lineRenderer.startWidth = projectionInfo.edgeLineWidth;
 						lineRenderer.endWidth = projectionInfo.edgeLineWidth;
 						lineRenderer.material.color = projectionInfo.edgeColor;
@@ -286,10 +286,14 @@ public class ObjectProjecter : MonoBehaviour {
 		Vector3 point2 = egdeproj.end.marker.transform.position;
 		///jeżeli na tej samej rzutni (egdeproj.nOfProj) jeden z tych pktów jest zakryty to oznacz krawędz jako zakrytą
 		if(egdeproj.start.collids[egdeproj.nOfProj] || egdeproj.end.collids[egdeproj.nOfProj]){
-			egdeproj.lineRenderer.material.color = Color.yellow;
+			Color color = projectionInfo.edgeColor;
+        	color.a = 0.2f;
+			egdeproj.lineRenderer.material.color = color;
 		}
 		else{
-			egdeproj.lineRenderer.material.color = Color.black;
+			Color color = projectionInfo.edgeColor;
+        	color.a = 1.0f;
+			egdeproj.lineRenderer.material.color = color;
 		}
 
 		egdeproj.lineRenderer.SetPosition(0, point1);
