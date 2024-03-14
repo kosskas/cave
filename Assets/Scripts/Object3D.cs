@@ -64,6 +64,7 @@ public class Object3D : MonoBehaviour {
 			//TODO
 			//Dodanie projekcji rzutów
 			GetEgdesList();
+			AddSolidEdges();
 			AddRays();
 
 		}
@@ -154,6 +155,15 @@ public class Object3D : MonoBehaviour {
             Debug.Log(edge.Item1 + " - " + edge.Item2);
         }
 	}
+
+
+	private void AddSolidEdges()
+	{
+		SolidEdges solidEdges = gameObject.AddComponent<SolidEdges>();
+		solidEdges.InitEdges(this, edges, labeledVertices);	
+	}
+
+
 	/// <summary>
 	/// Sprawdza czy wierzchołki sąsiadują ze sobą
 	/// </summary>
