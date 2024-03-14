@@ -224,9 +224,9 @@ public class ObjectProjecter : MonoBehaviour {
 			//tekst
 			GameObject label = new GameObject("VertexLabel" + i);
             TextMesh textMesh = label.AddComponent<TextMesh>();
-            textMesh.text = names[i/nOfProjDirs]; //ta sama nazwa ale inny wymiar
+            textMesh.text = names[i/nOfProjDirs] + new String('\'', i%nOfProjDirs + 1); //ta sama nazwa ale inny wymiar
             textMesh.characterSize = 0.1f;
-            textMesh.color = Color.black;
+            textMesh.color = Color.white;
             textMesh.font = null;
 			label.transform.SetParent(gameObject.transform);
 
