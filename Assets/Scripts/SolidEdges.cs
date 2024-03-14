@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class SolidEdges : MonoBehaviour {
 
@@ -44,6 +45,7 @@ public class SolidEdges : MonoBehaviour {
             lineRenderer.startWidth = 0.02f;
             lineRenderer.endWidth = 0.02f;
 			lineRenderer.numCapVertices = 10;
+			lineRenderer.shadowCastingMode = ShadowCastingMode.Off;
 
 			lineRenderer.SetPosition(0, transform.TransformPoint(labeledVertices[edge.Item1]));
 			lineRenderer.SetPosition(1, transform.TransformPoint(labeledVertices[edge.Item2]));
