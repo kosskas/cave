@@ -485,7 +485,7 @@ GameObject:
   - component: {fileID: 282840814}
   - component: {fileID: 282840813}
   - component: {fileID: 282840811}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -601,7 +601,7 @@ GameObject:
   - component: {fileID: 347449877}
   - component: {fileID: 347449876}
   - component: {fileID: 347449875}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: FPSPlayer
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1632,7 +1632,7 @@ GameObject:
   - component: {fileID: 1881719718}
   - component: {fileID: 1881719717}
   - component: {fileID: 1881719720}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Capsule
   m_TagString: Player
   m_Icon: {fileID: 0}
