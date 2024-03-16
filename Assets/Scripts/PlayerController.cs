@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
     public bool canMove = true;
     CharacterController characterController;
     Vector3 moveDirection = Vector3.zero;
+    WallCreator wallCreator;
     float rotationX = 0;
     //[HideInInspector]
 
@@ -38,6 +39,8 @@ public class PlayerController : MonoBehaviour
     {
         characterController = GetComponentInChildren<CharacterController>();
         playerCamera = GetComponentInChildren<Camera>();
+        wallCreator = GetComponentInChildren<WallCreator>();
+
         si = (SolidImporter)GameObject.FindObjectOfType(typeof(SolidImporter));
         cs = (CameraScript)GameObject.FindObjectOfType(typeof(CameraScript));
         // Lock cursor
@@ -72,6 +75,10 @@ public class PlayerController : MonoBehaviour
         if(Input.GetKeyDown("l")){
             ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
             op.RefreshRayDirection();
+        }
+        if(Input.GetKeyDown("c"))
+        {
+            wallCreator.CreateWall();
         }
 
         Vector3 forward = transform.TransformDirection(Vector3.forward);
