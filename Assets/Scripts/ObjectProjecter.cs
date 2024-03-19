@@ -256,25 +256,25 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Tworzy listę linii które będą wyświetlane jako krawędzie na odpowiednich rzutniach
 	/// </summary>
 	private void CreateEgdesProj(){
-		for(int k = 0; k < nOfProjDirs; k++){
-			for(int i = k; i < projs.Length; i+=nOfProjDirs){		
-				for(int j = i; j < projs.Length; j+=nOfProjDirs){
-					if(OBJECT3D.AreNeighbours(projs[i].name, projs[j].name)){
-						GameObject line = new GameObject("EgdeLine");
-						LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
-						lineRenderer.positionCount = 2;
-						lineRenderer.material = new Material(Shader.Find("Transparent/Diffuse")); // Ustawienie defaultowego materiału
-						lineRenderer.startWidth = projectionInfo.edgeLineWidth;
-						lineRenderer.endWidth = projectionInfo.edgeLineWidth;
-						lineRenderer.material.color = projectionInfo.edgeColor;
-						line.transform.SetParent(gameObject.transform);
+		// for(int k = 0; k < nOfProjDirs; k++){
+		// 	for(int i = k; i < projs.Length; i+=nOfProjDirs){		
+		// 		for(int j = i; j < projs.Length; j+=nOfProjDirs){
+		// 			if(OBJECT3D.AreNeighbours(projs[i].name, projs[j].name)){
+		// 				GameObject line = new GameObject("EgdeLine");
+		// 				LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
+		// 				lineRenderer.positionCount = 2;
+		// 				lineRenderer.material = new Material(Shader.Find("Transparent/Diffuse")); // Ustawienie defaultowego materiału
+		// 				lineRenderer.startWidth = projectionInfo.edgeLineWidth;
+		// 				lineRenderer.endWidth = projectionInfo.edgeLineWidth;
+		// 				lineRenderer.material.color = projectionInfo.edgeColor;
+		// 				line.transform.SetParent(gameObject.transform);
 
-						///dodaj do listy rzutowanych krawędzi
-						edgesprojs.Add(new EdgeProjection(k, lineRenderer,projs[i], projs[j]));
-					}
-				}
-			}	
-		}		
+		// 				///dodaj do listy rzutowanych krawędzi
+		// 				edgesprojs.Add(new EdgeProjection(k, lineRenderer,projs[i], projs[j]));
+		// 			}
+		// 		}
+		// 	}	
+		// }		
 	}
 	/// <summary>
 	/// Rysuje krawędź na rzutni
