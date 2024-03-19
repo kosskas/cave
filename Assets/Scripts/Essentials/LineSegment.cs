@@ -1,11 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class LineSegment : MonoBehaviour {
 
-	private Vector3 referencePoint;
 	private Vector3 startPoint;
 	private Vector3 endPoint;
 	private Color lineColor = Color.black;
@@ -33,17 +33,21 @@ public class LineSegment : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
-		lineRenderer.SetPosition(0, referencePoint + (transform.rotation * startPoint));
-		lineRenderer.SetPosition(1, referencePoint + (transform.rotation * endPoint));
+		lineRenderer.SetPosition(0, this.startPoint);
+		lineRenderer.SetPosition(1, this.endPoint);
 	}
 
-	public void SetBaseCoordinates(Vector3 referencePoint, Vector3 startPoint, Vector3 endPoint)
+	public void SetCoordinates(Vector3 startPoint, Vector3 endPoint)
 	{
-		this.referencePoint = referencePoint;
-		this.transform.position = referencePoint;
+		this.transform.position = startPoint + 0.5f * (endPoint - startPoint);
 
 		this.startPoint = startPoint;
 		this.endPoint = endPoint;
+	}
+
+	public Tuple<Vector3, Vector3> GetCoordinates()
+	{
+		return new Tuple<Vector3, Vector3>(this.startPoint, this.endPoint);
 	}
 
 	public void SetStyle(Color lineColor, float lineWidth)
@@ -54,11 +58,16 @@ public class LineSegment : MonoBehaviour {
 
 	public void SetLabel(string text, float textSize, Color textColor)
 	{
+		if (text.Length == 0)
+		{
+			return;
+		}
+
 		if (labelObject == null)
 		{
 			labelObject = new GameObject("Label");
 			labelObject.transform.SetParent(gameObject.transform);
-			labelObject.transform.position = referencePoint + startPoint + 0.5f * (endPoint - startPoint);
+			labelObject.transform.position = this.transform.position;
 			labelObject.AddComponent<Label>();
 		}
 

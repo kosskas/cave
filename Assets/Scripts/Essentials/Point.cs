@@ -5,7 +5,6 @@ using UnityEngine.Rendering;
 
 public class Point : MonoBehaviour {
 
-	private Vector3 referencePoint;
 	private Vector3 point;
 	private Color pointColor = Color.black;
 	private float pointSize = 1.0f;
@@ -32,16 +31,22 @@ public class Point : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		lineRenderer.SetPosition(0, referencePoint + (transform.rotation * point));
-		lineRenderer.SetPosition(1, referencePoint + (transform.rotation * point));
+		// lineRenderer.SetPosition(0, this.point);
+		// lineRenderer.SetPosition(1, this.point);
+		lineRenderer.SetPosition(0, this.transform.position);
+		lineRenderer.SetPosition(1, this.transform.position);
 	}
 
-	public void SetBaseCoordinates(Vector3 referencePoint, Vector3 point)
+	public void SetCoordinates(Vector3 point)
 	{
-		this.referencePoint = referencePoint;
-		this.transform.position = referencePoint;
+		this.transform.position = point;
 
 		this.point = point;
+	}
+
+	public Vector3 GetCoordinates()
+	{
+		return this.transform.position;
 	}
 
 	public void SetStyle(Color pointColor, float pointSize)
@@ -52,11 +57,16 @@ public class Point : MonoBehaviour {
 
 	public void SetLabel(string text, float textSize, Color textColor)
 	{
+		if (text.Length == 0)
+		{
+			return;
+		}
+
 		if (labelObject == null)
 		{
 			labelObject = new GameObject("Label");
 			labelObject.transform.SetParent(gameObject.transform);
-			labelObject.transform.position = referencePoint + point;
+			labelObject.transform.position = this.transform.position;
 			labelObject.AddComponent<Label>();
 		}
 
