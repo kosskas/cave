@@ -88,6 +88,8 @@ public class Object3D : MonoBehaviour {
 		InitVertexObjects();
 
 		InitEdgeObjects();
+
+		AddRays();
 	}
 
 	void Update()
@@ -166,7 +168,8 @@ public class Object3D : MonoBehaviour {
 	{
 		foreach (var vertexLabel in baseVertices.Keys.ToList())
 		{
-			rotatedVertices[vertexLabel] = midPoint + baseVertices[vertexLabel];
+			//rotatedVertices[vertexLabel] = midPoint + baseVertices[vertexLabel];
+			rotatedVertices[vertexLabel] = transform.TransformPoint(baseVertices[vertexLabel]);
 		}
 	}
 
@@ -174,7 +177,8 @@ public class Object3D : MonoBehaviour {
 	{
 		foreach (var vertexLabel in rotatedVertices.Keys.ToList())
 		{
-			rotatedVertices[vertexLabel] = midPoint + (transform.rotation * baseVertices[vertexLabel]);
+			//rotatedVertices[vertexLabel] = midPoint + (transform.rotation * baseVertices[vertexLabel]);
+			rotatedVertices[vertexLabel] = transform.TransformPoint(baseVertices[vertexLabel]);
 		}
 	}
 
@@ -215,7 +219,16 @@ public class Object3D : MonoBehaviour {
 			edgeObjects.Add(edgeObject);
 		}
 	}
+	/// <summary>
+	/// Inicjuje mechanizm rzutowania
+	/// </summary>
+	private void AddRays()
+    {
+		ProjectionInfo projectionInfo = new ProjectionInfo(); //bazowo parametry czytane z pliku
 
+        ObjectProjecter op = gameObject.AddComponent<ObjectProjecter>();
+		op.InitProjecter(this, projectionInfo, rotatedVertices, edges);
+    }
 }
 
 

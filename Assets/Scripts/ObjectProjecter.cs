@@ -33,7 +33,8 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// Lista krawędzi
 	/// </summary>
-	List<Tuple<string, string>> edges = new List<Tuple<string, string>>();
+	///List<Tuple<string, string>> edges = new List<Tuple<string, string>>();
+	List<EdgeInfo> edges = null;
 	/// <summary>
 	/// Tablica określająca rzut wierzchołka na rzutnie.
 	/// projs[k,k+1,...,k+nOfProjDirs-1] dotyczą rzutów na różne płaszczyzny tego samego wierzchołka, przez co mają taką samą nazwę
@@ -67,7 +68,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="obj">Referencja na strukturę Object3D</param>
 	/// <param name="labeledVertices">Oznaczenia wierzchołków</param>
 	/// <param name="faces"></param>
-	public void InitProjecter(Object3D obj,ProjectionInfo projectionInfo, Dictionary<string, Vector3> labeledVertices, List<Tuple<string, string>> edges){
+	public void InitProjecter(Object3D obj,ProjectionInfo projectionInfo, Dictionary<string, Vector3> labeledVertices, List<EdgeInfo> edges){
 		this.OBJECT3D = obj;
 		this.labeledVertices = labeledVertices;
 		this.edges = edges;
@@ -84,8 +85,8 @@ public class ObjectProjecter : MonoBehaviour {
 	void Update () {
 		if(OBJECT3D != null){
 			GenerateRays();
-			ResolveCovering();
-			DrawEgdesProjection();
+			CastPoints();
+			//DrawEgdesProjection();
 
 		}
 	}
@@ -132,7 +133,8 @@ public class ObjectProjecter : MonoBehaviour {
 			int i = k; //przeczytaj opis projs[] jak nie wiesz
 			foreach (var pair in labeledVertices)
 			{
-				Vector3 vertex = transform.TransformPoint(pair.Value); //transformacja wierzchołka z pliku tak aby zgadzał się z aktualną pozycją bryły (ze wzgl. jej na obrót) 
+				//Vector3 vertex = transform.TransformPoint(pair.Value); //transformacja wierzchołka z pliku tak aby zgadzał się z aktualną pozycją bryły (ze wzgl. jej na obrót) 
+				Vector3 vertex = pair.Value;
 				Ray ray = new Ray(vertex, rayDirections[k]);
 				//Debug.DrawRay(vertex, rayDirections[k]);
 				RaycastHit hit;
@@ -149,7 +151,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// Sprawdza kolizję do zakrywania wierzchołków
 	/// </summary>
-	private void ResolveCovering(){
+	private void CastPoints(){
 		///sprawdzenie kolizji do zakrywania wierzch
 		for(int k = 0; k < nOfProjDirs; k++){
 			int i = k; //przeczytaj opis projs[] jak nie wiesz
