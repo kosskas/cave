@@ -9,6 +9,19 @@ using System.Linq;
 /// <summary>
 /// Klasa SolidImporter służy do parsowania i ładowania brył zapisanych w formacie wobj to aplikacji.
 /// </summary>
+/// 
+
+public struct EdgeInfo {
+	public string label;
+	public Tuple<string, string> endPoints;
+
+	public EdgeInfo(string label, Tuple<string, string> endPoints)
+	{
+		this.label = label;
+		this.endPoints = endPoints;
+	}
+}
+
 public class SolidImporter : MonoBehaviour {
 
 	private const string pathToFolderWithSolids = "./Assets/Figures3D";
@@ -22,6 +35,7 @@ public class SolidImporter : MonoBehaviour {
 
 	private List<Vector3> vertices = new List<Vector3>();
 	private List<int> triangles = new List<int>();
+	private List<EdgeInfo> edges = new List<EdgeInfo>();
 
 	private GameObject customSolid;
 	private GameObject mainObj;
@@ -89,6 +103,7 @@ public class SolidImporter : MonoBehaviour {
 	private void ClearSolid() {
 		labeledVertices.Clear();
 		faces.Clear();
+		edges.Clear();
 		vertices.Clear();
 		triangles.Clear();
 	}
@@ -104,8 +119,8 @@ public class SolidImporter : MonoBehaviour {
                 {
 					if (line.Contains("###")) part++;
 					else if (String.IsNullOrEmpty(line)) continue;
-					else if (part == 1) ReadVertex(line);
-					else if (part == 2) ReadFace(line);
+					else if (part == 1) { ReadVertex(line); }
+					else if (part == 2) { ReadFace(line); ReadEdges(line); }
 					else if (part > 2) break;
                 }
             }
@@ -134,6 +149,28 @@ public class SolidImporter : MonoBehaviour {
 		Array.ForEach(faceData, label => face.Add(label));
 
 		faces.Add(face);
+	}
+
+	private void ReadEdges(string line) {
+		string[] vLabelsOfFace = line.Trim().Split(',');
+
+		for (int i = 0; i < vLabelsOfFace.Length; i++)
+		{
+			int v1 = i % vLabelsOfFace.Length;
+			int v2 = (i+1) % vLabelsOfFace.Length;
+
+			if (edges.Exists(edge => 
+					(edge.endPoints.Item1 == vLabelsOfFace[v1] && edge.endPoints.Item2 == vLabelsOfFace[v2]) ||
+					(edge.endPoints.Item2 == vLabelsOfFace[v1] && edge.endPoints.Item1 == vLabelsOfFace[v2]) 
+			))
+			{
+				continue;
+			}
+
+			edges.Add(
+				new EdgeInfo("", new Tuple<string, string>(vLabelsOfFace[v1], vLabelsOfFace[v2]))
+			);
+		}
 	}
 
 	// O(2n)
@@ -198,11 +235,81 @@ public class SolidImporter : MonoBehaviour {
 		//Set parent as MainObject
 		customSolid.transform.SetParent(mainObj.transform);
 		//zeruje bo było (0,2,0) nie wiem czemu
-        customSolid.transform.localPosition = Vector3.zero;
+		transform.position = Vector3.zero;
+        customSolid.transform.position = Vector3.zero;
 
 		//Dodanie Object3D - centralnej klasy która podepnie resztę komponentów
 		Object3D object3D = customSolid.AddComponent<Object3D>();
-		object3D.InitObject(vertices, triangles,faces, labeledVertices);
+		
+		/**/
+		
+		Dictionary<string, Vector3> testV = new Dictionary<string, Vector3>()
+		{
+			{ "A", new Vector3(-1, -1, -1) },
+			{ "B", new Vector3(-1, -1, 1) },
+			{ "C", new Vector3(-1, 1, -1) },
+			{ "D", new Vector3(-1, 1, 1) },
+
+			{ "E", new Vector3(1, -1, -1) },
+			{ "F", new Vector3(1, -1, 1) },
+			{ "G", new Vector3(1, 1, -1) },
+			{ "H", new Vector3(1, 1, 1) }
+		};
+		List<EdgeInfo> testE = new List<EdgeInfo>()
+		{
+			new EdgeInfo("a", new Tuple<string, string>("A", "C")),
+			new EdgeInfo("b", new Tuple<string, string>("C", "D")),
+			new EdgeInfo("c", new Tuple<string, string>("D", "B")),
+			new EdgeInfo("d", new Tuple<string, string>("B", "A")),
+
+			new EdgeInfo("e", new Tuple<string, string>("A", "E")),
+			new EdgeInfo("f", new Tuple<string, string>("C", "G")),
+			new EdgeInfo("g", new Tuple<string, string>("D", "H")),
+			new EdgeInfo("h", new Tuple<string, string>("B", "F")),
+
+			new EdgeInfo("i", new Tuple<string, string>("E", "G")),
+			new EdgeInfo("j", new Tuple<string, string>("G", "H")),
+			new EdgeInfo("k", new Tuple<string, string>("H", "F")),
+			new EdgeInfo("l", new Tuple<string, string>("F", "E"))
+		};
+		List<List<string>> testF = new List<List<string>>()
+		{
+			new List<string>(){ "A", "C", "G", "E" },
+
+			new List<string>(){ "C", "D", "H", "G" },
+
+			new List<string>(){ "E", "G", "H", "F" },
+
+			new List<string>(){ "E", "F", "B", "A" },
+
+			new List<string>(){ "F", "H", "D", "B" },
+
+			new List<string>(){ "B", "D", "C", "A" }
+		};
+		List<int> testT = new List<int>()
+		{
+			0, 1, 2,
+			0, 2, 3,
+
+			4, 5, 6,
+			4, 6, 7,
+
+			8, 9, 10,
+			8, 10, 11,
+
+			12, 13, 14,
+			12, 14, 15,
+
+			16, 17, 18,
+			16, 18, 19,
+
+			20, 21, 22,
+			20, 22, 23
+		};
+
+		//object3D.InitObject(testV, testE, testF, testT);
+		object3D.InitObject(labeledVertices, edges, faces, triangles);
+		/**/
 
 	}
 	private void DeleteSolid() {
