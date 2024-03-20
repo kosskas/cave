@@ -74,4 +74,11 @@ public class LineSegment : MonoBehaviour {
 		Label label = labelObject.GetComponent<Label>();
 		label.SetLabel(text, textSize, textColor);
 	}
+
+	public void SetEnable(bool mode)
+	{
+		if (lineRenderer == null) return;
+
+		lineRenderer.enabled = mode;
+	}
 }
