@@ -6,8 +6,8 @@ using UnityEngine.Rendering;
 
 public class LineSegment : MonoBehaviour {
 
-	private Vector3 startPoint;
-	private Vector3 endPoint;
+	private Vector3 startPoint = Vector3.zero;
+	private Vector3 endPoint= Vector3.zero;
 	private Color lineColor = Color.black;
 	private float lineWidth = 1.0f;
 

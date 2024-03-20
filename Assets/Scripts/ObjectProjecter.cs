@@ -170,11 +170,11 @@ public class ObjectProjecter : MonoBehaviour {
 					if (hit.collider.CompareTag("Solid")) 
 					{
 						//oznacz wg jakiej rzutni pkt jest zakryty
-						projs[i].collids[k] = true;
+						//projs[i].collids[k] = true;
             		}
 					else
 					{
-						projs[i].collids[k] = false;
+						//projs[i].collids[k] = false;
 					}		
 				}
 				i+=nOfProjDirs;
@@ -190,61 +190,60 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="hit">Metadana o zderzeniu</param>
 	private void DrawProjection(VertexProjection proj, Ray ray, RaycastHit hit){
 		//rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
-		proj.lineRenderer.enabled = showlines;
+		//proj.lineRenderer.enabled = showlines;
+		proj.lineRenderer.SetEnabled(showlines);
 		if(showlines){
-			proj.lineRenderer.SetPosition(0, ray.origin);
-			proj.lineRenderer.SetPosition(1, hit.point);
+			proj.line.SetCoordinates(ray.origin,hit.point);
+			//proj.lineRenderer.SetPosition(0, ray.origin);
+			//proj.lineRenderer.SetPosition(1, hit.point);
 		}
 
 		//znacznik
-		proj.marker.transform.position = hit.point;
+		//proj.marker.transform.position = hit.point;
+		proj.vertex.SetCoordinates(hit.point);
 
 		//tekst skierowany do gracza
-		proj.label.transform.position = hit.point;
-		Vector3 playerPos = OBJECT3D.player.transform.position;
-		Vector3 directionToPlayer = ( playerPos+ 2*Vector3.up - proj.label.transform.position).normalized;
-		proj.label.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
+		//proj.label.transform.position = hit.point;
+		//Vector3 playerPos = OBJECT3D.player.transform.position;
+		//Vector3 directionToPlayer = ( playerPos+ 2*Vector3.up - proj.label.transform.position).normalized;
+		//proj.label.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
 	}
 	/// <summary>
 	/// Tworzy rzuty wierzchołków
 	/// </summary>
-	private void CreateHitPoints()
+	    private void CreateHitPoints()
     {
-		int length = nOfProjDirs * labeledVertices.ToArray().Length; //l.wierzch x liczba rzutni
-		string[] names = labeledVertices.Keys.ToArray();
-		projs = new VertexProjection[length];
-		/*info
-		points[k,k+1,...,k+nOfProjDirs-1] dotyczą różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
-		*/
+        int length = nOfProjDirs * labeledVertices.ToArray().Length; //l.wierzch x liczba rzutni
+        string[] names = labeledVertices.Keys.ToArray();
+        projs = new VertexProjection[length];
+        /*info
+        points[k,k+1,...,k+nOfProjDirs-1] dotyczą różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
+        */
+        var VertexProjections = new GameObject("VertexProjections");
+        VertexProjections.transform.SetParent(gameObject.transform);
+
         for (int i = 0; i < projs.Length; i++){
-			//znacznik
-			GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-			marker.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
-			Destroy(marker.GetComponent<Collider>());
-			marker.transform.SetParent(gameObject.transform);
+            GameObject obj = new GameObject("VertexProjection " + i);
+            obj.transform.SetParent(VertexProjections.transform);
+            GameObject Point = new GameObject("Point " + i);
+            Point.transform.SetParent(obj.transform);
+			GameObject Line = new GameObject("Line " + i);
+            Line.transform.SetParent(obj.transform);
 
-			//tekst
-			GameObject label = new GameObject("VertexLabel" + i);
-            TextMesh textMesh = label.AddComponent<TextMesh>();
-            textMesh.text = names[i/nOfProjDirs] + new String('\'', i%nOfProjDirs + 1); //ta sama nazwa ale inny wymiar
-            textMesh.characterSize = 0.1f;
-            textMesh.color = Color.white;
-            textMesh.font = null;
-			label.transform.SetParent(gameObject.transform);
+            //znacznik
+            Point vertexObject = Point.AddComponent<Point>();
+            vertexObject.SetStyle(Color.black, 0.08f);
+            //vertexObject.SetCoordinates(null);
+            vertexObject.SetLabel(names[i/nOfProjDirs] + new String('\'', i%nOfProjDirs + 1), 0.08f, Color.white);
+            
+            ///linia
+            LineSegment lineseg = Line.AddComponent<LineSegment>();
+            lineseg.SetStyle(Color.black, 0.02f);
+            lineseg.SetLabel("", 0.02f, Color.white);
+            Vector3 vertex3D = labeledVertices[names[i / nOfProjDirs]];
+            projs[i] = new VertexProjection(ref vertex3D, ref vertexObject, ref lineseg, names[i / nOfProjDirs]);
 
-			
-			///linia
-			GameObject line = new GameObject("RayLine");
-			LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
-			lineRenderer.positionCount = 2;
-            lineRenderer.material = new Material(Shader.Find("Standard")); // Ustawienie defaultowego materiału
-            lineRenderer.startWidth = projectionInfo.projectionLineWidth;
-            lineRenderer.endWidth = projectionInfo.projectionLineWidth;
-			line.transform.SetParent(gameObject.transform);
-			
-			projs[i] = new VertexProjection(marker, label, lineRenderer, names[i/nOfProjDirs]);
-
-		}
+        }
     }
 	/// <summary>
 	/// Rysuje krawiędzie miedzy wierzchołkami na rzutniach
@@ -284,22 +283,22 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="egdeproj">Informacje o rzutowanej krawędzi</param>
 	private void DrawEgdeLine(EdgeProjection egdeproj){
 		//pobierz wsp. markerów wierzchołków na rzutni
-		Vector3 point1 = egdeproj.start.marker.transform.position;
-		Vector3 point2 = egdeproj.end.marker.transform.position;
-		///jeżeli na tej samej rzutni (egdeproj.nOfProj) jeden z tych pktów jest zakryty to oznacz krawędz jako zakrytą
-		if(egdeproj.start.collids[egdeproj.nOfProj] || egdeproj.end.collids[egdeproj.nOfProj]){
-			Color color = projectionInfo.edgeColor;
-        	color.a = 0.2f;
-			egdeproj.lineRenderer.material.color = color;
-		}
-		else{
-			Color color = projectionInfo.edgeColor;
-        	color.a = 1.0f;
-			egdeproj.lineRenderer.material.color = color;
-		}
+		// Vector3 point1 = egdeproj.start.marker.transform.position;
+		// Vector3 point2 = egdeproj.end.marker.transform.position;
+		// ///jeżeli na tej samej rzutni (egdeproj.nOfProj) jeden z tych pktów jest zakryty to oznacz krawędz jako zakrytą
+		// if(egdeproj.start.collids[egdeproj.nOfProj] || egdeproj.end.collids[egdeproj.nOfProj]){
+		// 	Color color = projectionInfo.edgeColor;
+        // 	color.a = 0.2f;
+		// 	egdeproj.lineRenderer.material.color = color;
+		// }
+		// else{
+		// 	Color color = projectionInfo.edgeColor;
+        // 	color.a = 1.0f;
+		// 	egdeproj.lineRenderer.material.color = color;
+		// }
 
-		egdeproj.lineRenderer.SetPosition(0, point1);
-		egdeproj.lineRenderer.SetPosition(1, point2);
+		// egdeproj.lineRenderer.SetPosition(0, point1);
+		// egdeproj.lineRenderer.SetPosition(1, point2);
 	}
 	/// <summary>
 	/// Przełącza widoczność linii rzutujących

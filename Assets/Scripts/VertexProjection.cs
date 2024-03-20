@@ -12,27 +12,25 @@ public class VertexProjection
     /// <summary>
     /// Tablica określająca zakrycie wierzchołka według danej (1,2,3) rzutni
     /// </summary>
-    public bool[] collids;   
-    
+    //public bool[] collids;  
+
     /// <summary>
-    /// Znacznik na planszy
+    /// Referencja na rzutowany punkt w 3D
     /// </summary>
-    public GameObject marker;
-    
+    public Vector3 vertex3D;
     /// <summary>
-    /// Tekst
+    /// Znacznik na płaszczyźnie
     /// </summary>
-    public GameObject label;
-    
+    public Point vertex;
     /// <summary>
-    /// Linia
+    /// Linia rzutująca punkt
     /// </summary>
-    public LineRenderer lineRenderer;
+    public LineSegment line;
 
     /// <summary>
     /// Nazwa
     /// </summary>
-    public String name;
+    public String vertexName;
 
     /// <summary>
     /// Konstruktor klasy VertexProjection
@@ -41,13 +39,13 @@ public class VertexProjection
     /// <param name="labelObject">Tekst</param>
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
     /// <param name="vertexName">Nazwa</param>
-    public VertexProjection(GameObject markerObject, GameObject labelObject, LineRenderer lineRendererObject, String vertexName)
+    public VertexProjection(ref Vector3 vertex3D, ref Point vertex, ref LineSegment line, String vertexName)
     {  
-        ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
-        collids = new bool[op.GetNOfProjections()];
-        marker = markerObject;
-        label = labelObject;
-        lineRenderer = lineRendererObject;
-        name = vertexName;
+        //ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+        //collids = new bool[op.GetNOfProjections()];
+        this.vertex3D = vertex3D;
+        this.vertex= vertex;
+        this.line = line;
+        this.vertexName = vertexName;
     }
 }
