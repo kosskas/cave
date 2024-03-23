@@ -258,7 +258,9 @@ public class ObjectProjecter : MonoBehaviour {
 	public void SetShowingLines(){
 		showlines = !showlines;
 	}
-
+	/// <summary>
+	/// Przełącza pilnowanie prostopadłości rzutu
+	/// </summary>
 	public void watchPerpendicularity(){
 		perpendicularity = !perpendicularity;
 	}
