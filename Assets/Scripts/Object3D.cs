@@ -23,7 +23,7 @@ public class Object3D : MonoBehaviour {
 	/// <summary>
 	/// Określa współrzędne środka ciężkości bryły, które służą jako punkt odniesienia np. do symulacji rotacji bryły 3D
 	/// </summary>
-	public Vector3 midPoint = new Vector3(0.0f, 2.0f, 0.0f);
+	public Vector3 midPoint = new Vector3(0.0f, 1.0f, 0.0f);
 
 	/// <summary>
 	/// Krawędzie bryły określone przez etykietę i etykiety wierzchołków, któe łączy
@@ -197,9 +197,9 @@ public class Object3D : MonoBehaviour {
 			obj.transform.SetParent(verticesFolder.transform);
 
 			Point vertexObject = obj.AddComponent<Point>();
-			vertexObject.SetStyle(Color.black, 0.08f);
+			vertexObject.SetStyle(Color.black, 0.04f);
 			vertexObject.SetCoordinates(rotatedVertices[vertexLabel]);
-			vertexObject.SetLabel(vertexLabel, 0.08f, Color.white);
+			vertexObject.SetLabel(vertexLabel, 0.04f, Color.white);
 
 			vertexObjects[vertexLabel] = vertexObject;
 		}
@@ -216,9 +216,9 @@ public class Object3D : MonoBehaviour {
 			obj.transform.SetParent(edgesFolder.transform);
 
 			LineSegment edgeObject = obj.AddComponent<LineSegment>();
-			edgeObject.SetStyle(Color.black, 0.02f);
+			edgeObject.SetStyle(Color.black, 0.01f);
 			edgeObject.SetCoordinates(rotatedVertices[edge.endPoints.Item1], rotatedVertices[edge.endPoints.Item2]);
-			edgeObject.SetLabel(edge.label, 0.02f, Color.white);
+			edgeObject.SetLabel(edge.label, 0.01f, Color.white);
 
 			edgeObjects.Add(edgeObject);
 		}
@@ -228,7 +228,12 @@ public class Object3D : MonoBehaviour {
 	/// </summary>
 	private void AddRays()
     {
-		ProjectionInfo projectionInfo = new ProjectionInfo(); //bazowo parametry czytane z pliku
+		ProjectionInfo projectionInfo = new ProjectionInfo(
+    		Color.black, Color.white, 0.04f, 0.04f,    // Parametry punktu
+    		Color.black, Color.white, 0.01f, 0.01f,    // Parametry krawędzi
+    		Color.gray, Color.white, 0.01f, 0.01f,     // Parametry linii rzutującej
+    		false                                     // Określenie czy linie rzutowania powinny być wyświetlane
+		);
 
         ObjectProjecter op = gameObject.AddComponent<ObjectProjecter>();
 		op.InitProjecter(this, projectionInfo, rotatedVertices, edges);

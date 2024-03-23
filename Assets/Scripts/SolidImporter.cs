@@ -27,6 +27,7 @@ public class SolidImporter : MonoBehaviour {
 	private const string pathToFolderWithSolids = "./Assets/Figures3D";
 	private const string solidFileExt = "*.wobj";
 	
+	private const float SIZER = 0.3f; 
 	private string[] solidFiles;
 	private int currentSolidFileIndex;
 
@@ -139,7 +140,7 @@ public class SolidImporter : MonoBehaviour {
 		float y = float.Parse(vertexData[2], CultureInfo.InvariantCulture);
 		float z = float.Parse(vertexData[3], CultureInfo.InvariantCulture);
 
-		labeledVertices[label] = new Vector3(x, y, z);
+		labeledVertices[label] = new Vector3(x, y, z) * SIZER;
 	}
 
 	private void ReadFace(string line) {

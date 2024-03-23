@@ -225,13 +225,13 @@ public class ObjectProjecter : MonoBehaviour {
 
 		//znacznik
 		Point vertexObject = Point.AddComponent<Point>();
-		vertexObject.SetStyle(Color.black, 0.08f);
-		vertexObject.SetLabel(name + new String('\'', nOfProj + 1), 0.08f, Color.white);
+		vertexObject.SetStyle(projectionInfo.pointColor, projectionInfo.pointSize);
+		vertexObject.SetLabel(name + new String('\'', nOfProj + 1), projectionInfo.pointLabelSize, projectionInfo.pointLabelColor);
 		
-		///linia
+		///linia rzutująca
 		LineSegment lineseg = Line.AddComponent<LineSegment>();
-		lineseg.SetStyle(Color.black, 0.02f);
-		lineseg.SetLabel("", 0.02f, Color.white);
+		lineseg.SetStyle(projectionInfo.projectionLineColor, projectionInfo.projectionLineWidth);
+		lineseg.SetLabel("", projectionInfo.projectionLabelSize, projectionInfo.projectionLabelColor);
 
 		return new VertexProjection(ref vertexObject, ref lineseg, name);
 	}
@@ -248,8 +248,8 @@ public class ObjectProjecter : MonoBehaviour {
 		GameObject edge = new GameObject("EgdeLine P("+nOfProj +") " + p1.vertexName+p2.vertexName);
 		edge.transform.SetParent(EdgeProjectionsDir.transform);
 		LineSegment drawEdge = edge.AddComponent<LineSegment>();
-		drawEdge.SetStyle(Color.black, 0.02f);
-		drawEdge.SetLabel(label, 0.02f, Color.white);	
+		drawEdge.SetStyle(projectionInfo.edgeLineColor, projectionInfo.edgeLineWidth);
+		drawEdge.SetLabel(label, projectionInfo.edgeLabelSize, projectionInfo.edgeLabelColor);	
 		return new EdgeProjection(nOfProj, drawEdge, p1, p2);		
 	}
 	/// <summary>
