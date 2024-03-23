@@ -91,9 +91,9 @@ public class Object3D : MonoBehaviour {
 
 		AddRays();
 
-		foreach(var edge in edges){
-			Debug.Log(edge.endPoints.Item1+" " +edge.endPoints.Item2);
-		}
+		// foreach(var edge in edges){
+		// 	Debug.Log(edge.endPoints.Item1+" " +edge.endPoints.Item2);
+		// }
 	}
 
 	void Update()

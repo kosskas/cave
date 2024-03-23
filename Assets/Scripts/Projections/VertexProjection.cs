@@ -10,15 +10,6 @@ using UnityEngine.UI;
 public class VertexProjection
 {
     /// <summary>
-    /// Tablica określająca zakrycie wierzchołka według danej (1,2,3) rzutni
-    /// </summary>
-    //public bool[] collids;  
-
-    /// <summary>
-    /// Referencja na rzutowany punkt w 3D
-    /// </summary>
-    public Vector3 vertex3D;
-    /// <summary>
     /// Znacznik na płaszczyźnie
     /// </summary>
     public Point vertex;
@@ -28,22 +19,18 @@ public class VertexProjection
     public LineSegment line;
 
     /// <summary>
-    /// Nazwa
+    /// Nazwa wierzchołka
     /// </summary>
-    public String vertexName;
+    public string vertexName;
 
     /// <summary>
     /// Konstruktor klasy VertexProjection
     /// </summary>
-    /// <param name="markerObject">Znacznik na planszy</param>
-    /// <param name="labelObject">Tekst</param>
-    /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
-    /// <param name="vertexName">Nazwa</param>
-    public VertexProjection(ref Vector3 vertex3D, ref Point vertex, ref LineSegment line, String vertexName)
+    /// <param name="vertex">Punkt na płaszczyźnie</param>
+    /// <param name="line">Lina rzutująca</param>
+    /// <param name="vertexName">Nazwa wierzchołka</param>
+    public VertexProjection(ref Point vertex, ref LineSegment line, string vertexName)
     {  
-        //ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
-        //collids = new bool[op.GetNOfProjections()];
-        this.vertex3D = vertex3D;
         this.vertex= vertex;
         this.line = line;
         this.vertexName = vertexName;
