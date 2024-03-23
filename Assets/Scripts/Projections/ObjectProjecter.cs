@@ -29,12 +29,14 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// Oznaczenia wierzchołków
 	/// </summary>
-	Dictionary<string, Vector3> labeledVertices;
+	Dictionary<string, Vector3> rotatedVertices;
 	/// <summary>
 	/// Lista krawędzi
 	/// </summary>
 	///List<Tuple<string, string>> edges = new List<Tuple<string, string>>();
 	List<EdgeInfo> edges = null;
+
+
 	/// <summary>
 	/// Tablica określająca rzut wierzchołka na rzutnie.
 	/// projs[k,k+1,...,k+nOfProjDirs-1] dotyczą rzutów na różne płaszczyzny tego samego wierzchołka, przez co mają taką samą nazwę
@@ -49,6 +51,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Lista krawędzi wyświetlanych na rzutniach
 	/// </summary>
 	List<EdgeProjection> edgesprojs = new List<EdgeProjection>();
+
 	/// <summary>
 	/// Kierunki promieni, prostopadłe
 	/// </summary>
@@ -66,17 +69,16 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Inicjuje mechanizm rzutowania
 	/// </summary>
 	/// <param name="obj">Referencja na strukturę Object3D</param>
-	/// <param name="labeledVertices">Oznaczenia wierzchołków</param>
+	/// <param name="rotatedVertices">Oznaczenia wierzchołków</param>
 	/// <param name="faces"></param>
-	public void InitProjecter(Object3D obj,ProjectionInfo projectionInfo, Dictionary<string, Vector3> labeledVertices, List<EdgeInfo> edges){
+	public void InitProjecter(Object3D obj,ProjectionInfo projectionInfo, Dictionary<string, Vector3> rotatedVertices, List<EdgeInfo> edges){
 		this.OBJECT3D = obj;
-		this.labeledVertices = labeledVertices;
+		this.rotatedVertices = rotatedVertices;
 		this.edges = edges;
 		this.projectionInfo = projectionInfo;
 
 		CreateRayDirections();
 		CreateHitPoints();
-		CreateEgdesProj();
 	}
 	
 	/// <summary>
@@ -86,10 +88,7 @@ public class ObjectProjecter : MonoBehaviour {
 		if(OBJECT3D != null){
 			GenerateRays();
 			CastPoints();
-			//DrawEgdesProjection();
-		foreach(var edge in edges){
-			Debug.Log(edge.label+ " "+edge.endPoints);
-		}
+			DrawEgdesProjection();
 		}
 	}
 
@@ -131,25 +130,26 @@ public class ObjectProjecter : MonoBehaviour {
 	void GenerateRays()
     {
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = false; //wyłączenie collidera bo raye go nie lubią i się z nim zderzają
-		for(int k = 0; k < nOfProjDirs; k++){
-			int i = k; //przeczytaj opis projs[] jak nie wiesz
-			foreach (var pair in labeledVertices)
-			{
-				//Vector3 vertex = transform.TransformPoint(pair.Value); //transformacja wierzchołka z pliku tak aby zgadzał się z aktualną pozycją bryły (ze wzgl. jej na obrót) 
-				Vector3 vertex = pair.Value;
-				Ray ray = new Ray(vertex, rayDirections[k]);
-				//Debug.DrawRay(vertex, rayDirections[k]);
-				RaycastHit hit;
-        		if (Physics.Raycast(ray, out hit))
-        		{
-					DrawProjection(projs[i], ray, hit);			
-				}
-				i+=nOfProjDirs;
-			}			
-		}
-		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem		
+
+		foreach (var edge in edgesprojs)
+		{
+				CastRay(edge.start, edge.nOfProj);
+				CastRay(edge.end, edge.nOfProj);
+		}			
+		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem	
     }
 
+	private void CastRay(VertexProjection vproj, int direction){
+			Vector3 vertex = rotatedVertices[vproj.vertexName];
+			//Vector3 vertex = vproj.vertex3D;
+			Ray ray = new Ray(vertex, rayDirections[direction]);
+			Debug.DrawRay(vertex, rayDirections[direction]);
+			RaycastHit hit;
+			if (Physics.Raycast(ray, out hit))
+			{
+				DrawVertexProjection(vproj, ray, hit);			
+			}
+	}
 	/// <summary>
 	/// Sprawdza kolizję do zakrywania wierzchołków
 	/// </summary>
@@ -157,7 +157,7 @@ public class ObjectProjecter : MonoBehaviour {
 		///sprawdzenie kolizji do zakrywania wierzch
 		for(int k = 0; k < nOfProjDirs; k++){
 			int i = k; //przeczytaj opis projs[] jak nie wiesz
-			foreach (var pair in labeledVertices)
+			foreach (var pair in rotatedVertices)
 			{
 				///offset musi być bo inaczej nie działa
 				Vector3 vertex = transform.TransformPoint(pair.Value*1.0001f);//* 1.005f; //dodaj lekki offset tak żeby nie było jakiś dziwnych kolizji
@@ -190,7 +190,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="proj">Inforamcje o wierzchołku</param>
 	/// <param name="ray">Promień</param>
 	/// <param name="hit">Metadana o zderzeniu</param>
-	private void DrawProjection(VertexProjection proj, Ray ray, RaycastHit hit){
+	private void DrawVertexProjection(VertexProjection proj, Ray ray, RaycastHit hit){
 		//rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
 		proj.line.SetEnable(showlines);
 		if(showlines){
@@ -205,40 +205,42 @@ public class ObjectProjecter : MonoBehaviour {
 	/// </summary>
 	private void CreateHitPoints()
     {
-        int length = nOfProjDirs * labeledVertices.ToArray().Length; //l.wierzch x liczba rzutni
-        string[] names = labeledVertices.Keys.ToArray();
-        projs = new VertexProjection[length];
+       // int length = nOfProjDirs * labeledVertices.ToArray().Length; //l.wierzch x liczba rzutni
+        //string[] names = labeledVertices.Keys.ToArray();
+        //projs = new VertexProjection[length];
         /*info
         points[k,k+1,...,k+nOfProjDirs-1] dotyczą różnych rzutów tego samego wierzchołka, przez co mają taką samą nazwę
         */
         var VertexProjections = new GameObject("VertexProjections");
         VertexProjections.transform.SetParent(gameObject.transform);
 
+        var EdgeProjections = new GameObject("EdgeProjections");
+        EdgeProjections.transform.SetParent(gameObject.transform);
         //for (int i = 0; i < projs.Length; i++){
-		int i =0;
-		foreach(var edge in edges){
-            GameObject obj = new GameObject("VertexProjection " + i);
-            obj.transform.SetParent(VertexProjections.transform);
-            GameObject Point = new GameObject("Point " + i);
-            Point.transform.SetParent(obj.transform);
-			GameObject Line = new GameObject("Line " + i);
-            Line.transform.SetParent(obj.transform);
-
-            //znacznik
-            Point vertexObject = Point.AddComponent<Point>();
-            vertexObject.SetStyle(Color.black, 0.08f);
-            //vertexObject.SetCoordinates(null);
-            vertexObject.SetLabel(names[i/nOfProjDirs] + new String('\'', i%nOfProjDirs + 1), 0.08f, Color.white);
-            
-            ///linia
-            LineSegment lineseg = Line.AddComponent<LineSegment>();
-            lineseg.SetStyle(Color.black, 0.02f);
-            lineseg.SetLabel("", 0.02f, Color.white);
-            Vector3 vertex3D = labeledVertices[names[i / nOfProjDirs]];
-            projs[i] = new VertexProjection(ref vertex3D, ref vertexObject, ref lineseg, names[i / nOfProjDirs]);
-			i++;
-
-        }
+		
+		for(int k = 0; k < nOfProjDirs; k++){
+			Dictionary<string, VertexProjection> vertexOnThisPlane = new Dictionary<string, VertexProjection>();
+			foreach(var edge in edges){
+				VertexProjection p1 = null;
+				VertexProjection p2 = null;
+				if(vertexOnThisPlane.ContainsKey(edge.endPoints.Item1)){
+					p1 = vertexOnThisPlane[edge.endPoints.Item1];
+				}
+				else{
+					p1 = CreateVertexProjection(VertexProjections, edge.endPoints.Item1, k);
+					vertexOnThisPlane[edge.endPoints.Item1] = p1;
+				}
+				if(vertexOnThisPlane.ContainsKey(edge.endPoints.Item2)){
+					p2= vertexOnThisPlane[edge.endPoints.Item2];
+				}
+				else{
+					p2 = CreateVertexProjection(VertexProjections, edge.endPoints.Item2, k);
+					vertexOnThisPlane[edge.endPoints.Item2] = p2;
+				}
+				EdgeProjection edgeProj = CreateEgdeProjection(EdgeProjections, p1, p2, k);
+				edgesprojs.Add(edgeProj);
+			}
+		}
     }
 	/// <summary>
 	/// Rysuje krawiędzie miedzy wierzchołkami na rzutniach
@@ -248,10 +250,44 @@ public class ObjectProjecter : MonoBehaviour {
 			DrawEgdeLine(edgeproj);
 		}
 	}
+
+	private VertexProjection CreateVertexProjection(GameObject VertexProjectionsDir, string name, int nOfProj){
+		GameObject obj = new GameObject("VertexProjection P("+nOfProj+") " + name);
+		obj.transform.SetParent(VertexProjectionsDir.transform);
+		GameObject Point = new GameObject("Point P("+nOfProj+") " + name);
+		Point.transform.SetParent(obj.transform);
+		GameObject Line = new GameObject("Line P("+nOfProj+") " + name);
+		Line.transform.SetParent(obj.transform);
+
+		//znacznik 1
+		Point vertexObject = Point.AddComponent<Point>();
+		vertexObject.SetStyle(Color.black, 0.08f);
+		//vertexObject.SetCoordinates(null);
+		vertexObject.SetLabel(name + new String('\'', nOfProj + 1), 0.08f, Color.white);
+		
+		///linia1
+		LineSegment lineseg = Line.AddComponent<LineSegment>();
+		lineseg.SetStyle(Color.black, 0.02f);
+		lineseg.SetLabel("", 0.02f, Color.white);
+		Vector3 vertex3D = rotatedVertices[name];
+
+		return new VertexProjection(ref vertex3D, ref vertexObject, ref lineseg, name);
+	}
 	/// <summary>
 	/// Tworzy listę linii które będą wyświetlane jako krawędzie na odpowiednich rzutniach
 	/// </summary>
-	private void CreateEgdesProj(){
+	private EdgeProjection CreateEgdeProjection(GameObject EdgeProjectionsDir, VertexProjection p1, VertexProjection p2, int nOfProj){
+		GameObject line = new GameObject("EgdeLine P("+nOfProj +") " + p1.vertexName+p2.vertexName);
+		line.transform.SetParent(EdgeProjectionsDir.transform);
+		LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
+		lineRenderer.positionCount = 2;
+		lineRenderer.material = new Material(Shader.Find("Transparent/Diffuse")); // Ustawienie defaultowego materiału
+		lineRenderer.startWidth = projectionInfo.edgeLineWidth;
+		lineRenderer.endWidth = projectionInfo.edgeLineWidth;
+		lineRenderer.material.color = projectionInfo.edgeColor;
+		
+		return new EdgeProjection(nOfProj, lineRenderer, p1, p2);
+
 		// for(int k = 0; k < nOfProjDirs; k++){
 		// 	for(int i = k; i < projs.Length; i+=nOfProjDirs){		
 		// 		for(int j = i; j < projs.Length; j+=nOfProjDirs){
@@ -278,8 +314,9 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="egdeproj">Informacje o rzutowanej krawędzi</param>
 	private void DrawEgdeLine(EdgeProjection egdeproj){
 		//pobierz wsp. markerów wierzchołków na rzutni
-		// Vector3 point1 = egdeproj.start.marker.transform.position;
-		// Vector3 point2 = egdeproj.end.marker.transform.position;
+		Vector3 point1 = egdeproj.start.vertex.GetCoordinates();
+		Vector3 point2 = egdeproj.end.vertex.GetCoordinates();
+
 		// ///jeżeli na tej samej rzutni (egdeproj.nOfProj) jeden z tych pktów jest zakryty to oznacz krawędz jako zakrytą
 		// if(egdeproj.start.collids[egdeproj.nOfProj] || egdeproj.end.collids[egdeproj.nOfProj]){
 		// 	Color color = projectionInfo.edgeColor;
@@ -292,20 +329,13 @@ public class ObjectProjecter : MonoBehaviour {
 		// 	egdeproj.lineRenderer.material.color = color;
 		// }
 
-		// egdeproj.lineRenderer.SetPosition(0, point1);
-		// egdeproj.lineRenderer.SetPosition(1, point2);
+		egdeproj.lineRenderer.SetPosition(0, point1);
+		egdeproj.lineRenderer.SetPosition(1, point2);
 	}
 	/// <summary>
 	/// Przełącza widoczność linii rzutujących
 	/// </summary>
 	public void SetShowingLines(){
 		showlines = !showlines;
-	}
-	/// <summary>
-	/// Zwraca liczbę rzutni na planszy
-	/// </summary>
-	/// <returns>liczba rzutni</returns>
-	public int GetNOfProjections(){
-		return nOfProjDirs;
 	}
 }
