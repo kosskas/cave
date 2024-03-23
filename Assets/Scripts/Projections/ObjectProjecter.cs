@@ -87,7 +87,9 @@ public class ObjectProjecter : MonoBehaviour {
 			GenerateRays();
 			CastPoints();
 			//DrawEgdesProjection();
-
+		foreach(var edge in edges){
+			Debug.Log(edge.label+ " "+edge.endPoints);
+		}
 		}
 	}
 
@@ -212,7 +214,9 @@ public class ObjectProjecter : MonoBehaviour {
         var VertexProjections = new GameObject("VertexProjections");
         VertexProjections.transform.SetParent(gameObject.transform);
 
-        for (int i = 0; i < projs.Length; i++){
+        //for (int i = 0; i < projs.Length; i++){
+		int i =0;
+		foreach(var edge in edges){
             GameObject obj = new GameObject("VertexProjection " + i);
             obj.transform.SetParent(VertexProjections.transform);
             GameObject Point = new GameObject("Point " + i);
@@ -232,6 +236,7 @@ public class ObjectProjecter : MonoBehaviour {
             lineseg.SetLabel("", 0.02f, Color.white);
             Vector3 vertex3D = labeledVertices[names[i / nOfProjDirs]];
             projs[i] = new VertexProjection(ref vertex3D, ref vertexObject, ref lineseg, names[i / nOfProjDirs]);
+			i++;
 
         }
     }
