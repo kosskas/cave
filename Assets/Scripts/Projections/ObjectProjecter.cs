@@ -28,7 +28,6 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Lista krawędzi wyświetlanych na rzutniach
 	/// </summary>
 	List<EdgeProjection> edgesprojs = new List<EdgeProjection>();
-
 	/// <summary>
 	/// Kierunki promieni, prostopadłe
 	/// </summary>
@@ -42,6 +41,16 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Pokazywanie promieni rzutowania
 	/// </summary>
 	bool showlines = false;
+
+	/// <summary>
+	/// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
+	/// </summary>
+	Dictionary<int, Dictionary<string, VertexProjection>> verticesOnWalls = new Dictionary<int, Dictionary<string, VertexProjection>>();
+	/// <summary>
+	/// Opisuje zbiór rzutowanych krawędzi na danej płaszczyźnie
+	/// </summary>
+	Dictionary<int, Dictionary<int, EdgeProjection>> egdesOnWalls = new Dictionary<int, Dictionary<int, EdgeProjection>>();
+
 	/// <summary>
 	/// Inicjuje mechanizm rzutowania
 	/// </summary>
@@ -148,7 +157,11 @@ public class ObjectProjecter : MonoBehaviour {
         EdgeProjections.transform.SetParent(gameObject.transform);
 		
 		for(int k = 0; k < nOfProjDirs; k++){
+			//iterujemy po krawędziach, wierzchołki się powtórzą więc żeby kilku tych samych rzutów jednego wierzchołka nie było to słownik
 			Dictionary<string, VertexProjection> vertexOnThisPlane = new Dictionary<string, VertexProjection>();
+			//słownik krawędzi na danej rzutni
+			Dictionary<int, EdgeProjection> egdeOnThisPlane = new Dictionary<int, EdgeProjection>();
+			int i=0; //numer krawędzi, potrzebny do Dictionary
 			foreach(var edge in edges){
 				VertexProjection p1 = null;
 				VertexProjection p2 = null;
@@ -168,7 +181,11 @@ public class ObjectProjecter : MonoBehaviour {
 				}
 				EdgeProjection edgeProj = CreateEgdeProjection(EdgeProjections, p1, p2, k, edge.label);
 				edgesprojs.Add(edgeProj);
+
+				egdeOnThisPlane[i++] = edgeProj;
 			}
+			verticesOnWalls[k] = vertexOnThisPlane;
+			egdesOnWalls[k] = egdeOnThisPlane;
 		}
     }
 	/// <summary>
