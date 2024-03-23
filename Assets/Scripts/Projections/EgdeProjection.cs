@@ -15,9 +15,9 @@ public class EdgeProjection
     public int nOfProj;
  
     /// <summary>
-    /// Linia
+    /// Rysowana krawędź
     /// </summary>
-    public LineRenderer lineRenderer;
+    public LineSegment line;
 
     /// <summary>
     /// Początek krawędzi - punkt początkowy
@@ -35,10 +35,10 @@ public class EdgeProjection
     /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
     /// <param name="start">punkt początkowy</param>
     /// <param name="end">punkt końcowy</param>
-    public EdgeProjection(int nOfProj, LineRenderer lineRendererObject, VertexProjection start, VertexProjection end)
+    public EdgeProjection(int nOfProj, LineSegment line, VertexProjection start, VertexProjection end)
     {
         this.nOfProj = nOfProj;
-        this.lineRenderer = lineRendererObject;
+        this.line = line;
         this.start = start;
         this.end = end;
     }

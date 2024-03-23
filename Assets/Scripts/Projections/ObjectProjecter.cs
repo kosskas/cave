@@ -166,7 +166,7 @@ public class ObjectProjecter : MonoBehaviour {
 					p2 = CreateVertexProjection(VertexProjections, edge.endPoints.Item2, k);
 					vertexOnThisPlane[edge.endPoints.Item2] = p2;
 				}
-				EdgeProjection edgeProj = CreateEgdeProjection(EdgeProjections, p1, p2, k);
+				EdgeProjection edgeProj = CreateEgdeProjection(EdgeProjections, p1, p2, k, edge.label);
 				edgesprojs.Add(edgeProj);
 			}
 		}
@@ -180,8 +180,9 @@ public class ObjectProjecter : MonoBehaviour {
 		Vector3 point1 = egdeproj.start.vertex.GetCoordinates();
 		Vector3 point2 = egdeproj.end.vertex.GetCoordinates();
 
-		egdeproj.lineRenderer.SetPosition(0, point1);
-		egdeproj.lineRenderer.SetPosition(1, point2);
+		//egdeproj.lineRenderer.SetPosition(0, point1);
+		//egdeproj.lineRenderer.SetPosition(1, point2);
+		egdeproj.line.SetCoordinates(point1, point2);
 	}
 	/// <summary>
 	/// Tworzy rzut punktu na płaszczyznę
@@ -217,17 +218,15 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="p1">Pierwszy zrzutowany punkt krawędzi</param>
 	/// <param name="p2">Drugi zrzutowany punkt krawędzi</param>
 	/// <param name="nOfProj">Numer rzutni</param>
+	/// <param name="label">Etykieta krawędzi</param>
 	/// <returns>Informacje o rzucie krawędzi na daną płaszczyznę</returns>
-	private EdgeProjection CreateEgdeProjection(GameObject EdgeProjectionsDir, VertexProjection p1, VertexProjection p2, int nOfProj){
-		GameObject line = new GameObject("EgdeLine P("+nOfProj +") " + p1.vertexName+p2.vertexName);
-		line.transform.SetParent(EdgeProjectionsDir.transform);
-		LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
-		lineRenderer.positionCount = 2;
-		lineRenderer.material = new Material(Shader.Find("Transparent/Diffuse")); // Ustawienie defaultowego materiału
-		lineRenderer.startWidth = projectionInfo.edgeLineWidth;
-		lineRenderer.endWidth = projectionInfo.edgeLineWidth;
-		lineRenderer.material.color = projectionInfo.edgeColor;	
-		return new EdgeProjection(nOfProj, lineRenderer, p1, p2);		
+	private EdgeProjection CreateEgdeProjection(GameObject EdgeProjectionsDir, VertexProjection p1, VertexProjection p2, int nOfProj, string label){
+		GameObject edge = new GameObject("EgdeLine P("+nOfProj +") " + p1.vertexName+p2.vertexName);
+		edge.transform.SetParent(EdgeProjectionsDir.transform);
+		LineSegment drawEdge = edge.AddComponent<LineSegment>();
+		drawEdge.SetStyle(Color.black, 0.02f);
+		drawEdge.SetLabel(label, 0.02f, Color.white);	
+		return new EdgeProjection(nOfProj, drawEdge, p1, p2);		
 	}
 	/// <summary>
 	/// Przełącza widoczność linii rzutujących
