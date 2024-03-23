@@ -43,6 +43,10 @@ public class ObjectProjecter : MonoBehaviour {
 	bool showlines = false;
 
 	/// <summary>
+	/// Pilnuje prostopadłości rzutów
+	/// </summary>
+	bool perpendicularity = false;
+	/// <summary>
 	/// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
 	/// </summary>
 	Dictionary<int, Dictionary<string, VertexProjection>> verticesOnWalls = new Dictionary<int, Dictionary<string, VertexProjection>>();
@@ -75,6 +79,9 @@ public class ObjectProjecter : MonoBehaviour {
 		if(OBJECT3D != null && rotatedVertices != null && edges != null){
 			ProjectObject();
 			//CastPointWithCollision
+			if(perpendicularity){
+				RefreshRayDirection();
+			}
 		}
 	}
 	/// <summary>
@@ -251,4 +258,10 @@ public class ObjectProjecter : MonoBehaviour {
 	public void SetShowingLines(){
 		showlines = !showlines;
 	}
+
+	public void watchPerpendicularity(){
+		perpendicularity = !perpendicularity;
+	}
+
+
 }
