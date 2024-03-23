@@ -190,28 +190,18 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="hit">Metadana o zderzeniu</param>
 	private void DrawProjection(VertexProjection proj, Ray ray, RaycastHit hit){
 		//rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
-		//proj.lineRenderer.enabled = showlines;
-		proj.lineRenderer.SetEnabled(showlines);
+		proj.line.SetEnable(showlines);
 		if(showlines){
 			proj.line.SetCoordinates(ray.origin,hit.point);
-			//proj.lineRenderer.SetPosition(0, ray.origin);
-			//proj.lineRenderer.SetPosition(1, hit.point);
 		}
-
 		//znacznik
-		//proj.marker.transform.position = hit.point;
 		proj.vertex.SetCoordinates(hit.point);
-
-		//tekst skierowany do gracza
-		//proj.label.transform.position = hit.point;
-		//Vector3 playerPos = OBJECT3D.player.transform.position;
-		//Vector3 directionToPlayer = ( playerPos+ 2*Vector3.up - proj.label.transform.position).normalized;
-		//proj.label.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
 	}
+
 	/// <summary>
 	/// Tworzy rzuty wierzchołków
 	/// </summary>
-	    private void CreateHitPoints()
+	private void CreateHitPoints()
     {
         int length = nOfProjDirs * labeledVertices.ToArray().Length; //l.wierzch x liczba rzutni
         string[] names = labeledVertices.Keys.ToArray();
