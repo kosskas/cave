@@ -101,6 +101,14 @@ public class Object3D : MonoBehaviour {
 		// Aktualizacja współrzędnych wierzchołków pod wpływem obrotu (rotacji) bryły
 		UpdateRotatedVertices();
 		
+		///edgeObjects jest NULL???? albo rotatedVertices?
+		// if(edgeObjects == null){
+		// 	Debug.LogWarning("edgeObjects");
+		// }
+		// if(rotatedVertices == null){
+		// 	Debug.LogWarning("rotatedVertices");
+		// }
+
 		// Aktualizacja krawędzi
 		for (int i = 0; i < edgeObjects.Count; i++)
 		{
@@ -229,7 +237,7 @@ public class Object3D : MonoBehaviour {
 	private void AddRays()
     {
 		ProjectionInfo projectionInfo = new ProjectionInfo(
-    		Color.black, Color.white, 0.04f, 0.04f,    // Parametry punktu
+    		Color.black, Color.white, 0.02f, 0.04f,    // Parametry punktu
     		Color.black, Color.white, 0.01f, 0.01f,    // Parametry krawędzi
     		Color.gray, Color.white, 0.01f, 0.01f,     // Parametry linii rzutującej
     		false                                     // Określenie czy linie rzutowania powinny być wyświetlane

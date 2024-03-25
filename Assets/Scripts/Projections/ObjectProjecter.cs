@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UI;
 /// <summary>
@@ -54,7 +55,14 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Opisuje zbiór rzutowanych krawędzi na danej płaszczyźnie
 	/// </summary>
 	Dictionary<int, Dictionary<int, EdgeProjection>> egdesOnWalls = new Dictionary<int, Dictionary<int, EdgeProjection>>();
-
+	/// <summary>
+	/// Lista par ścian prostopadłych
+	/// </summary>
+	List<Tuple<int, int>> perpenWalls;
+	/// <summary>
+	/// Lista linii odnoszących
+	/// </summary>
+	List<Tuple<EdgeProjection,EdgeProjection>> referenceLines;
 	/// <summary>
 	/// Inicjuje mechanizm rzutowania
 	/// </summary>
@@ -70,6 +78,8 @@ public class ObjectProjecter : MonoBehaviour {
 		if(OBJECT3D != null && rotatedVertices != null && edges != null){
 			CreateRayDirections();
 			CreateHitPoints();
+			ProjectObject();
+			AddReferenceLines();
 		}
 	}	
 	/// <summary>
@@ -78,6 +88,7 @@ public class ObjectProjecter : MonoBehaviour {
 	void Update () {
 		if(OBJECT3D != null && rotatedVertices != null && edges != null){
 			ProjectObject();
+			ProjectReferenceLines();
 			//CastPointWithCollision
 			if(perpendicularity){
 				RefreshRayDirection();
@@ -85,33 +96,46 @@ public class ObjectProjecter : MonoBehaviour {
 		}
 	}
 	/// <summary>
-	/// Tworzy na podstawie pozycji ścian, wektor rzutujący w kierunku prostopadłum do płaszczyzn
+	/// Przełącza widoczność linii rzutujących
 	/// </summary>
-	void CreateRayDirections(){
-		GameObject[] walls = GameObject.FindGameObjectsWithTag("Wall");
-		nOfProjDirs = walls.Length;
-		rayDirections = new Vector3[nOfProjDirs];
-		RefreshRayDirection();
+	public void SetShowingLines(){
+		showlines = !showlines;
+	}
+	/// <summary>
+	/// Przełącza pilnowanie prostopadłości rzutu
+	/// </summary>
+	public void watchPerpendicularity(){
+		perpendicularity = !perpendicularity;
 	}
 	/// <summary>
 	/// Odświerza rzuty w kierunku prostopadłum do płaszczyzn
 	/// </summary>
 	public void RefreshRayDirection(){
 		GameObject[] walls = GameObject.FindGameObjectsWithTag("Wall");
-		int i=0;
+		int idx=0;
 		const float LengthOfTheRay = 10f;
 		foreach (GameObject wall in walls)
         {
 			Transform tr = wall.transform;
 		   	Vector3 pos = tr.position;
 			Vector3 normal = tr.TransformVector(Vector3.right); //patrz w kierunku X, czewona strzałka UNITY
-			rayDirections[i++] = (-1f) * normal*LengthOfTheRay; // minus bo w przeciwnym kierunku niż patzry ściana, czyli patrzymy na ścianę
+			rayDirections[idx++] = (-1f) * normal*LengthOfTheRay; // minus bo w przeciwnym kierunku niż patzry ściana, czyli patrzymy na ścianę
         }
+	}
+	/// <summary>
+	/// Tworzy na podstawie pozycji ścian, wektor rzutujący w kierunku prostopadłum do płaszczyzn
+	/// </summary>
+	private void CreateRayDirections(){
+		GameObject[] walls = GameObject.FindGameObjectsWithTag("Wall");
+		nOfProjDirs = walls.Length;
+		rayDirections = new Vector3[nOfProjDirs];
+		RefreshRayDirection();
+		perpenWalls = FindPerpendicularWallsToGroundWall(walls);
 	}
 	/// <summary>
 	/// Rzutuje punkty i krawędzie bryły na płaszczyzny
 	/// </summary>
-	void ProjectObject(){
+	private void ProjectObject(){
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = false; //wyłączenie collidera bo raye go nie lubią i się z nim zderzają
 		foreach (var edge in edgesprojs)
 		{
@@ -186,7 +210,7 @@ public class ObjectProjecter : MonoBehaviour {
 					p2 = CreateVertexProjection(VertexProjections, edge.endPoints.Item2, k);
 					vertexOnThisPlane[edge.endPoints.Item2] = p2;
 				}
-				EdgeProjection edgeProj = CreateEgdeProjection(EdgeProjections, p1, p2, k, edge.label);
+				EdgeProjection edgeProj = CreateEgdeProjection(EdgeProjections, p1, p2,edge.label,k);
 				edgesprojs.Add(edgeProj);
 
 				egdeOnThisPlane[i++] = edgeProj;
@@ -208,15 +232,124 @@ public class ObjectProjecter : MonoBehaviour {
 		//egdeproj.lineRenderer.SetPosition(1, point2);
 		egdeproj.line.SetCoordinates(point1, point2);
 	}
-	/// <summary>
+	private List<Tuple<int, int>> FindPerpendicularWallsToGroundWall(GameObject[] walls){
+		//Debug.Log(Vector3.up); jesłi tylko podłoga to znajdz == wall.transform.right
+		List<Tuple<int, int>> tmp = new List<Tuple<int, int>>();
+		//znajdz groundwall
+		GameObject groundWall = null;
+		int i =0;
+		foreach (GameObject wall in walls){
+			if(wall.transform.right == Vector3.up){
+				groundWall = wall;
+				break;
+			}
+			i++;
+		}
+		if(groundWall == null){
+			Debug.Log("Nie znaleziono sciany na podlodze");
+			return null;
+		}
+		Debug.Log(groundWall.name);
+		int j =0;
+		foreach (GameObject wall in walls)
+        {
+			float dot = Vector3.Dot(groundWall.transform.right, wall.transform.right);
+			float eps = 1e-6F;
+			if(dot < eps && dot > -eps){
+				tmp.Add(new Tuple<int, int>(i, j));
+				Debug.Log(groundWall.name+ "   "+wall.name);
+			}
+			j++;
+		}
+		return tmp;
+	}
+
+	private void AddReferenceLines(){
+		var ReferenceLinesDir = new GameObject("ReferenceLines");
+        ReferenceLinesDir.transform.SetParent(gameObject.transform);
+		var crossPointsDir = new GameObject("crossPointsDir");
+        crossPointsDir.transform.SetParent(gameObject.transform);
+		referenceLines = new List<Tuple<EdgeProjection, EdgeProjection>>();
+		foreach(var pair in perpenWalls){
+			int wall1 = pair.Item1;
+			int wall2 = pair.Item2;
+			foreach(var vertice in rotatedVertices){
+				VertexProjection v1 = verticesOnWalls[wall1][vertice.Key];
+				VertexProjection v2= verticesOnWalls[wall2][vertice.Key];
+				EdgeProjection refLine1 = CreateEgdeProjection(ReferenceLinesDir, CreateVertexProjection(crossPointsDir, "",wall1+2*wall2), v1, "",wall1+2*wall2+1);
+				EdgeProjection refLine2 = CreateEgdeProjection(ReferenceLinesDir, CreateVertexProjection(crossPointsDir, "",wall1+2*wall2), v2, "",wall1+2*wall2+1);			
+				referenceLines.Add(new Tuple<EdgeProjection, EdgeProjection>(refLine1, refLine2));
+			}
+		}
+	}
+
+	private void ProjectReferenceLines(){
+		int i =0;
+		foreach(var pair in perpenWalls){
+			int wall1 = pair.Item1;
+			int wall2 = pair.Item2;
+			foreach(var vertice in rotatedVertices){
+				VertexProjection v1 = verticesOnWalls[wall1][vertice.Key];
+				VertexProjection v2= verticesOnWalls[wall2][vertice.Key];
+				Vector3 p = vertice.Value;		
+				Vector3 cross = FindCrossingPoint(p, v1.vertex.GetCoordinates(), v2.vertex.GetCoordinates());
+				referenceLines[i].Item1.start.vertex.SetCoordinates(cross);
+				referenceLines[i].Item2.start.vertex.SetCoordinates(cross);
+				DrawEgdeLine(referenceLines[i].Item1);
+				DrawEgdeLine(referenceLines[i].Item2);
+				i++;
+			}
+		}
+	}
+
+    // Funkcja przyjmująca trzy Vector3 jako argumenty i zwracająca wektor spełniający określone warunki
+    private Vector3 FindCrossingPoint(Vector3 vec1, Vector3 vec2, Vector3 vec3)
+    {
+		
+        // Zadeklarowanie wektora wynikowego
+        Vector3 resultVector = Vector3.zero;
+        // Sprawdzenie dla każdej współrzędnej wektorów wejściowych
+        for (int i = 0; i < 3; i++)
+        {
+            // Warunek, aby jedna wartość była taka sama dla wszystkich wektorów
+            if (Compare(vec1[i],vec2[i]) && Compare(vec2[i],vec3[i]))
+            {
+                resultVector[i] = vec1[i];
+            }
+            // Warunek, aby jedna wartość była inna niż dla vec1 i vec2
+            if (Compare(vec1[i],vec2[i]) && !Compare(vec2[i],vec3[i]))
+            {
+                resultVector[i] = vec3[i];
+            }
+			// Warunek, aby jedna wartość była inna niż dla vec2 i vec3
+			else if (Compare(vec2[i],vec3[i]) && !Compare(vec3[i],vec1[i]))
+            {
+                resultVector[i] = vec1[i];
+            }
+			// Warunek, aby jedna wartość była inna niż dla vec1 i vec3
+			else if (Compare(vec1[i],vec3[i]) && !Compare(vec3[i],vec2[i]))
+            {
+                resultVector[i] = vec2[i];
+            }
+            
+        }
+
+        return resultVector;
+    }
+    private bool Compare(float a, float b)
+    {
+        const float epsilon = 0.0001f; // Dokładność do 4 miejsc po przecinku
+        return Mathf.Abs(a - b) < epsilon;
+    }
+    /// <summary>
 	/// Tworzy rzut punktu na płaszczyznę
 	/// </summary>
 	/// <param name="VertexProjectionsDir">Katalog organizujący rzuty wierzchołków</param>
 	/// <param name="name">Nazwa rzutowanego wierzchołka</param>
 	/// <param name="nOfProj">Numer rzutni</param>
-	/// <returns>Informacje o rzucie punktu na daną płaszczyznę</returns>
+	/// <returns>Rzut punktu na daną płaszczyznę</returns>
 	private VertexProjection CreateVertexProjection(GameObject VertexProjectionsDir, string name, int nOfProj){
-		GameObject obj = new GameObject("VertexProjection P("+nOfProj+") " + name);
+		GameObject obj = new GameObject(VertexProjectionsDir.name+" P("+nOfProj+") " + name);
 		obj.transform.SetParent(VertexProjectionsDir.transform);
 		GameObject Point = new GameObject("Point P("+nOfProj+") " + name);
 		Point.transform.SetParent(obj.transform);
@@ -226,7 +359,7 @@ public class ObjectProjecter : MonoBehaviour {
 		//znacznik
 		Point vertexObject = Point.AddComponent<Point>();
 		vertexObject.SetStyle(projectionInfo.pointColor, projectionInfo.pointSize);
-		vertexObject.SetLabel(name + new String('\'', nOfProj + 1), projectionInfo.pointLabelSize, projectionInfo.pointLabelColor);
+		vertexObject.SetLabel(name, projectionInfo.pointLabelSize, projectionInfo.pointLabelColor);
 		
 		///linia rzutująca
 		LineSegment lineseg = Line.AddComponent<LineSegment>();
@@ -235,7 +368,7 @@ public class ObjectProjecter : MonoBehaviour {
 
 		return new VertexProjection(ref vertexObject, ref lineseg, name);
 	}
-	/// <summary>
+    /// <summary>
 	/// Tworzy rzut krawędzi na płaszczyznę
 	/// </summary>
 	/// <param name="EdgeProjectionsDir">Katalog organizujący rzuty krawędzi</param>
@@ -243,27 +376,25 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="p2">Drugi zrzutowany punkt krawędzi</param>
 	/// <param name="nOfProj">Numer rzutni</param>
 	/// <param name="label">Etykieta krawędzi</param>
-	/// <returns>Informacje o rzucie krawędzi na daną płaszczyznę</returns>
-	private EdgeProjection CreateEgdeProjection(GameObject EdgeProjectionsDir, VertexProjection p1, VertexProjection p2, int nOfProj, string label){
-		GameObject edge = new GameObject("EgdeLine P("+nOfProj +") " + p1.vertexName+p2.vertexName);
+	/// <returns>Rzut krawędzi na daną płaszczyznę</returns>
+	private EdgeProjection CreateEgdeProjection(GameObject EdgeProjectionsDir, VertexProjection p1, VertexProjection p2, string label, int nOfProj){
+		GameObject edge = new GameObject(EdgeProjectionsDir.name+" P("+nOfProj +") " + p1.vertexName+p2.vertexName);
 		edge.transform.SetParent(EdgeProjectionsDir.transform);
 		LineSegment drawEdge = edge.AddComponent<LineSegment>();
 		drawEdge.SetStyle(projectionInfo.edgeLineColor, projectionInfo.edgeLineWidth);
 		drawEdge.SetLabel(label, projectionInfo.edgeLabelSize, projectionInfo.edgeLabelColor);	
 		return new EdgeProjection(nOfProj, drawEdge, p1, p2);		
 	}
-	/// <summary>
-	/// Przełącza widoczność linii rzutujących
-	/// </summary>
-	public void SetShowingLines(){
-		showlines = !showlines;
-	}
-	/// <summary>
-	/// Przełącza pilnowanie prostopadłości rzutu
-	/// </summary>
-	public void watchPerpendicularity(){
-		perpendicularity = !perpendicularity;
-	}
-
-
 }
+// Debug.Log("Punkt " + vertice.Key);
+// Debug.Log(p.x.ToString("F3") + ", " + p.y.ToString("F3") + ", " + p.z.ToString("F3"));
+// Debug.Log("W1 " + wall1);
+// Debug.Log(v1.vertex.GetCoordinates().x.ToString("F3") + ", " + v1.vertex.GetCoordinates().y.ToString("F3") + ", " + v1.vertex.GetCoordinates().z.ToString("F3"));
+// Debug.Log("W2 " + wall2);
+// Debug.Log(v2.vertex.GetCoordinates().x.ToString("F3") + ", " + v2.vertex.GetCoordinates().y.ToString("F3") + ", " + v2.vertex.GetCoordinates().z.ToString("F3"));			
+				
+// 				//Vector3 f = FindCommonAxis(p, v1.vertex.GetCoordinates(), v2.vertex.GetCoordinates());
+// //Debug.Log(f.x.ToString("F3") + ", " + f.y.ToString("F3") + ", " + f.z.ToString("F3"));
+// 				Vector3 f = FindCrossingPoint(p, v1.vertex.GetCoordinates(), v2.vertex.GetCoordinates());
+// Debug.Log(f.x.ToString("F3") + ", " + f.y.ToString("F3") + ", " + f.z.ToString("F3"));
+//return;
