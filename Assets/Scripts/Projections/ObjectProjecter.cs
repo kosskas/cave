@@ -88,8 +88,9 @@ public class ObjectProjecter : MonoBehaviour {
 	void Update () {
 		if(OBJECT3D != null && rotatedVertices != null && edges != null){
 			ProjectObject();
-			ProjectReferenceLines();
-			//CastPointWithCollision
+			if(perpenWalls != null && referenceLines != null){
+				ProjectReferenceLines();
+			}			
 			if(perpendicularity){
 				RefreshRayDirection();
 			}
@@ -232,6 +233,11 @@ public class ObjectProjecter : MonoBehaviour {
 		//egdeproj.lineRenderer.SetPosition(1, point2);
 		egdeproj.line.SetCoordinates(point1, point2);
 	}
+	/// <summary>
+	/// Znajduje ściany podstopadłe do ściany leżącej na podłodze
+	/// </summary>
+	/// <param name="walls">Lista wszystkich ścian</param>
+	/// <returns>Lista par ścian prostopadłych do siebie, null jeśli nie ma ściany leżązej na podłodze</returns>
 	private List<Tuple<int, int>> FindPerpendicularWallsToGroundWall(GameObject[] walls){
 		//Debug.Log(Vector3.up); jesłi tylko podłoga to znajdz == wall.transform.right
 		List<Tuple<int, int>> tmp = new List<Tuple<int, int>>();
@@ -263,7 +269,9 @@ public class ObjectProjecter : MonoBehaviour {
 		}
 		return tmp;
 	}
-
+	/// <summary>
+	/// Dodaje linie odnoszące
+	/// </summary>
 	private void AddReferenceLines(){
 		var ReferenceLinesDir = new GameObject("ReferenceLines");
         ReferenceLinesDir.transform.SetParent(gameObject.transform);
@@ -276,13 +284,15 @@ public class ObjectProjecter : MonoBehaviour {
 			foreach(var vertice in rotatedVertices){
 				VertexProjection v1 = verticesOnWalls[wall1][vertice.Key];
 				VertexProjection v2= verticesOnWalls[wall2][vertice.Key];
-				EdgeProjection refLine1 = CreateEgdeProjection(ReferenceLinesDir, CreateVertexProjection(crossPointsDir, "",wall1+2*wall2), v1, "",wall1+2*wall2+1);
-				EdgeProjection refLine2 = CreateEgdeProjection(ReferenceLinesDir, CreateVertexProjection(crossPointsDir, "",wall1+2*wall2), v2, "",wall1+2*wall2+1);			
+				EdgeProjection refLine1 = CreateEgdeProjection(ReferenceLinesDir, CreateVertexProjection(crossPointsDir, "",wall1+10*wall2), v1, "",wall1+10*wall2);
+				EdgeProjection refLine2 = CreateEgdeProjection(ReferenceLinesDir, CreateVertexProjection(crossPointsDir, "",wall1+10*wall2), v2, "",wall1+10*wall2);			
 				referenceLines.Add(new Tuple<EdgeProjection, EdgeProjection>(refLine1, refLine2));
 			}
 		}
 	}
-
+	/// <summary>
+	/// Rysuje linie odnoszące
+	/// </summary>
 	private void ProjectReferenceLines(){
 		int i =0;
 		foreach(var pair in perpenWalls){
@@ -302,44 +312,46 @@ public class ObjectProjecter : MonoBehaviour {
 		}
 	}
 
-    // Funkcja przyjmująca trzy Vector3 jako argumenty i zwracająca wektor spełniający określone warunki
+    /// <summary>
+	/// Znajduje punkt przecięcia prostopadłych ścian dla dwóch rzutów i punktu w 3D
+	/// </summary>
+	/// <param name="vec1">Punkt w 3D</param>
+	/// <param name="vec2">Rzut wierzchołka na 1 ścianie</param>
+	/// <param name="vec3">Rzut wierzchołka na 2 ścianie</param>
+	/// <returns>Punkt przecięcia ścian</returns>
     private Vector3 FindCrossingPoint(Vector3 vec1, Vector3 vec2, Vector3 vec3)
-    {
-		
-        // Zadeklarowanie wektora wynikowego
-        Vector3 resultVector = Vector3.zero;
-        // Sprawdzenie dla każdej współrzędnej wektorów wejściowych
+    {		
+		/*
+		v1 = (A, b, c)
+		v2 = (A, e, c)
+		v3 = (A, b, f)
+		ret = (A, e, f)
+		*/
+        Vector3 ret = Vector3.zero;
+		const float eps = 0.0001f;
         for (int i = 0; i < 3; i++)
         {
-            // Warunek, aby jedna wartość była taka sama dla wszystkich wektorów
-            if (Compare(vec1[i],vec2[i]) && Compare(vec2[i],vec3[i]))
+			bool cmp_v12 = Mathf.Abs(vec1[i] - vec2[i]) < eps;
+			bool cmp_v13 = Mathf.Abs(vec1[i] - vec3[i]) < eps;
+			bool cmp_v23 = Mathf.Abs(vec2[i] - vec3[i]) < eps;
+            if (cmp_v12 && cmp_v23)
             {
-                resultVector[i] = vec1[i];
+                ret[i] = vec1[i];
             }
-            // Warunek, aby jedna wartość była inna niż dla vec1 i vec2
-            if (Compare(vec1[i],vec2[i]) && !Compare(vec2[i],vec3[i]))
+            if (cmp_v12 && !cmp_v23)
             {
-                resultVector[i] = vec3[i];
+                ret[i] = vec3[i];
             }
-			// Warunek, aby jedna wartość była inna niż dla vec2 i vec3
-			else if (Compare(vec2[i],vec3[i]) && !Compare(vec3[i],vec1[i]))
+			else if (cmp_v23 && !cmp_v13)
             {
-                resultVector[i] = vec1[i];
+                ret[i] = vec1[i];
             }
-			// Warunek, aby jedna wartość była inna niż dla vec1 i vec3
-			else if (Compare(vec1[i],vec3[i]) && !Compare(vec3[i],vec2[i]))
+			else if (cmp_v13 && !cmp_v23)
             {
-                resultVector[i] = vec2[i];
-            }
-            
+                ret[i] = vec2[i];
+            }     
         }
-
-        return resultVector;
-    }
-    private bool Compare(float a, float b)
-    {
-        const float epsilon = 0.0001f; // Dokładność do 4 miejsc po przecinku
-        return Mathf.Abs(a - b) < epsilon;
+        return ret;
     }
     /// <summary>
 	/// Tworzy rzut punktu na płaszczyznę
