@@ -24,7 +24,7 @@ public struct EdgeInfo {
 
 public class SolidImporter : MonoBehaviour {
 
-	private const string pathToFolderWithSolids = "./Assets/Figures3D";
+	private const string pathToFolderWithSolids = "./Figures3D";
 	private const string solidFileExt = "*.wobj";
 	
 	private const float SIZER = 0.3f; 
