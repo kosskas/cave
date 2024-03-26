@@ -267,6 +267,16 @@ public class ObjectProjecter : MonoBehaviour {
 			}
 			j++;
 		}
+		// for(int i =0; i < walls.Length; i++){
+		// 	for(int j =i; j < walls.Length; j++){
+		// 		float dot = Vector3.Dot(walls[i].transform.right, walls[j].transform.right);
+		// 		float eps = 1e-6F;
+		// 		if(dot < eps && dot > -eps){
+		// 			tmp.Add(new Tuple<int, int>(i, j));
+		// 			Debug.Log(walls[i].name+ "   "+walls[j].name);
+		// 		}
+		// 	}
+		// }
 		return tmp;
 	}
 	/// <summary>
