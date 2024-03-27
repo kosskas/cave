@@ -96,7 +96,12 @@ public class DefaultSolid {
 ///
 public class SolidImporter : MonoBehaviour {
 
-	private const string pathToFolderWithSolids = "./Figures3D";
+	#if UNITY_EDITOR
+		private const string pathToFolderWithSolids = "./Assets/Figures3D";
+	#else
+		private const string pathToFolderWithSolids = "./Figures3D";
+	#endif
+
 
 	private bool isSolidFolderValid = false;
 	private const string solidFileExt = "*.wobj";
