@@ -67,7 +67,11 @@ public class PlayerController : MonoBehaviour
 
         if(Input.GetKeyDown("o")){
             ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
-            op.SetShowingLines();
+            op.SetShowingProjectionLines();
+        }
+        if(Input.GetKeyDown("i")){
+            ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+            op.SetShowingReferenceLines();
         }
         if(Input.GetKeyDown("l")){
             ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));

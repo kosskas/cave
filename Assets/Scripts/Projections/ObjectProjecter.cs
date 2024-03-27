@@ -44,6 +44,11 @@ public class ObjectProjecter : MonoBehaviour {
 	bool showlines = false;
 
 	/// <summary>
+	/// Pokazywanie linii odnoszących
+	/// </summary>
+	bool showPerpenLines = false;
+
+	/// <summary>
 	/// Pilnuje prostopadłości rzutów
 	/// </summary>
 	bool perpendicularity = false;
@@ -99,8 +104,14 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <summary>
 	/// Przełącza widoczność linii rzutujących
 	/// </summary>
-	public void SetShowingLines(){
+	public void SetShowingProjectionLines(){
 		showlines = !showlines;
+	}
+	/// <summary>
+	/// Przełącza widoczność linii odnoszących
+	/// </summary>
+	public void SetShowingReferenceLines(){
+		showPerpenLines = !showPerpenLines;
 	}
 	/// <summary>
 	/// Przełącza pilnowanie prostopadłości rzutu
@@ -142,7 +153,7 @@ public class ObjectProjecter : MonoBehaviour {
 		{
 				CastRay(edge.start, edge.nOfProj);
 				CastRay(edge.end, edge.nOfProj);
-				DrawEgdeLine(edge);
+				DrawEgdeLine(edge, true);
 		}			
 		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem	
     }
@@ -224,7 +235,9 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Rysuje krawędź na rzutni
 	/// </summary>
 	/// <param name="egdeproj">Informacje o rzutowanej krawędzi</param>
-	private void DrawEgdeLine(EdgeProjection egdeproj){
+	/// <param name="show">Ustawienie widoczności</param>
+	private void DrawEgdeLine(EdgeProjection egdeproj, bool show){
+		egdeproj.line.SetEnable(show);
 		//pobierz wsp. wierzchołków na rzutni
 		Vector3 point1 = egdeproj.start.vertex.GetCoordinates();
 		Vector3 point2 = egdeproj.end.vertex.GetCoordinates();
@@ -315,8 +328,8 @@ public class ObjectProjecter : MonoBehaviour {
 				Vector3 cross = FindCrossingPoint(p, v1.vertex.GetCoordinates(), v2.vertex.GetCoordinates());
 				referenceLines[i].Item1.start.vertex.SetCoordinates(cross);
 				referenceLines[i].Item2.start.vertex.SetCoordinates(cross);
-				DrawEgdeLine(referenceLines[i].Item1);
-				DrawEgdeLine(referenceLines[i].Item2);
+				DrawEgdeLine(referenceLines[i].Item1, showPerpenLines);
+				DrawEgdeLine(referenceLines[i].Item2, showPerpenLines);
 				i++;
 			}
 		}
@@ -388,8 +401,10 @@ public class ObjectProjecter : MonoBehaviour {
 		lineseg.SetStyle(projectionInfo.projectionLineColor, projectionInfo.projectionLineWidth);
 		lineseg.SetLabel("", projectionInfo.projectionLabelSize, projectionInfo.projectionLabelColor);
 
-		return new VertexProjection(ref vertexObject, ref lineseg, name);
+		return new VertexProjection(vertexObject, lineseg, name);
 	}
+
+
     /// <summary>
 	/// Tworzy rzut krawędzi na płaszczyznę
 	/// </summary>

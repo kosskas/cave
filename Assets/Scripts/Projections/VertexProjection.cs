@@ -9,6 +9,7 @@ using UnityEngine.UI;
 /// </summary>
 public class VertexProjection
 {
+    public string name;
     /// <summary>
     /// Znacznik na płaszczyźnie
     /// </summary>
@@ -29,10 +30,12 @@ public class VertexProjection
     /// <param name="vertex">Punkt na płaszczyźnie</param>
     /// <param name="line">Lina rzutująca</param>
     /// <param name="vertexName">Nazwa wierzchołka</param>
-    public VertexProjection(ref Point vertex, ref LineSegment line, string vertexName)
+    public VertexProjection(Point vertex, LineSegment line, string vertexName)
     {  
         this.vertex= vertex;
         this.line = line;
         this.vertexName = vertexName;
     }
+
+
 }
