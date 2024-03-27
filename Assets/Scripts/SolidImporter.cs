@@ -6,10 +6,7 @@ using System.IO;
 using System.Text;
 using System.Globalization;
 using System.Linq;
-/// <summary>
-/// Klasa SolidImporter służy do parsowania i ładowania brył zapisanych w formacie wobj to aplikacji.
-/// </summary>
-/// 
+
 
 public struct EdgeInfo {
 	public string label;
@@ -22,13 +19,90 @@ public struct EdgeInfo {
 	}
 }
 
+
+public class DefaultSolid {
+	public static Dictionary<string, Vector3> Verticies = new Dictionary<string, Vector3>()
+	{
+		{ "A", new Vector3(-1, -1, -1) },
+		{ "B", new Vector3(-1, -1, 1) },
+		{ "C", new Vector3(-1, 1, -1) },
+		{ "D", new Vector3(-1, 1, 1) },
+
+		{ "E", new Vector3(1, -1, -1) },
+		{ "F", new Vector3(1, -1, 1) },
+		{ "G", new Vector3(1, 1, -1) },
+		{ "H", new Vector3(1, 1, 1) }
+	};
+
+	public static List<EdgeInfo> Edges = new List<EdgeInfo>()
+	{
+		new EdgeInfo("a", new Tuple<string, string>("A", "C")),
+		new EdgeInfo("b", new Tuple<string, string>("C", "D")),
+		new EdgeInfo("c", new Tuple<string, string>("D", "B")),
+		new EdgeInfo("d", new Tuple<string, string>("B", "A")),
+
+		new EdgeInfo("e", new Tuple<string, string>("A", "E")),
+		new EdgeInfo("f", new Tuple<string, string>("C", "G")),
+		new EdgeInfo("g", new Tuple<string, string>("D", "H")),
+		new EdgeInfo("h", new Tuple<string, string>("B", "F")),
+
+		new EdgeInfo("i", new Tuple<string, string>("E", "G")),
+		new EdgeInfo("j", new Tuple<string, string>("G", "H")),
+		new EdgeInfo("k", new Tuple<string, string>("H", "F")),
+		new EdgeInfo("l", new Tuple<string, string>("F", "E"))
+	};
+
+	public static List<List<string>> Faces = new List<List<string>>()
+		{
+			new List<string>(){ "A", "C", "G", "E" },
+
+			new List<string>(){ "C", "D", "H", "G" },
+
+			new List<string>(){ "E", "G", "H", "F" },
+
+			new List<string>(){ "E", "F", "B", "A" },
+
+			new List<string>(){ "F", "H", "D", "B" },
+
+			new List<string>(){ "B", "D", "C", "A" }
+		};
+
+	public static List<int> Triangles = new List<int>()
+	{
+		0, 1, 2,
+		0, 2, 3,
+
+		4, 5, 6,
+		4, 6, 7,
+
+		8, 9, 10,
+		8, 10, 11,
+
+		12, 13, 14,
+		12, 14, 15,
+
+		16, 17, 18,
+		16, 18, 19,
+
+		20, 21, 22,
+		20, 22, 23
+	};
+}
+
+
+/// <summary>
+/// Klasa SolidImporter służy do parsowania i ładowania brył zapisanych w formacie wobj to aplikacji.
+/// </summary>
+///
 public class SolidImporter : MonoBehaviour {
 
 	private const string pathToFolderWithSolids = "./Figures3D";
+
+	private bool isSolidFolderValid = false;
 	private const string solidFileExt = "*.wobj";
 	
 	private const float SIZER = 0.3f; 
-	private string[] solidFiles;
+	private string[] solidFiles = null;
 	private int currentSolidFileIndex;
 
 	private Dictionary<string, Vector3> labeledVertices = new Dictionary<string, Vector3>();
@@ -44,9 +118,21 @@ public class SolidImporter : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		mainObj = GameObject.Find("MainObject");
-		solidFiles = Directory.GetFiles(pathToFolderWithSolids, solidFileExt);
+
+		try {
+			solidFiles = Directory.GetFiles(pathToFolderWithSolids, solidFileExt);
+			Debug.Log(solidFiles);
+		}
+		catch (System.Exception) {
+			solidFiles = null;
+			Debug.LogError("[CAVE] It seems that folder " + Application.dataPath + pathToFolderWithSolids + " does not exist.");
+		}
+		
 		currentSolidFileIndex = 0;
+
+		isSolidFolderValid = (solidFiles == null || solidFiles.Length == 0) ? false : true;
 	}
+
 	/// <summary>
 	/// Szuka następną bryłę do załadowania w folderze i ładuje ją. W trakcie działania parsuje plik w formacie wobj, środkuje bryłę względem 0,0,0. Ładuje Object3D -centralną, klasę, która podłącza resztę komponentów
 	/// </summary>
@@ -54,29 +140,22 @@ public class SolidImporter : MonoBehaviour {
 		DeleteMainObjChild();
 		DeleteSolid();
 		ClearSolid();
-		PickNextSolid();
-		ReadSolid();
-		CentralizePosition();
-		SetUpVertices();
-		SetUpTriangles();
+
+		if (isSolidFolderValid) {
+			PickNextSolid();
+			ReadSolid();
+			CentralizePosition();
+			SetUpVertices();
+			SetUpTriangles();
+		}
+
 		CreateSolidObject();
+
 		LogStatus();
-
-		// Debug.Log("vertices");
-		// foreach (var vertex in vertices)
-		// {
-		// 	Debug.Log($"Label: {vertex.Label}, Vertex: {vertex.Vertex}");
-		// }
-		// Debug.Log("faces");
-		// for (int i = 0; i < triangles.Count; i += 3)
-		// {
-		// 	Debug.Log($"{triangles[i]} {triangles[i + 1]} {triangles[i + 2]}");
-		// }
-
 	}
 
     private void LogStatus() {
-		if (solidFiles.Length > 0)
+		if (solidFiles != null && solidFiles.Length > 0)
 		{
 			StringBuilder infoString = new StringBuilder();
 			infoString.Append(String.Format(" Current solid: {0}", Path.GetFileName(GetCurrentSolid())));
@@ -89,7 +168,7 @@ public class SolidImporter : MonoBehaviour {
 		}
 		else
 		{
-			Debug.LogError("No solids found!");
+			Debug.LogWarning("[CAVE] No solids found! Default solid has loaded.");
 		}
 	}
 
@@ -242,76 +321,12 @@ public class SolidImporter : MonoBehaviour {
 		//Dodanie Object3D - centralnej klasy która podepnie resztę komponentów
 		Object3D object3D = customSolid.AddComponent<Object3D>();
 		
-		/**/
-		
-		Dictionary<string, Vector3> testV = new Dictionary<string, Vector3>()
-		{
-			{ "A", new Vector3(-1, -1, -1) },
-			{ "B", new Vector3(-1, -1, 1) },
-			{ "C", new Vector3(-1, 1, -1) },
-			{ "D", new Vector3(-1, 1, 1) },
-
-			{ "E", new Vector3(1, -1, -1) },
-			{ "F", new Vector3(1, -1, 1) },
-			{ "G", new Vector3(1, 1, -1) },
-			{ "H", new Vector3(1, 1, 1) }
-		};
-		List<EdgeInfo> testE = new List<EdgeInfo>()
-		{
-			new EdgeInfo("a", new Tuple<string, string>("A", "C")),
-			new EdgeInfo("b", new Tuple<string, string>("C", "D")),
-			new EdgeInfo("c", new Tuple<string, string>("D", "B")),
-			new EdgeInfo("d", new Tuple<string, string>("B", "A")),
-
-			new EdgeInfo("e", new Tuple<string, string>("A", "E")),
-			new EdgeInfo("f", new Tuple<string, string>("C", "G")),
-			new EdgeInfo("g", new Tuple<string, string>("D", "H")),
-			new EdgeInfo("h", new Tuple<string, string>("B", "F")),
-
-			new EdgeInfo("i", new Tuple<string, string>("E", "G")),
-			new EdgeInfo("j", new Tuple<string, string>("G", "H")),
-			new EdgeInfo("k", new Tuple<string, string>("H", "F")),
-			new EdgeInfo("l", new Tuple<string, string>("F", "E"))
-		};
-		List<List<string>> testF = new List<List<string>>()
-		{
-			new List<string>(){ "A", "C", "G", "E" },
-
-			new List<string>(){ "C", "D", "H", "G" },
-
-			new List<string>(){ "E", "G", "H", "F" },
-
-			new List<string>(){ "E", "F", "B", "A" },
-
-			new List<string>(){ "F", "H", "D", "B" },
-
-			new List<string>(){ "B", "D", "C", "A" }
-		};
-		List<int> testT = new List<int>()
-		{
-			0, 1, 2,
-			0, 2, 3,
-
-			4, 5, 6,
-			4, 6, 7,
-
-			8, 9, 10,
-			8, 10, 11,
-
-			12, 13, 14,
-			12, 14, 15,
-
-			16, 17, 18,
-			16, 18, 19,
-
-			20, 21, 22,
-			20, 22, 23
-		};
-
-		//object3D.InitObject(testV, testE, testF, testT);
-		object3D.InitObject(labeledVertices, edges, faces, triangles);
-		/**/
-
+		if (isSolidFolderValid) {
+			object3D.InitObject(labeledVertices, edges, faces, triangles);
+		}
+		else {
+			object3D.InitObject(DefaultSolid.Verticies, DefaultSolid.Edges, DefaultSolid.Faces, DefaultSolid.Triangles);
+		}
 	}
 	private void DeleteSolid() {
 		Destroy(customSolid);
