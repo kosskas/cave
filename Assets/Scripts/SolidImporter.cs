@@ -23,15 +23,15 @@ public struct EdgeInfo {
 public class DefaultSolid {
 	public static Dictionary<string, Vector3> Verticies = new Dictionary<string, Vector3>()
 	{
-		{ "A", new Vector3(-1, -1, -1) },
-		{ "B", new Vector3(-1, -1, 1) },
-		{ "C", new Vector3(-1, 1, -1) },
-		{ "D", new Vector3(-1, 1, 1) },
+		{ "A", new Vector3(-0.3f, -0.3f, -0.3f) },
+		{ "B", new Vector3(-0.3f, -0.3f, 0.3f) },
+		{ "C", new Vector3(-0.3f, 0.3f, -0.3f) },
+		{ "D", new Vector3(-0.3f, 0.3f, 0.3f) },
 
-		{ "E", new Vector3(1, -1, -1) },
-		{ "F", new Vector3(1, -1, 1) },
-		{ "G", new Vector3(1, 1, -1) },
-		{ "H", new Vector3(1, 1, 1) }
+		{ "E", new Vector3(0.3f, -0.3f, -0.3f) },
+		{ "F", new Vector3(0.3f, -0.3f, 0.3f) },
+		{ "G", new Vector3(0.3f, 0.3f, -0.3f) },
+		{ "H", new Vector3(0.3f, 0.3f, 0.3f) }
 	};
 
 	public static List<EdgeInfo> Edges = new List<EdgeInfo>()
