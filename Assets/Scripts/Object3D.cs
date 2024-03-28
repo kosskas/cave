@@ -150,9 +150,6 @@ public class Object3D : MonoBehaviour {
 
         // Assign the generated mesh to the MeshFilter
         this.meshFilter.mesh = mesh;
-
-		//Dodanie collidera potrzebnego do obracania
-		MeshCollider meshColl = gameObject.AddComponent<MeshCollider>();
     }
 
 	private Vector3[] ConvertFacesCollectionToVertexArray()
