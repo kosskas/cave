@@ -33,13 +33,10 @@ public class PlayerController : MonoBehaviour
     //[HideInInspector]
 
     SolidImporter si;
-    CameraScript cs;
     void Start()
     {
         characterController = GetComponentInChildren<CharacterController>();
-        playerCamera = GetComponentInChildren<Camera>();
         si = (SolidImporter)GameObject.FindObjectOfType(typeof(SolidImporter));
-        cs = (CameraScript)GameObject.FindObjectOfType(typeof(CameraScript));
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -50,21 +47,11 @@ public class PlayerController : MonoBehaviour
         ////
         /// NOTE: jedyny Input nie będący tutaj jest w pliku ObjectRotator!
         ///
-        //from CameraScript
-        if(Input.GetKeyDown("1"))
-        {
-			cs.SetCam1();			
-        }
-        if (Input.GetKeyDown("2"))
-		{
-			cs.SetCam2();	
-		}
         //from solidimporter
         if(Input.GetKeyDown("p"))
         {
             si.ImportSolid();
         }
-
         if(Input.GetKeyDown("o")){
             ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
             op.SetShowingProjectionLines();

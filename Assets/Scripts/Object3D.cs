@@ -169,11 +169,7 @@ public class Object3D : MonoBehaviour {
 	/// </summary>
 	private void AddCamera()
 	{	
-		GameObject camObject = GameObject.Find("CameraObject");
-		CameraScript camScript = camObject.GetComponent<CameraScript>();
-		GameObject staticCam = camScript.cam2;
 		ObjectRotator rotator = gameObject.AddComponent<ObjectRotator>();
-		rotator.cam = staticCam.GetComponent<Camera>();
 	}
 
 	private void InitRotatedVertices()
