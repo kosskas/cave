@@ -148,14 +148,12 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Rzutuje punkty i krawędzie bryły na płaszczyzny
 	/// </summary>
 	private void ProjectObject(){
-		this.OBJECT3D.GetComponent<MeshCollider>().enabled = false; //wyłączenie collidera bo raye go nie lubią i się z nim zderzają
 		foreach (var edge in edgesprojs)
 		{
 				CastRay(edge.start, edge.nOfProj);
 				CastRay(edge.end, edge.nOfProj);
 				DrawEgdeLine(edge, true);
 		}			
-		this.OBJECT3D.GetComponent<MeshCollider>().enabled = true; //włączenie collidera żeby móc obracać obiektem	
     }
 	/// <summary>
 	/// Wyznacza rzut punktu na zadaną płaszczyznę

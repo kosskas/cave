@@ -8,10 +8,23 @@ public class ObjectRotator : MonoBehaviour {
 	/// Szybkość obrotu
 	/// </summary>
 	[SerializeField] public float rotationSpeed = 10f;
+
+	GameObject tmp;
+
+	private bool isRotating = false;
+
+	void Start(){
+		tmp = GameObject.Find("FlystickPlaceholder");
+	}
+
+	void Update(){
+		transform.rotation = tmp.transform.rotation;
+	}
 	/// <summary>
 	/// Kamera potrzebna do wyliczania obrotu
 	/// </summary>
-	public Camera cam;
+	//public Camera cam;
+	/*
 	void OnMouseDrag()
     {
 		float rotationX = Input.GetAxis("Mouse X") * rotationSpeed;
@@ -23,5 +36,5 @@ public class ObjectRotator : MonoBehaviour {
 		transform.rotation = Quaternion.AngleAxis(rotationY, right) * transform.rotation;
 
 	}
-	
+	*/
 }

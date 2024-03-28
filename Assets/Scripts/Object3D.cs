@@ -150,9 +150,6 @@ public class Object3D : MonoBehaviour {
 
         // Assign the generated mesh to the MeshFilter
         this.meshFilter.mesh = mesh;
-
-		//Dodanie collidera potrzebnego do obracania
-		MeshCollider meshColl = gameObject.AddComponent<MeshCollider>();
     }
 
 	private Vector3[] ConvertFacesCollectionToVertexArray()
@@ -169,11 +166,7 @@ public class Object3D : MonoBehaviour {
 	/// </summary>
 	private void AddCamera()
 	{	
-		GameObject camObject = GameObject.Find("CameraObject");
-		CameraScript camScript = camObject.GetComponent<CameraScript>();
-		GameObject staticCam = camScript.cam2;
 		ObjectRotator rotator = gameObject.AddComponent<ObjectRotator>();
-		rotator.cam = staticCam.GetComponent<Camera>();
 	}
 
 	private void InitRotatedVertices()
