@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 /// <summary>
 /// Zarządza projekcją obiektu na płaszczyzny 
@@ -211,17 +212,20 @@ public class ObjectProjecter : MonoBehaviour {
 					p1 = vertexOnThisPlane[edge.endPoints.Item1];
 				}
 				else{
-					p1 = CreateVertexProjection(VertexProjections, edge.endPoints.Item1, k);
+					p1 = VertexProjection.CreateVertexProjection(VertexProjections, edge.endPoints.Item1, k);
+					p1.SetDisplay(projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLabelColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
 					vertexOnThisPlane[edge.endPoints.Item1] = p1;
 				}
 				if(vertexOnThisPlane.ContainsKey(edge.endPoints.Item2)){
 					p2= vertexOnThisPlane[edge.endPoints.Item2];
 				}
 				else{
-					p2 = CreateVertexProjection(VertexProjections, edge.endPoints.Item2, k);
+					p2 = VertexProjection.CreateVertexProjection(VertexProjections, edge.endPoints.Item2, k);
+					p2.SetDisplay(projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLabelColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
 					vertexOnThisPlane[edge.endPoints.Item2] = p2;
 				}
-				EdgeProjection edgeProj = CreateEgdeProjection(EdgeProjections, p1, p2,edge.label,k);
+				EdgeProjection edgeProj = EdgeProjection.CreateEgdeProjection(EdgeProjections, p1, p2,edge.label,k);
+				edgeProj.SetDisplay(projectionInfo.edgeLineColor, projectionInfo.edgeLineWidth, projectionInfo.edgeLabelColor, projectionInfo.edgeLabelSize);
 				edgesprojs.Add(edgeProj);
 
 				egdeOnThisPlane[i++] = edgeProj;
@@ -306,8 +310,18 @@ public class ObjectProjecter : MonoBehaviour {
 			foreach(var vertice in rotatedVertices){
 				VertexProjection v1 = verticesOnWalls[wall1][vertice.Key];
 				VertexProjection v2= verticesOnWalls[wall2][vertice.Key];
-				EdgeProjection refLine1 = CreateEgdeProjection(ReferenceLinesDir, CreateVertexProjection(crossPointsDir, "",wall1+10*wall2), v1, "",wall1+10*wall2);
-				EdgeProjection refLine2 = CreateEgdeProjection(ReferenceLinesDir, CreateVertexProjection(crossPointsDir, "",wall1+10*wall2), v2, "",wall1+10*wall2);			
+				
+				VertexProjection vp1 = VertexProjection.CreateVertexProjection(crossPointsDir, "",wall1+10*wall2);
+				VertexProjection vp2 = VertexProjection.CreateVertexProjection(crossPointsDir, "",wall1+10*wall2);
+				vp1.SetDisplay(Color.black, 0f, Color.black, 0f, Color.black, 0f, Color.black, 0f);
+				vp2.SetDisplay(Color.black, 0f, Color.black, 0f, Color.black, 0f, Color.black, 0f);
+				
+
+				EdgeProjection refLine1 = EdgeProjection.CreateEgdeProjection(ReferenceLinesDir, vp1, v1, "",wall1+10*wall2);
+				EdgeProjection refLine2 = EdgeProjection.CreateEgdeProjection(ReferenceLinesDir, vp2, v2, "",wall1+10*wall2);		
+
+				refLine1.SetDisplay(projectionInfo.referenceLineColor, projectionInfo.referenceLineWidth, projectionInfo.referenceLabelColor, projectionInfo.referenceLabelSize);
+				refLine2.SetDisplay(projectionInfo.referenceLineColor, projectionInfo.referenceLineWidth, projectionInfo.referenceLabelColor, projectionInfo.referenceLabelSize);	
 				referenceLines.Add(new Tuple<EdgeProjection, EdgeProjection>(refLine1, refLine2));
 			}
 		}
@@ -375,52 +389,6 @@ public class ObjectProjecter : MonoBehaviour {
         }
         return ret;
     }
-    /// <summary>
-	/// Tworzy rzut punktu na płaszczyznę
-	/// </summary>
-	/// <param name="VertexProjectionsDir">Katalog organizujący rzuty wierzchołków</param>
-	/// <param name="name">Nazwa rzutowanego wierzchołka</param>
-	/// <param name="nOfProj">Numer rzutni</param>
-	/// <returns>Rzut punktu na daną płaszczyznę</returns>
-	private VertexProjection CreateVertexProjection(GameObject VertexProjectionsDir, string name, int nOfProj){
-		GameObject obj = new GameObject(VertexProjectionsDir.name+" P("+nOfProj+") " + name);
-		obj.transform.SetParent(VertexProjectionsDir.transform);
-		GameObject Point = new GameObject("Point P("+nOfProj+") " + name);
-		Point.transform.SetParent(obj.transform);
-		GameObject Line = new GameObject("Line P("+nOfProj+") " + name);
-		Line.transform.SetParent(obj.transform);
-
-		//znacznik
-		Point vertexObject = Point.AddComponent<Point>();
-		vertexObject.SetStyle(projectionInfo.pointColor, projectionInfo.pointSize);
-		vertexObject.SetLabel(name, projectionInfo.pointLabelSize, projectionInfo.pointLabelColor);
-		
-		///linia rzutująca
-		LineSegment lineseg = Line.AddComponent<LineSegment>();
-		lineseg.SetStyle(projectionInfo.projectionLineColor, projectionInfo.projectionLineWidth);
-		lineseg.SetLabel("", projectionInfo.projectionLabelSize, projectionInfo.projectionLabelColor);
-
-		return new VertexProjection(vertexObject, lineseg, name);
-	}
-
-
-    /// <summary>
-	/// Tworzy rzut krawędzi na płaszczyznę
-	/// </summary>
-	/// <param name="EdgeProjectionsDir">Katalog organizujący rzuty krawędzi</param>
-	/// <param name="p1">Pierwszy zrzutowany punkt krawędzi</param>
-	/// <param name="p2">Drugi zrzutowany punkt krawędzi</param>
-	/// <param name="nOfProj">Numer rzutni</param>
-	/// <param name="label">Etykieta krawędzi</param>
-	/// <returns>Rzut krawędzi na daną płaszczyznę</returns>
-	private EdgeProjection CreateEgdeProjection(GameObject EdgeProjectionsDir, VertexProjection p1, VertexProjection p2, string label, int nOfProj){
-		GameObject edge = new GameObject(EdgeProjectionsDir.name+" P("+nOfProj +") " + p1.vertexName+p2.vertexName);
-		edge.transform.SetParent(EdgeProjectionsDir.transform);
-		LineSegment drawEdge = edge.AddComponent<LineSegment>();
-		drawEdge.SetStyle(projectionInfo.edgeLineColor, projectionInfo.edgeLineWidth);
-		drawEdge.SetLabel(label, projectionInfo.edgeLabelSize, projectionInfo.edgeLabelColor);	
-		return new EdgeProjection(nOfProj, drawEdge, p1, p2);		
-	}
 }
 // Debug.Log("Punkt " + vertice.Key);
 // Debug.Log(p.x.ToString("F3") + ", " + p.y.ToString("F3") + ", " + p.z.ToString("F3"));

@@ -77,6 +77,28 @@ public class ProjectionInfo
     /// </summary>
     public float projectionLabelSize = 0.01f;
 
+
+    /*  Linie odnoszące  */
+
+    /// <summary>
+    /// Kolor linii odnoszącej
+    /// </summary>
+    public Color referenceLineColor = Color.gray;
+    /// <summary>
+    /// Kolor etykiet linii odnoszącej.
+    /// </summary>
+    public Color referenceLabelColor = Color.black;
+    
+    /// <summary>
+    /// Grubość linii odnoszącej.<
+    /// </summary>
+    public float referenceLineWidth = 0f;
+    
+    /// <summary>
+    /// Rozmiar etykiet linii odnoszącej.
+    /// </summary>
+    public float referenceLabelSize = 0f;
+
     /* Flagi do rzutowania */
 
     /// <summary>
@@ -104,10 +126,15 @@ public class ProjectionInfo
     /// <param name="projectionLabelColor">Kolor etykiet linii rzutującej.</param>
     /// <param name="projectionLineWidth">Grubość linii rzutującej.</param>
     /// <param name="projectionLabelSize">Rozmiar etykiet linii rzutującej.</param>
+    /// <param name="referenceLineColor">Kolor linii odnoszącej.</param>
+    /// <param name="referenceLabelColor">Kolor etykiet linii odnoszącej.</param>
+    /// <param name="referenceLineWidth">Grubość linii odnoszącej.</param>
+    /// <param name="referenceLabelSize">Rozmiar etykiet linii odnoszącej.</param>
     /// <param name="showProjectionLines">Określa czy linie rzutowania powinny być wyświetlane.</param>
     public ProjectionInfo(Color pointColor, Color pointLabelColor, float pointSize, float pointLabelSize,
                           Color edgeLineColor, Color edgeLabelColor, float edgeLineWidth, float edgeLabelSize,
                           Color projectionLineColor, Color projectionLabelColor, float projectionLineWidth, float projectionLabelSize,
+                          Color referenceLineColor, Color referenceLabelColor, float referenceLineWidth, float referenceLabelSize,
                           bool showProjectionLines)
     {
         this.pointColor = pointColor;
@@ -122,6 +149,10 @@ public class ProjectionInfo
         this.projectionLabelColor = projectionLabelColor;
         this.projectionLineWidth = projectionLineWidth;
         this.projectionLabelSize = projectionLabelSize;
+        this.referenceLineColor = referenceLineColor;
+        this.referenceLabelColor = referenceLabelColor;
+        this.referenceLineWidth = referenceLineWidth;
+        this.referenceLabelSize = referenceLabelSize;
         this.showProjectionLines = showProjectionLines;
     }
 }

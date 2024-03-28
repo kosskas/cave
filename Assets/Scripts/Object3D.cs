@@ -240,6 +240,7 @@ public class Object3D : MonoBehaviour {
     		Color.black, Color.white, 0.02f, 0.04f,    // Parametry punktu
     		Color.black, Color.white, 0.01f, 0.01f,    // Parametry krawędzi
     		Color.gray, Color.white, 0.01f, 0.01f,     // Parametry linii rzutującej
+			Color.gray, Color.white, 0.01f, 0.01f,		// Parametry linii odnoszących
     		false                                     // Określenie czy linie rzutowania powinny być wyświetlane
 		);
 
