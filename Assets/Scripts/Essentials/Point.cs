@@ -10,7 +10,7 @@ using UnityEngine.Rendering;
 public class Point : MonoBehaviour {
 
 	/// <summary>
-	/// Współrzędne punktu
+	/// Współrzędne punktu, liczone względem położenia obiektu rodzica
 	/// </summary>
 	private Vector3 point = Vector3.zero;
 
@@ -25,12 +25,12 @@ public class Point : MonoBehaviour {
 	private float pointSize = 1.0f;
 
 	/// <summary>
-	/// Referencja na obiekt klasy LineRenderer używany do narysowania punktu
+	/// Referencja na obiekt klasy LineRenderer używany do rysowania punktu
 	/// </summary>
 	LineRenderer lineRenderer = null;
 
 	/// <summary>
-	/// Referencja na GameObject zawierający objekt klasy Label 
+	/// Referencja na GameObject zawierający komponent z objektem klasy Label 
 	/// </summary>
 	GameObject labelObject = null;
 
@@ -72,9 +72,9 @@ public class Point : MonoBehaviour {
 
 
 	/// <summary>
-	/// Metoda ustawia, nadpisując dotychczasowe, współrzędne punktu liczone względem położenia obiektu rodzica
+	/// Metoda ustawia, nadpisując dotychczasowe, współrzędne punktu
 	/// </summary>
-	/// <param name="point">Obiekt klasy Vector3</param>
+	/// <param name="point">Obiekt klasy Vector3, współrzędne punktu, liczone względem położenia obiektu rodzica</param>
 	public void SetCoordinates(Vector3 point)
 	{
 		this.transform.position = point;
@@ -82,9 +82,9 @@ public class Point : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Metoda zwraca aktualne współrzędne punktu liczone względem położenia obiektu rodzica
+	/// Metoda zwraca aktualne współrzędne punktu
 	/// </summary>
-	/// <returns>Obiekt klasy Vector3</returns>
+	/// <returns>Obiekt klasy Vector3, współrzędne punktu, liczone względem położenia obiektu rodzica</returns>
 	public Vector3 GetCoordinates()
 	{
 		return point;
@@ -93,8 +93,8 @@ public class Point : MonoBehaviour {
 	/// <summary>
 	/// Metoda ustawia właściowści rysowanego punktu
 	/// </summary>
-	/// <param name="pointColor">kolor punktu</param>
-	/// <param name="pointSize">średnica punktu</param>
+	/// <param name="pointColor">Kolor punktu</param>
+	/// <param name="pointSize">Średnica punktu</param>
 	public void SetStyle(Color pointColor, float pointSize)
 	{
 		this.pointColor = pointColor;
@@ -107,7 +107,7 @@ public class Point : MonoBehaviour {
 	/// jeśli nie, dołącza komponent etykiety (obiekt klasy Label) i ustawia właściowści wyświetlanego tekstu tej etykiety
 	/// </summary>
 	/// <param name="text">Tekst która ma zostać wyświetlony na etykiecie</param>
-	/// <param name="textSize">Rozmiar fontu wyświetlanego tekstu</param>
+	/// <param name="fontSize">Rozmiar fontu wyświetlanego tekstu</param>
 	/// <param name="textColor">Kolor wyświetlanego tekstu</param>
 	public void SetLabel(string text, float fontSize, Color textColor)
 	{
