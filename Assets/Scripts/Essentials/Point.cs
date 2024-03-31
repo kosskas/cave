@@ -12,7 +12,7 @@ public class Point : MonoBehaviour {
 	/// <summary>
 	/// Współrzędne punktu
 	/// </summary>
-	private Vector3 point;
+	private Vector3 point = Vector3.zero;
 
 	/// <summary>
 	/// Kolor punktu
@@ -127,4 +127,5 @@ public class Point : MonoBehaviour {
 		Label label = labelObject.GetComponent<Label>();
 		label.SetLabel(text, fontSize, textColor);
 	}
+
 }
