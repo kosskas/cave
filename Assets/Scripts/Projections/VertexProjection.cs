@@ -9,7 +9,6 @@ using UnityEngine.UI;
 /// </summary>
 public class VertexProjection
 {
-    public string name;
     /// <summary>
     /// Znacznik na płaszczyźnie
     /// </summary>

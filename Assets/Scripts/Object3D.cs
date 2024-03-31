@@ -51,15 +51,21 @@ public class Object3D : MonoBehaviour {
 	public GameObject player = null;
 
 
-	public Dictionary<string, Point> vertexObjects = new Dictionary<string, Point>();
+	private Dictionary<string, Point> vertexObjects = new Dictionary<string, Point>();
 
-	public List<LineSegment> edgeObjects = new List<LineSegment>();
+	private List<LineSegment> edgeObjects = new List<LineSegment>();
 
-	public GameObject edgesFolder = null;
-	public GameObject verticesFolder = null;
+	private GameObject edgesFolder = null;
+	private GameObject verticesFolder = null;
 	
 
-	
+	/// <summary>
+	/// Inicjuje wyświetlaną bryłę oraz resztę komponentów
+	/// </summary>
+	/// <param name="baseVertices">Wierzchołki opisane przez etykietę i bazowe współrzędne, czyli określone w pliku .wobj</param>
+	/// <param name="edges">Krawędzie bryły określone przez etykietę i etykiety wierzchołków, któe łączy</param>
+	/// <param name="faces">Kolekcja zawiera kolekcje, z których każda zawiera etykiety wierzchołów tworzących ścianę bryły 3D</param>
+	/// <param name="triangles">Kolekcja indeksów wierzchołków z kolekcji faces, gdzie każda kolejna trójka definiuje trójkąt dla mesha bryły 3D</param>
 	public void InitObject( Dictionary<string, Vector3> baseVertices, List<EdgeInfo> edges, List<List<string>> faces, List<int> triangles )
 	{
 		this.player = GameObject.Find("FPSPlayer");

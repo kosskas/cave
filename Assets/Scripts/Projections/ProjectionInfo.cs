@@ -85,12 +85,12 @@ public class ProjectionInfo
     public bool showProjectionLines = false;
 
     /// <summary>
-    /// Konstruktor bezparametrowy.
+    /// Inicjuje pola obiektu według wartości początkowych
     /// </summary>
     public ProjectionInfo(){}
 
     /// <summary>
-    /// Konstruktor z parametrami.
+    /// Inicjuje pola obiektu według zadanych wartości podanych
     /// </summary>
     /// <param name="pointColor">Kolor punktów.</param>
     /// <param name="pointLabelColor">Kolor etykiet punktów.</param>
