@@ -576,7 +576,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &282840811
 AudioListener:
   m_ObjectHideFlags: 0
@@ -760,7 +760,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   walkingSpeed: 6.5
-  playerCamera: {fileID: 282840813}
+  playerCamera: {fileID: 586607412}
   lookSpeed: 2
   lookXLimit: 45
   canMove: 1
@@ -873,6 +873,11 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: bf1ac880dbe997a46acfe269bbb72014, type: 2}
   m_IsPrefabParent: 0
+--- !u!20 &586607412 stripped
+Camera:
+  m_PrefabParentObject: {fileID: 20707860808229536, guid: bf1ac880dbe997a46acfe269bbb72014,
+    type: 2}
+  m_PrefabInternal: {fileID: 586607411}
 --- !u!1 &793511885
 GameObject:
   m_ObjectHideFlags: 0
