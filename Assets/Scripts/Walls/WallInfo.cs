@@ -11,6 +11,10 @@ using UnityEngine.UI;
 public class WallInfo
 {
     /// <summary>
+    /// Obiekt ściany Unity
+    /// </summary>
+    private GameObject gameObject;
+    /// <summary>
     /// Numer ściany
     /// </summary>
     public int number;
@@ -35,12 +39,18 @@ public class WallInfo
     /// </summary>    
     public bool watchPerpendicularity = false;
 
+
+    private Transform oldtrans;
+    private Rotation oldrotat;
+
     /// <summary>
     /// Konstruktor inicjujący parametry klasy WallInfo z domyślnie ustawionymi flagami.
     /// </summary>
+    /// <param name="gameObject">Obiekt ściany Unity</param>
     /// <param name="number">Numer ściany.</param>
     /// <param name="name">Nazwa ściany.</param>
-    public WallInfo(int number, string name){
+    public WallInfo(GameObject gameObject, int number, string name){
+        this.gameObject = gameObject;
         this.number = number;
         this.name = name;
     }
@@ -48,19 +58,25 @@ public class WallInfo
     /// <summary>
     /// Konstruktor inicjujący wszystkie parametry klasy WallInfo.
     /// </summary>
+    /// <param name="gameObject">Obiekt ściany Unity</param>
     /// <param name="number">Numer ściany.</param>
     /// <param name="name">Nazwa ściany.</param>
     /// <param name="showProjection">Flaga dotycząca wyświetlania na ścianie rzutów.</param>
     /// <param name="showLines">Flaga dotycząca wyświetlania linii rzutujących.</param>
     /// <param name="showReferenceLines">Flaga dotycząca wyświetlania linii odnoszących.</param>
     /// <param name="watchPerpendicularity">Flaga dotycząca pilnowania prostopadłości rzutu na ścianie.</param>
-    public WallInfo(int number, string name, bool showProjection, bool showLines, bool showReferenceLines, bool watchPerpendicularity)
+    public WallInfo(GameObject gameObject, int number, string name, bool showProjection, bool showLines, bool showReferenceLines, bool watchPerpendicularity)
     {
+        this.gameObject = gameObject;
         this.number = number;
         this.name = name;
         this.showProjection = showProjection;
         this.showLines = showLines;
         this.showReferenceLines = showReferenceLines;
         this.watchPerpendicularity = watchPerpendicularity;
+    }
+
+    public Vector3 GetNormal(){
+        return gameObject.transform.right;
     }
 }
