@@ -682,6 +682,35 @@ Prefab:
       propertyPath: m_ViewID.m_Type
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1036901858813508, guid: 4e989319e1a6746439e05903ce1e807d, type: 2}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114810793624457228, guid: 4e989319e1a6746439e05903ce1e807d,
+        type: 2}
+      propertyPath: config.general.movementType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114810793624457228, guid: 4e989319e1a6746439e05903ce1e807d,
+        type: 2}
+      propertyPath: config.general.dblJumpToToggleMovementType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114810793624457228, guid: 4e989319e1a6746439e05903ce1e807d,
+        type: 2}
+      propertyPath: config.walking.jumpingEnabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114810793624457228, guid: 4e989319e1a6746439e05903ce1e807d,
+        type: 2}
+      propertyPath: config.walking.playJumpingAudio
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114810793624457228, guid: 4e989319e1a6746439e05903ce1e807d,
+        type: 2}
+      propertyPath: config.walking.playWalkingAudio
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 4e989319e1a6746439e05903ce1e807d, type: 2}
   m_IsPrefabParent: 0
