@@ -10,6 +10,12 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 
+####LZWP
+/Assets/LZWPlib
+/Assets/UnityPackages
+LZWPlib.meta
+UnityPackages.meta
+
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
