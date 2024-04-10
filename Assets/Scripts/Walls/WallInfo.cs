@@ -43,7 +43,6 @@ public class WallInfo
     private Vector3 oldposition;
     private Quaternion oldrotation;
 
-//    private Rotation oldrotat;
 
     /// <summary>
     /// Konstruktor inicjujący parametry klasy WallInfo z domyślnie ustawionymi flagami.
