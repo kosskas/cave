@@ -22,10 +22,6 @@ public class WallController : MonoBehaviour {
 	{
 		//sprawdzaj czy dodano ściane
 	}
-    public List<WallInfo> GetWallsInfo()
-	{
-		return walls;
-	}
 	public void ResetWallsPos()
 	{
 		//Uwzgl. nowe sciany
@@ -35,7 +31,7 @@ public class WallController : MonoBehaviour {
 		}
 	}
 
-	public Vector3[] GetWallNormalsVec()
+	public Vector3[] GetWallNormals()
 	{
 		Vector3[] normals = new Vector3[walls.Count];
 		for(int i = 0; i < walls.Count; i++)
@@ -43,7 +39,6 @@ public class WallController : MonoBehaviour {
 			normals[i] = walls[i].GetNormal();
 		}
 		return null;
-
 	}
 
     /// <summary>
@@ -51,21 +46,19 @@ public class WallController : MonoBehaviour {
     /// </summary>
     /// <param name="walls">Lista wszystkich ścian</param>
     /// <returns>Lista par ścian prostopadłych do siebie, null jeśli nie ma ściany leżązej na podłodze</returns>
-    private List<Tuple<int, int>> FindPerpendicularWallsToGroundWall(GameObject[] walls)
+    public List<Tuple<WallInfo, WallInfo>> FindPerpendicularWallsToGroundWall()
     {
         //Debug.Log(Vector3.up); jesłi tylko podłoga to znajdz == wall.transform.right
-        List<Tuple<int, int>> tmp = new List<Tuple<int, int>>();
+        List<Tuple<WallInfo, WallInfo>> tmp = new List<Tuple<WallInfo, WallInfo>>();
         //znajdz groundwall
-        GameObject groundWall = null;
-        int i = 0;
-        foreach (GameObject wall in walls)
+        WallInfo groundWall = null;
+        foreach (WallInfo wall in walls)
         {
-            if (wall.transform.right == Vector3.up)
+            if (wall.GetNormal() == Vector3.up)
             {
                 groundWall = wall;
                 break;
             }
-            i++;
         }
         if (groundWall == null)
         {
@@ -73,28 +66,16 @@ public class WallController : MonoBehaviour {
             return null;
         }
         Debug.Log(groundWall.name);
-        int j = 0;
-        foreach (GameObject wall in walls)
+        foreach (WallInfo wall in walls)
         {
-            float dot = Vector3.Dot(groundWall.transform.right, wall.transform.right);
-            float eps = 1e-6F;
+            float dot = Vector3.Dot(groundWall.GetNormal(), wall.GetNormal());
+            const float eps = 1e-6F;
             if (dot < eps && dot > -eps)
             {
-                tmp.Add(new Tuple<int, int>(i, j));
+                tmp.Add(new Tuple<WallInfo, WallInfo>(groundWall, wall));
                 Debug.Log(groundWall.name + "   " + wall.name);
             }
-            j++;
         }
-        // for(int i =0; i < walls.Length; i++){
-        // 	for(int j =i; j < walls.Length; j++){
-        // 		float dot = Vector3.Dot(walls[i].transform.right, walls[j].transform.right);
-        // 		float eps = 1e-6F;
-        // 		if(dot < eps && dot > -eps){
-        // 			tmp.Add(new Tuple<int, int>(i, j));
-        // 			Debug.Log(walls[i].name+ "   "+walls[j].name);
-        // 		}
-        // 	}
-        // }
         return tmp;
     }
 
