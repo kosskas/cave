@@ -40,8 +40,10 @@ public class WallInfo
     public bool watchPerpendicularity = false;
 
 
-    private Transform oldtrans;
-    private Rotation oldrotat;
+    private Vector3 oldposition;
+    private Quaternion oldrotation;
+
+//    private Rotation oldrotat;
 
     /// <summary>
     /// Konstruktor inicjujący parametry klasy WallInfo z domyślnie ustawionymi flagami.
@@ -74,6 +76,16 @@ public class WallInfo
         this.showLines = showLines;
         this.showReferenceLines = showReferenceLines;
         this.watchPerpendicularity = watchPerpendicularity;
+        
+
+       oldposition = gameObject.transform.position;
+       oldrotation = gameObject.transform.rotation;
+    }
+
+    public void SetPrevPos()
+    {
+        gameObject.transform.position = oldposition;
+        gameObject.transform.rotation = oldrotation;
     }
 
     public Vector3 GetNormal(){
