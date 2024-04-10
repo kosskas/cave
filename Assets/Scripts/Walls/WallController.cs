@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class WallController : MonoBehaviour {
 	
-	WallInfo[] walls;
+	List<WallInfo> walls;
 
 	// Use this for initialization
 	void Start () {
 		GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
-		walls = new WallInfo[wallsobject.Length];
+		walls = new List<WallInfo>();
 		int idx = 0;
 		foreach(GameObject wall in wallsobject)
 		{
-			walls[idx] = new WallInfo(wall, idx, wall.name, true, false, false, false);
+			walls.Add(new WallInfo(wall, idx, wall.name, true, false, false, false));
 			idx++;
 		}
 	}
@@ -21,7 +21,7 @@ public class WallController : MonoBehaviour {
 	{
 		//sprawdzaj czy dodano ściane
 	}
-    public WallInfo[] GetWallInfoTab()
+    public List<WallInfo> GetWallsInfo()
 	{
 		return walls;
 	}
