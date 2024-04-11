@@ -204,7 +204,7 @@ public class Object3D : MonoBehaviour {
 			obj.transform.SetParent(verticesFolder.transform);
 
 			Point vertexObject = obj.AddComponent<Point>();
-			vertexObject.SetStyle(Color.black, 0.04f);
+			vertexObject.SetStyle(Color.black, 0.02f);
 			vertexObject.SetCoordinates(rotatedVertices[vertexLabel]);
 			vertexObject.SetLabel(vertexLabel, 0.04f, Color.white);
 
