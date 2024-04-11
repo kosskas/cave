@@ -132,9 +132,22 @@ public class Object3D : MonoBehaviour {
 	{
         // Create a new mesh
         Mesh mesh = new Mesh();
-        
-		mesh.vertices = ConvertFacesCollectionToVertexArray(); 
-		mesh.triangles = this.triangles.ToArray();
+
+		Vector3[] v = ConvertFacesCollectionToVertexArray();
+
+		int ll = this.triangles.Count;
+        int[] z = new int[ll * 2];
+
+        this.triangles.ToArray().CopyTo(z, 0);
+
+        List<int> lt = this.triangles;
+		lt.Reverse();
+		lt.ToArray().CopyTo(z, ll);
+
+
+
+        mesh.vertices = v;
+		mesh.triangles = z;
 
         // Recalculate normals and bounds
         mesh.RecalculateNormals();
@@ -164,7 +177,9 @@ public class Object3D : MonoBehaviour {
 
 		faces.ForEach( face => face.ForEach( label => vertices.Add(baseVertices[label])));
 
-		return vertices.ToArray();
+        faces.ForEach(face => face.ForEach(label => vertices.Prepend(baseVertices[label])));
+
+        return vertices.ToArray();
 	}
 
 	/// <summary>
