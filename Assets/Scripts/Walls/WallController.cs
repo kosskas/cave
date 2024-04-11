@@ -5,16 +5,22 @@ using UnityEngine;
 
 public class WallController : MonoBehaviour {
 	
-	List<WallInfo> walls;
+	private List<WallInfo> walls;
 
 	// Use this for initialization
 	void Start () {
 		GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
+        Debug.Log(wallsobject.Length);
 		walls = new List<WallInfo>();
 		int idx = 0;
 		foreach(GameObject wall in wallsobject)
 		{
-			walls.Add(new WallInfo(wall, idx, wall.name, true, false, false, false));
+			walls.Add(new WallInfo(wall, idx, wall.name,
+                true,   //show projection
+                false,  //showLines
+                false,  //showReferenceLines
+                false   //watchPerpen
+            ));
 			idx++;
 		}
 	}
@@ -22,6 +28,46 @@ public class WallController : MonoBehaviour {
 	{
 		//sprawdzaj czy dodano ściane
 	}
+    /// <summary>
+    /// Szuka informacji o ścianie na podstawie jej obiketu Unity
+    /// </summary>
+    /// <param name="wallObject">Obiekt ściany Unity</param>
+    /// <returns>Informacje o ścianie</returns>
+    public WallInfo FindWallInfoByGameObject(GameObject wallObject)
+    {
+        foreach (WallInfo wall in walls)
+        {
+            if(wall.gameObject == wallObject)
+            {
+                return wall;
+            }
+        }
+        return null;
+    }
+    /// <summary>
+    /// Ustawia parametry ściany według obiektu ściany Unity
+    /// </summary>
+    /// <param name="wallObject">Obiekt ściany Unity</param>
+    /// <param name="showProjection">Flaga dot. wyświetlania na ścianie rzutów</param>
+    /// <param name="showLines">Flaga dot. wyświetlania linii rzutujących</param>
+    /// <param name="showReferenceLines">Flaga dot. wyświetlania linii odnoszących</param>
+    /// <param name="watchPerpendicularity">Flaga dot. pilnowania prostopadłości rzutu na ścianie</param>
+    public void SetWallInfo(GameObject wallObject,bool showProjection, bool showLines, bool showReferenceLines, bool watchPerpendicularity)
+    {
+        for(int i = 0; i < walls.Count; i++)
+        {
+            if (walls[i].gameObject == wallObject)
+            {
+                walls[i].showProjection = showProjection;
+                walls[i].showLines = showLines;
+                walls[i].showReferenceLines = showReferenceLines;
+                walls[i].watchPerpendicularity = watchPerpendicularity;
+            }
+        }
+    }
+    /// <summary>
+    /// Resetuje pozycje ścian do pozycji początkowych
+    /// </summary>
 	public void ResetWallsPos()
 	{
 		//Uwzgl. nowe sciany
@@ -30,7 +76,25 @@ public class WallController : MonoBehaviour {
 			wall.SetPrevPos();
 		}
 	}
-
+    /// <summary>
+    /// PObiera listę ścian i ją zwraca
+    /// </summary>
+    /// <returns>Lista ścian jaka jest na scenie</returns>
+    public List<WallInfo> GetWalls() {
+        return walls;
+    }
+    /// <summary>
+    /// Odczytuje liczbe wszystkich ścian
+    /// </summary>
+    /// <returns>Liczba ścian</returns>
+    public int GetWallCount()
+    {
+        return walls.Count;
+    }
+    /// <summary>
+    /// Odczytuje ze ścian ich wektory normalne
+    /// </summary>
+    /// <returns>Tablica wektorów normalnych ścian</returns>
 	public Vector3[] GetWallNormals()
 	{
 		Vector3[] normals = new Vector3[walls.Count];
@@ -38,13 +102,11 @@ public class WallController : MonoBehaviour {
 		{
 			normals[i] = walls[i].GetNormal();
 		}
-		return null;
+		return normals;
 	}
-
     /// <summary>
     /// Znajduje ściany podstopadłe do ściany leżącej na podłodze
     /// </summary>
-    /// <param name="walls">Lista wszystkich ścian</param>
     /// <returns>Lista par ścian prostopadłych do siebie, null jeśli nie ma ściany leżązej na podłodze</returns>
     public List<Tuple<WallInfo, WallInfo>> FindPerpendicularWallsToGroundWall()
     {
@@ -85,8 +147,8 @@ public class WallController : MonoBehaviour {
     /// <param name="vec1">Punkt w 3D</param>
     /// <param name="vec2">Rzut wierzchołka na 1 ścianie</param>
     /// <param name="vec3">Rzut wierzchołka na 2 ścianie</param>
-    /// <returns>Punkt przecięcia ścian</returns>
-    private Vector3 FindCrossingPoint(Vector3 vec1, Vector3 vec2, Vector3 vec3)
+    /// <returns>Punkt przecięcia ścian, wektor zerowy jeśli nie ma</returns>
+    public Vector3 FindCrossingPoint(Vector3 vec1, Vector3 vec2, Vector3 vec3)
     {
         /*
 		v1 = (A, b, c)

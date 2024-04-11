@@ -13,7 +13,7 @@ public class WallInfo
     /// <summary>
     /// Obiekt ściany Unity
     /// </summary>
-    private GameObject gameObject;
+    public GameObject gameObject;
     /// <summary>
     /// Numer ściany
     /// </summary>
@@ -80,13 +80,18 @@ public class WallInfo
        oldposition = gameObject.transform.position;
        oldrotation = gameObject.transform.rotation;
     }
-
+    /// <summary>
+    /// Przywraca pozycję początkową ściany
+    /// </summary>
     public void SetPrevPos()
     {
         gameObject.transform.position = oldposition;
         gameObject.transform.rotation = oldrotation;
     }
-
+    /// <summary>
+    /// Funkcja zwraca wektor normalny ściany, przyjęty w projektcie jako vector.right
+    /// </summary>
+    /// <returns>Wektor normalny</returns>
     public Vector3 GetNormal(){
         return gameObject.transform.right;
     }
