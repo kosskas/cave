@@ -250,11 +250,12 @@ public class Object3D : MonoBehaviour {
 	/// </summary>
 	private void AddRays()
     {
+		float labelsize_default = 0.01f;
 		ProjectionInfo projectionInfo = new ProjectionInfo(
     		Color.black, Color.white, 0.02f, 0.04f,    // Parametry punktu
-    		Color.black, Color.white, 0.01f, 0.01f,    // Parametry krawędzi
-    		Color.gray, Color.white, 0.01f, 0.01f,     // Parametry linii rzutującej
-			Color.gray, Color.white, 0.01f, 0.01f,		// Parametry linii odnoszących
+    		Color.black, Color.white, 0.01f, labelsize_default,    // Parametry krawędzi
+    		Color.gray, Color.white, 0.003f, labelsize_default,     // Parametry linii rzutującej
+			Color.gray, Color.white, 0.003f, labelsize_default,		// Parametry linii odnoszących
     		false                                     // Określenie czy linie rzutowania powinny być wyświetlane
 		);
 
