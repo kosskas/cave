@@ -161,7 +161,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="vproj">Rzut punktu</param>
 	/// <param name="direction">Numer płaszczyzny</param>
 	private void CastRay(VertexProjection vproj, int direction){
-		Vector3 vertex = rotatedVertices[vproj.vertexName];
+		Vector3 vertex = rotatedVertices[vproj.vertexid];
 		Ray ray = new Ray(vertex, rayDirections[direction]);
 		Debug.DrawRay(vertex, rayDirections[direction]);
 		RaycastHit hit;
@@ -215,7 +215,7 @@ public class ObjectProjecter : MonoBehaviour {
 				}
 				else{
 					p1 = VertexProjection.CreateVertexProjection(VertexProjections, edge.endPoints.Item1, k);
-					p1.SetDisplay(projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLabelColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
+					p1.SetDisplay(edge.endPoints.Item1 + new string('\'', k+1), projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLabelColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
 					vertexOnThisPlane[edge.endPoints.Item1] = p1;
 				}
 				if(vertexOnThisPlane.ContainsKey(edge.endPoints.Item2)){
@@ -223,7 +223,7 @@ public class ObjectProjecter : MonoBehaviour {
 				}
 				else{
 					p2 = VertexProjection.CreateVertexProjection(VertexProjections, edge.endPoints.Item2, k);
-					p2.SetDisplay(projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLabelColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
+					p2.SetDisplay(edge.endPoints.Item2 + new string('\'', k+1), projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLabelColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
 					vertexOnThisPlane[edge.endPoints.Item2] = p2;
 				}
 				EdgeProjection edgeProj = EdgeProjection.CreateEgdeProjection(EdgeProjections, p1, p2,edge.label,k);
@@ -315,8 +315,8 @@ public class ObjectProjecter : MonoBehaviour {
 
                 VertexProjection vp1 = VertexProjection.CreateVertexProjection(crossPointsDir, "",wall1+10*wall2);
 				VertexProjection vp2 = VertexProjection.CreateVertexProjection(crossPointsDir, "",wall1+10*wall2);
-				vp1.SetDisplay(Color.black, 0f, Color.black, 0f, Color.black, 0f, Color.black, 0f);
-				vp2.SetDisplay(Color.black, 0f, Color.black, 0f, Color.black, 0f, Color.black, 0f);
+				vp1.SetDisplay(v1.vertexid,Color.black, 0f, Color.black, 0f, Color.black, 0f, Color.black, 0f);
+				vp2.SetDisplay(v2.vertexid,Color.black, 0f, Color.black, 0f, Color.black, 0f, Color.black, 0f);
 				
 
 				EdgeProjection refLine1 = EdgeProjection.CreateEgdeProjection(ReferenceLinesDir, vp1, v1, "",wall1+10*wall2);
