@@ -68,14 +68,14 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Lista linii odnoszących
 	/// </summary>
 	List<Tuple<EdgeProjection,EdgeProjection>> referenceLines;
-	/// <summary>
-	/// Inicjuje mechanizm rzutowania
-	/// </summary>
-	/// <param name="obj">Referencja na strukturę Object3D</param>
-	/// <param name="projectionInfo">Metadane dotyczące wyświetlania rzutów</param>
-	/// <param name="rotatedVertices">Oznaczenia wierzchołków</param>
-	/// <param name="edges">Lista krawędzi</param>
-	public void InitProjecter(Object3D obj,ProjectionInfo projectionInfo, Dictionary<string, Vector3> rotatedVertices, List<EdgeInfo> edges){
+    /// <summary>
+    /// Inicjuje mechanizm rzutowania
+    /// </summary>
+    /// <param name="obj">Referencja na strukturę Object3D</param>
+    /// <param name="projectionInfo">Metadane dotyczące wyświetlania rzutów</param>
+    /// <param name="rotatedVertices">Oznaczenia wierzchołków</param>
+    /// <param name="edges">Lista krawędzi</param>
+    public void InitProjecter(Object3D obj,ProjectionInfo projectionInfo, Dictionary<string, Vector3> rotatedVertices, List<EdgeInfo> edges){
 		this.OBJECT3D = obj;
 		this.rotatedVertices = rotatedVertices;
 		this.edges = edges;
@@ -177,13 +177,17 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="ray">Promień</param>
 	/// <param name="hit">Metadana o zderzeniu</param>
 	private void DrawVertexProjection(VertexProjection proj, Ray ray, RaycastHit hit){
-		//rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
-		proj.line.SetEnable(showlines);
+		const float antiztrack = 0.01f;
+
+        //rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
+        proj.line.SetEnable(showlines);
+
+		Vector3 antiztrackhit = hit.point + antiztrack * hit.normal;
 		if(showlines){
-			proj.line.SetCoordinates(ray.origin,hit.point);
+			proj.line.SetCoordinates(ray.origin, antiztrackhit);
 		}
 		//znacznik
-		proj.vertex.SetCoordinates(hit.point);
+		proj.vertex.SetCoordinates(antiztrackhit);
 	}
 	/// <summary>
 	/// Tworzy rzuty wierzchołków
@@ -297,7 +301,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Dodaje linie odnoszące
 	/// </summary>
 	private void AddReferenceLines(){
-		var ReferenceLinesDir = new GameObject("ReferenceLines");
+        var ReferenceLinesDir = new GameObject("ReferenceLines");
         ReferenceLinesDir.transform.SetParent(gameObject.transform);
 		var crossPointsDir = new GameObject("crossPointsDir");
         crossPointsDir.transform.SetParent(gameObject.transform);
@@ -308,8 +312,8 @@ public class ObjectProjecter : MonoBehaviour {
 			foreach(var vertice in rotatedVertices){
 				VertexProjection v1 = verticesOnWalls[wall1][vertice.Key];
 				VertexProjection v2= verticesOnWalls[wall2][vertice.Key];
-				
-				VertexProjection vp1 = VertexProjection.CreateVertexProjection(crossPointsDir, "",wall1+10*wall2);
+
+                VertexProjection vp1 = VertexProjection.CreateVertexProjection(crossPointsDir, "",wall1+10*wall2);
 				VertexProjection vp2 = VertexProjection.CreateVertexProjection(crossPointsDir, "",wall1+10*wall2);
 				vp1.SetDisplay(Color.black, 0f, Color.black, 0f, Color.black, 0f, Color.black, 0f);
 				vp2.SetDisplay(Color.black, 0f, Color.black, 0f, Color.black, 0f, Color.black, 0f);
@@ -337,9 +341,9 @@ public class ObjectProjecter : MonoBehaviour {
 				VertexProjection v2= verticesOnWalls[wall2][vertice.Key];
 				Vector3 p = vertice.Value;		
 				Vector3 cross = FindCrossingPoint(p, v1.vertex.GetCoordinates(), v2.vertex.GetCoordinates());
-				referenceLines[i].Item1.start.vertex.SetCoordinates(cross);
+                referenceLines[i].Item1.start.vertex.SetCoordinates(cross);
 				referenceLines[i].Item2.start.vertex.SetCoordinates(cross);
-				DrawEgdeLine(referenceLines[i].Item1, showPerpenLines);
+                DrawEgdeLine(referenceLines[i].Item1, showPerpenLines);
 				DrawEgdeLine(referenceLines[i].Item2, showPerpenLines);
 				i++;
 			}
