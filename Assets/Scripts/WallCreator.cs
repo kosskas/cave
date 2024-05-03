@@ -38,7 +38,7 @@ public class WallCreator : MonoBehaviour {
 		point.transform.position = hit.point;
 		points.Add(point);
 		Debug.Log(hit.point);
-		if (points.Count == 2)
+		if (points.Count % 2 == 0 && points.Count > 0)
         {
 			CreateWall(points[wallsCounter*2].transform.position, points[wallsCounter*2+1].transform.position);
 			wallsCounter++;
