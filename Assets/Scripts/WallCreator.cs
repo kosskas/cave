@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class WallCreator : MonoBehaviour {
 
-	public Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+	public Ray ray;
 	public RaycastHit hit;
 	public List<GameObject> points = new List<GameObject>();
 	public GameObject newWall;
-	public int wallsCounter = 0;
+	public int wallsCounter;
 	// Use this for initialization
 	void Start () {
-		
+		ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
+		wallsCounter = 0;
 	}
 	
 	// Update is called once per frame
@@ -21,7 +22,7 @@ public class WallCreator : MonoBehaviour {
 		{
 			//Debug.Log(hit.transform.name);
 			//Debug.Log("hit");
-			Debug.DrawLine(ray.origin, hit.point, Color.red);
+			//Debug.DrawLine(ray.origin, hit.point, Color.red);
 			
 		}
 		//Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
@@ -59,16 +60,20 @@ public class WallCreator : MonoBehaviour {
 		Collider coll = newWall.GetComponent<Collider>();
 		coll.enabled = false;
 
+		// Ustawienie orientacji prostopadłościanu zgodnie z kierunkiem wektora
+		newWall.transform.rotation = Quaternion.LookRotation(direction);
+		//Debug.Log(newWall.transform.rotation);
+		Debug.Log("Player position:" + transform.position);
+
 		// Ustawienie rozmiaru prostopadłościanu
-		newWall.transform.localScale = new Vector3(3.4f, 0.1f, distance); // Długość prostopadłościanu
+		newWall.transform.localScale = new Vector3(7f, 0.1f, distance); // Długość prostopadłościanu
 																		  //rectPrism.transform.localScale += new Vector3(0, distance, 1); // Wysokość prostopadłościanu
 																		  //rectPrism.transform.localScale += new Vector3(0, 0, distance); // Szerokość prostopadłościanu
 
-		// Ustawienie orientacji prostopadłościanu zgodnie z kierunkiem wektora
-		newWall.transform.rotation = Quaternion.LookRotation(direction);
+
 
 		// Ustawienie pozycji prostopadłościanu na środek linii między punktami
-		newWall.transform.position = point1 + (direction / 2) + new Vector3(-1.7f,0,0);
+		newWall.transform.position = point1 + (direction / 2); 
 	}
 
 
