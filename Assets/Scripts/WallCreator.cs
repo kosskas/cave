@@ -58,7 +58,8 @@ public class WallCreator : MonoBehaviour {
 
 		newWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		Collider coll = newWall.GetComponent<Collider>();
-		coll.enabled = false;
+		//coll.enabled = true;
+		
 
 		// Ustawienie orientacji prostopadłościanu zgodnie z kierunkiem wektora
 		newWall.transform.rotation = Quaternion.LookRotation(direction);
@@ -66,14 +67,18 @@ public class WallCreator : MonoBehaviour {
 		Debug.Log("Player position:" + transform.position);
 
 		// Ustawienie rozmiaru prostopadłościanu
-		newWall.transform.localScale = new Vector3(7f, 0.1f, distance); // Długość prostopadłościanu
+		newWall.transform.localScale = new Vector3(7f, 0.01f, distance); // Długość prostopadłościanu
 																		  //rectPrism.transform.localScale += new Vector3(0, distance, 1); // Wysokość prostopadłościanu
 																		  //rectPrism.transform.localScale += new Vector3(0, 0, distance); // Szerokość prostopadłościanu
 
 
 
 		// Ustawienie pozycji prostopadłościanu na środek linii między punktami
-		newWall.transform.position = point1 + (direction / 2); 
+		newWall.transform.position = point1 + (direction / 2);
+		WallRotator rotator = newWall.AddComponent<WallRotator>();
+		
+		newWall.transform.parent = GameObject.Find("Walls").transform;
+		//coll.isTrigger = true;
 	}
 
 
