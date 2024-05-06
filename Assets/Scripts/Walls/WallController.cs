@@ -132,7 +132,7 @@ public class WallController : MonoBehaviour {
         {
             float dot = Vector3.Dot(groundWall.GetNormal(), wall.GetNormal());
             const float eps = 1e-6F;
-            if (dot < eps && dot > -eps)
+            if (dot < 0f+eps && dot > 0f-eps)
             {
                 tmp.Add(new Tuple<WallInfo, WallInfo>(groundWall, wall));
                 Debug.Log(groundWall.name + "   " + wall.name);
@@ -180,6 +180,24 @@ public class WallController : MonoBehaviour {
                 ret[i] = vec2[i];
             }
         }
+        return ret;
+    }
+    /// <summary>
+    /// Znajduje punkt przecięcia ścian dla dwóch rzutów punktu w 3D
+    /// </summary>
+    /// <param name="pointA">Rzut punktu na 1. ścianę</param>
+    /// <param name="normA">Wektor normalny 1. ściany</param>
+    /// <param name="pointB">Rzut punktu na 2. ścianę</param>
+    /// <param name="normB">Wektor normalny 2. ściany</param>
+    /// <returns>Punkt przecięcia ścian z rzutami</returns>
+    public Vector3 FindCrossingPoint2(Vector3 pointA, Vector3 normA, Vector3 pointB, Vector3 normB)
+    {
+        ///1. Równania płaszczyzn(pktA, normA)
+        ///2. Prosta przecinająca płaszczyzny
+        ///3. prosta prostopadła(przez pktA) do prostej przecinającej
+        ///4. == pkt. przecięcia
+        Vector3 ret = Vector3.zero;
+        const float eps = 0.0001f;
         return ret;
     }
 }
