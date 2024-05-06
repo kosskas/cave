@@ -132,9 +132,22 @@ public class Object3D : MonoBehaviour {
 	{
         // Create a new mesh
         Mesh mesh = new Mesh();
-        
-		mesh.vertices = ConvertFacesCollectionToVertexArray(); 
-		mesh.triangles = this.triangles.ToArray();
+
+		Vector3[] v = ConvertFacesCollectionToVertexArray();
+
+		int ll = this.triangles.Count;
+        int[] z = new int[ll * 2];
+
+        this.triangles.ToArray().CopyTo(z, 0);
+
+        List<int> lt = this.triangles;
+		lt.Reverse();
+		lt.ToArray().CopyTo(z, ll);
+
+
+
+        mesh.vertices = v;
+		mesh.triangles = z;
 
         // Recalculate normals and bounds
         mesh.RecalculateNormals();
@@ -164,7 +177,9 @@ public class Object3D : MonoBehaviour {
 
 		faces.ForEach( face => face.ForEach( label => vertices.Add(baseVertices[label])));
 
-		return vertices.ToArray();
+        faces.ForEach(face => face.ForEach(label => vertices.Prepend(baseVertices[label])));
+
+        return vertices.ToArray();
 	}
 
 	/// <summary>
@@ -235,11 +250,12 @@ public class Object3D : MonoBehaviour {
 	/// </summary>
 	private void AddRays()
     {
+		float labelsize_default = 0.01f;
 		ProjectionInfo projectionInfo = new ProjectionInfo(
     		Color.black, Color.white, 0.02f, 0.04f,    // Parametry punktu
-    		Color.black, Color.white, 0.01f, 0.01f,    // Parametry krawędzi
-    		Color.gray, Color.white, 0.01f, 0.01f,     // Parametry linii rzutującej
-			Color.gray, Color.white, 0.01f, 0.01f,		// Parametry linii odnoszących
+    		Color.black, Color.white, 0.01f, labelsize_default,    // Parametry krawędzi
+    		Color.gray, Color.white, 0.003f, labelsize_default,     // Parametry linii rzutującej
+			Color.gray, Color.white, 0.003f, labelsize_default,		// Parametry linii odnoszących
     		false                                     // Określenie czy linie rzutowania powinny być wyświetlane
 		);
 

@@ -58,7 +58,7 @@ public class EdgeProjection
 	/// <param name="label">Etykieta krawędzi</param>
 	/// <returns>Rzut krawędzi na daną płaszczyznę</returns>
     public static EdgeProjection CreateEgdeProjection(GameObject EdgeProjectionsDir, VertexProjection p1, VertexProjection p2, string label, int nOfProj){
-		GameObject edge = new GameObject(EdgeProjectionsDir.name+" P("+nOfProj +") " + p1.vertexName+p2.vertexName);
+		GameObject edge = new GameObject(EdgeProjectionsDir.name+" P("+nOfProj +") " + p1.vertexid+p2.vertexid);
 		edge.transform.SetParent(EdgeProjectionsDir.transform);
 		LineSegment drawEdge = edge.AddComponent<LineSegment>();	
 		return new EdgeProjection(label, nOfProj, drawEdge, p1, p2);		
