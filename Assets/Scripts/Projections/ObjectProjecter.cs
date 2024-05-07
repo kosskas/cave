@@ -165,15 +165,20 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="vproj">Rzut punktu</param>
 	/// <param name="direction">Numer płaszczyzny</param>
 	private void CastRay(VertexProjection vproj, int direction){
+		const float maxRayLength = 5f;
 		Vector3 vertex = rotatedVertices[vproj.vertexid];
 		Ray ray = new Ray(vertex, rayDirections[direction]);
 		Debug.DrawRay(vertex, rayDirections[direction]);
-		RaycastHit hit;
-		if (Physics.Raycast(ray, out hit))
-		{
-			DrawVertexProjection(vproj, ray, hit);			
-		}
-	}
+        RaycastHit[] hits = Physics.RaycastAll(ray, maxRayLength);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            ///ściany mogą się pokrywać dlatego sprawdzam pod konkretną ścianę
+            if (hits[i].collider.gameObject == wc.GetWalls()[direction].gameObject)
+            {
+                DrawVertexProjection(vproj, ray, hits[i]);
+            }
+        }
+    }
 	/// <summary>
 	/// Rysuje wierzchołek na płaszczyźnie
 	/// </summary>
