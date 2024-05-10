@@ -8,71 +8,78 @@ using UnityEngine.UI;
 /// <summary>
 /// Zarządza projekcją obiektu na płaszczyzny 
 /// </summary>
-public class ObjectProjecter : MonoBehaviour {	
-	/// <summary>
-	/// Referencja na strukturę Obiekt3D
-	/// </summary>
-	Object3D OBJECT3D;
-	/// <summary>
-	/// Dane dot. wyświetlania rzutów
-	/// </summary>
-	ProjectionInfo projectionInfo;
-	/// <summary>
-	/// Oznaczenia wierzchołków
-	/// </summary>
-	Dictionary<string, Vector3> rotatedVertices;
-	/// <summary>
-	/// Lista krawędzi
-	/// </summary>
-	List<EdgeInfo> edges = null;
-	/// <summary>
-	/// Lista krawędzi wyświetlanych na rzutniach
-	/// </summary>
-	List<EdgeProjection> edgesprojs = new List<EdgeProjection>();
-	/// <summary>
-	/// Kierunki promieni, prostopadłe
-	/// </summary>
-	Vector3[] rayDirections = null;
-	//Vector3[] rayDirections = {Vector3.right*10, Vector3.down*10, Vector3.forward*10}; //ray w kierunku: X, -Y i Z +rzekome_własne_kierunki
-	/// <summary>
-	/// Liczba rzutni
-	/// </summary>
-	int nOfProjDirs; //liczba rzutni jak ww.
-	/// <summary>
-	/// Pokazywanie promieni rzutowania
-	/// </summary>
-	bool showlines = false;
+public class ObjectProjecter : MonoBehaviour {
+    /// <summary>
+    /// Referencja na strukturę Obiekt3D
+    /// </summary>
+    Object3D OBJECT3D;
+    /// <summary>
+    /// Dane dot. wyświetlania rzutów
+    /// </summary>
+    ProjectionInfo projectionInfo;
+    /// <summary>
+    /// Oznaczenia wierzchołków
+    /// </summary>
+    Dictionary<string, Vector3> rotatedVertices;
+    /// <summary>
+    /// Lista krawędzi
+    /// </summary>
+    List<EdgeInfo> edges;
 
-	/// <summary>
-	/// Pokazywanie linii odnoszących
-	/// </summary>
-	bool showPerpenLines = false;
+    /// <summary>
+    /// Kontroler ścian
+    /// </summary>
+    WallController wc;
+    //////////////////////////////////////////
 
-	/// <summary>
-	/// Pilnuje prostopadłości rzutów
-	/// </summary>
-	bool perpendicularity = false;
-	/// <summary>
-	/// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
-	/// </summary>
-	Dictionary<WallInfo, Dictionary<string, VertexProjection>> verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, VertexProjection>>();
-	/// <summary>
-	/// Opisuje zbiór rzutowanych krawędzi na danej płaszczyźnie
-	/// </summary>
-	Dictionary<WallInfo, Dictionary<int, EdgeProjection>> egdesOnWalls = new Dictionary<WallInfo, Dictionary<int, EdgeProjection>>();
+
+    /// <summary>
+    /// Lista krawędzi wyświetlanych na rzutniach
+    /// </summary>
+    List<EdgeProjection> edgesprojs;
+    /// <summary>
+    /// Kierunki promieni, prostopadłe
+    /// </summary>
+    Vector3[] rayDirections;
+    //Vector3[] rayDirections = {Vector3.right*10, Vector3.down*10, Vector3.forward*10}; //ray w kierunku: X, -Y i Z +rzekome_własne_kierunki
+    /// <summary>
+    /// Liczba rzutni
+    /// </summary>
+    int nOfProjDirs; //liczba rzutni jak ww.
+    /// <summary>
+    /// Pokazywanie promieni rzutowania
+    /// </summary>
+    bool showlines = false;
+
+    /// <summary>
+    /// Pokazywanie linii odnoszących
+    /// </summary>
+    bool showPerpenLines = false;
+
+    /// <summary>
+    /// Pilnuje prostopadłości rzutów
+    /// </summary>
+    bool perpendicularity = false;
+    /// <summary>
+    /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
+    /// </summary>
+    Dictionary<WallInfo, Dictionary<string, VertexProjection>> verticesOnWalls;
+    /// <summary>
+    /// Opisuje zbiór rzutowanych krawędzi na danej płaszczyźnie
+    /// </summary>
+    Dictionary<WallInfo, Dictionary<int, EdgeProjection>> egdesOnWalls;
     /// <summary>
     /// Lista par ścian prostopadłych
     /// </summary>
     List<Tuple<WallInfo, WallInfo>> perpenWalls;
-	/// <summary>
-	/// Lista linii odnoszących
-	/// </summary>
-	List<Tuple<EdgeProjection,EdgeProjection>> referenceLines;
-
-	/// <summary>
-	/// Kontroler ścian
-	/// </summary>
-    WallController wc;
+    /// <summary>
+    /// Lista linii odnoszących
+    /// </summary>
+    List<Tuple<EdgeProjection, EdgeProjection>> referenceLines;
+    /// <summary>
+    /// Katalog organizujący rzuty
+    /// </summary>
+    GameObject projectionDir = null;
 
     /// <summary>
     /// Inicjuje mechanizm rzutowania
@@ -87,17 +94,43 @@ public class ObjectProjecter : MonoBehaviour {
 		this.edges = edges;
 		this.projectionInfo = projectionInfo;
         wc = (WallController)FindObjectOfType(typeof(WallController));
-        if (OBJECT3D != null && rotatedVertices != null && edges != null){
+        ResetProjections();
+    }
+    /// <summary>
+    /// Resetuje projekcję rzutów
+    /// </summary>
+    public void ResetProjections()
+    {
+        edgesprojs = new List<EdgeProjection>();
+        rayDirections = null;
+        verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, VertexProjection>>();
+        egdesOnWalls = new Dictionary<WallInfo, Dictionary<int, EdgeProjection>>();
+        perpenWalls = null;
+        referenceLines = new List<Tuple<EdgeProjection, EdgeProjection>>();
+
+        if (projectionDir != null)
+        {
+            DestroyImmediate(GameObject.Find("VertexProjections"));
+            DestroyImmediate(GameObject.Find("EdgeProjections"));
+            DestroyImmediate(GameObject.Find("ReferenceLines"));
+            DestroyImmediate(GameObject.Find("crossPointsDir"));
+            DestroyImmediate(GameObject.Find("ProjectionDir"));
+        }
+        projectionDir = new GameObject("ProjectionDir");
+        projectionDir.transform.SetParent(gameObject.transform);
+
+        if (OBJECT3D != null && rotatedVertices != null && edges != null)
+        {
             CreateRayDirections();
-			CreateHitPoints();
-			ProjectObject();
-			AddReferenceLines();
-		}
-	}	
-	/// <summary>
-	/// Aktualizuje rzutowanie
-	/// </summary>
-	void Update () {
+            CreateHitPoints();
+            ProjectObject();
+            AddReferenceLines();
+        }
+    }
+    /// <summary>
+    /// Aktualizuje rzutowanie
+    /// </summary>
+    void Update () {
 		if(OBJECT3D != null && rotatedVertices != null && edges != null){
 			ProjectObject();
 			if(perpenWalls != null && referenceLines != null){
