@@ -19,21 +19,21 @@ public class VertexProjection
     public LineSegment line;
 
     /// <summary>
-    /// Nazwa wierzchołka
+    /// Identyfikator wierzchołka
     /// </summary>
-    public string vertexName;
+    public string vertexid;
 
     /// <summary>
     /// Konstruktor klasy VertexProjection
     /// </summary>
     /// <param name="vertex">Punkt na płaszczyźnie</param>
     /// <param name="line">Lina rzutująca</param>
-    /// <param name="vertexName">Nazwa wierzchołka</param>
-    public VertexProjection(Point vertex, LineSegment line, string vertexName)
+    /// <param name="vertexid">Nazwa wierzchołka</param>
+    public VertexProjection(Point vertex, LineSegment line, string vertexid)
     {  
         this.vertex= vertex;
         this.line = line;
-        this.vertexName = vertexName;
+        this.vertexid = vertexid;
     }
     /// <summary>
 	/// Tworzy rzut punktu na płaszczyznę
@@ -42,22 +42,23 @@ public class VertexProjection
 	/// <param name="name">Nazwa rzutowanego wierzchołka</param>
 	/// <param name="nOfProj">Numer rzutni</param>
 	/// <returns>Rzut punktu na daną płaszczyznę</returns>
-	public static VertexProjection CreateVertexProjection(GameObject VertexProjectionsDir, string name, int nOfProj){
-		GameObject obj = new GameObject(VertexProjectionsDir.name+" P("+nOfProj+") " + name);
+	public static VertexProjection CreateVertexProjection(GameObject VertexProjectionsDir, string vertexid, int nOfProj){
+		GameObject obj = new GameObject(VertexProjectionsDir.name+" P("+nOfProj+") " + vertexid);
 		obj.transform.SetParent(VertexProjectionsDir.transform);
-		GameObject Point = new GameObject("Point P("+nOfProj+") " + name);
+		GameObject Point = new GameObject("Point P("+nOfProj+") " + vertexid);
 		Point.transform.SetParent(obj.transform);
-		GameObject Line = new GameObject("Line P("+nOfProj+") " + name);
+		GameObject Line = new GameObject("Line P("+nOfProj+") " + vertexid);
 		Line.transform.SetParent(obj.transform);
 		//znacznik
 		Point vertexObject = Point.AddComponent<Point>();		
 		///linia rzutująca
 		LineSegment lineseg = Line.AddComponent<LineSegment>();
-		return new VertexProjection(vertexObject, lineseg, name);
+		return new VertexProjection(vertexObject, lineseg, vertexid);
 	}
     /// <summary>
     /// Ustawia wyświetlania rzutu wierzchołka
     /// </summary>
+    /// <param name="vertexname">Etykieta punktu</param>
     /// <param name="pointColor">Kolor punktu</param>
     /// <param name="pointSize">Rozmiar punktu</param>
     /// <param name="pointLabelColor">Kolor etykiet punktu</param>
@@ -66,13 +67,13 @@ public class VertexProjection
     /// <param name="projectionLineWidth">Grubość linii rzutującej</param>
     /// <param name="projectionLabelColor">Kolor etykiety linii rzutującej</param>
     /// <param name="projectionLabelSize">Rozmiar etykiety linii rzutującej</param>
-    public void SetDisplay(Color pointColor, float pointSize,
+    public void SetDisplay(string vertexname, Color pointColor, float pointSize,
         Color pointLabelColor, float pointLabelSize,
         Color projectionLineColor, float projectionLineWidth,
         Color projectionLabelColor, float projectionLabelSize
          ){
         vertex.SetStyle(pointColor, pointSize);
-		vertex.SetLabel(vertexName, pointLabelSize, pointLabelColor);
+		vertex.SetLabel(vertexname, pointLabelSize, pointLabelColor);
         line.SetStyle(projectionLineColor, projectionLineWidth);
 		line.SetLabel("", projectionLabelSize, projectionLabelColor);
     }
