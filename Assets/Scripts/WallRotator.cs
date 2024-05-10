@@ -32,6 +32,14 @@ public class WallRotator : MonoBehaviour {
 	/// </summary>
 	public Camera cam;
 
+	void Start()
+    {
+		//baseMaterial = Resources.Load<Material>("Assets/Materials/wall");
+		//hoverMaterial = Resources.Load<Material>("Material/hoverWall");
+		player = GameObject.Find("FPSPlayer");
+		cam = Camera.main;
+	}
+
 	void Update()
     {
 		if (Vector3.Distance(gameObject.transform.position, player.transform.position) > hoverDistance)
