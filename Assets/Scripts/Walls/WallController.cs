@@ -6,28 +6,47 @@ using UnityEngine;
 public class WallController : MonoBehaviour {
 	
 	private List<WallInfo> walls;
+    int wallconter;
+    // Use this for initialization
+    void Start()
+    {
+        AddWalls();
+    }
+    void Update()
+    {
+        /*
+        ///Sprawdzaj czy dodano nową ścianę
+        GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
+        if(wallconter < wallsobject.Length)
+        {
+            AddWalls();
 
-	// Use this for initialization
-	void Start () {
-		GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
+            ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+            if (op)
+            {
+                op.ResetProjections();
+            }
+        }
+        */
+    }
+    private void AddWalls()
+    {
+        GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
         Debug.Log(wallsobject.Length);
-		walls = new List<WallInfo>();
-		int idx = 0;
-		foreach(GameObject wall in wallsobject)
-		{
-			walls.Add(new WallInfo(wall, idx, wall.name,
+        walls = new List<WallInfo>();
+        int idx = 0;
+        foreach (GameObject wall in wallsobject)
+        {
+            walls.Add(new WallInfo(wall, idx, wall.name,
                 true,   //show projection
                 false,  //showLines
                 false,  //showReferenceLines
                 false   //watchPerpen
             ));
-			idx++;
-		}
-	}
-	void Update ()
-	{
-		//sprawdzaj czy dodano ściane
-	}
+            idx++;
+        }
+        wallconter = walls.Count;
+    }
     /// <summary>
     /// Szuka informacji o ścianie na podstawie jej obiketu Unity
     /// </summary>
