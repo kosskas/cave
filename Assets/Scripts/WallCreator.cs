@@ -10,8 +10,10 @@ public class WallCreator : MonoBehaviour {
 	public List<GameObject> points = new List<GameObject>();
 	public GameObject newWall;
 	public int wallsCounter;
-	// Use this for initialization
-	void Start () {
+    [SerializeField] public GameObject wallPrefab;
+
+    // Use this for initialization
+    void Start () {
 		ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
 		wallsCounter = 0;
 	}
@@ -57,34 +59,38 @@ public class WallCreator : MonoBehaviour {
 		Vector3 direction = point2 - point1;
 		float distance = direction.magnitude;
 
-		newWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		Collider coll = newWall.GetComponent<Collider>();
-		//coll.enabled = true;
+        newWall = Instantiate(wallPrefab);
 
 
-		// Ustawienie orientacji prostopadłościanu zgodnie z kierunkiem wektora
-		newWall.transform.rotation = Quaternion.LookRotation(direction);
-		//Debug.Log(newWall.transform.rotation);
-		Debug.Log("Player position:" + transform.position);
-
-		// Ustawienie rozmiaru prostopadłościanu
-		newWall.transform.localScale = new Vector3(0.01f, 3.4f * 2, 3.4f * 2); // Długość prostopadłościanu
-                                                                               //rectPrism.transform.localScale += new Vector3(0, distance, 1); // Wysokość prostopadłościanu
-                                                                               //rectPrism.transform.localScale += new Vector3(0, 0, distance); // Szerokość prostopadłościanu
-
-        float angle = 90f;
-        Quaternion rotation = Quaternion.Euler(newWall.transform.eulerAngles.x, newWall.transform.eulerAngles.y, newWall.transform.eulerAngles.z - angle);
+        // Ustawienie orientacji prostopadłościanu zgodnie z kierunkiem wektora
+        Quaternion look = Quaternion.LookRotation(direction);
+        float angle = 90f; ///liczyć dynamicznie;
+        Quaternion rotation = Quaternion.Euler(look.eulerAngles.x, look.eulerAngles.y, look.eulerAngles.z - angle);
         newWall.transform.rotation = rotation;
+        //Debug.Log(newWall.transform.rotation);
+        Debug.Log("Player position:" + transform.position);
+
+
         // Ustawienie pozycji prostopadłościanu na środek linii między punktami
-        newWall.transform.position = point1 + (direction / 2);
-		//WallRotator rotator = newWall.AddComponent<WallRotator>();
+        Vector3 magicOffset = new Vector3(1.7f, 0, 0); ///liczyć dynamicznie;
+        //newWall.transform.position = Vector3.zero; //localposition???
+        newWall.transform.position = point1 + (direction / 2) + magicOffset;
 
-		newWall.transform.parent = GameObject.Find("Walls").transform;
+        //WallRotator rotator = newWall.AddComponent<WallRotator>();
+
+
+        MeshRenderer meshRenderer = newWall.GetComponent<MeshRenderer>();
+        meshRenderer.material = new Material(Shader.Find("Transparent/Diffuse"));
+        Color color = meshRenderer.material.color;
+        color.a = 0.5f;
+        meshRenderer.material.color = color;
+
+        BoxCollider boxCollider = newWall.GetComponent<BoxCollider>();
+        boxCollider.isTrigger = false;
+
         newWall.tag = "Wall";
-        //coll.isTrigger = true;
-
-        Debug.Log("New Wall " + newWall.transform.right);
-	}
+        newWall.transform.parent = GameObject.Find("Walls").transform;
+    }
 }
 /*
         float angle;
