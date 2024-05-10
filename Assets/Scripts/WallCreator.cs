@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 public class WallCreator : MonoBehaviour {
@@ -47,7 +48,7 @@ public class WallCreator : MonoBehaviour {
 	}
 
 	void CreateWall(Vector3 point1, Vector3 point2)
-    {
+	{
 		//GameObject gameObj = new GameObject();
 		//LineRenderer lineRenderer = gameObj.AddComponent<LineRenderer>();
 		//lineRenderer.SetWidth(0.05f, 0.05f);
@@ -59,7 +60,7 @@ public class WallCreator : MonoBehaviour {
 		newWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		Collider coll = newWall.GetComponent<Collider>();
 		//coll.enabled = true;
-		
+
 
 		// Ustawienie orientacji prostopadłościanu zgodnie z kierunkiem wektora
 		newWall.transform.rotation = Quaternion.LookRotation(direction);
@@ -67,19 +68,36 @@ public class WallCreator : MonoBehaviour {
 		Debug.Log("Player position:" + transform.position);
 
 		// Ustawienie rozmiaru prostopadłościanu
-		newWall.transform.localScale = new Vector3(7f, 0.01f, distance); // Długość prostopadłościanu
-																		  //rectPrism.transform.localScale += new Vector3(0, distance, 1); // Wysokość prostopadłościanu
-																		  //rectPrism.transform.localScale += new Vector3(0, 0, distance); // Szerokość prostopadłościanu
+		newWall.transform.localScale = new Vector3(0.01f, 3.4f * 2, 3.4f * 2); // Długość prostopadłościanu
+                                                                               //rectPrism.transform.localScale += new Vector3(0, distance, 1); // Wysokość prostopadłościanu
+                                                                               //rectPrism.transform.localScale += new Vector3(0, 0, distance); // Szerokość prostopadłościanu
 
+        float angle = 90f;
+        Quaternion rotation = Quaternion.Euler(newWall.transform.eulerAngles.x, newWall.transform.eulerAngles.y, newWall.transform.eulerAngles.z - angle);
+        newWall.transform.rotation = rotation;
+        // Ustawienie pozycji prostopadłościanu na środek linii między punktami
+        newWall.transform.position = point1 + (direction / 2);
+		//WallRotator rotator = newWall.AddComponent<WallRotator>();
 
-
-		// Ustawienie pozycji prostopadłościanu na środek linii między punktami
-		newWall.transform.position = point1 + (direction / 2);
-		WallRotator rotator = newWall.AddComponent<WallRotator>();
-		
 		newWall.transform.parent = GameObject.Find("Walls").transform;
-		//coll.isTrigger = true;
+        newWall.tag = "Wall";
+        //coll.isTrigger = true;
+
+        Debug.Log("New Wall " + newWall.transform.right);
 	}
-
-
 }
+/*
+        float angle;
+        if(point2.y < 1f && point1.y < 1f)
+		{
+			angle = -90f;
+        }
+		//else if (newWall.transform.right == Vector3.forward)
+		//{
+		//	angle = 0f;
+		//}
+        else
+{
+    angle = 90f;
+}
+*/
