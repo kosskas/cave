@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Klasa WallController zarządza właściwościami ścian
+/// </summary>
 public class WallController : MonoBehaviour {
 	
 	private List<WallInfo> walls;
@@ -13,8 +16,7 @@ public class WallController : MonoBehaviour {
         AddWalls();
     }
     void Update()
-    {
-        /*
+    {      
         ///Sprawdzaj czy dodano nową ścianę
         GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
         if(wallconter < wallsobject.Length)
@@ -26,8 +28,7 @@ public class WallController : MonoBehaviour {
             {
                 op.ResetProjections();
             }
-        }
-        */
+        }   
     }
     private void AddWalls()
     {
@@ -96,7 +97,7 @@ public class WallController : MonoBehaviour {
 		}
 	}
     /// <summary>
-    /// PObiera listę ścian i ją zwraca
+    /// Pobiera listę ścian i ją zwraca
     /// </summary>
     /// <returns>Lista ścian jaka jest na scenie</returns>
     public List<WallInfo> GetWalls() {
