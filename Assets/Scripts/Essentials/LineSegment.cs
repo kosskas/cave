@@ -143,8 +143,11 @@ public class LineSegment : MonoBehaviour {
 		{
 			return;
 		}
-
 		lineRenderer.enabled = mode;
-	}
+        if (labelObject != null)
+		{
+            labelObject.GetComponent<Renderer>().enabled = mode;
+        }
+    }
 
 }

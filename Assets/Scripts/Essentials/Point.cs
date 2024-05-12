@@ -127,5 +127,20 @@ public class Point : MonoBehaviour {
 		Label label = labelObject.GetComponent<Label>();
 		label.SetLabel(text, fontSize, textColor);
 	}
-
+    /// <summary>
+    /// Metoda umożliwia włączenie lub wyłączenie widoczności (renderowania) punktu
+    /// </summary>
+    /// <param name="mode">Flaga ustawiająca widoczność. Jeśli "true" punkt zacznie być rysowany, jeśli "false" punkt przestanie być rysowany </param>
+    public void SetEnable(bool mode)
+    {
+        if (lineRenderer == null)
+        {
+            return;
+        }
+        lineRenderer.enabled = mode;
+        if (labelObject != null)
+        {
+            labelObject.GetComponent<Renderer>().enabled = mode;
+        }
+    }
 }
