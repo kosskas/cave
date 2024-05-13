@@ -60,8 +60,8 @@ public class WallCreator : MonoBehaviour {
 		float distance = direction.magnitude;
 
         newWall = Instantiate(wallPrefab);
-
-
+        newWall.transform.parent = GameObject.Find("Walls").transform;
+        newWall.tag = "Wall";
         // Ustawienie orientacji prostopadłościanu zgodnie z kierunkiem wektora
         Quaternion look = Quaternion.LookRotation(direction);
         float angle = 90f; ///liczyć dynamicznie;
@@ -88,8 +88,8 @@ public class WallCreator : MonoBehaviour {
         BoxCollider boxCollider = newWall.GetComponent<BoxCollider>();
         boxCollider.isTrigger = false;
 
-        newWall.tag = "Wall";
-        newWall.transform.parent = GameObject.Find("Walls").transform;
+        
+        
     }
 }
 /*
