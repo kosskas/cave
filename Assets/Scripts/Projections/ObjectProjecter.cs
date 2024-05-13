@@ -176,8 +176,8 @@ public class ObjectProjecter : MonoBehaviour {
 		{
 			foreach(int idx in egdesOnWalls[wall].Keys)
 			{
-				CastRay(egdesOnWalls[wall][idx].start, egdesOnWalls[wall][idx].nOfProj,wall.showProjection,wall.showLines);
-                CastRay(egdesOnWalls[wall][idx].end, egdesOnWalls[wall][idx].nOfProj, wall.showProjection, wall.showLines);
+				CastRay(egdesOnWalls[wall][idx].start, egdesOnWalls[wall][idx].nOfProj,wall.showProjection, globalShowlines && wall.showLines);
+                CastRay(egdesOnWalls[wall][idx].end, egdesOnWalls[wall][idx].nOfProj, wall.showProjection, globalShowlines && wall.showLines);
                 DrawEgdeLine(egdesOnWalls[wall][idx], wall.showProjection);
             }
 		}
@@ -220,14 +220,14 @@ public class ObjectProjecter : MonoBehaviour {
 	private void DrawVertexProjection(VertexProjection proj, Ray ray, RaycastHit hit, bool showProjection, bool showlines)
     {
 		const float antiztrack = 0.01f;
-
-        //rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
-        proj.line.SetEnable(globalShowlines && showProjection && showlines);
+        //przełączanie widoczności
+        proj.line.SetEnable(showProjection && showlines);
 		proj.vertex.SetEnable(showProjection);
         Vector3 antiztrackhit = hit.point + antiztrack * hit.normal;
-		if(globalShowlines && showProjection && showlines)
+		if(showProjection && showlines)
         {
-			proj.line.SetCoordinates(ray.origin, antiztrackhit);
+            //rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
+            proj.line.SetCoordinates(ray.origin, antiztrackhit);
 		}
 		if(showProjection)
 		{
