@@ -2,26 +2,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 /// <summary>
 /// Klasa WallController zarządza właściwościami ścian
 /// </summary>
 public class WallController : MonoBehaviour {
-	
-	private List<WallInfo> walls;
+    private class WallComparer : IEqualityComparer<WallInfo>
+    {
+        public bool Equals(WallInfo x, WallInfo y)
+        {
+            return x.gameObject.Equals(y.gameObject);
+        }
+        public int GetHashCode(WallInfo obj)
+        {
+            return obj.gameObject.GetHashCode();
+        }
+    }
+
+    private List<WallInfo> walls;
+    private List<WallInfo> basicwalls;
     int wallconter;
     // Use this for initialization
     void Start()
     {
-        AddWalls();
+        basicwalls = AddWalls();
+        walls = basicwalls;
     }
     void Update()
     {      
-        ///Sprawdzaj czy dodano nową ścianę
+        ///Sprawdzaj czy dodano nową ścianę lub usunięto
         GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
-        if(wallconter < wallsobject.Length)
+        if(wallconter != wallsobject.Length)
         {
-            AddWalls();
+            walls = AddWalls();
 
             ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
             if (op)
@@ -30,15 +44,15 @@ public class WallController : MonoBehaviour {
             }
         }   
     }
-    private void AddWalls()
+    private List<WallInfo> AddWalls()
     {
         GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
         Debug.Log(wallsobject.Length);
-        walls = new List<WallInfo>();
+        List<WallInfo> ret = new List<WallInfo>();
         int idx = 0;
         foreach (GameObject wall in wallsobject)
         {
-            walls.Add(new WallInfo(wall, idx, wall.name,
+            ret.Add(new WallInfo(wall, idx, wall.name,
                 true,   //show projection
                 false,  //showLines
                 false,  //showReferenceLines
@@ -46,7 +60,8 @@ public class WallController : MonoBehaviour {
             ));
             idx++;
         }
-        wallconter = walls.Count;
+        wallconter = ret.Count;
+        return ret;
     }
     /// <summary>
     /// Szuka informacji o ścianie na podstawie jej obiketu Unity
@@ -86,16 +101,16 @@ public class WallController : MonoBehaviour {
         }
     }
     /// <summary>
-    /// Resetuje pozycje ścian do pozycji początkowych
+    /// Usuwa wszystkie nowo dodane ściany 
     /// </summary>
-	public void ResetWallsPos()
+	public void SetBasicWalls()
 	{
-		//Uwzgl. nowe sciany
-		foreach(WallInfo wall in walls)
-		{
-			wall.SetPrevPos();
-		}
-	}
+        List<WallInfo> tmpwalls = walls.Except(basicwalls, new WallComparer()).ToList();
+        foreach(WallInfo tmpwall in tmpwalls)
+        {
+            Destroy(tmpwall.gameObject);
+        }
+    }
     /// <summary>
     /// Pobiera listę ścian i ją zwraca
     /// </summary>
