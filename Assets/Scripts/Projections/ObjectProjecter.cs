@@ -57,10 +57,6 @@ public class ObjectProjecter : MonoBehaviour {
     bool showPerpenLines = false;
 
     /// <summary>
-    /// Pilnuje prostopadłości rzutów
-    /// </summary>
-    bool perpendicularity = false;
-    /// <summary>
     /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
     /// </summary>
     Dictionary<WallInfo, Dictionary<string, VertexProjection>> verticesOnWalls;
@@ -135,9 +131,6 @@ public class ObjectProjecter : MonoBehaviour {
 			ProjectObject();
 			if(perpenWalls != null && referenceLines != null){
 				ProjectReferenceLines();
-			}			
-			if(perpendicularity){
-				RefreshRayDirection();
 			}
 		}
 	}
@@ -152,12 +145,6 @@ public class ObjectProjecter : MonoBehaviour {
 	/// </summary>
 	public void SetShowingReferenceLines(){
 		showPerpenLines = !showPerpenLines;
-	}
-	/// <summary>
-	/// Przełącza pilnowanie prostopadłości rzutu
-	/// </summary>
-	public void watchPerpendicularity(){
-		perpendicularity = !perpendicularity;
 	}
 	/// <summary>
 	/// Odświerza rzuty w kierunku prostopadłum do płaszczyzn
