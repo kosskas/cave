@@ -49,7 +49,7 @@ public class ObjectProjecter : MonoBehaviour {
     /// <summary>
     /// Pokazywanie promieni rzutowania
     /// </summary>
-    bool showlines = false;
+    bool globalShowlines = false;
 
     /// <summary>
     /// Pokazywanie linii odnoszących
@@ -138,7 +138,7 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Przełącza widoczność linii rzutujących
 	/// </summary>
 	public void SetShowingProjectionLines(){
-		showlines = !showlines;
+        globalShowlines = !globalShowlines;
 	}
 	/// <summary>
 	/// Przełącza widoczność linii odnoszących
@@ -172,19 +172,31 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Rzutuje punkty i krawędzie bryły na płaszczyzny
 	/// </summary>
 	private void ProjectObject(){
+		foreach(WallInfo wall in egdesOnWalls.Keys)
+		{
+			foreach(int idx in egdesOnWalls[wall].Keys)
+			{
+				CastRay(egdesOnWalls[wall][idx].start, egdesOnWalls[wall][idx].nOfProj,wall.showProjection,wall.showLines);
+                CastRay(egdesOnWalls[wall][idx].end, egdesOnWalls[wall][idx].nOfProj, wall.showProjection, wall.showLines);
+                DrawEgdeLine(egdesOnWalls[wall][idx], wall.showProjection);
+            }
+		}
+		/*		
 		foreach (var edge in edgesprojs)
 		{
 				CastRay(edge.start, edge.nOfProj);
 				CastRay(edge.end, edge.nOfProj);
 				DrawEgdeLine(edge, true);
-		}			
+		}
+		*/		
     }
 	/// <summary>
 	/// Wyznacza rzut punktu na zadaną płaszczyznę
 	/// </summary>
 	/// <param name="vproj">Rzut punktu</param>
 	/// <param name="direction">Numer płaszczyzny</param>
-	private void CastRay(VertexProjection vproj, int direction){
+	private void CastRay(VertexProjection vproj, int direction, bool showProjection, bool showLines)
+    {
 		const float maxRayLength = 5f;
 		Vector3 vertex = rotatedVertices[vproj.vertexid];
 		Ray ray = new Ray(vertex, rayDirections[direction]);
@@ -195,7 +207,7 @@ public class ObjectProjecter : MonoBehaviour {
             ///ściany mogą się pokrywać dlatego sprawdzam pod konkretną ścianę
             if (hits[i].collider.gameObject == wc.GetWalls()[direction].gameObject)
             {
-                DrawVertexProjection(vproj, ray, hits[i]);
+                DrawVertexProjection(vproj, ray, hits[i], showProjection, showLines);
             }
         }
     }
@@ -205,18 +217,23 @@ public class ObjectProjecter : MonoBehaviour {
 	/// <param name="proj">Inforamcje o wierzchołku</param>
 	/// <param name="ray">Promień</param>
 	/// <param name="hit">Metadana o zderzeniu</param>
-	private void DrawVertexProjection(VertexProjection proj, Ray ray, RaycastHit hit){
+	private void DrawVertexProjection(VertexProjection proj, Ray ray, RaycastHit hit, bool showProjection, bool showlines)
+    {
 		const float antiztrack = 0.01f;
 
         //rysuwanie lini wychodzącej z wierzchołka do punktu kolizji
-        proj.line.SetEnable(showlines);
-
-		Vector3 antiztrackhit = hit.point + antiztrack * hit.normal;
-		if(showlines){
+        proj.line.SetEnable(globalShowlines && showProjection && showlines);
+		proj.vertex.SetEnable(showProjection);
+        Vector3 antiztrackhit = hit.point + antiztrack * hit.normal;
+		if(globalShowlines && showProjection && showlines)
+        {
 			proj.line.SetCoordinates(ray.origin, antiztrackhit);
 		}
-		//znacznik
-		proj.vertex.SetCoordinates(antiztrackhit);
+		if(showProjection)
+		{
+            //znacznik
+            proj.vertex.SetCoordinates(antiztrackhit);
+        }
 	}
 	/// <summary>
 	/// Tworzy rzuty wierzchołków
@@ -328,8 +345,8 @@ public class ObjectProjecter : MonoBehaviour {
 				Vector3 cross = wc.FindCrossingPoint(p, v1.vertex.GetCoordinates(), v2.vertex.GetCoordinates());
 				referenceLines[i].Item1.start.vertex.SetCoordinates(cross);
 				referenceLines[i].Item2.start.vertex.SetCoordinates(cross);
-                DrawEgdeLine(referenceLines[i].Item1, showPerpenLines);
-				DrawEgdeLine(referenceLines[i].Item2, showPerpenLines);
+                DrawEgdeLine(referenceLines[i].Item1, showPerpenLines && wall1.showProjection && wall2.showProjection && wall1.showReferenceLines && wall2.showReferenceLines);
+				DrawEgdeLine(referenceLines[i].Item2, showPerpenLines && wall1.showProjection && wall2.showProjection && wall1.showReferenceLines && wall2.showReferenceLines);
 				i++;
 			}
 		}

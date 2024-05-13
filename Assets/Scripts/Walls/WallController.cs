@@ -54,8 +54,8 @@ public class WallController : MonoBehaviour {
         {
             ret.Add(new WallInfo(wall, idx, wall.name,
                 true,   //show projection
-                false,  //showLines
-                false,  //showReferenceLines
+                true,  //showLines
+                true,  //showReferenceLines
                 false   //watchPerpen
             ));
             idx++;
