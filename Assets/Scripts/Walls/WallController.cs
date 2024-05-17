@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.Purchasing;
 
 /// <summary>
 /// Klasa WallController zarządza właściwościami ścian
@@ -36,7 +37,7 @@ public class WallController : MonoBehaviour {
         if(wallconter != wallsobject.Length)
         {
             walls = AddWalls();
-
+            Debug.Log("Test jest "+walls[3].showProjection);
             ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
             if (op)
             {
@@ -93,10 +94,7 @@ public class WallController : MonoBehaviour {
         {
             if (walls[i].gameObject == wallObject)
             {
-                walls[i].showProjection = showProjection;
-                walls[i].showLines = showLines;
-                walls[i].showReferenceLines = showReferenceLines;
-                walls[i].watchPerpendicularity = watchPerpendicularity;
+                walls[i].SetFlags(showProjection, showLines, showReferenceLines, watchPerpendicularity);
             }
         }
     }
@@ -218,21 +216,18 @@ public class WallController : MonoBehaviour {
         return ret;
     }
     /// <summary>
-    /// Znajduje punkt przecięcia ścian dla dwóch rzutów punktu w 3D
+    /// Ustawia flagi ścian na wartości domyślne
     /// </summary>
-    /// <param name="pointA">Rzut punktu na 1. ścianę</param>
-    /// <param name="normA">Wektor normalny 1. ściany</param>
-    /// <param name="pointB">Rzut punktu na 2. ścianę</param>
-    /// <param name="normB">Wektor normalny 2. ściany</param>
-    /// <returns>Punkt przecięcia ścian z rzutami</returns>
-    public Vector3 FindCrossingPoint2(Vector3 pointA, Vector3 normA, Vector3 pointB, Vector3 normB)
+    public void SetDefaultShowRules()
     {
-        ///1. Równania płaszczyzn(pktA, normA)
-        ///2. Prosta przecinająca płaszczyzny
-        ///3. prosta prostopadła(przez pktA) do prostej przecinającej
-        ///4. == pkt. przecięcia
-        Vector3 ret = Vector3.zero;
-        const float eps = 0.0001f;
-        return ret;
+        for(int i =0; i < walls.Count; i++)
+        {
+            walls[i].SetFlags(
+                true,   //show projection
+                true,  //showLines
+                true,  //showReferenceLines
+                false   //watchPerpen
+            );
+        }
     }
 }

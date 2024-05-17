@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
         if(Input.GetKeyDown("p"))
         {
             wc.SetBasicWalls();
+            wc.SetDefaultShowRules();
             si.ImportSolid();
         }
         if(Input.GetKeyDown("o")){
@@ -65,6 +66,7 @@ public class PlayerController : MonoBehaviour
         }
         if(Input.GetKeyDown("l")){
             wc.SetBasicWalls();
+            wc.SetDefaultShowRules();
         }
 
         Vector3 forward = transform.TransformDirection(Vector3.forward);
