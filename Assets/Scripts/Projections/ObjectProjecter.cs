@@ -190,12 +190,14 @@ public class ObjectProjecter : MonoBehaviour {
 		}
 		*/		
     }
-	/// <summary>
-	/// Wyznacza rzut punktu na zadaną płaszczyznę
-	/// </summary>
-	/// <param name="vproj">Rzut punktu</param>
-	/// <param name="direction">Numer płaszczyzny</param>
-	private void CastRay(VertexProjection vproj, int direction, bool showProjection, bool showLines)
+    /// <summary>
+    /// Wyznacza rzut punktu na zadaną płaszczyznę
+    /// </summary>
+    /// <param name="vproj">Rzut punktu</param>
+    /// <param name="direction">Numer płaszczyzny</param>
+    /// <param name="showProjection">Ustawienie widoczności dla rzutu</param>
+    /// <param name="showLines">Ustawienie widoczności dla linii</param>
+    private void CastRay(VertexProjection vproj, int direction, bool showProjection, bool showLines)
     {
 		const float maxRayLength = 5f;
 		Vector3 vertex = rotatedVertices[vproj.vertexid];
@@ -211,13 +213,15 @@ public class ObjectProjecter : MonoBehaviour {
             }
         }
     }
-	/// <summary>
-	/// Rysuje wierzchołek na płaszczyźnie
-	/// </summary>
-	/// <param name="proj">Inforamcje o wierzchołku</param>
-	/// <param name="ray">Promień</param>
-	/// <param name="hit">Metadana o zderzeniu</param>
-	private void DrawVertexProjection(VertexProjection proj, Ray ray, RaycastHit hit, bool showProjection, bool showlines)
+    /// <summary>
+    /// Rysuje wierzchołek na płaszczyźnie
+    /// </summary>
+    /// <param name="proj">Inforamcje o wierzchołku</param>
+    /// <param name="ray">Promień</param>
+    /// <param name="hit">Metadana o zderzeniu</param>
+    /// <param name="showProjection">Ustawienie widoczności dla rzutu</param>
+    /// <param name="showlines">Ustawienie widoczności dla linii</param>
+    private void DrawVertexProjection(VertexProjection proj, Ray ray, RaycastHit hit, bool showProjection, bool showlines)
     {
 		const float antiztrack = 0.01f;
         //przełączanie widoczności
