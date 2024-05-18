@@ -11,23 +11,46 @@ public class WallCreator : MonoBehaviour {
 	public GameObject newWall;
 	public int wallsCounter;
     [SerializeField] public GameObject wallPrefab;
+	private WallController wallController;
 
     // Use this for initialization
     void Start () {
 		ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
 		wallsCounter = 0;
+		GameObject wallsObject = GameObject.Find("Walls");
+		wallController = wallsObject.GetComponent<WallController>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		
+
 		if (Physics.Raycast(ray, out hit, 100))
 		{
 			//Debug.Log(hit.transform.name);
 			//Debug.Log("hit");
 			//Debug.DrawLine(ray.origin, hit.point, Color.red);
-			
+
 		}
+
+		if (Input.GetKeyDown("v"))
+		{
+			if (hit.collider.tag == "Wall")
+			{
+				Debug.Log("hit: " + hit.collider.name);
+				WallInfo info = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
+				if (info.showLines)
+				{
+					wallController.SetWallInfo(hit.collider.gameObject, false, false, false, false);
+				}
+				else
+				{
+					wallController.SetWallInfo(hit.collider.gameObject, true, true, true, true);
+				}
+			}
+		}
+
 		//Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
 		if (Input.GetKeyDown("c"))
 		{
