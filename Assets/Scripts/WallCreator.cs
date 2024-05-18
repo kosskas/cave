@@ -69,7 +69,15 @@ public class WallCreator : MonoBehaviour {
         {
 			CreateWall(points[wallsCounter*2].transform.position, points[wallsCounter*2+1].transform.position);
 			wallsCounter++;
-        }
+			foreach (GameObject obj in points)
+			{
+				// Usuwanie obiektu ze sceny
+				if (obj != null)
+				{
+					Destroy(obj);
+				}
+			}
+		}
 	}
 
 	void CreateWall(Vector3 point1, Vector3 point2)
