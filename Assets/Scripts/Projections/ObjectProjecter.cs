@@ -106,11 +106,11 @@ public class ObjectProjecter : MonoBehaviour {
 
         if (projectionDir != null)
         {
-            DestroyImmediate(GameObject.Find("VertexProjections"));
-            DestroyImmediate(GameObject.Find("EdgeProjections"));
-            DestroyImmediate(GameObject.Find("ReferenceLines"));
-            DestroyImmediate(GameObject.Find("crossPointsDir"));
-            DestroyImmediate(GameObject.Find("ProjectionDir"));
+            Destroy(GameObject.Find("VertexProjections"));
+            Destroy(GameObject.Find("EdgeProjections"));
+            Destroy(GameObject.Find("ReferenceLines"));
+            Destroy(GameObject.Find("crossPointsDir"));
+            Destroy(GameObject.Find("ProjectionDir"));
         }
         projectionDir = new GameObject("ProjectionDir");
         projectionDir.transform.SetParent(gameObject.transform);
