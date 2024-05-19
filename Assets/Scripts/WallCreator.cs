@@ -36,19 +36,27 @@ public class WallCreator : MonoBehaviour {
 
 		if (Input.GetKeyDown("v"))
 		{
-			if (hit.collider.tag == "Wall")
-			{
-				Debug.Log("hit: " + hit.collider.name);
-				WallInfo info = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
-				if (info.showLines)
+			if (hit.collider != null)
+            {
+				if (hit.collider.tag == "Wall")
 				{
-					wallController.SetWallInfo(hit.collider.gameObject, false, false, false, false);
-				}
-				else
-				{
-					wallController.SetWallInfo(hit.collider.gameObject, true, true, true, true);
+					Debug.Log("hit: " + hit.collider.name);
+					WallInfo info = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
+					if (info != null)
+                    {
+						if (info.showLines)
+						{
+							wallController.SetWallInfo(hit.collider.gameObject, false, false, false, false);
+						}
+						else
+						{
+							wallController.SetWallInfo(hit.collider.gameObject, true, true, true, true);
+						}
+					}
+					
 				}
 			}
+			
 		}
 
 		//Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
@@ -100,12 +108,12 @@ public class WallCreator : MonoBehaviour {
         newWall.transform.rotation = rotation;
         //Debug.Log(newWall.transform.rotation);
         Debug.Log("Player position:" + transform.position);
+		newWall.transform.localScale = new Vector3(newWall.transform.localScale.x, newWall.transform.localScale.y * 3f, newWall.transform.localScale.y * 3f);
 
-
-        // Ustawienie pozycji prostopadłościanu na środek linii między punktami
-        Vector3 magicOffset = new Vector3(1.7f, 0, 0); ///liczyć dynamicznie;
+		// Ustawienie pozycji prostopadłościanu na środek linii między punktami
+		Vector3 magicOffset = new Vector3(1.7f, 0, 0); ///liczyć dynamicznie;
         //newWall.transform.position = Vector3.zero; //localposition???
-        newWall.transform.position = point1 + (direction / 2) + magicOffset;
+        newWall.transform.position = point1 + (direction / 2);
 
         //WallRotator rotator = newWall.AddComponent<WallRotator>();
 
