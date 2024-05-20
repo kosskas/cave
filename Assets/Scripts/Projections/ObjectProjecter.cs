@@ -247,10 +247,10 @@ public class ObjectProjecter : MonoBehaviour {
     {
 		///katalog organizujący rzuty wierzchołków
         var VertexProjections = new GameObject("VertexProjections");
-        VertexProjections.transform.SetParent(gameObject.transform);
+        VertexProjections.transform.SetParent(projectionDir.transform);
 		///katalog organizujący rzuty krawędzi
         var EdgeProjections = new GameObject("EdgeProjections");
-        EdgeProjections.transform.SetParent(gameObject.transform);
+        EdgeProjections.transform.SetParent(projectionDir.transform);
 		List<WallInfo> Walls = wc.GetWalls();
 		foreach(WallInfo wall in Walls){
 			//iterujemy po krawędziach, wierzchołki się powtórzą więc żeby kilku tych samych rzutów jednego wierzchołka nie było to słownik
@@ -308,9 +308,9 @@ public class ObjectProjecter : MonoBehaviour {
 	/// </summary>
 	private void AddReferenceLines(){
         var ReferenceLinesDir = new GameObject("ReferenceLines");
-        ReferenceLinesDir.transform.SetParent(gameObject.transform);
+        ReferenceLinesDir.transform.SetParent(projectionDir.transform);
 		var crossPointsDir = new GameObject("crossPointsDir");
-        crossPointsDir.transform.SetParent(gameObject.transform);
+        crossPointsDir.transform.SetParent(projectionDir.transform);
 		referenceLines = new List<Tuple<EdgeProjection, EdgeProjection>>();
 		foreach(var pair in perpenWalls){
             WallInfo wall1 = pair.Item1;
