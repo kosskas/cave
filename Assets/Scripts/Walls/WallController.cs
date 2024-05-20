@@ -23,27 +23,45 @@ public class WallController : MonoBehaviour {
 
     private List<WallInfo> walls;
     private List<WallInfo> basicwalls;
+    private List<WallInfo> stack;
+
     int wallconter;
     // Use this for initialization
     void Start()
     {
         basicwalls = AddWalls();
         walls = basicwalls;
+        stack = new List<WallInfo>();
     }
     void Update()
     {      
         ///Sprawdzaj czy dodano nową ścianę lub usunięto
         GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
-        if(wallconter != wallsobject.Length)
-        {
-            walls = AddWalls();
-            Debug.Log("Test jest "+walls[3].showProjection);
-            ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
-            if (op)
+        if(wallsobject != null) {
+            if(wallconter != wallsobject.Length)
             {
-                op.ResetProjections();
-            }
-        }   
+                bool isnewwall = (wallconter + 1 == wallsobject.Length);
+                List<WallInfo> oldwalls = new List<WallInfo>(walls);
+                walls = AddWalls();
+                //obiekt moze nie jeszcze nie byc zaladowany 
+                ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+                if (op != null)
+                {
+                    op.ResetProjections();
+                }
+                if (isnewwall)
+                {
+                    //jesli dodano nową ściane
+                    WallInfo[] newwall = walls.Except(oldwalls, new WallComparer()).ToArray();
+                    if(newwall != null && newwall.Length == 1)
+                    {
+                        stack.Add(newwall[0]);
+                    }
+                   // Debug.Log("Dodano scian " + newwall.Length);
+                   // Debug.Log("Nowa sciana to " + newwall[0].name + " o idx "+ newwall[0].number);                    
+                }
+            }  
+        }
     }
     private List<WallInfo> AddWalls()
     {
@@ -65,7 +83,7 @@ public class WallController : MonoBehaviour {
         return ret;
     }
     /// <summary>
-    /// Szuka informacji o ścianie na podstawie jej obiketu Unity
+    /// Szuka informacji o ścianie na podstawie jej obiektu Unity
     /// </summary>
     /// <param name="wallObject">Obiekt ściany Unity</param>
     /// <returns>Informacje o ścianie</returns>
@@ -108,6 +126,21 @@ public class WallController : MonoBehaviour {
         {
             Destroy(tmpwall.gameObject);
         }
+        stack = new List<WallInfo>();
+    }
+    /// <summary>
+    /// Usuwa ściany z odwróconą chronologią ich dodania
+    /// </summary>
+    public void PopBackWall()
+    {
+        if(stack !=  null && stack.Count > 0)
+        {
+            WallInfo lastWall = stack[stack.Count - 1];
+            lastWall.showProjection = false;
+            stack.RemoveAt(stack.Count - 1);
+            Destroy(lastWall.gameObject);
+            lastWall.gameObject = null;
+        } 
     }
     /// <summary>
     /// Pobiera listę ścian i ją zwraca

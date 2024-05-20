@@ -67,8 +67,7 @@ public class PlayerController : MonoBehaviour
             op.SetShowingReferenceLines();
         }
         if(Input.GetKeyDown("l")){
-            wc.SetBasicWalls();
-            wc.SetDefaultShowRules();
+            wc.PopBackWall();
         }
 
         Vector3 forward = transform.TransformDirection(Vector3.forward);
