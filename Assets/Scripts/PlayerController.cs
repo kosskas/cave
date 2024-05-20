@@ -37,8 +37,10 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         characterController = GetComponentInChildren<CharacterController>();
-        si = (SolidImporter)GameObject.FindObjectOfType(typeof(SolidImporter));
-        wc = (WallController)GameObject.FindObjectOfType(typeof(WallController));
+        GameObject mainObject = GameObject.Find("MainObject");
+        si = mainObject.GetComponent<SolidImporter>();
+        GameObject wallsObject = GameObject.Find("Walls");
+        wc = wallsObject.GetComponent<WallController>();
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;

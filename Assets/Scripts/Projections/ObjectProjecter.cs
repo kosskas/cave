@@ -89,7 +89,8 @@ public class ObjectProjecter : MonoBehaviour {
 		this.rotatedVertices = rotatedVertices;
 		this.edges = edges;
 		this.projectionInfo = projectionInfo;
-        wc = (WallController)FindObjectOfType(typeof(WallController));
+        GameObject wallsObject = GameObject.Find("Walls");
+        wc = wallsObject.GetComponent<WallController>();
         ResetProjections();
     }
     /// <summary>

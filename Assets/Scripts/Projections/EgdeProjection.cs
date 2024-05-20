@@ -37,7 +37,7 @@ public class EdgeProjection
     /// </summary>
     /// <param name="label">Oznaczenie linii</param>
     /// <param name="nOfProj">Numer rzutni</param>
-    /// <param name="lineRendererObject">Obiekt LineRenderer do rysowania linii</param>
+    /// <param name="line">Obiekt LineRenderer do rysowania linii</param>
     /// <param name="start">punkt początkowy</param>
     /// <param name="end">punkt końcowy</param>
     public EdgeProjection(string label, int nOfProj, LineSegment line, VertexProjection start, VertexProjection end)

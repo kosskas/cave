@@ -39,7 +39,7 @@ public class VertexProjection
 	/// Tworzy rzut punktu na płaszczyznę
 	/// </summary>
 	/// <param name="VertexProjectionsDir">Katalog organizujący rzuty wierzchołków</param>
-	/// <param name="name">Nazwa rzutowanego wierzchołka</param>
+	/// <param name="vertexid">ID rzutowanego wierzchołka</param>
 	/// <param name="nOfProj">Numer rzutni</param>
 	/// <returns>Rzut punktu na daną płaszczyznę</returns>
 	public static VertexProjection CreateVertexProjection(GameObject VertexProjectionsDir, string vertexid, int nOfProj){
