@@ -40,7 +40,7 @@ public class WallCreator : MonoBehaviour {
             {
 				if (hit.collider.tag == "Wall")
 				{
-					Debug.Log("hit: " + hit.collider.name);
+					//Debug.Log("hit: " + hit.collider.name);
 					WallInfo info = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
 					if (info != null)
                     {
@@ -73,9 +73,21 @@ public class WallCreator : MonoBehaviour {
 		point.transform.position = hit.point;
 		points.Add(point);
 		Debug.Log(hit.point);
+		int wallType = 0;
 		if (points.Count % 2 == 0 && points.Count > 0)
         {
-			CreateWall(points[wallsCounter*2].transform.position, points[wallsCounter*2+1].transform.position);
+			WallInfo hitWallInfo = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
+            if (hitWallInfo != null)
+            {
+                if (hitWallInfo.GetNormal() == Vector3.up)
+                {
+                    //Debug.Log("Floor hit");
+					wallType = 1;
+                }
+
+            }
+
+            CreateWall(points[wallsCounter*2].transform.position, points[wallsCounter*2+1].transform.position, wallType);
 			wallsCounter++;
 			foreach (GameObject obj in points)
 			{
@@ -88,7 +100,7 @@ public class WallCreator : MonoBehaviour {
 		}
 	}
 
-	void CreateWall(Vector3 point1, Vector3 point2)
+	void CreateWall(Vector3 point1, Vector3 point2, int type) //type = 1 jesli podloga, 2 jak sufit
 	{
 		//GameObject gameObj = new GameObject();
 		//LineRenderer lineRenderer = gameObj.AddComponent<LineRenderer>();
@@ -96,18 +108,38 @@ public class WallCreator : MonoBehaviour {
 		//lineRenderer.SetPosition(0, point1);
 		//lineRenderer.SetPosition(1, point2);
 		Vector3 direction = point2 - point1;
-		float distance = direction.magnitude;
+		Debug.Log("Direction: " + direction);
+		//float distance = direction.magnitude;
+		//GameObject mainObject = GameObject.Find("MainObject");
 
         newWall = Instantiate(wallPrefab);
         newWall.transform.parent = GameObject.Find("Walls").transform;
         newWall.tag = "Wall";
         // Ustawienie orientacji prostopadłościanu zgodnie z kierunkiem wektora
         Quaternion look = Quaternion.LookRotation(direction);
+		//Debug.DrawRay(point1, direction);
+
         float angle = 90f; ///liczyć dynamicznie;
+		if (type == 1)
+        {
+			//if(newWall.transform.position.z > 0)
+			//         {
+			//	angle = 180f;
+			//}
+			//         else
+			//         {
+			//	angle = 270;
+			//         }
+			angle = 180f;
+		}
+		
         Quaternion rotation = Quaternion.Euler(look.eulerAngles.x, look.eulerAngles.y, look.eulerAngles.z - angle);
         newWall.transform.rotation = rotation;
-        //Debug.Log(newWall.transform.rotation);
-        Debug.Log("Player position:" + transform.position);
+		float angleToWall = Vector3.Angle(new Vector3(0.0f,2.0f,0.0f), newWall.transform.right);
+		Debug.Log("Kat: " + angleToWall);
+
+		//Debug.Log(newWall.transform.rotation);
+		//Debug.Log("Player position:" + transform.position);
 		newWall.transform.localScale = new Vector3(newWall.transform.localScale.x, newWall.transform.localScale.y * 3f, newWall.transform.localScale.y * 3f);
 
 		// Ustawienie pozycji prostopadłościanu na środek linii między punktami
