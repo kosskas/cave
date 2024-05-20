@@ -117,20 +117,43 @@ public class WallCreator : MonoBehaviour {
         newWall.tag = "Wall";
         // Ustawienie orientacji prostopadłościanu zgodnie z kierunkiem wektora
         Quaternion look = Quaternion.LookRotation(direction);
-		//Debug.DrawRay(point1, direction);
+		//Debug.DrawRay(point1, direction.normalized * 5.0f, Color.red, 5.0f);
 
-        float angle = 90f; ///liczyć dynamicznie;
+
+		Vector3 midpoint = point1 + direction / 2.0f;
+
+		// Obliczanie wektora prostopadłego do direction
+		Vector3 perpendicularDirection = Vector3.Cross(direction.normalized, Vector3.up).normalized;
+
+		// Obliczanie punktu oddalonego o 0.1 jednostki na linii prostopadłej od środka linii
+		Vector3 pointAtDistance0_1 = midpoint + perpendicularDirection * 0.1f;
+
+		// Punkt, do którego porównujemy
+		Vector3 targetPoint = new Vector3(0, 2, 0);
+
+		// Obliczanie odległości od punktu docelowego
+		float distanceFromMidpoint = Vector3.Distance(midpoint, targetPoint);
+		float distanceFromPointAtDistance0_1 = Vector3.Distance(pointAtDistance0_1, targetPoint);
+
+		if (distanceFromMidpoint > distanceFromPointAtDistance0_1)
+        {
+			Debug.Log("Sciana jest git");
+        }
+
+		// Rysowanie promienia prostopadłego
+		//Debug.DrawRay(point1 + (direction / 2), perpendicularDirection.normalized * 5.0f, Color.blue, 5.0f);
+
+		float angle = 90f; ///liczyć dynamicznie;
 		if (type == 1)
         {
-			//if(newWall.transform.position.z > 0)
-			//         {
-			//	angle = 180f;
-			//}
-			//         else
-			//         {
-			//	angle = 270;
-			//         }
-			angle = 180f;
+			if (distanceFromMidpoint > distanceFromPointAtDistance0_1)
+			{
+				angle = 180f;
+			}
+			else
+            {
+				angle = 0;
+            }
 		}
 		
         Quaternion rotation = Quaternion.Euler(look.eulerAngles.x, look.eulerAngles.y, look.eulerAngles.z - angle);
