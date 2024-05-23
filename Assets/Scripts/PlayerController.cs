@@ -62,8 +62,7 @@ public class PlayerController : MonoBehaviour
             };
 
             Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button4).OnPress += () => {
-                ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
-                op.watchPerpendicularity();
+                wc.PopBackWall();
             };
         }
     }
