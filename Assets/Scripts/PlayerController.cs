@@ -62,14 +62,6 @@ public class PlayerController : MonoBehaviour
                     op.SetShowingReferenceLines();
                 }
             };
-
-            Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button3).OnPress += () => {
-
-            };
-
-            Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button4).OnPress += () => {
-                wc.PopBackWall();
-            };
         }
     }
 
