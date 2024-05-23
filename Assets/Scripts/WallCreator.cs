@@ -185,7 +185,42 @@ public class WallCreator : MonoBehaviour {
         
         
     }
+
+	private Vector3 FindVectorFromPlaneTowardsSolid(Vector3 point1, Vector3 point2)
+	{
+		// from Object3D
+		Vector3 mPoint = new Vector3(0.0f, 1.0f, 0.0f);
+		
+		// wektor delta ('point1' --> 'point2')
+		Vector3 delta = ( point2 - point1 );
+
+		// t - parameter from parametric equation of the plane
+		float t = ( delta.x*(mPoint.x-point1.x) + delta.y*(mPoint.y-point1.y) + delta.z*(mPoint.z-point1.z) )/( delta.x*delta.x + delta.y*delta.y + delta.z*delta.z );
+
+		// wektor b leżący na wysokości h trójkąta opadającej z wierzchołka 'mPoint' na bok 'point1.point2', skierowany w stronę 'mPoint'
+		//  niech punkt k będzie punktem przyłożenia wektora b, czyli punktem przecięcia wysokości h i prostej 'point1.point2'
+		Vector3 kPoint = ( point1 + t*delta );
+
+		// określenie wektora b ('kPoint' --> 'mPoint')
+		//  przyłożonego do punktu przecięcia wysokości h z prostą 'point1.point2'
+		//  i skierowanego w stronę 'mPoint'
+		//  i prostopadłego do prostej 'point1.point2'
+		//  ALE NIEKONIECZNIE PROSTOPADŁEGO DO PŁASZCZYZNY
+		Vector3 b = ( mPoint - kPoint );
+
+		//         m         //            m
+		//         |         //            |
+		//         |         //            |
+		//         |         //            |
+		// 1-------k-----2   // 1---2------k
+
+		// zwrócenie znormalizowanego wektora b
+		return b.normalized;
+	}
 }
+
+
+
 /*
         float angle;
         if(point2.y < 1f && point1.y < 1f)
