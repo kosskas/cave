@@ -41,8 +41,9 @@ public class Point : MonoBehaviour {
 		lineRenderer = gameObject.AddComponent<LineRenderer>();
 
 		lineRenderer.positionCount = 2;
-		lineRenderer.material = new Material(Shader.Find("Standard"));
-		lineRenderer.numCapVertices = 10;
+        lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
+        lineRenderer.material.color = pointColor;
+        lineRenderer.numCapVertices = 10;
 		lineRenderer.shadowCastingMode = ShadowCastingMode.Off;
 
 		lineRenderer.startColor = pointColor;
