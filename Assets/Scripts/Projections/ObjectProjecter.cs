@@ -267,7 +267,7 @@ public class ObjectProjecter : MonoBehaviour {
 				else{
 					p1 = VertexProjection.CreateVertexProjection(VertexProjections, edge.endPoints.Item1, wall.number);
 
-					p1.SetDisplay(edge.endPoints.Item1 + new string('\'', wall.number+1), projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLabelColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
+					p1.SetDisplay(edge.endPoints.Item1 + new string('\'', wall.number+1), projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLineColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
                     vertexOnThisPlane[edge.endPoints.Item1] = p1;
 				}
 				if(vertexOnThisPlane.ContainsKey(edge.endPoints.Item2)){
@@ -275,7 +275,7 @@ public class ObjectProjecter : MonoBehaviour {
 				}
 				else{
 					p2 = VertexProjection.CreateVertexProjection(VertexProjections, edge.endPoints.Item2, wall.number);
-					p2.SetDisplay(edge.endPoints.Item2 + new string('\'', wall.number+1), projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLabelColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
+					p2.SetDisplay(edge.endPoints.Item2 + new string('\'', wall.number+1), projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLineColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
                     vertexOnThisPlane[edge.endPoints.Item2] = p2;
 				}
 				EdgeProjection edgeProj = EdgeProjection.CreateEgdeProjection(EdgeProjections, p1, p2,edge.label, wall.number);

@@ -254,7 +254,7 @@ public class Object3D : MonoBehaviour {
 		ProjectionInfo projectionInfo = new ProjectionInfo(
     		Color.black, Color.white, 0.009f, 0.04f,    // Parametry punktu
     		Color.black, Color.white, 0.005f, labelsize_default,    // Parametry krawędzi
-    		Color.white, Color.blue, 0.001f, labelsize_default,     // Parametry linii rzutującej
+    		Color.blue, Color.white, 0.001f, labelsize_default,     // Parametry linii rzutującej
 			Color.gray, Color.white, 0.002f, labelsize_default,		// Parametry linii odnoszących
     		false                                     // Określenie czy linie rzutowania powinny być wyświetlane
 		);
