@@ -639,7 +639,8 @@ MonoBehaviour:
   points: []
   newWall: {fileID: 0}
   wallsCounter: 0
-  wallPrefab: {fileID: 0}
+  wallPrefab: {fileID: 1221629244415174, guid: 3040a5d0cb05a344cb2fec3c5f96f845, type: 2}
+  flystick: {fileID: 1789050893}
 --- !u!1001 &454873667
 Prefab:
   m_ObjectHideFlags: 0
@@ -1622,6 +1623,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdef08fd407ff0c47824e8766aafa844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1789050893 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1390819586400066, guid: b6165818436e3294c9f7ce5e53106f44,
+    type: 2}
+  m_PrefabInternal: {fileID: 1135588677}
 --- !u!1 &1795819646
 GameObject:
   m_ObjectHideFlags: 0
