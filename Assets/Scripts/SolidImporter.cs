@@ -163,9 +163,9 @@ public class SolidImporter : MonoBehaviour {
 	private const string solidFileExt = "*.wobj";
 	
 	/// <summary>
-	/// Współczynnik przeskalowania współrzędnych wierzchołków 
+	/// Maksymalna odległość wierzchołka od środka ciężkości bryły po przeskalowaniu 
 	/// </summary>
-	private const float SIZER = 0.3f; 
+	private const float MAX_DISTANCE = 0.8f; 
 
 	/// <summary>
 	/// Nazwy plików .wobj znalezione w katalogu 'pathToFolderWithSolids'
@@ -254,6 +254,7 @@ public class SolidImporter : MonoBehaviour {
 			PickNextSolid();
 			ReadSolid();
 			CentralizePosition();
+			NormalizeSolid();
 			SetUpVertices();
 			SetUpTriangles();
 		}
@@ -342,7 +343,7 @@ public class SolidImporter : MonoBehaviour {
 		float y = float.Parse(vertexData[2], CultureInfo.InvariantCulture);
 		float z = float.Parse(vertexData[3], CultureInfo.InvariantCulture);
 
-		labeledVertices[label] = new Vector3(x, y, z) * SIZER;
+		labeledVertices[label] = new Vector3(x, y, z);
 	}
 
 	/// <summary>
@@ -411,6 +412,25 @@ public class SolidImporter : MonoBehaviour {
 		centerPoint /= n;
 
 		labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => entry.Value - centerPoint);
+	}
+
+	
+	private void NormalizeSolid()
+	{
+		float maxDistance = 0.0f;
+
+		foreach(Vector3 vertex in labeledVertices.Values)
+		{
+			float distance = (float)Math.Sqrt(
+				(float)Math.Pow(vertex.x, 2) + 
+				(float)Math.Pow(vertex.y, 2) +
+				(float)Math.Pow(vertex.z, 2)
+			);
+
+			maxDistance = (distance > maxDistance) ? distance : maxDistance;
+		}
+
+		labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => (entry.Value * MAX_DISTANCE) / maxDistance);
 	}
 
 	/// <summary>

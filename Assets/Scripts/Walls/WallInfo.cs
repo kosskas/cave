@@ -95,4 +95,18 @@ public class WallInfo
     public Vector3 GetNormal(){
         return gameObject.transform.right;
     }
+    /// <summary>
+    /// Ustawia flagi na określone wartości
+    /// </summary>
+    /// <param name="showProjection">Flaga dotycząca wyświetlania na ścianie rzutów.</param>
+    /// <param name="showLines">Flaga dotycząca wyświetlania linii rzutujących.</param>
+    /// <param name="showReferenceLines">Flaga dotycząca wyświetlania linii odnoszących.</param>
+    /// <param name="watchPerpendicularity">Flaga dotycząca pilnowania prostopadłości rzutu na ścianie.</param>
+    public void SetFlags(bool showProjection, bool showLines, bool showReferenceLines, bool watchPerpendicularity)
+    {
+        this.showProjection = showProjection;
+        this.showLines = showLines;
+        this.showReferenceLines = showReferenceLines;
+        this.watchPerpendicularity = watchPerpendicularity;
+    }
 }

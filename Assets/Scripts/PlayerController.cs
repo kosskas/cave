@@ -37,8 +37,10 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         characterController = GetComponentInChildren<CharacterController>();
-        si = (SolidImporter)GameObject.FindObjectOfType(typeof(SolidImporter));
-        wc = (WallController)GameObject.FindObjectOfType(typeof(WallController));
+        GameObject mainObject = GameObject.Find("MainObject");
+        si = mainObject.GetComponent<SolidImporter>();
+        GameObject wallsObject = GameObject.Find("Walls");
+        wc = wallsObject.GetComponent<WallController>();
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -74,7 +76,8 @@ public class PlayerController : MonoBehaviour
         //from solidimporter
         if(Input.GetKeyDown("p"))
         {
-            wc.ResetWallsPos();
+            wc.SetBasicWalls();
+            wc.SetDefaultShowRules();
             si.ImportSolid();
         }
         if(Input.GetKeyDown("o")){
@@ -86,9 +89,7 @@ public class PlayerController : MonoBehaviour
             op.SetShowingReferenceLines();
         }
         if(Input.GetKeyDown("l")){
-            //ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
-            //op.watchPerpendicularity();
-            wc.ResetWallsPos();
+            wc.PopBackWall();
         }
 
         Vector3 forward = transform.TransformDirection(Vector3.forward);

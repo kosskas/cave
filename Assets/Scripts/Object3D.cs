@@ -162,7 +162,7 @@ public class Object3D : MonoBehaviour {
         // Set the material for the MeshRenderer (you can create your own material or use an existing one)
         meshRenderer.material = new Material(Shader.Find("Transparent/Diffuse"));
 		Color color = Color.white;
-        color.a = 0.5f;
+        color.a = 0.3f;
 
         // Ustawienie koloru na biały
         meshRenderer.material.color = color;
@@ -219,7 +219,7 @@ public class Object3D : MonoBehaviour {
 			obj.transform.SetParent(verticesFolder.transform);
 
 			Point vertexObject = obj.AddComponent<Point>();
-			vertexObject.SetStyle(Color.black, 0.02f);
+			vertexObject.SetStyle(Color.black, 0.009f);
 			vertexObject.SetCoordinates(rotatedVertices[vertexLabel]);
 			vertexObject.SetLabel(vertexLabel, 0.04f, Color.white);
 
@@ -238,7 +238,7 @@ public class Object3D : MonoBehaviour {
 			obj.transform.SetParent(edgesFolder.transform);
 
 			LineSegment edgeObject = obj.AddComponent<LineSegment>();
-			edgeObject.SetStyle(Color.black, 0.01f);
+			edgeObject.SetStyle(Color.black, 0.005f);
 			edgeObject.SetCoordinates(rotatedVertices[edge.endPoints.Item1], rotatedVertices[edge.endPoints.Item2]);
 			edgeObject.SetLabel(edge.label, 0.01f, Color.white);
 
@@ -252,10 +252,10 @@ public class Object3D : MonoBehaviour {
     {
 		float labelsize_default = 0.01f;
 		ProjectionInfo projectionInfo = new ProjectionInfo(
-    		Color.black, Color.white, 0.02f, 0.04f,    // Parametry punktu
-    		Color.black, Color.white, 0.01f, labelsize_default,    // Parametry krawędzi
-    		Color.gray, Color.white, 0.003f, labelsize_default,     // Parametry linii rzutującej
-			Color.gray, Color.white, 0.003f, labelsize_default,		// Parametry linii odnoszących
+    		Color.black, Color.white, 0.009f, 0.04f,    // Parametry punktu
+    		Color.black, Color.white, 0.005f, labelsize_default,    // Parametry krawędzi
+    		Color.blue, Color.white, 0.001f, labelsize_default,     // Parametry linii rzutującej
+			Color.gray, Color.white, 0.002f, labelsize_default,		// Parametry linii odnoszących
     		false                                     // Określenie czy linie rzutowania powinny być wyświetlane
 		);
 

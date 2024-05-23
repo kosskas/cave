@@ -2,34 +2,88 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using UnityEngine.Purchasing;
 
+/// <summary>
+/// Klasa WallController zarządza właściwościami ścian
+/// </summary>
 public class WallController : MonoBehaviour {
-	
-	private List<WallInfo> walls;
+    private class WallComparer : IEqualityComparer<WallInfo>
+    {
+        public bool Equals(WallInfo x, WallInfo y)
+        {
+            return x.gameObject.Equals(y.gameObject);
+        }
+        public int GetHashCode(WallInfo obj)
+        {
+            return obj.gameObject.GetHashCode();
+        }
+    }
 
-	// Use this for initialization
-	void Start () {
-		GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
+    private List<WallInfo> walls;
+    private List<WallInfo> basicwalls;
+    private List<WallInfo> stack;
+
+    int wallconter;
+    // Use this for initialization
+    void Start()
+    {
+        basicwalls = AddWalls();
+        walls = basicwalls;
+        stack = new List<WallInfo>();
+    }
+    void Update()
+    {      
+        ///Sprawdzaj czy dodano nową ścianę lub usunięto
+        GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
+        if(wallsobject != null) {
+            if(wallconter != wallsobject.Length)
+            {
+                bool isnewwall = (wallconter + 1 == wallsobject.Length);
+                List<WallInfo> oldwalls = new List<WallInfo>(walls);
+                walls = AddWalls();
+                //obiekt moze nie jeszcze nie byc zaladowany 
+                ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+                if (op != null)
+                {
+                    op.ResetProjections();
+                }
+                if (isnewwall)
+                {
+                    //jesli dodano nową ściane
+                    WallInfo[] newwall = walls.Except(oldwalls, new WallComparer()).ToArray();
+                    if(newwall != null && newwall.Length == 1)
+                    {
+                        stack.Add(newwall[0]);
+                    }
+                   // Debug.Log("Dodano scian " + newwall.Length);
+                   // Debug.Log("Nowa sciana to " + newwall[0].name + " o idx "+ newwall[0].number);                    
+                }
+            }  
+        }
+    }
+    private List<WallInfo> AddWalls()
+    {
+        GameObject[] wallsobject = GameObject.FindGameObjectsWithTag("Wall");
         Debug.Log(wallsobject.Length);
-		walls = new List<WallInfo>();
-		int idx = 0;
-		foreach(GameObject wall in wallsobject)
-		{
-			walls.Add(new WallInfo(wall, idx, wall.name,
+        List<WallInfo> ret = new List<WallInfo>();
+        int idx = 0;
+        foreach (GameObject wall in wallsobject)
+        {
+            ret.Add(new WallInfo(wall, idx, wall.name,
                 true,   //show projection
-                false,  //showLines
-                false,  //showReferenceLines
+                true,  //showLines
+                true,  //showReferenceLines
                 false   //watchPerpen
             ));
-			idx++;
-		}
-	}
-	void Update ()
-	{
-		//sprawdzaj czy dodano ściane
-	}
+            idx++;
+        }
+        wallconter = ret.Count;
+        return ret;
+    }
     /// <summary>
-    /// Szuka informacji o ścianie na podstawie jej obiketu Unity
+    /// Szuka informacji o ścianie na podstawie jej obiektu Unity
     /// </summary>
     /// <param name="wallObject">Obiekt ściany Unity</param>
     /// <returns>Informacje o ścianie</returns>
@@ -58,26 +112,38 @@ public class WallController : MonoBehaviour {
         {
             if (walls[i].gameObject == wallObject)
             {
-                walls[i].showProjection = showProjection;
-                walls[i].showLines = showLines;
-                walls[i].showReferenceLines = showReferenceLines;
-                walls[i].watchPerpendicularity = watchPerpendicularity;
+                walls[i].SetFlags(showProjection, showLines, showReferenceLines, watchPerpendicularity);
             }
         }
     }
     /// <summary>
-    /// Resetuje pozycje ścian do pozycji początkowych
+    /// Usuwa wszystkie nowo dodane ściany 
     /// </summary>
-	public void ResetWallsPos()
+	public void SetBasicWalls()
 	{
-		//Uwzgl. nowe sciany
-		foreach(WallInfo wall in walls)
-		{
-			wall.SetPrevPos();
-		}
-	}
+        List<WallInfo> tmpwalls = walls.Except(basicwalls, new WallComparer()).ToList();
+        foreach(WallInfo tmpwall in tmpwalls)
+        {
+            Destroy(tmpwall.gameObject);
+        }
+        stack = new List<WallInfo>();
+    }
     /// <summary>
-    /// PObiera listę ścian i ją zwraca
+    /// Usuwa ściany z odwróconą chronologią ich dodania
+    /// </summary>
+    public void PopBackWall()
+    {
+        if(stack !=  null && stack.Count > 0)
+        {
+            WallInfo lastWall = stack[stack.Count - 1];
+            lastWall.showProjection = false;
+            stack.RemoveAt(stack.Count - 1);
+            Destroy(lastWall.gameObject);
+            lastWall.gameObject = null;
+        } 
+    }
+    /// <summary>
+    /// Pobiera listę ścian i ją zwraca
     /// </summary>
     /// <returns>Lista ścian jaka jest na scenie</returns>
     public List<WallInfo> GetWalls() {
@@ -183,21 +249,18 @@ public class WallController : MonoBehaviour {
         return ret;
     }
     /// <summary>
-    /// Znajduje punkt przecięcia ścian dla dwóch rzutów punktu w 3D
+    /// Ustawia flagi ścian na wartości domyślne
     /// </summary>
-    /// <param name="pointA">Rzut punktu na 1. ścianę</param>
-    /// <param name="normA">Wektor normalny 1. ściany</param>
-    /// <param name="pointB">Rzut punktu na 2. ścianę</param>
-    /// <param name="normB">Wektor normalny 2. ściany</param>
-    /// <returns>Punkt przecięcia ścian z rzutami</returns>
-    public Vector3 FindCrossingPoint2(Vector3 pointA, Vector3 normA, Vector3 pointB, Vector3 normB)
+    public void SetDefaultShowRules()
     {
-        ///1. Równania płaszczyzn(pktA, normA)
-        ///2. Prosta przecinająca płaszczyzny
-        ///3. prosta prostopadła(przez pktA) do prostej przecinającej
-        ///4. == pkt. przecięcia
-        Vector3 ret = Vector3.zero;
-        const float eps = 0.0001f;
-        return ret;
+        for(int i =0; i < walls.Count; i++)
+        {
+            walls[i].SetFlags(
+                true,   //show projection
+                true,  //showLines
+                true,  //showReferenceLines
+                false   //watchPerpen
+            );
+        }
     }
 }

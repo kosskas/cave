@@ -41,8 +41,9 @@ public class Point : MonoBehaviour {
 		lineRenderer = gameObject.AddComponent<LineRenderer>();
 
 		lineRenderer.positionCount = 2;
-		lineRenderer.material = new Material(Shader.Find("Standard"));
-		lineRenderer.numCapVertices = 10;
+        lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
+        lineRenderer.material.color = pointColor;
+        lineRenderer.numCapVertices = 10;
 		lineRenderer.shadowCastingMode = ShadowCastingMode.Off;
 
 		lineRenderer.startColor = pointColor;
@@ -127,5 +128,20 @@ public class Point : MonoBehaviour {
 		Label label = labelObject.GetComponent<Label>();
 		label.SetLabel(text, fontSize, textColor);
 	}
-
+    /// <summary>
+    /// Metoda umożliwia włączenie lub wyłączenie widoczności (renderowania) punktu
+    /// </summary>
+    /// <param name="mode">Flaga ustawiająca widoczność. Jeśli "true" punkt zacznie być rysowany, jeśli "false" punkt przestanie być rysowany </param>
+    public void SetEnable(bool mode)
+    {
+        if (lineRenderer == null)
+        {
+            return;
+        }
+        lineRenderer.enabled = mode;
+        if (labelObject != null)
+        {
+            labelObject.GetComponent<Renderer>().enabled = mode;
+        }
+    }
 }
