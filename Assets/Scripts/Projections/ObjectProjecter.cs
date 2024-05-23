@@ -129,7 +129,9 @@ public class ObjectProjecter : MonoBehaviour {
     /// </summary>
     void Update () {
 		if(OBJECT3D != null && rotatedVertices != null && edges != null){
-			ProjectObject();
+            CheckWallPosition();
+
+            ProjectObject();
 			if(perpenWalls != null && referenceLines != null){
 				ProjectReferenceLines();
 			}
@@ -356,4 +358,25 @@ public class ObjectProjecter : MonoBehaviour {
 			}
 		}
 	}
+    private void CheckWallPosition()
+    {
+        //Dictionary<WallInfo, Dictionary<string, VertexProjection>> verticesOnWalls;
+        foreach (var wall in verticesOnWalls.Keys) {
+            foreach(var str in verticesOnWalls[wall].Keys)
+            {
+                if (verticesOnWalls[wall][str].vertex.GetCoordinates() == Vector3.zero)
+                {
+                    ///sciana jest zle polozona
+                    Renderer renderer = wall.gameObject.GetComponent<Renderer>();
+                    if(renderer != null)
+                    {
+                        Color color = Color.red;
+                        color.a = 0.3f;
+                        renderer.material.color = color;
+                    }     
+                    break;
+                }
+            }
+        }
+    }
 }
