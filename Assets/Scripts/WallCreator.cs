@@ -12,21 +12,40 @@ public class WallCreator : MonoBehaviour {
 	public int wallsCounter;
     [SerializeField] public GameObject wallPrefab;
 	private WallController wallController;
-
+    [SerializeField] GameObject flystick;
+	LineSegment rayline;
     // Use this for initialization
     void Start () {
 		ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
 		wallsCounter = 0;
 		GameObject wallsObject = GameObject.Find("Walls");
 		wallController = wallsObject.GetComponent<WallController>();
-	}
+		
+        rayline = flystick.AddComponent<LineSegment>();
+        rayline.SetStyle(Color.red, 0.02f);
+        rayline.SetCoordinates(flystick.transform.position, flystick.transform.forward * 10f);
+        rayline.SetLabel("", 0.01f, Color.white);
+        if (Lzwp.sync.isMaster)
+		{
+			Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button3).OnPress += () =>
+			{
+				SwitchWallVisibility();
+
+            };
+
+			Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button4).OnPress += () =>
+			{
+				CreatePoint();
+            };
+		}
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
-		ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		
+        ray = new Ray(flystick.transform.position, flystick.transform.forward * 10f);
 
-		if (Physics.Raycast(ray, out hit, 100))
+        if (Physics.Raycast(ray, out hit, 100))
 		{
 			//Debug.Log(hit.transform.name);
 			//Debug.Log("hit");
@@ -36,35 +55,38 @@ public class WallCreator : MonoBehaviour {
 
 		if (Input.GetKeyDown("v"))
 		{
-			if (hit.collider != null)
-            {
-				if (hit.collider.tag == "Wall")
-				{
-					//Debug.Log("hit: " + hit.collider.name);
-					WallInfo info = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
-					if (info != null)
-                    {
-						if (info.showLines)
-						{
-							wallController.SetWallInfo(hit.collider.gameObject, false, false, false, false);
-						}
-						else
-						{
-							wallController.SetWallInfo(hit.collider.gameObject, true, true, true, true);
-						}
-					}
-					
-				}
-			}
-			
-		}
-
+			SwitchWallVisibility();
+        }
 		//Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
 		if (Input.GetKeyDown("c"))
 		{
 			CreatePoint();
 		}
 	}
+
+	void SwitchWallVisibility()
+	{
+        if (hit.collider != null)
+        {
+            if (hit.collider.tag == "Wall")
+            {
+                //Debug.Log("hit: " + hit.collider.name);
+                WallInfo info = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
+                if (info != null)
+                {
+                    if (info.showLines)
+                    {
+                        wallController.SetWallInfo(hit.collider.gameObject, false, false, false, false);
+                    }
+                    else
+                    {
+                        wallController.SetWallInfo(hit.collider.gameObject, true, true, true, true);
+                    }
+                }
+
+            }
+        }
+    }
 
 	void CreatePoint() 
 	{
