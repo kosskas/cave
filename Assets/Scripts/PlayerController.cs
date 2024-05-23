@@ -48,17 +48,23 @@ public class PlayerController : MonoBehaviour
         if (Lzwp.sync.isMaster)
         {
             Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button1).OnPress += () => {
-                 si.ImportSolid();
+                ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+                if (op)
+                {
+                    op.SetShowingProjectionLines();
+                }
             };
 
             Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button2).OnPress += () => {
                 ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
-                op.SetShowingProjectionLines();
+                if (op)
+                {
+                    op.SetShowingReferenceLines();
+                }
             };
 
             Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button3).OnPress += () => {
-                ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
-                op.SetShowingReferenceLines();
+
             };
 
             Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button4).OnPress += () => {
@@ -69,6 +75,22 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (Lzwp.sync.isMaster)
+        {
+            int flystickIdx = 0;
+            if (Lzwp.input.flysticks.Count > flystickIdx)
+            {
+                float x = Lzwp.input.flysticks[flystickIdx].joysticks[0];
+                if( x <= -0.5f)
+                {
+                    wc.PopBackWall();
+                }
+                if( x >= 0.5f)
+                {
+                    si.ImportSolid();
+                }
+            }
+        }
         ////
         /// NOTE: jedyny Input nie będący tutaj jest w pliku ObjectRotator!
         ///
