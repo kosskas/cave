@@ -414,7 +414,10 @@ public class SolidImporter : MonoBehaviour {
 		labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => entry.Value - centerPoint);
 	}
 
-	
+	/// <summary>
+	/// Metoda normalizuje rozmiar bryły, tak aby niezależnie od współrzędnych wierzchołków zdefiniowanych w pliku .wobj,
+	/// nie przyjmowała większego rozmiaru niż 'MAX_DISTANCE'*'MAX_DISTANCE' x 'MAX_DISTANCE'*'MAX_DISTANCE' x 'MAX_DISTANCE'*'MAX_DISTANCE'.
+	/// </summary>
 	private void NormalizeSolid()
 	{
 		float maxDistance = 0.0f;
