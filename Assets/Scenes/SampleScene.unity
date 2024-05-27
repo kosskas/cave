@@ -633,6 +633,7 @@ MonoBehaviour:
   newWall: {fileID: 0}
   wallsCounter: 0
   wallPrefab: {fileID: 1221629244415174, guid: 3040a5d0cb05a344cb2fec3c5f96f845, type: 2}
+  midPoint: {x: 0, y: 1, z: 0}
 --- !u!1 &793511885
 GameObject:
   m_ObjectHideFlags: 0
@@ -800,7 +801,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &962985216
 Transform:
   m_ObjectHideFlags: 0
