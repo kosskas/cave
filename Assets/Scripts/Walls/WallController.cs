@@ -43,19 +43,25 @@ public class WallController : MonoBehaviour {
             ret.Add(new WallInfo(wall, idx, wall.name,
                 true,   //show projection
                 true,  //showLines
-                true,  //showReferenceLines
-                false   //watchPerpen
+                true  //showReferenceLines
             ));
             idx++;
         }
         wallcounter = ret.Count;
         return ret;
     }
-    public void AddWall(GameObject wallobject, bool showProjection, bool showLines, bool showReferenceLines, bool watchPerpendicularity)
+    /// <summary>
+    /// Dodaje nową ścianę do kolekcji ścian
+    /// </summary>
+    /// <param name="wallobject">Obiekt ściany Unity na scenie</param>
+    /// <param name="showProjection"></param>
+    /// <param name="showLines"></param>
+    /// <param name="showReferenceLines"></param>
+    public void AddWall(GameObject wallobject, bool showProjection, bool showLines, bool showReferenceLines)
     {
         if(wallobject != null && walls != null)
         {
-            WallInfo wall = new WallInfo(wallobject, wallcounter++, wallobject.name, showProjection, showLines, showReferenceLines, watchPerpendicularity);
+            WallInfo wall = new WallInfo(wallobject, wallcounter++, wallobject.name, showProjection, showLines, showReferenceLines);
             walls.Add(wall);
             playerAddedWalls.Add(wall);
             ResetProjection();
@@ -85,14 +91,13 @@ public class WallController : MonoBehaviour {
     /// <param name="showProjection">Flaga dot. wyświetlania na ścianie rzutów</param>
     /// <param name="showLines">Flaga dot. wyświetlania linii rzutujących</param>
     /// <param name="showReferenceLines">Flaga dot. wyświetlania linii odnoszących</param>
-    /// <param name="watchPerpendicularity">Flaga dot. pilnowania prostopadłości rzutu na ścianie</param>
-    public void SetWallInfo(GameObject wallObject,bool showProjection, bool showLines, bool showReferenceLines, bool watchPerpendicularity)
+    public void SetWallInfo(GameObject wallObject,bool showProjection, bool showLines, bool showReferenceLines)
     {
         for(int i = 0; i < walls.Count; i++)
         {
             if (walls[i].gameObject == wallObject)
             {
-                walls[i].SetFlags(showProjection, showLines, showReferenceLines, watchPerpendicularity);
+                walls[i].SetFlags(showProjection, showLines, showReferenceLines);
             }
         }
     }
@@ -252,18 +257,13 @@ public class WallController : MonoBehaviour {
     /// </summary>
     public void SetDefaultShowRules()
     {
-        for(int i =0; i < walls.Count; i++)
+        for (int i = 0; i < walls.Count; i++)
         {
             walls[i].SetFlags(
                 true,   //show projection
                 true,  //showLines
-                true,  //showReferenceLines
-                false   //watchPerpen
+                true  //showReferenceLines
             );
         }
-    }
-    private void CopyOldRules(List<WallInfo> oldrules)
-    {
-
     }
 }

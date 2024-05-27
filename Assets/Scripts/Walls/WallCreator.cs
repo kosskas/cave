@@ -51,11 +51,11 @@ public class WallCreator : MonoBehaviour {
                     {
 						if (info.showLines)
 						{
-							wallController.SetWallInfo(hit.collider.gameObject, false, false, false, false);
+							wallController.SetWallInfo(hit.collider.gameObject, false, false, false);
 						}
 						else
 						{
-							wallController.SetWallInfo(hit.collider.gameObject, true, true, true, true);
+							wallController.SetWallInfo(hit.collider.gameObject, true, true, true);
 						}
 					}
 					
@@ -94,7 +94,7 @@ public class WallCreator : MonoBehaviour {
 
             CreateWall(points[wallsCounter*2].transform.position, points[wallsCounter*2+1].transform.position, hitWallInfo);
 			wallsCounter++;
-			wallController.AddWall(newWall, true, true, true, true);
+			wallController.AddWall(newWall, true, true, true);
             foreach (GameObject obj in points)
 			{
 				// Usuwanie obiektu ze sceny
