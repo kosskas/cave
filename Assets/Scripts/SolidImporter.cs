@@ -165,7 +165,7 @@ public class SolidImporter : MonoBehaviour {
 	/// <summary>
 	/// Maksymalna odległość wierzchołka od środka ciężkości bryły po przeskalowaniu 
 	/// </summary>
-	private const float MAX_DISTANCE = 0.8f; 
+	private const float MAX_RADIUS_TRESHOLD = 0.8f;
 
 	/// <summary>
 	/// Nazwy plików .wobj znalezione w katalogu 'pathToFolderWithSolids'
@@ -420,20 +420,23 @@ public class SolidImporter : MonoBehaviour {
 	/// </summary>
 	private void NormalizeSolid()
 	{
-		float maxDistance = 0.0f;
+		float maxRadius = 0.0f;
 
 		foreach(Vector3 vertex in labeledVertices.Values)
 		{
-			float distance = (float)Math.Sqrt(
+			float radius = (float)Math.Sqrt(
 				(float)Math.Pow(vertex.x, 2) + 
 				(float)Math.Pow(vertex.y, 2) +
 				(float)Math.Pow(vertex.z, 2)
 			);
 
-			maxDistance = (distance > maxDistance) ? distance : maxDistance;
+			maxRadius = (radius > maxRadius) ? radius : maxRadius;
 		}
 
-		labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => (entry.Value * MAX_DISTANCE) / maxDistance);
+		if (maxRadius > MAX_RADIUS_TRESHOLD)
+		{
+			labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => (entry.Value * MAX_RADIUS_TRESHOLD) / maxRadius);
+		}
 	}
 
 	/// <summary>
