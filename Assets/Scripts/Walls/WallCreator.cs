@@ -94,7 +94,8 @@ public class WallCreator : MonoBehaviour {
 
             CreateWall(points[wallsCounter*2].transform.position, points[wallsCounter*2+1].transform.position, hitWallInfo);
 			wallsCounter++;
-			foreach (GameObject obj in points)
+			wallController.AddWall(newWall, true, true, true, true);
+            foreach (GameObject obj in points)
 			{
 				// Usuwanie obiektu ze sceny
 				if (obj != null)

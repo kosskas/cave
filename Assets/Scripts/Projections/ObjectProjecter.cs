@@ -366,6 +366,12 @@ public class ObjectProjecter : MonoBehaviour {
             {
                 if (verticesOnWalls[wall][str].vertex.GetCoordinates() == Vector3.zero)
                 {
+                    //sprawdz czy sciana jest wylaczona celowo
+                    WallInfo errwall = wc.FindWallInfoByGameObject(wall.gameObject);
+                    if (errwall != null && !errwall.showProjection)
+                    {
+                        break;
+                    }
                     ///sciana jest zle polozona
                     Renderer renderer = wall.gameObject.GetComponent<Renderer>();
                     if(renderer != null)
@@ -373,7 +379,9 @@ public class ObjectProjecter : MonoBehaviour {
                         Color color = Color.red;
                         color.a = 0.3f;
                         renderer.material.color = color;
-                    }     
+                    }
+                    errwall.SetFlags(false, false, false, false);
+
                     break;
                 }
             }
