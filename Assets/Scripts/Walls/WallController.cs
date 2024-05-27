@@ -264,6 +264,11 @@ public class WallController : MonoBehaviour {
                 true,  //showLines
                 true  //showReferenceLines
             );
+            ///wyłącz wysuwaną ścianę cavea
+            if(walls[i].name == "Wall6")
+            {
+                walls[i].SetFlags(false,false, false);
+            }
         }
     }
 }
