@@ -51,6 +51,29 @@ public class Object3D : MonoBehaviour {
 	public GameObject player = null;
 
 
+	private const float POINT_DIAMETER = 0.015f; 						// 0.009f
+	private const float LINE_WEIGHT = 0.008f; 							// 0.005f
+
+	private const float ON_WALL_POINT_DIAMETER = 0.5f * POINT_DIAMETER; // 0.009f
+	private const float ON_WALL_LINE_WEIGHT = 0.5f * LINE_WEIGHT; 		// 0.005f
+
+	private const float CONSTRUCTION_LINE_WEIGHT = 2.0f * 0.001f;
+	private const float ADDITIONAL_CONSTRUCTION_LINE_WEIGHT = 2.0f * 0.001f; 
+	private const float AXIS_WEIGHT = 0.002f; 
+
+
+	private const float VERTEX_LABEL_SIZE = 0.04f;
+	private const float EDGE_LABEL_SIZE = 0.01f;
+
+
+	private Color LABEL_COLOR = Color.white;
+	private Color POINT_COLOR = Color.black;
+	private Color LINE_COLOR = Color.black;
+	private Color CONSTRUCTION_LINE_COLOR = Color.blue;
+	private Color ADDITIONAL_CONSTRUCTION_LINE_COLOR = Color.grey;
+
+	private const float SOLID_WALL_TRANSPARENCY = 0.3f;
+
 	private Dictionary<string, Point> vertexObjects = new Dictionary<string, Point>();
 
 	private List<LineSegment> edgeObjects = new List<LineSegment>();
@@ -162,7 +185,7 @@ public class Object3D : MonoBehaviour {
         // Set the material for the MeshRenderer (you can create your own material or use an existing one)
         meshRenderer.material = new Material(Shader.Find("Transparent/Diffuse"));
 		Color color = Color.white;
-        color.a = 0.3f;
+        color.a = SOLID_WALL_TRANSPARENCY;
 
         // Ustawienie koloru na biały
         meshRenderer.material.color = color;
@@ -219,9 +242,9 @@ public class Object3D : MonoBehaviour {
 			obj.transform.SetParent(verticesFolder.transform);
 
 			Point vertexObject = obj.AddComponent<Point>();
-			vertexObject.SetStyle(Color.black, 0.009f);
+			vertexObject.SetStyle(POINT_COLOR, POINT_DIAMETER);
 			vertexObject.SetCoordinates(rotatedVertices[vertexLabel]);
-			vertexObject.SetLabel(vertexLabel, 0.04f, Color.white);
+			vertexObject.SetLabel(vertexLabel, VERTEX_LABEL_SIZE, LABEL_COLOR);
 
 			vertexObjects[vertexLabel] = vertexObject;
 		}
@@ -238,9 +261,9 @@ public class Object3D : MonoBehaviour {
 			obj.transform.SetParent(edgesFolder.transform);
 
 			LineSegment edgeObject = obj.AddComponent<LineSegment>();
-			edgeObject.SetStyle(Color.black, 0.005f);
+			edgeObject.SetStyle(LINE_COLOR, LINE_WEIGHT);
 			edgeObject.SetCoordinates(rotatedVertices[edge.endPoints.Item1], rotatedVertices[edge.endPoints.Item2]);
-			edgeObject.SetLabel(edge.label, 0.01f, Color.white);
+			edgeObject.SetLabel(edge.label, EDGE_LABEL_SIZE, LABEL_COLOR);
 
 			edgeObjects.Add(edgeObject);
 		}
@@ -250,13 +273,12 @@ public class Object3D : MonoBehaviour {
 	/// </summary>
 	private void AddRays()
     {
-		float labelsize_default = 0.01f;
 		ProjectionInfo projectionInfo = new ProjectionInfo(
-    		Color.black, Color.white, 0.009f, 0.04f,    // Parametry punktu
-    		Color.black, Color.white, 0.005f, labelsize_default,    // Parametry krawędzi
-    		Color.blue, Color.white, 0.001f, labelsize_default,     // Parametry linii rzutującej
-			Color.gray, Color.white, 0.002f, labelsize_default,		// Parametry linii odnoszących
-    		false                                     // Określenie czy linie rzutowania powinny być wyświetlane
+    		POINT_COLOR, LABEL_COLOR, ON_WALL_POINT_DIAMETER, VERTEX_LABEL_SIZE,    									// Parametry punktu
+    		LINE_COLOR, LABEL_COLOR, ON_WALL_LINE_WEIGHT, EDGE_LABEL_SIZE,    											// Parametry krawędzi
+    		CONSTRUCTION_LINE_COLOR, LABEL_COLOR, CONSTRUCTION_LINE_WEIGHT, EDGE_LABEL_SIZE,     						// Parametry linii rzutującej
+			ADDITIONAL_CONSTRUCTION_LINE_COLOR, LABEL_COLOR, ADDITIONAL_CONSTRUCTION_LINE_WEIGHT, EDGE_LABEL_SIZE,		// Parametry linii odnoszących
+    		false                                     																	// Określenie czy linie rzutowania powinny być wyświetlane
 		);
 
         ObjectProjecter op = gameObject.AddComponent<ObjectProjecter>();

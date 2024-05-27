@@ -165,7 +165,12 @@ public class SolidImporter : MonoBehaviour {
 	/// <summary>
 	/// Maksymalna odległość wierzchołka od środka ciężkości bryły po przeskalowaniu 
 	/// </summary>
-	private const float MAX_DISTANCE = 0.8f; 
+	private const float MAX_RADIUS_TRESHOLD = 0.8f;
+
+	/// <summary>
+	/// Współczynnik skalowania rozmiaru bryły, tak aby wartość 1 w pliku .wobj odpowiadała 'SCALING_FACTOR' [m] w jaskini
+	/// </summary>
+	private const float SCALING_FACTOR = 0.5f;
 
 	/// <summary>
 	/// Nazwy plików .wobj znalezione w katalogu 'pathToFolderWithSolids'
@@ -254,6 +259,7 @@ public class SolidImporter : MonoBehaviour {
 			PickNextSolid();
 			ReadSolid();
 			CentralizePosition();
+			ScaleSolid();
 			NormalizeSolid();
 			SetUpVertices();
 			SetUpTriangles();
@@ -414,26 +420,36 @@ public class SolidImporter : MonoBehaviour {
 		labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => entry.Value - centerPoint);
 	}
 
+
+	private void ScaleSolid()
+	{
+		labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => entry.Value * SCALING_FACTOR);
+	}
+
+
 	/// <summary>
 	/// Metoda normalizuje rozmiar bryły, tak aby niezależnie od współrzędnych wierzchołków zdefiniowanych w pliku .wobj,
 	/// nie przyjmowała większego rozmiaru niż 'MAX_DISTANCE'*'MAX_DISTANCE' x 'MAX_DISTANCE'*'MAX_DISTANCE' x 'MAX_DISTANCE'*'MAX_DISTANCE'.
 	/// </summary>
 	private void NormalizeSolid()
 	{
-		float maxDistance = 0.0f;
+		float maxRadius = 0.0f;
 
 		foreach(Vector3 vertex in labeledVertices.Values)
 		{
-			float distance = (float)Math.Sqrt(
+			float radius = (float)Math.Sqrt(
 				(float)Math.Pow(vertex.x, 2) + 
 				(float)Math.Pow(vertex.y, 2) +
 				(float)Math.Pow(vertex.z, 2)
 			);
 
-			maxDistance = (distance > maxDistance) ? distance : maxDistance;
+			maxRadius = (radius > maxRadius) ? radius : maxRadius;
 		}
 
-		labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => (entry.Value * MAX_DISTANCE) / maxDistance);
+		if (maxRadius > MAX_RADIUS_TRESHOLD)
+		{
+			labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => (entry.Value * MAX_RADIUS_TRESHOLD) / maxRadius);
+		}
 	}
 
 	/// <summary>
