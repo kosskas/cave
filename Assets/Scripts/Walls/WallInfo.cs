@@ -34,14 +34,6 @@ public class WallInfo
     /// Flaga dot. wyświetlania linii odnoszących
     /// </summary>
     public bool showReferenceLines = true;
-    /// <summary>
-    /// Flaga dot. pilnowania prostopadłości rzutu na ścianie
-    /// </summary>    
-    public bool watchPerpendicularity = false;
-
-
-    private Vector3 oldposition;
-    private Quaternion oldrotation;
 
 
     /// <summary>
@@ -65,8 +57,7 @@ public class WallInfo
     /// <param name="showProjection">Flaga dotycząca wyświetlania na ścianie rzutów.</param>
     /// <param name="showLines">Flaga dotycząca wyświetlania linii rzutujących.</param>
     /// <param name="showReferenceLines">Flaga dotycząca wyświetlania linii odnoszących.</param>
-    /// <param name="watchPerpendicularity">Flaga dotycząca pilnowania prostopadłości rzutu na ścianie.</param>
-    public WallInfo(GameObject gameObject, int number, string name, bool showProjection, bool showLines, bool showReferenceLines, bool watchPerpendicularity)
+    public WallInfo(GameObject gameObject, int number, string name, bool showProjection, bool showLines, bool showReferenceLines)
     {
         this.gameObject = gameObject;
         this.number = number;
@@ -74,20 +65,8 @@ public class WallInfo
         this.showProjection = showProjection;
         this.showLines = showLines;
         this.showReferenceLines = showReferenceLines;
-        this.watchPerpendicularity = watchPerpendicularity;
-        
+    }
 
-       oldposition = gameObject.transform.position;
-       oldrotation = gameObject.transform.rotation;
-    }
-    /// <summary>
-    /// Przywraca pozycję początkową ściany
-    /// </summary>
-    public void SetPrevPos()
-    {
-        gameObject.transform.position = oldposition;
-        gameObject.transform.rotation = oldrotation;
-    }
     /// <summary>
     /// Funkcja zwraca wektor normalny ściany, przyjęty w projektcie jako vector.right
     /// </summary>
@@ -101,12 +80,10 @@ public class WallInfo
     /// <param name="showProjection">Flaga dotycząca wyświetlania na ścianie rzutów.</param>
     /// <param name="showLines">Flaga dotycząca wyświetlania linii rzutujących.</param>
     /// <param name="showReferenceLines">Flaga dotycząca wyświetlania linii odnoszących.</param>
-    /// <param name="watchPerpendicularity">Flaga dotycząca pilnowania prostopadłości rzutu na ścianie.</param>
-    public void SetFlags(bool showProjection, bool showLines, bool showReferenceLines, bool watchPerpendicularity)
+    public void SetFlags(bool showProjection, bool showLines, bool showReferenceLines)
     {
         this.showProjection = showProjection;
         this.showLines = showLines;
         this.showReferenceLines = showReferenceLines;
-        this.watchPerpendicularity = watchPerpendicularity;
     }
 }
