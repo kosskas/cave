@@ -168,6 +168,11 @@ public class SolidImporter : MonoBehaviour {
 	private const float MAX_RADIUS_TRESHOLD = 0.8f;
 
 	/// <summary>
+	/// Współczynnik skalowania rozmiaru bryły, tak aby wartość 1 w pliku .wobj odpowiadała 'SCALING_FACTOR' [m] w jaskini
+	/// </summary>
+	private const float SCALING_FACTOR = 1.0f;
+
+	/// <summary>
 	/// Nazwy plików .wobj znalezione w katalogu 'pathToFolderWithSolids'
 	/// </summary>
 	private string[] solidFiles = null;
@@ -254,6 +259,7 @@ public class SolidImporter : MonoBehaviour {
 			PickNextSolid();
 			ReadSolid();
 			CentralizePosition();
+			ScaleSolid();
 			NormalizeSolid();
 			SetUpVertices();
 			SetUpTriangles();
@@ -413,6 +419,13 @@ public class SolidImporter : MonoBehaviour {
 
 		labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => entry.Value - centerPoint);
 	}
+
+
+	private void ScaleSolid()
+	{
+		labeledVertices = labeledVertices.ToDictionary(entry => entry.Key, entry => entry.Value * SCALING_FACTOR);
+	}
+
 
 	/// <summary>
 	/// Metoda normalizuje rozmiar bryły, tak aby niezależnie od współrzędnych wierzchołków zdefiniowanych w pliku .wobj,
