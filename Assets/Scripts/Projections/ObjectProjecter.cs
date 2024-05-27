@@ -372,9 +372,9 @@ public class ObjectProjecter : MonoBehaviour {
                         Color color = Color.red;
                         color.a = 0.3f;
                         renderer.material.color = color;
-                        return;
                     }
-                    //errwall.SetFlags(false, false, false);
+                    wc.FindWallInfoByGameObject(wall.gameObject).SetFlags(false, false, false);
+                    break;
                 }
             }
         }
