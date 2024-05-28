@@ -56,9 +56,17 @@ public class PlayerController : MonoBehaviour
         {
             wc.SetBasicWalls();
             wc.SetDefaultShowRules();
+            si.SetUpDirection();
             si.ImportSolid();
         }
-        if(Input.GetKeyDown("o")){
+        if (Input.GetKeyDown("u"))
+        {
+            wc.SetBasicWalls();
+            wc.SetDefaultShowRules();
+            si.SetDownDirection();
+            si.ImportSolid();
+        }
+        if (Input.GetKeyDown("o")){
             ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
             op.SetShowingProjectionLines();
         }
