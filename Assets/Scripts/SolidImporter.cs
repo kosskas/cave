@@ -221,7 +221,7 @@ public class SolidImporter : MonoBehaviour {
 	/// </summary>
 	private GameObject mainObj;
 
-
+	private int direction = 1;
 	// Use this for initialization
 	void Start ()
 	{
@@ -300,14 +300,31 @@ public class SolidImporter : MonoBehaviour {
 		vertices.Clear();
 		triangles.Clear();
 	}
-
 	/// <summary>
-	/// Metoda inkrementuje w sposób zapętlony (modulo liczba plików w 'solidFiles') indeks pliku do załadowania
+	/// Ustawia kolejność ładowania kolejnych obiektów w górę
+	/// </summary>
+	public void SetUpDirection()
+	{
+		direction = 1;
+	}
+    /// <summary>
+    /// Ustawia kolejność ładowania kolejnych obiektów w dół
+    /// </summary>
+    public void SetDownDirection()
+	{
+		direction = -1;
+    }
+	/// <summary>
+	/// Metoda inkrementuje w sposób zapętlony w górę bądź dół (modulo liczba plików w 'solidFiles') indeks pliku do załadowania
 	/// </summary>
 	private void PickNextSolid() 
 	{
-		currentSolidFileIndex = (currentSolidFileIndex + 1) % solidFiles.Length;
-	}
+        currentSolidFileIndex = (currentSolidFileIndex + direction) % solidFiles.Length;
+        if (currentSolidFileIndex < 0)
+        {
+            currentSolidFileIndex += solidFiles.Length;
+        }
+    }
 
 	/// <summary>
 	/// Metoda rozpoznaje sekcje wczytanego pliku i odpowiednio je interpretuje
