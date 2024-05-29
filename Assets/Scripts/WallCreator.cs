@@ -74,6 +74,24 @@ public class WallCreator : MonoBehaviour {
 
 	void CreatePoint() 
 	{
+		WallInfo justHit = null;
+		
+		try
+		{
+			justHit = wallController.FindWallInfoByGameObject(hit.collider.gameObject) as WallInfo;
+		}
+		catch (System.NullReferenceException)
+		{
+			Debug.LogError("CANNOT place new Point because NULL has been hit");
+			return;
+		}
+
+		if (justHit == null)
+		{
+			Debug.LogError("CANNOT place new Point because NO WALL has been hit");
+			return;
+		}
+
 		GameObject point = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 		point.transform.localScale = new Vector3(POINT_SIZE, POINT_SIZE, POINT_SIZE);
 		point.transform.position = hit.point;
@@ -82,26 +100,26 @@ public class WallCreator : MonoBehaviour {
 
 		if (points.Count == 1)
 		{
-			hitWallInfo = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
+			hitWallInfo = justHit;
 		}
-		else if (points.Count == 2)
-        {
-			if (hitWallInfo == null)
-			{
-				Debug.LogError("CANNOT create new Wall object because hitWallInfo is NULL");
-				ClearPoints();
-				return;
-			}
 
-			if (hitWallInfo != wallController.FindWallInfoByGameObject(hit.collider.gameObject))
+		if (points.Count == 2)
+		{
+			if (hitWallInfo != justHit)
 			{
-				Debug.LogError("CANNOT create a new Wall object because the same wall has not been hit twice.");
+				Debug.LogError("CANNOT create a new Wall object because DIFFERENT WALLS has been hit.");
 				ClearPoints();
 				return;
 			}
 
 			CreateWall(points[0].transform.position, points[1].transform.position, hitWallInfo);
 			ClearPoints();			
+		}
+
+		if (points.Count > 2)
+		{
+			Debug.LogError("TO MANY Points have been placed.");
+			ClearPoints();
 		}
 	}
 
