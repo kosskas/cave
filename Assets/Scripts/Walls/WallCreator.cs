@@ -3,13 +3,23 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-public class WallCreator : MonoBehaviour {
-
-	public Ray ray;
-	public RaycastHit hit;
-	public List<GameObject> points = new List<GameObject>();
-	public GameObject newWall;
+/// <summary>
+/// Klasa odpowiadająca za dodawanie nowej ściany przechodzącej przez 2 punkty i prostopadłej do ściany, na której użytkownik wskazał te punkty
+public class WallCreator : MonoBehaviour
+{
+    /// <summary>
+    /// Szablon obiektu ściany
+    /// </summary>
     [SerializeField] public GameObject wallPrefab;
+
+    /// <summary>
+    /// Określa współrzędne środka ciężkości bryły, które służą jako punkt odniesienia np. do symulacji rotacji bryły 3D
+    /// </summary>
+    public Vector3 midPoint = new Vector3(0.0f, 1.0f, 0.0f);
+    private Ray ray;
+    private RaycastHit hit;
+    private List<GameObject> points = new List<GameObject>();
+	private GameObject newWall;
 	private WallController wallController;
     [SerializeField] GameObject flystick;
 	LineSegment rayline;
@@ -18,11 +28,6 @@ public class WallCreator : MonoBehaviour {
 	private const float POINT_SIZE = 0.05f;
 	private const float RAY_WEIGHT = 0.005f;
 	private const float RAY_RANGE = 100f;
-
-	/// <summary>
-	/// Określa współrzędne środka ciężkości bryły, które służą jako punkt odniesienia np. do symulacji rotacji bryły 3D
-	/// </summary>
-	public Vector3 midPoint = new Vector3(0.0f, 1.0f, 0.0f);
 
     // Use this for initialization
     void Start () {
