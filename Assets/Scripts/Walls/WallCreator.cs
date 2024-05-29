@@ -16,6 +16,8 @@ public class WallCreator : MonoBehaviour {
 	private WallInfo hitWallInfo = null;
 
 	private const float POINT_SIZE = 0.05f;
+	private const float RAY_WEIGHT = 0.005f;
+	private const float RAY_RANGE = 100f;
 
 	/// <summary>
 	/// Określa współrzędne środka ciężkości bryły, które służą jako punkt odniesienia np. do symulacji rotacji bryły 3D
@@ -24,13 +26,13 @@ public class WallCreator : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-		ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
+		//ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
 		GameObject wallsObject = GameObject.Find("Walls");
 		wallController = wallsObject.GetComponent<WallController>();
 		
         rayline = flystick.AddComponent<LineSegment>();
-        rayline.SetStyle(Color.red, 0.02f);
-        rayline.SetCoordinates(flystick.transform.position, flystick.transform.forward * 10f);
+        rayline.SetStyle(Color.red, RAY_WEIGHT);
+        rayline.SetCoordinates(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
         rayline.SetLabel("", 0.01f, Color.white);
         if (Lzwp.sync.isMaster)
 		{
@@ -50,8 +52,8 @@ public class WallCreator : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        ray = new Ray(flystick.transform.position, flystick.transform.forward * 10f);
-
+        ray = new Ray(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
+        rayline.SetCoordinates(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
         if (Physics.Raycast(ray, out hit, 100))
 		{
 			//Debug.Log(hit.transform.name);

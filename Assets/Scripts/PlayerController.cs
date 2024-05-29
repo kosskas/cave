@@ -34,6 +34,10 @@ public class PlayerController : MonoBehaviour
     //[HideInInspector]
 
     SolidImporter si;
+    /// <summary>
+    /// Zmienna czy gałka jest przechylona
+    /// </summary>
+    private bool is_tilted = false;
     void Start()
     {
         characterController = GetComponentInChildren<CharacterController>();
@@ -62,6 +66,10 @@ public class PlayerController : MonoBehaviour
                     op.SetShowingReferenceLines();
                 }
             };
+
+            Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Joystick).OnPress += () => {
+                wc.PopBackWall();
+            };
         }
     }
 
@@ -73,13 +81,31 @@ public class PlayerController : MonoBehaviour
             if (Lzwp.input.flysticks.Count > flystickIdx)
             {
                 float x = Lzwp.input.flysticks[flystickIdx].joysticks[0];
-                if( x <= -0.5f)
+                if( x <= -0.8f)
                 {
-                    wc.PopBackWall();
+                    if (is_tilted == false)
+                    {
+                        wc.SetBasicWalls();
+                        wc.SetDefaultShowRules();
+                        si.SetDownDirection();
+                        si.ImportSolid();
+                        is_tilted = true;
+                    }
                 }
-                if( x >= 0.5f)
+                else if( x >= 0.8f)
                 {
-                    si.ImportSolid();
+                    if (is_tilted == false)
+                    {
+                        wc.SetBasicWalls();
+                        wc.SetDefaultShowRules();
+                        si.SetUpDirection();
+                        si.ImportSolid();
+                        is_tilted = true;
+                    }
+                }
+                else
+                {
+                    is_tilted = false;
                 }
             }
         }
