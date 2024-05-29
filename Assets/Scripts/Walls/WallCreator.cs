@@ -9,9 +9,11 @@ public class WallCreator : MonoBehaviour {
 	public RaycastHit hit;
 	public List<GameObject> points = new List<GameObject>();
 	public GameObject newWall;
-	public int wallsCounter;
     [SerializeField] public GameObject wallPrefab;
 	private WallController wallController;
+	private WallInfo hitWallInfo = null;
+
+	private const float POINT_SIZE = 0.05f;
 
 	/// <summary>
 	/// Określa współrzędne środka ciężkości bryły, które służą jako punkt odniesienia np. do symulacji rotacji bryły 3D
@@ -21,7 +23,6 @@ public class WallCreator : MonoBehaviour {
     // Use this for initialization
     void Start () {
 		ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
-		wallsCounter = 0;
 		GameObject wallsObject = GameObject.Find("Walls");
 		wallController = wallsObject.GetComponent<WallController>();
 	}
@@ -74,36 +75,48 @@ public class WallCreator : MonoBehaviour {
 	void CreatePoint() 
 	{
 		GameObject point = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-		point.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+		point.transform.localScale = new Vector3(POINT_SIZE, POINT_SIZE, POINT_SIZE);
 		point.transform.position = hit.point;
-		points.Add(point);
 		Debug.Log(hit.point);
-		int wallType = 0;
-		if (points.Count % 2 == 0 && points.Count > 0)
+		points.Add(point);
+
+		if (points.Count == 1)
+		{
+			hitWallInfo = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
+		}
+		else if (points.Count == 2)
         {
-			WallInfo hitWallInfo = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
-            if (hitWallInfo != null)
-            {
-                if (hitWallInfo.GetNormal() == Vector3.up)
-                {
-                    //Debug.Log("Floor hit");
-					wallType = 1;
-                }
-
-            }
-
-            CreateWall(points[wallsCounter*2].transform.position, points[wallsCounter*2+1].transform.position, hitWallInfo);
-			wallsCounter++;
-			wallController.AddWall(newWall, true, true, true);
-            foreach (GameObject obj in points)
+			if (hitWallInfo == null)
 			{
-				// Usuwanie obiektu ze sceny
-				if (obj != null)
-				{
-					Destroy(obj);
-				}
+				Debug.LogError("CANNOT create new Wall object because hitWallInfo is NULL");
+				ClearPoints();
+				return;
+			}
+
+			if (hitWallInfo != wallController.FindWallInfoByGameObject(hit.collider.gameObject))
+			{
+				Debug.LogError("CANNOT create a new Wall object because the same wall has not been hit twice.");
+				ClearPoints();
+				return;
+			}
+
+			CreateWall(points[0].transform.position, points[1].transform.position, hitWallInfo);
+			ClearPoints();
+            wallController.AddWall(newWall, true, true, true);
+        }
+	}
+
+	void ClearPoints()
+	{
+		foreach (GameObject obj in points)
+		{
+			if (obj != null)
+			{
+				Destroy(obj);	// Usuwanie obiektu ze sceny
 			}
 		}
+
+		points.Clear();
 	}
 
 	void CreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo)
