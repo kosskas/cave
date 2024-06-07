@@ -54,9 +54,9 @@ public class WallController : MonoBehaviour {
     /// Dodaje nową ścianę do kolekcji ścian
     /// </summary>
     /// <param name="wallobject">Obiekt ściany Unity na scenie</param>
-    /// <param name="showProjection"></param>
-    /// <param name="showLines"></param>
-    /// <param name="showReferenceLines"></param>
+    /// <param name="showProjection">Flaga dot. wyświetlania na ścianie rzutów</param>
+    /// <param name="showLines">Flaga dot. wyświetlania linii rzutujących</param>
+    /// <param name="showReferenceLines">Flaga dot. wyświetlania linii odnoszących</param>
     public void AddWall(GameObject wallobject, bool showProjection, bool showLines, bool showReferenceLines)
     {
         if(wallobject != null && walls != null)
