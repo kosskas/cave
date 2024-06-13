@@ -29,18 +29,23 @@ public class PlayerController : MonoBehaviour
     public bool canMove = true;
     CharacterController characterController;
     WallController wc;
+    WallCreator wcrt;
     Vector3 moveDirection = Vector3.zero;
     float rotationX = 0;
     //[HideInInspector]
 
     SolidImporter si;
+    private Ray ray;
+    private RaycastHit hit;
     void Start()
     {
+        ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
         characterController = GetComponentInChildren<CharacterController>();
         GameObject mainObject = GameObject.Find("MainObject");
         si = mainObject.GetComponent<SolidImporter>();
         GameObject wallsObject = GameObject.Find("Walls");
         wc = wallsObject.GetComponent<WallController>();
+        wcrt = gameObject.GetComponent<WallCreator>();
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -48,11 +53,15 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        ///Raycasting
+        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Physics.Raycast(ray, out hit, 100);
+
         ////
         /// NOTE: jedyny Input nie będący tutaj jest w pliku ObjectRotator!
         ///
         //from solidimporter
-        if(Input.GetKeyDown("p"))
+        if (Input.GetKeyDown("p"))
         {
             wc.SetBasicWalls();
             wc.SetDefaultShowRules();
@@ -77,6 +86,15 @@ public class PlayerController : MonoBehaviour
         if(Input.GetKeyDown("l")){
             wc.PopBackWall();
         }
+        if (Input.GetKeyDown("v"))
+        {
+            SetShowingProjection();
+        }
+        //Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
+        if (Input.GetKeyDown("c"))
+        {
+            wcrt.CreatePoint(hit);
+        }
 
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
@@ -96,6 +114,29 @@ public class PlayerController : MonoBehaviour
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+        }
+    }
+    void SetShowingProjection()
+    {
+        if (hit.collider != null)
+        {
+            if (hit.collider.tag == "Wall")
+            {
+                //Debug.Log("hit: " + hit.collider.name);
+                WallInfo info = wc.FindWallInfoByGameObject(hit.collider.gameObject);
+                if (info != null)
+                {
+                    if (info.showLines)
+                    {
+                        wc.SetWallInfo(hit.collider.gameObject, false, false, false);
+                    }
+                    else
+                    {
+                        wc.SetWallInfo(hit.collider.gameObject, true, true, true);
+                    }
+                }
+
+            }
         }
     }
 

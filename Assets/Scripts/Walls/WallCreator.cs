@@ -16,8 +16,6 @@ public class WallCreator : MonoBehaviour
     /// Określa współrzędne środka ciężkości bryły, które służą jako punkt odniesienia np. do symulacji rotacji bryły 3D
     /// </summary>
     public Vector3 midPoint = new Vector3(0.0f, 1.0f, 0.0f);
-    private Ray ray;
-    private RaycastHit hit;
     private List<GameObject> points = new List<GameObject>();
 	private GameObject newWall;
 	private WallController wallController;
@@ -27,57 +25,16 @@ public class WallCreator : MonoBehaviour
 
     // Use this for initialization
     void Start () {
-		ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
 		GameObject wallsObject = GameObject.Find("Walls");
 		wallController = wallsObject.GetComponent<WallController>();
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		
 
-		if (Physics.Raycast(ray, out hit, 100))
-		{
-			//Debug.Log(hit.transform.name);
-			//Debug.Log("hit");
-			//Debug.DrawLine(ray.origin, hit.point, Color.red);
-
-		}
-
-		if (Input.GetKeyDown("v"))
-		{
-			if (hit.collider != null)
-            {
-				if (hit.collider.tag == "Wall")
-				{
-					//Debug.Log("hit: " + hit.collider.name);
-					WallInfo info = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
-					if (info != null)
-                    {
-						if (info.showLines)
-						{
-							wallController.SetWallInfo(hit.collider.gameObject, false, false, false);
-						}
-						else
-						{
-							wallController.SetWallInfo(hit.collider.gameObject, true, true, true);
-						}
-					}
-					
-				}
-			}
-			
-		}
-
-		//Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
-		if (Input.GetKeyDown("c"))
-		{
-			CreatePoint();
-		}
-	}
-
-	void CreatePoint() 
+	/// <summary>
+	/// Stworzy punkt na ścianie przez który będzie przechodzić nowa ściana
+	/// </summary>
+	/// <param name="hit">Metadane o kolizji</param>
+	public void CreatePoint(RaycastHit hit) 
 	{
 		WallInfo justHit = null;
 		
