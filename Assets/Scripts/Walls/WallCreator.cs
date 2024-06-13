@@ -21,23 +21,45 @@ public class WallCreator : MonoBehaviour
     private List<GameObject> points = new List<GameObject>();
 	private GameObject newWall;
 	private WallController wallController;
+    [SerializeField] GameObject flystick;
+	LineSegment rayline;
 	private WallInfo hitWallInfo = null;
 
 	private const float POINT_SIZE = 0.05f;
+	private const float RAY_WEIGHT = 0.005f;
+	private const float RAY_RANGE = 100f;
 
     // Use this for initialization
     void Start () {
-		ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
+		//ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
 		GameObject wallsObject = GameObject.Find("Walls");
 		wallController = wallsObject.GetComponent<WallController>();
-	}
+		
+        rayline = flystick.AddComponent<LineSegment>();
+        rayline.SetStyle(Color.red, RAY_WEIGHT);
+        rayline.SetCoordinates(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
+        rayline.SetLabel("", 0.01f, Color.white);
+        if (Lzwp.sync.isMaster)
+		{
+			Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button3).OnPress += () =>
+			{
+				SwitchWallVisibility();
+
+            };
+
+			Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button4).OnPress += () =>
+			{
+				CreatePoint();
+            };
+		}
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
-		ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		
-
-		if (Physics.Raycast(ray, out hit, 100))
+        ray = new Ray(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
+        rayline.SetCoordinates(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
+        if (Physics.Raycast(ray, out hit, 100))
 		{
 			//Debug.Log(hit.transform.name);
 			//Debug.Log("hit");
@@ -47,35 +69,38 @@ public class WallCreator : MonoBehaviour
 
 		if (Input.GetKeyDown("v"))
 		{
-			if (hit.collider != null)
-            {
-				if (hit.collider.tag == "Wall")
-				{
-					//Debug.Log("hit: " + hit.collider.name);
-					WallInfo info = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
-					if (info != null)
-                    {
-						if (info.showLines)
-						{
-							wallController.SetWallInfo(hit.collider.gameObject, false, false, false);
-						}
-						else
-						{
-							wallController.SetWallInfo(hit.collider.gameObject, true, true, true);
-						}
-					}
-					
-				}
-			}
-			
-		}
-
+			SwitchWallVisibility();
+        }
 		//Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
 		if (Input.GetKeyDown("c"))
 		{
 			CreatePoint();
 		}
 	}
+
+	void SwitchWallVisibility()
+	{
+        if (hit.collider != null)
+        {
+            if (hit.collider.tag == "Wall")
+            {
+                //Debug.Log("hit: " + hit.collider.name);
+                WallInfo info = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
+                if (info != null)
+                {
+                    if (info.showLines)
+                    {
+                        wallController.SetWallInfo(hit.collider.gameObject, false, false, false);
+                    }
+                    else
+                    {
+                        wallController.SetWallInfo(hit.collider.gameObject, true, true, true);
+                    }
+                }
+
+            }
+        }
+    }
 
 	void CreatePoint() 
 	{

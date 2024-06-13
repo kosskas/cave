@@ -34,6 +34,10 @@ public class PlayerController : MonoBehaviour
     //[HideInInspector]
 
     SolidImporter si;
+    /// <summary>
+    /// Zmienna czy gałka jest przechylona
+    /// </summary>
+    private bool is_tilted = false;
     void Start()
     {
         characterController = GetComponentInChildren<CharacterController>();
@@ -44,10 +48,67 @@ public class PlayerController : MonoBehaviour
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        if (Lzwp.sync.isMaster)
+        {
+            Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button1).OnPress += () => {
+                ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+                if (op)
+                {
+                    op.SetShowingProjectionLines();
+                }
+            };
+
+            Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button2).OnPress += () => {
+                ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+                if (op)
+                {
+                    op.SetShowingReferenceLines();
+                }
+            };
+
+            Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Joystick).OnPress += () => {
+                wc.PopBackWall();
+            };
+        }
     }
 
     void Update()
     {
+        if (Lzwp.sync.isMaster)
+        {
+            int flystickIdx = 0;
+            if (Lzwp.input.flysticks.Count > flystickIdx)
+            {
+                float x = Lzwp.input.flysticks[flystickIdx].joysticks[0];
+                if( x <= -0.8f)
+                {
+                    if (is_tilted == false)
+                    {
+                        wc.SetBasicWalls();
+                        wc.SetDefaultShowRules();
+                        si.SetDownDirection();
+                        si.ImportSolid();
+                        is_tilted = true;
+                    }
+                }
+                else if( x >= 0.8f)
+                {
+                    if (is_tilted == false)
+                    {
+                        wc.SetBasicWalls();
+                        wc.SetDefaultShowRules();
+                        si.SetUpDirection();
+                        si.ImportSolid();
+                        is_tilted = true;
+                    }
+                }
+                else
+                {
+                    is_tilted = false;
+                }
+            }
+        }
         ////
         /// NOTE: jedyny Input nie będący tutaj jest w pliku ObjectRotator!
         ///
@@ -94,7 +155,7 @@ public class PlayerController : MonoBehaviour
         {
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+            //playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
     }

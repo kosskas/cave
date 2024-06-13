@@ -33,12 +33,14 @@ public class Label : MonoBehaviour {
 	/// </summary>
 	TextMesh textMesh = null;
 
+	GameObject leftCamera = null;
+
 
 	// Use this for initialization
 	void Start ()
 	{
-		player = GameObject.Find("FPSPlayer");
-
+		//player = GameObject.Find("FPSPlayer");
+		leftCamera = GameObject.FindGameObjectWithTag("MainCamera");
 		textMesh = gameObject.AddComponent<TextMesh>();
 		textMesh.text = text;
 		textMesh.characterSize = fontSize;
@@ -57,8 +59,9 @@ public class Label : MonoBehaviour {
 	/// </summary>
 	private void RotateLabelToPlayer()
 	{
-		Vector3 playerPosition = player.transform.position;
-		Vector3 directionToPlayer = (playerPosition + 2*Vector3.up - gameObject.transform.position).normalized;
+		//Vector3 playerPosition = player.transform.position;
+		Vector3 leftcameraPos = leftCamera.transform.position;
+		Vector3 directionToPlayer = (leftcameraPos + 2*Vector3.up - gameObject.transform.position).normalized;
 
 		gameObject.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
 	}
