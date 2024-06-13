@@ -16,69 +16,21 @@ public class WallCreator : MonoBehaviour
     /// Określa współrzędne środka ciężkości bryły, które służą jako punkt odniesienia np. do symulacji rotacji bryły 3D
     /// </summary>
     public Vector3 midPoint = new Vector3(0.0f, 1.0f, 0.0f);
-    private Ray ray;
-    private RaycastHit hit;
     private List<GameObject> points = new List<GameObject>();
 	private GameObject newWall;
 	private WallController wallController;
-    [SerializeField] GameObject flystick;
-	LineSegment rayline;
+
 	private WallInfo hitWallInfo = null;
 
-	private const float POINT_SIZE = 0.05f;
-	private const float RAY_WEIGHT = 0.005f;
-	private const float RAY_RANGE = 100f;
+
 
     // Use this for initialization
     void Start () {
-		//ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
 		GameObject wallsObject = GameObject.Find("Walls");
 		wallController = wallsObject.GetComponent<WallController>();
-		
-        rayline = flystick.AddComponent<LineSegment>();
-        rayline.SetStyle(Color.red, RAY_WEIGHT);
-        rayline.SetCoordinates(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
-        rayline.SetLabel("", 0.01f, Color.white);
-        if (Lzwp.sync.isMaster)
-		{
-			Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button3).OnPress += () =>
-			{
-				SwitchWallVisibility();
-
-            };
-
-			Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button4).OnPress += () =>
-			{
-				CreatePoint();
-            };
-		}
-
     }
 	
-	// Update is called once per frame
-	void Update () {
-        ray = new Ray(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
-        rayline.SetCoordinates(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
-        if (Physics.Raycast(ray, out hit, 100))
-		{
-			//Debug.Log(hit.transform.name);
-			//Debug.Log("hit");
-			//Debug.DrawLine(ray.origin, hit.point, Color.red);
-
-		}
-
-		if (Input.GetKeyDown("v"))
-		{
-			SwitchWallVisibility();
-        }
-		//Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
-		if (Input.GetKeyDown("c"))
-		{
-			CreatePoint();
-		}
-	}
-
-	void SwitchWallVisibility()
+	public void SwitchWallVisibility(RaycastHit hit)
 	{
         if (hit.collider != null)
         {
@@ -101,8 +53,12 @@ public class WallCreator : MonoBehaviour
             }
         }
     }
-
-	void CreatePoint() 
+    /// <summary>
+    /// Stworzy punkt na ścianie przez który będzie przechodzić nowa ściana
+    /// </summary>
+    /// <param name="hit">Metadane o kolizji</param>
+    /// <param name="POINT_SIZE">Rozmiar punktu</param>
+    public void CreatePoint(RaycastHit hit,float POINT_SIZE) 
 	{
 		WallInfo justHit = null;
 		

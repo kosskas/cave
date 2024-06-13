@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
     public bool canMove = true;
     CharacterController characterController;
     WallController wc;
+    WallCreator wcrt;
     Vector3 moveDirection = Vector3.zero;
     float rotationX = 0;
     //[HideInInspector]
@@ -38,13 +39,27 @@ public class PlayerController : MonoBehaviour
     /// Zmienna czy gałka jest przechylona
     /// </summary>
     private bool is_tilted = false;
+    private Ray ray;
+    private RaycastHit hit;
+    [SerializeField] GameObject flystick;
+    LineSegment rayline;
+    private const float POINT_SIZE = 0.05f;
+    private const float RAY_WEIGHT = 0.005f;
+    private const float RAY_RANGE = 100f;
     void Start()
     {
+        ray =  Camera.main.ScreenPointToRay(Input.mousePosition); rayline = flystick.AddComponent<LineSegment>();
+        rayline.SetStyle(Color.red, RAY_WEIGHT);
+        rayline.SetCoordinates(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
+        rayline.SetLabel("", 0.01f, Color.white);
+
+
         characterController = GetComponentInChildren<CharacterController>();
         GameObject mainObject = GameObject.Find("MainObject");
         si = mainObject.GetComponent<SolidImporter>();
         GameObject wallsObject = GameObject.Find("Walls");
         wc = wallsObject.GetComponent<WallController>();
+        wcrt = gameObject.GetComponent<WallCreator>();
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -66,6 +81,15 @@ public class PlayerController : MonoBehaviour
                     op.SetShowingReferenceLines();
                 }
             };
+            Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button3).OnPress += () =>
+            {
+                wcrt.SwitchWallVisibility(hit);
+
+            };
+            Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Button4).OnPress += () =>
+            {
+                wcrt.CreatePoint(hit, POINT_SIZE);
+            };
 
             Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Joystick).OnPress += () => {
                 wc.PopBackWall();
@@ -75,6 +99,11 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        ///Raycasting
+        ray = new Ray(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
+        rayline.SetCoordinates(flystick.transform.position, flystick.transform.forward * RAY_RANGE);
+        Physics.Raycast(ray, out hit, 100);
+
         if (Lzwp.sync.isMaster)
         {
             int flystickIdx = 0;
@@ -109,11 +138,12 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
         ////
         /// NOTE: jedyny Input nie będący tutaj jest w pliku ObjectRotator!
         ///
         //from solidimporter
-        if(Input.GetKeyDown("p"))
+        if (Input.GetKeyDown("p"))
         {
             wc.SetBasicWalls();
             wc.SetDefaultShowRules();
@@ -138,6 +168,15 @@ public class PlayerController : MonoBehaviour
         if(Input.GetKeyDown("l")){
             wc.PopBackWall();
         }
+        if (Input.GetKeyDown("v"))
+        {
+            wcrt.SwitchWallVisibility(hit);
+        }
+        //Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
+        if (Input.GetKeyDown("c"))
+        {
+            wcrt.CreatePoint(hit, POINT_SIZE);
+        }
 
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
@@ -159,5 +198,4 @@ public class PlayerController : MonoBehaviour
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
     }
-
 }
