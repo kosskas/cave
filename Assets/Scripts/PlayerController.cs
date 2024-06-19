@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     CharacterController characterController;
     WallController wc;
     WallCreator wcrt;
+    PointPlacer pp;
     Vector3 moveDirection = Vector3.zero;
     float rotationX = 0;
     //[HideInInspector]
@@ -56,6 +57,7 @@ public class PlayerController : MonoBehaviour
         GameObject wallsObject = GameObject.Find("Walls");
         wc = wallsObject.GetComponent<WallController>();
         wcrt = gameObject.GetComponent<WallCreator>();
+        pp = gameObject.GetComponent<PointPlacer>();
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -68,7 +70,7 @@ public class PlayerController : MonoBehaviour
         ///Raycasting
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Physics.Raycast(ray, out hit, 100);
-        
+
         ////
         /// NOTE: jedyny Input nie będący tutaj jest w pliku ObjectRotator!
         ///
@@ -131,7 +133,7 @@ public class PlayerController : MonoBehaviour
 
     void Update2Dto3D()
     {
-        
+        pp.MovePointPrototype(hit);
     }
 
     void Update3Dto2D()
