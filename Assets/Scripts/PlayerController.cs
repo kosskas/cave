@@ -51,14 +51,9 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
+
         characterController = GetComponentInChildren<CharacterController>();
-        GameObject mainObject = GameObject.Find("MainObject");
-        si = mainObject.GetComponent<SolidImporter>();
-        GameObject wallsObject = GameObject.Find("Walls");
-        wc = wallsObject.GetComponent<WallController>();
-        wcrt = gameObject.GetComponent<WallCreator>();
-        pp = gameObject.GetComponent<PointPlacer>();
-        pp.CreatePoint();
+
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -123,11 +118,24 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown("1"))
         {
             mode = PlayerControllerMode.Mode3Dto2D;
+
+            GameObject mainObject = GameObject.Find("MainObject");
+            si = mainObject.GetComponent<SolidImporter>();
+            
+            GameObject wallsObject = GameObject.Find("Walls");
+            wc = wallsObject.GetComponent<WallController>();
+            wcrt = gameObject.GetComponent<WallCreator>();
+
             Debug.Log($"<color=blue> MODE grupowy ON </color>");
         }
         else if (Input.GetKeyDown("2"))
         {
             mode = PlayerControllerMode.Mode2Dto3D;
+
+            pp = gameObject.GetComponent<PointPlacer>();
+            pp.CreatePoint();
+            pp.MovePointPrototype(hit);
+
             Debug.Log($"<color=blue> MODE inzynierka ON </color>");
         }
     }
