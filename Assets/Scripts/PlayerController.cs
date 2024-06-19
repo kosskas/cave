@@ -58,6 +58,7 @@ public class PlayerController : MonoBehaviour
         wc = wallsObject.GetComponent<WallController>();
         wcrt = gameObject.GetComponent<WallCreator>();
         pp = gameObject.GetComponent<PointPlacer>();
+        pp.CreatePoint();
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;

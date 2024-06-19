@@ -7,7 +7,9 @@ public class PointPlacer : MonoBehaviour {
 	// Use this for initialization
 	private GameObject point;
 	private const float POINT_SIZE = 0.05f;
-	void Start () {
+
+	public void CreatePoint() 
+    {
 		point = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         Renderer pointRenderer = point.GetComponent<Renderer>();
 
@@ -33,7 +35,6 @@ public class PointPlacer : MonoBehaviour {
         point.layer = LayerMask.NameToLayer("Ignore Raycast");
     }
 	
-
 	public void MovePointPrototype(RaycastHit hit)
     {
 		if (hit.collider != null)
