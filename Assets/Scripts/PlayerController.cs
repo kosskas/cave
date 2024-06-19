@@ -1,6 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+public enum PlayerControllerMode
+{
+    ModeMenu,
+    Mode3Dto2D,
+    Mode2Dto3D
+}
+
 /// <summary>
 /// Klasa PlayerController jest klasą strerującą graczem w aplikacji. Obsługuje ruch gracza po mapie oraz wszelkie dodatkowe czynności inicjowane przyciskiem z klawiatury.
 /// </summary>
@@ -27,6 +35,8 @@ public class PlayerController : MonoBehaviour
     /// Zmienna warunkowa, określająca czy gracz może się poruszać.
     /// </summary>
     public bool canMove = true;
+
+    PlayerControllerMode mode = PlayerControllerMode.ModeMenu;
     CharacterController characterController;
     WallController wc;
     WallCreator wcrt;
@@ -49,6 +59,8 @@ public class PlayerController : MonoBehaviour
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        Debug.Log($"<color=blue> [MODE MENU]  1 -> grp  ,  2 -> inz  [MODE MENU] </color>");
     }
 
     void Update()
@@ -56,44 +68,30 @@ public class PlayerController : MonoBehaviour
         ///Raycasting
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Physics.Raycast(ray, out hit, 100);
-
+        
         ////
         /// NOTE: jedyny Input nie będący tutaj jest w pliku ObjectRotator!
         ///
         //from solidimporter
-        if (Input.GetKeyDown("p"))
+
+        switch (mode)
         {
-            wc.SetBasicWalls();
-            wc.SetDefaultShowRules();
-            si.SetUpDirection();
-            si.ImportSolid();
-        }
-        if (Input.GetKeyDown("u"))
-        {
-            wc.SetBasicWalls();
-            wc.SetDefaultShowRules();
-            si.SetDownDirection();
-            si.ImportSolid();
-        }
-        if (Input.GetKeyDown("o")){
-            ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
-            op.SetShowingProjectionLines();
-        }
-        if(Input.GetKeyDown("i")){
-            ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
-            op.SetShowingReferenceLines();
-        }
-        if(Input.GetKeyDown("l")){
-            wc.PopBackWall();
-        }
-        if (Input.GetKeyDown("v"))
-        {
-            SetShowingProjection();
-        }
-        //Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
-        if (Input.GetKeyDown("c"))
-        {
-            wcrt.CreatePoint(hit);
+            case PlayerControllerMode.ModeMenu:
+                UpdateMenu();
+                break;
+
+            case PlayerControllerMode.Mode2Dto3D:
+                Update2Dto3D();
+                break;
+
+            case PlayerControllerMode.Mode3Dto2D:
+                Update3Dto2D();
+                break;
+
+            default:
+                Debug.Log("[i] switch(PlayerControllerMode) default case");
+                mode = PlayerControllerMode.ModeMenu;
+                break;
         }
 
         Vector3 forward = transform.TransformDirection(Vector3.forward);
@@ -116,6 +114,73 @@ public class PlayerController : MonoBehaviour
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
     }
+
+    void UpdateMenu()
+    {
+        if (Input.GetKeyDown("1"))
+        {
+            mode = PlayerControllerMode.Mode3Dto2D;
+            Debug.Log($"<color=blue> MODE grupowy ON </color>");
+        }
+        else if (Input.GetKeyDown("2"))
+        {
+            mode = PlayerControllerMode.Mode2Dto3D;
+            Debug.Log($"<color=blue> MODE inzynierka ON </color>");
+        }
+    }
+
+    void Update2Dto3D()
+    {
+        
+    }
+
+    void Update3Dto2D()
+    {
+        if (Input.GetKeyDown("p"))
+        {
+            wc.SetBasicWalls();
+            wc.SetDefaultShowRules();
+            si.SetUpDirection();
+            si.ImportSolid();
+        }
+
+        if (Input.GetKeyDown("u"))
+        {
+            wc.SetBasicWalls();
+            wc.SetDefaultShowRules();
+            si.SetDownDirection();
+            si.ImportSolid();
+        }
+
+        if (Input.GetKeyDown("o"))
+        {
+            ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+            op.SetShowingProjectionLines();
+        }
+        
+        if(Input.GetKeyDown("i"))
+        {
+            ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
+            op.SetShowingReferenceLines();
+        }
+
+        if(Input.GetKeyDown("l"))
+        {
+            wc.PopBackWall();
+        }
+
+        if (Input.GetKeyDown("v"))
+        {
+            SetShowingProjection();
+        }
+
+        //Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
+        if (Input.GetKeyDown("c"))
+        {
+            wcrt.CreatePoint(hit);
+        }
+    }
+
     void SetShowingProjection()
     {
         if (hit.collider != null)
