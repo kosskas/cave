@@ -7,20 +7,9 @@ public class PointPlacer : MonoBehaviour {
 	// Use this for initialization
 	private GameObject point;
 	private const float POINT_SIZE = 0.05f;
-    private const float POINT_DIAMETER = 0.015f;                        // 0.009f
-    private const float LINE_WEIGHT = 0.008f;                           // 0.005f
-
-    private const float ON_WALL_POINT_DIAMETER = 0.5f * POINT_DIAMETER; // 0.009f
-    private const float ON_WALL_LINE_WEIGHT = 0.5f * LINE_WEIGHT;       // 0.005f
-
-    private const float CONSTRUCTION_LINE_WEIGHT = 2.0f * 0.001f;
-    private const float ADDITIONAL_CONSTRUCTION_LINE_WEIGHT = 2.0f * 0.001f;
-    private const float AXIS_WEIGHT = 0.002f;
-
+    private const float POINT_DIAMETER = 0.015f;
 
     private const float VERTEX_LABEL_SIZE = 0.04f;
-    private const float EDGE_LABEL_SIZE = 0.01f;
-
 
     private Color LABEL_COLOR = Color.white;
     private Color POINT_COLOR = Color.black;
@@ -101,6 +90,8 @@ public class PointPlacer : MonoBehaviour {
 
 
                 ///TODO włóż do struktury pointy per ściana
+                WallInfo wall = wc.FindWallInfoByGameObject(hit.collider.gameObject);
+                mc.AddPointProjection(wall, label, placedPoint);
             }
         }
 
