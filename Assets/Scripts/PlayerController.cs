@@ -134,6 +134,8 @@ public class PlayerController : MonoBehaviour
             mode = PlayerControllerMode.Mode2Dto3D;
 
             gc = new GridCreator();
+            GameObject wallsObject = GameObject.Find("Walls");
+            wc = wallsObject.GetComponent<WallController>();
 
             pp = gameObject.GetComponent<PointPlacer>();
             pp.CreatePoint();
