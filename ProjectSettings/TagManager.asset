@@ -7,6 +7,8 @@ TagManager:
   - Viewport
   - Solid
   - Wall
+  - GridLine
+  - GridPoint
   layers:
   - Default
   - TransparentFX
