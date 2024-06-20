@@ -148,7 +148,7 @@ public class PlayerController : MonoBehaviour
     void Update2Dto3D()
     {
         pp.MovePointPrototype(hit);
-        if (Input.GetKeyDown("p"))
+        if (Input.GetKeyDown("c"))
         {
             pp.PlacePoint(hit);
         }
