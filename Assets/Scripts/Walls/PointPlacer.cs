@@ -8,6 +8,16 @@ public class PointPlacer : MonoBehaviour {
 	private GameObject point;
 	private const float POINT_SIZE = 0.05f;
 
+    private GameObject pointsDir;
+    private WallController wc;
+
+    void Start()
+    {
+        pointsDir = new GameObject("PointsDir");
+        GameObject wallsObject = GameObject.Find("Walls");
+        wc = wallsObject.GetComponent<WallController>();
+    }
+
 	public void CreatePoint() 
     {
 		point = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -48,4 +58,25 @@ public class PointPlacer : MonoBehaviour {
 		}
 		
 	}
+
+    public GameObject PlacePoint(RaycastHit hit)
+    {
+        GameObject placedPoint = null;
+        if (hit.collider != null)
+        {
+            if (hit.collider.tag == "Wall")
+            {
+                ///TODO sprawdz czy na gridzie
+                ///TODO nadaj Etykiete
+                placedPoint = Instantiate(point);
+                placedPoint.transform.parent = pointsDir.transform;
+                placedPoint.name += wc.FindWallInfoByGameObject(hit.collider.gameObject).name;
+
+                ///TODO włóż do struktury pointy per ściana
+            }
+        }
+
+        
+        return placedPoint;
+    }
 }

@@ -134,6 +134,8 @@ public class PlayerController : MonoBehaviour
             mode = PlayerControllerMode.Mode2Dto3D;
 
             gc = new GridCreator();
+            GameObject wallsObject = GameObject.Find("Walls");
+            wc = wallsObject.GetComponent<WallController>();
 
             pp = gameObject.GetComponent<PointPlacer>();
             pp.CreatePoint();
@@ -146,6 +148,10 @@ public class PlayerController : MonoBehaviour
     void Update2Dto3D()
     {
         pp.MovePointPrototype(hit);
+        if (Input.GetKeyDown("p"))
+        {
+            pp.PlacePoint(hit);
+        }
     }
 
     void Update3Dto2D()
