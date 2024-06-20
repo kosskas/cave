@@ -146,6 +146,12 @@ public class PlayerController : MonoBehaviour
     void Update2Dto3D()
     {
         pp.MovePointPrototype(hit);
+
+        if (Input.GetKeyDown("p"))
+        {
+            pp.OnClick(hit);
+        }
+
     }
 
     void Update3Dto2D()

@@ -6,12 +6,15 @@ public class PointPlacer : MonoBehaviour {
 
 	// Use this for initialization
 	private GameObject point;
+    private Renderer pointRenderer;
 	private const float POINT_SIZE = 0.05f;
+
+    private List<GameObject> activePoints = new List<GameObject>();
 
 	public void CreatePoint() 
     {
 		point = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        Renderer pointRenderer = point.GetComponent<Renderer>();
+        pointRenderer = point.GetComponent<Renderer>();
 
         // Tworzymy nowy materiał
         Material transparentMaterial = new Material(Shader.Find("Standard"));
@@ -39,13 +42,43 @@ public class PointPlacer : MonoBehaviour {
     {
 		if (hit.collider != null)
         {
-            if (hit.collider.tag == "Wall")
+            if (hit.collider.tag != "Wall" && hit.collider.tag != "GridPoint")
             {
-                point.transform.localScale = new Vector3(POINT_SIZE, POINT_SIZE, POINT_SIZE);
-                point.transform.position = hit.point;
+                return;
             }
+
+            pointRenderer.material.color = (hit.collider.tag == "GridPoint") ? new Color(1, 0, 0, 1f) : new Color(1, 1, 1, 0.3f);
+            
+            point.transform.localScale = new Vector3(POINT_SIZE, POINT_SIZE, POINT_SIZE);
+            point.transform.position = hit.point;
 			
 		}
 		
 	}
+
+    public void OnClick(RaycastHit hit)
+    {
+        if (hit.collider != null)
+        {
+            if (hit.collider.tag == "GridPoint")
+            {
+                GameObject pointClicked = hit.collider.gameObject;
+
+                Renderer pointRenderer = pointClicked.GetComponent<Renderer>();
+                pointRenderer.enabled = !pointRenderer.enabled;
+
+                if (pointRenderer.enabled)
+                {
+                    activePoints.Add(pointClicked);
+                }
+                else
+                {
+                    activePoints.Remove(pointClicked);
+                }
+
+                //Debug.Log($"{hit.collider.tag} = {hit.collider.gameObject.name}");
+                Debug.Log($"Num of activePoints = {activePoints.Count}");
+            }
+        }
+    }
 }
