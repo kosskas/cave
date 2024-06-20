@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     WallController wc;
     WallCreator wcrt;
     PointPlacer pp;
+    GridCreator gc;
     Vector3 moveDirection = Vector3.zero;
     float rotationX = 0;
     //[HideInInspector]
@@ -131,6 +132,8 @@ public class PlayerController : MonoBehaviour
         else if (Input.GetKeyDown("2"))
         {
             mode = PlayerControllerMode.Mode2Dto3D;
+
+            gc = new GridCreator();
 
             pp = gameObject.GetComponent<PointPlacer>();
             pp.CreatePoint();
