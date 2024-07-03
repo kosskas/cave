@@ -13,11 +13,15 @@ public class PointPlacer : MonoBehaviour {
     private const float VERTEX_LABEL_SIZE = 0.04f;
 
     private Color LABEL_COLOR = Color.white;
+    private int labelText = 1;
     private Color POINT_COLOR = Color.black;
 
     private GameObject pointsDir;
     private WallController wc;
     private MeshBuilder mc;
+
+    //private List<GameObject> activePoints = new List<GameObject>();
+
 
     void Start()
     {
@@ -27,7 +31,34 @@ public class PointPlacer : MonoBehaviour {
         mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
     }
 
-    private List<GameObject> activePoints = new List<GameObject>();
+
+    /// <summary>
+    /// Metoda określa na której ścianie znajduje się punkt trafiony Raycastem
+    /// </summary>
+    /// <param name="wallNormal">Wektor normalny collidera punktu trafionego Raycastem</param>
+    /// <param name="pointPosition">Współrzędne trafionego punktu</param>
+    /// <returns>Obiekt opisujący ścianę, na której najprawdopodobniej znajduje się trafiony punkt</returns>
+    private WallInfo EstimateWall(Vector3 wallNormal, Vector3 pointPosition)
+    {
+        List<WallInfo> walls = wc.GetWalls();
+        WallInfo closestWall = null;
+        float distanceToClosestWall = Mathf.Infinity;
+        
+        foreach (var wall in walls)
+        {
+            float distance = Vector3.Distance(wall.gameObject.transform.position, pointPosition);
+
+            if (distance < distanceToClosestWall && wall.GetNormal() == wallNormal)
+            {
+                closestWall = wall;
+                distanceToClosestWall = distance;
+                //Debug.Log($"num: {closestWall.number}  Nwall: {wall.GetNormal()}  Nhit: {wallNormal} - {distanceToClosestWall}");
+            }
+        }
+
+        return closestWall;
+    }
+
 
 	public void CreatePoint() 
     {
@@ -65,9 +96,6 @@ public class PointPlacer : MonoBehaviour {
                 return;
             }
 
-            // point.transform.localScale = new Vector3(POINT_SIZE, POINT_SIZE, POINT_SIZE);
-            // point.transform.position = hit.point; ///Z-FIGHTING!!!
-
             pointRenderer.material.color = (hit.collider.tag == "GridPoint") ? new Color(1, 0, 0, 1f) : new Color(1, 1, 1, 0.3f);
             
             point.transform.localScale = new Vector3(POINT_SIZE, POINT_SIZE, POINT_SIZE);
@@ -84,52 +112,30 @@ public class PointPlacer : MonoBehaviour {
             if (hit.collider.tag == "GridPoint")
             {
                 GameObject pointClicked = hit.collider.gameObject;
+                Point point = pointClicked.GetComponent<Point>();
 
-                Renderer pointRenderer = pointClicked.GetComponent<Renderer>();
-                pointRenderer.enabled = !pointRenderer.enabled;
+                WallInfo wall = this.EstimateWall(hit.normal, point.GetCoordinates());
 
-                if (pointRenderer.enabled)
+                //if (activePoints.Contains(pointClicked))
+                if (point.IsEnabled())
                 {
-                    activePoints.Add(pointClicked);
+                    //activePoints.Remove(pointClicked);
+                    mc.RemovePointProjection(wall, pointClicked);
+                    point.SetEnable(false);
                 }
                 else
                 {
-                    activePoints.Remove(pointClicked);
+                    point.SetLabel($"{labelText}", VERTEX_LABEL_SIZE, LABEL_COLOR);
+                    mc.AddPointProjection(wall, $"{labelText}", pointClicked);
+                    labelText++;
+
+                    //activePoints.Add(pointClicked);
+                    point.SetEnable(true);
                 }
 
-                //Debug.Log($"{hit.collider.tag} = {hit.collider.gameObject.name}");
-                Debug.Log($"Num of activePoints = {activePoints.Count}");
+                //Debug.Log($"Num of activePoints = {activePoints.Count}");
             }
         }
     }
-    
-    public void PlacePoint(RaycastHit hit)
-    {
-        const float antiztrack = 0.01f;
-        GameObject placedPoint = null;
-        string label = "PKT";
-        if (hit.collider != null)
-        {
-            if (hit.collider.tag == "Wall")
-            {
-                ///TODO sprawdz czy sciana wgl wyswietla grid
-                ///TODO sprawdz czy na gridzie
-                ///TODO nadaj Etykiete
-                placedPoint = new GameObject("WallPoint");
-                placedPoint.transform.parent = pointsDir.transform;
-                Vector3 antiztrackhit = hit.point + antiztrack * hit.normal;
 
-                Point vertexObject = placedPoint.AddComponent<Point>();
-                vertexObject.SetStyle(POINT_COLOR, POINT_DIAMETER);
-                vertexObject.SetCoordinates(antiztrackhit);
-                vertexObject.SetLabel(label, VERTEX_LABEL_SIZE, LABEL_COLOR);
-
-
-                ///TODO włóż do struktury pointy per ściana
-                WallInfo wall = wc.FindWallInfoByGameObject(hit.collider.gameObject);
-                mc.AddPointProjection(wall, label, placedPoint);
-            }
-        }
-
-    }
 }
