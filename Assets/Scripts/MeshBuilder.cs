@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class MeshBuilder : MonoBehaviour {
 
@@ -41,13 +42,24 @@ public class MeshBuilder : MonoBehaviour {
 		
 	}
 
-	public void AddPointProjection(WallInfo wall, string label, GameObject pointobject)
+	public void AddPointProjection(WallInfo wall, string label, GameObject pointObject)
 	{
 		if (!verticesOnWalls.ContainsKey(wall)) {
 			verticesOnWalls[wall] = new Dictionary<string, GameObject>();
         }
-		verticesOnWalls[wall][label] = pointobject;
+		verticesOnWalls[wall][label] = pointObject;
 
-		Debug.Log("Punkt " + pointobject.transform.position + " N=" + wall.GetNormal());
+		Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()}");
+	}
+
+	public void RemovePointProjection(WallInfo wall, GameObject pointObject)
+	{
+		if (verticesOnWalls.ContainsKey(wall)) {
+			var pointToRemove = verticesOnWalls[wall].FirstOrDefault(kvp => kvp.Value == pointObject);
+			if (pointToRemove.Key != null) {
+				verticesOnWalls[wall].Remove(pointToRemove.Key);
+				Debug.Log($"Point removed: wall[{wall.number}] label[{pointToRemove.Key}] ");
+			}
+		}
 	}
 }
