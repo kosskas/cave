@@ -149,7 +149,7 @@ public class PlayerController : MonoBehaviour
     {
         pp.MovePointPrototype(hit);
 
-        if (Input.GetKeyDown("p"))
+        if (Input.GetKeyDown("space"))
         {
             pp.OnClick(hit);
         }
