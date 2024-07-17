@@ -1,4 +1,5 @@
-***Projekt grupowy 2023-2024*** <\br>
+***Projekt grupowy 2023-2024***
+<br/>
 
 Celem projektu jest stworzenie aplikacji, która ułatwi studentom zrozumienie, jak powstają rzuty obiektów 3D na płaszczyznę i wyjaśni geometryczne metody rozwiązywania zadań w przestrzeni. Pomoże ona studentom odróżnić rzut środkowy od równoległego, aksonometrię od perspektywy oraz rozwinie wyobraźnię przestrzenną.
 
