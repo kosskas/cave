@@ -4,9 +4,21 @@ using UnityEngine;
 using System.Linq;
 using System.Threading;
 
+
 public class MeshBuilder : MonoBehaviour {
-	
-	private class PointProjection
+    /*TODO
+     * Przypadki przy dodawaniu
+     * Sprawdz numeryczne porownianie
+     * Aktualizuj info jakie krawędzie między wierzchołkami	 
+     * Jak się określi krawędzie to zrób to samo w 3D
+     * Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
+	 * Kiedy jest juz to ten ray tylko do wierch ale nie w INF
+	 * podswietl dodawany na czerwono jesli zla plaszcz, umiejscowienie trzeciego
+	 * usun takze 3D kiedy są tylko 2
+     * jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly
+     * dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
+	*/
+    private class PointProjection
 	{
 		public GameObject pointObject;
 
@@ -90,34 +102,53 @@ public class MeshBuilder : MonoBehaviour {
 		//sprawdz czy istnieja już dwa
 		List<GameObject> currPts = GetCurrentPointProjections(label);
 
-		if(currPts.Count < 1)
+		if(currPts.Count == 0)
 		{
+            Debug.Log("Pierwszy");
             //nie bylo zadnych rzutow tego pktu
             //bedzie 1
             verticesOnWalls[wall][label] = pointObject;
         }
-        if (currPts.Count < 2)
+        else if (currPts.Count == 1)
         {
+            Debug.Log("Drugi");
             //jest juz 1 bedzie 2
             //podejmij rekonstrukcje
             //sprawdz plawszczyzny
-            Status result = ReconstructPoint(label);
+            Status result = ReconstructPoint(pointObject, label);
+            if(result == Status.PLANE_ERR)
+            {
+                //podswietl dodawany na czerwono
+                Debug.Log($"Rzuty pktu nie leza na jednej plaszczyznie");
+            }
+            if(result == Status.OK)
+            {
+                verticesOnWalls[wall][label] = pointObject;
+            }
         }
         else
 		{
-			//sa juz 2
-			//sprawdz czy dobrze postawiony trzeci
-            Vector3 rzut1 = currPts[0].transform.position;
-            Vector3 rzut2 = currPts[1].transform.position;
+            Debug.Log("Trzeci");
+            //sa juz 2
+            //sprawdz czy dobrze postawiony trzeci
+            Vector3 proj1 = currPts[0].transform.position;
+            Vector3 proj2 = currPts[1].transform.position;
 
-			Vector3 rzut3 = pointObject.transform.position;
+			Vector3 third_proj = pointObject.transform.position;
 
-            Vector3 test1 = RecreatePoint(rzut1, rzut2);
-            Vector3 test2 = RecreatePoint(rzut2, rzut3);
-            Vector3 test3 = RecreatePoint(rzut1, rzut3);
-
-
-
+            Vector3 test1 = RecreatePoint(proj1, proj2);
+            Vector3 test2 = RecreatePoint(proj2, third_proj);
+            Vector3 test3 = RecreatePoint(proj1, third_proj);
+            if(test2 == test3)
+            {
+                Debug.Log("3 polozony OK");
+                verticesOnWalls[wall][label] = pointObject;
+            }
+            else
+            {
+                //podswietl dodawany na czerwono
+                Debug.Log("3 polozony ZLE");
+            }
         }
         Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObject.transform.position}");
 
@@ -142,11 +173,13 @@ public class MeshBuilder : MonoBehaviour {
         //jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d
 	}
 
-	private Status ReconstructPoint(string label)
+	private Status ReconstructPoint(GameObject pointObject, string label)
 	{
 		int licz = 0;
 
         List<GameObject> pointsInfo = GetCurrentPointProjections(label);
+        pointsInfo.Add(pointObject);
+
         //sprawdz ile jest juz rzutow jednego pktu
         licz = pointsInfo.Count;
 		///ja nie wiem w jakiej kolejności to wypluwa rzuty. dopoki sa 2 to ok
@@ -172,13 +205,8 @@ public class MeshBuilder : MonoBehaviour {
             }
 			else
 			{
-				//podswietl je na czerwono
-                Debug.Log($"Rzuty pktu nie leza na jednej plaszczyznie");
                 return Status.PLANE_ERR;
-
             }
-
-
         }
 		if (licz > 2)
 		{
