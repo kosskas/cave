@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Threading;
+using UnityEditorInternal;
 
 
 public class MeshBuilder : MonoBehaviour {
@@ -41,7 +42,11 @@ public class MeshBuilder : MonoBehaviour {
     /// 
 
     Dictionary<WallInfo, Dictionary<string, GameObject>> verticesOnWalls;
-	Dictionary<string, Point> vertices3D;
+
+    /// <summary>
+    /// Get compoment Point
+    /// </summary>
+	Dictionary<string, GameObject> vertices3D;
 
     Dictionary<string, List<string>> edges;
 	GameObject reconstrVertDir;
@@ -66,7 +71,7 @@ public class MeshBuilder : MonoBehaviour {
         verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, GameObject>>();
 
 		edges = new Dictionary<string, List<string>>();
-		vertices3D = new Dictionary<string, Point>();
+		vertices3D = new Dictionary<string, GameObject>();
     }
 
 	// Update is called once per frame
@@ -90,10 +95,14 @@ public class MeshBuilder : MonoBehaviour {
 				///Kiedy jest juz to ten ray tylko do wierch ale nie w INF
 				///opt: jezeli jest kilka wspolniliowych to linia tylko to najdluzszego?
             }
-		}
-		
-	}
-
+        }
+    }
+    /// <summary>
+    /// Dodane rzut punktu z listy punktów odtwarzanego obiektu 3D
+    /// </summary>
+    /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
+    /// <param name="label">Etykieta rzutu</param>
+    /// <param name="pointObject">Informacje o rzucie</param>
 	public void AddPointProjection(WallInfo wall, string label, GameObject pointObject)
 	{
 		if (!verticesOnWalls.ContainsKey(wall)) {
@@ -139,7 +148,11 @@ public class MeshBuilder : MonoBehaviour {
             Vector3 test1 = RecreatePoint(proj1, proj2);
             Vector3 test2 = RecreatePoint(proj2, third_proj);
             Vector3 test3 = RecreatePoint(proj1, third_proj);
-            if(test2 == test3)
+            Debug.Log($"Test1  ---- {test1.x} {test1.y} {test1.z}");
+            Debug.Log($"Test2  ---- {test2.x} {test2.y} {test2.z}");
+            Debug.Log($"Test3  ---- {test3.x} {test3.y} {test3.z}");
+
+            if (test2 == test3)
             {
                 Debug.Log("3 polozony OK");
                 verticesOnWalls[wall][label] = pointObject;
@@ -150,35 +163,36 @@ public class MeshBuilder : MonoBehaviour {
                 Debug.Log("3 polozony ZLE");
             }
         }
-        Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObject.transform.position}");
-
-        //* Gdy 2 o tej samej etykiecie, na innych ścianach, sprawdź czy można postawić w 3D 
-        //sprawdz czy juz są dwa - postaw 3 z automatu?
-
-
-
+        Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObject.transform.position.x} {pointObject.transform.position.y} {pointObject.transform.position.z}");
     }
-
+    /// <summary>
+    /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D
+    /// </summary>
+    /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
+    /// <param name="pointObject">Informacje o rzucie</param>
     public void RemovePointProjection(WallInfo wall, GameObject pointObject)
 	{
-		//rozszerzyć o label
-		if (verticesOnWalls.ContainsKey(wall)) {
-			var pointToRemove = verticesOnWalls[wall].FirstOrDefault(kvp => kvp.Value == pointObject);
-			if (pointToRemove.Key != null) {
-				verticesOnWalls[wall].Remove(pointToRemove.Key);
-				Debug.Log($"Point removed: wall[{wall.number}] label[{pointToRemove.Key}] ");
-			}
-		}
+        //rozszerzyć o label
+        if (!verticesOnWalls.ContainsKey(wall))
+            return;
+        var pointToRemove = verticesOnWalls[wall].FirstOrDefault(kvp => kvp.Value == pointObject);
+
+        if (pointToRemove.Key == null)
+            return;
+
+        verticesOnWalls[wall].Remove(pointToRemove.Key);
+        Debug.Log($"Point removed: wall[{wall.number}] label[{pointToRemove.Key}] ");
+          
 		//usun takze 3D
         //jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d
-	}
 
+	}
 	private Status ReconstructPoint(GameObject pointObject, string label)
 	{
 		int licz = 0;
 
         List<GameObject> pointsInfo = GetCurrentPointProjections(label);
-        pointsInfo.Add(pointObject);
+        pointsInfo.Add(pointObject); //dodaj do listy ten jeszcze nie dodany
 
         //sprawdz ile jest juz rzutow jednego pktu
         licz = pointsInfo.Count;
@@ -199,7 +213,7 @@ public class MeshBuilder : MonoBehaviour {
                 vertexObject.SetCoordinates(pkt3D);
                 vertexObject.SetLabel(label, VERTEX_LABEL_SIZE, Color.white);
 
-                vertices3D[label] = vertexObject;
+                vertices3D[label] = obj;
                 return Status.OK;
 
             }
