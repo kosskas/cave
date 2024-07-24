@@ -159,9 +159,9 @@ public class PointPlacer : MonoBehaviour {
                 point.SetStyle(Color.black, 0.01f); //niech gridcreator wystawia wartosci
                 point.SetEnable(true);
                 point.SetLabel($"{label+new string('\'', index)}", VERTEX_LABEL_SIZE, LABEL_COLOR);
+                //Debug.Log($"TEST {label}");
 
-
-                mc.AddPointProjection(wall, $"{labelText}", labelObj);
+                mc.AddPointProjection(wall, $"{label}", labelObj);
             }
         }
     }
@@ -180,7 +180,7 @@ public class PointPlacer : MonoBehaviour {
                 {
                     Debug.LogError($"Wezel nie ma takiego dziecka jak {label}");
                 }               
-                mc.RemovePointProjection(wall, $"{labelText}", labelObj);
+                mc.RemovePointProjection(wall, $"{label}", labelObj);
                 Destroy(labelObj);
             }
         }

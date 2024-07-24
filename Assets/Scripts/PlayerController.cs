@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
     Vector3 moveDirection = Vector3.zero;
     float rotationX = 0;
     //[HideInInspector]
-
+    private int labelText = 1;
     SolidImporter si;
     private Ray ray;
     private RaycastHit hit;
@@ -151,7 +151,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown("o"))
         {
-            pp.CreateLabel(hit, "A");
+            pp.CreateLabel(hit, $"{labelText++}");
         }
         if (Input.GetKeyDown("p"))
         {
