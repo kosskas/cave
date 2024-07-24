@@ -60,12 +60,12 @@ public class GridCreator : MonoBehaviour {
         float lineWeight = float.Parse(config["line_weight"], CultureInfo.InvariantCulture);
 
         const float offsetFromWall = WALL_WEIGHT/2;
-        float xMinPos = -(WALL_SIZE/2)+(offsetFromWall+lineWeight/2);
-        float xMaxPos =  (WALL_SIZE/2)-(offsetFromWall+lineWeight/2);
-        float zMinPos = -(WALL_SIZE/2)+(offsetFromWall+lineWeight/2);
-        float zMaxPos =  (WALL_SIZE/2)-(offsetFromWall+lineWeight/2);
-        float yMinPos =  0+(offsetFromWall+lineWeight/2);
-        float yMaxPos =  WALL_SIZE-(offsetFromWall+lineWeight/2);
+        float xMinPos = -(WALL_SIZE/2)+(offsetFromWall);
+        float xMaxPos =  (WALL_SIZE/2)-(offsetFromWall);
+        float zMinPos = -(WALL_SIZE/2)+(offsetFromWall);
+        float zMaxPos =  (WALL_SIZE/2)-(offsetFromWall);
+        float yMinPos =  0+(offsetFromWall);
+        float yMaxPos =  WALL_SIZE-(offsetFromWall);
 
         float xRange = xMaxPos-xMinPos;
         float yRange = yMaxPos-yMinPos;
@@ -88,8 +88,8 @@ public class GridCreator : MonoBehaviour {
                 else if (perpendicularAxisName == 'Y')
                 {
                     float pos = yMinPos + (((float)ithLine/(float)numOfSpaces) * yRange);
-                    start = new Vector3(xMinPos, pos, zMinPos);
-                    stop = new Vector3(xMinPos, pos, zMaxPos);
+                    start = new Vector3(xMaxPos, pos, zMinPos);
+                    stop = new Vector3(xMaxPos, pos, zMaxPos);
                 }
                 //colliderSize = new Vector3(colliderWeight, colliderWeight, zRange);
             }
@@ -120,8 +120,8 @@ public class GridCreator : MonoBehaviour {
                 else if (perpendicularAxisName == 'Z')
                 {
                     float pos = zMinPos + (((float)ithLine/(float)numOfSpaces) * zRange);
-                    start = new Vector3(xMinPos, yMinPos, pos);
-                    stop = new Vector3(xMinPos, yMaxPos, pos);
+                    start = new Vector3(xMaxPos, yMinPos, pos);
+                    stop = new Vector3(xMaxPos, yMaxPos, pos);
                 }
                 //colliderSize = new Vector3(colliderWeight, yRange, colliderWeight);
             }
@@ -150,15 +150,15 @@ public class GridCreator : MonoBehaviour {
         float numOfSpacesInB = numOfLinesInAxisB-1;
 
         float lineWeight = float.Parse(config["line_weight"], CultureInfo.InvariantCulture);
-        float colliderWeight = lineWeight;
+        float pointWidth = lineWeight * 5.0f;
 
         const float offsetFromWall = WALL_WEIGHT/2;
-        float xMinPos = -(WALL_SIZE/2)+(offsetFromWall+lineWeight/2);
-        float xMaxPos =  (WALL_SIZE/2)-(offsetFromWall+lineWeight/2);
-        float zMinPos = -(WALL_SIZE/2)+(offsetFromWall+lineWeight/2);
-        float zMaxPos =  (WALL_SIZE/2)-(offsetFromWall+lineWeight/2);
-        float yMinPos =  0+(offsetFromWall+lineWeight/2);
-        float yMaxPos =  WALL_SIZE-(offsetFromWall+lineWeight/2);
+        float xMinPos = -(WALL_SIZE/2)+(offsetFromWall);
+        float xMaxPos =  (WALL_SIZE/2)-(offsetFromWall);
+        float zMinPos = -(WALL_SIZE/2)+(offsetFromWall);
+        float zMaxPos =  (WALL_SIZE/2)-(offsetFromWall);
+        float yMinPos =  0+(offsetFromWall);
+        float yMaxPos =  WALL_SIZE-(offsetFromWall);
 
         float xRange = xMaxPos-xMinPos;
         float yRange = yMaxPos-yMinPos;
@@ -178,55 +178,38 @@ public class GridCreator : MonoBehaviour {
                     pointPosX = xMinPos + (((float)ithLineInA/(float)numOfSpacesInA) * xRange);
                     pointPosY = yMinPos + (((float)ithLineInB/(float)numOfSpacesInB) * yRange);
                     pointPosZ = zMinPos;
-                    colliderSize = new Vector3(colliderWeight*5f, colliderWeight*5f, colliderWeight);
+                    colliderSize = new Vector3(2f, 2f, 0f);
                 }
                 else if (planeName == "XZ")
                 {
                     pointPosX = xMinPos + (((float)ithLineInA/(float)numOfSpacesInA) * xRange);
                     pointPosY = yMinPos;
                     pointPosZ = zMinPos + (((float)ithLineInB/(float)numOfSpacesInB) * zRange);
-                    colliderSize = new Vector3(colliderWeight*5f, colliderWeight, colliderWeight*5f);
+                    colliderSize = new Vector3(2f, 0f, 2f);
                 }
                 else if (planeName == "YZ")
                 {
-                    pointPosX = xMinPos;
+                    pointPosX = xMaxPos;
                     pointPosY = yMinPos + (((float)ithLineInA/(float)numOfSpacesInA) * yRange);
                     pointPosZ = zMinPos + (((float)ithLineInB/(float)numOfSpacesInB) * zRange);
-                    colliderSize = new Vector3(colliderWeight, colliderWeight*5f, colliderWeight*5f);
+                    colliderSize = new Vector3(0f, 2f, 2f);
                 }
 
-                GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                obj.name = $"point{planeName}=({ithLineInA},{ithLineInB})";
+                GameObject obj = new GameObject($"point{planeName}=({ithLineInA},{ithLineInB})");
                 obj.transform.SetParent(grid.transform);
                 obj.tag = "GridPoint";
 
-                Renderer pointRenderer = obj.GetComponent<Renderer>();
-                pointRenderer.material = new Material(Shader.Find("Unlit/Color"));
-                pointRenderer.material.color = new Color(0f, 0f, 0f, 1f);
-
-                obj.transform.localScale = new Vector3(POINT_SIZE, POINT_SIZE, POINT_SIZE);
-
-                obj.transform.position = new Vector3(pointPosX, pointPosY, pointPosZ);
-
-
-                // GameObject obj = new GameObject($"point{planeName}=({ithLineInA},{ithLineInB})");
-                // obj.transform.SetParent(grid.transform);
-                // obj.tag = "GridPoint";
-
                 BoxCollider boxCollider = obj.AddComponent<BoxCollider>();
-                boxCollider.size = colliderSize;
-                boxCollider.isTrigger = false; 
+                boxCollider.size = pointWidth * colliderSize;
+                boxCollider.isTrigger = true; 
 
-                pointRenderer.enabled = false;
-
-                // Point point = obj.AddComponent<Point>();
-                // point.SetStyle(Color.black, lineWeight*5);
-                // point.SetCoordinates(new Vector3(pointPosX, pointPosY, pointPosZ));
-                //point.SetEnable(true);
+                Point point = obj.AddComponent<Point>();
+                point.SetCoordinates(new Vector3(pointPosX, pointPosY, pointPosZ));
+                point.SetStyle(Color.black, pointWidth);
+                point.SetEnable(false);
             }
         }
     }
-
 
     private void ParseConfigFile()
     {

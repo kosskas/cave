@@ -11,53 +11,77 @@ public class Label : MonoBehaviour {
 	/// <summary>
 	/// Wyświetlany tekst
 	/// </summary>
-	private string text = "<?>";
+	private string _text = "<?>";
 
 	/// <summary>
 	/// Rozmiar fontu wyświetlanego tekstu
 	/// </summary>
-	private float fontSize = 1.0f;
+	private float _fontSize = 1.0f;
 
 	/// <summary>
 	/// Kolor wyświetlanego tekstu
 	/// </summary>
-	private Color color = Color.black;
+	private Color _color = Color.black;
+
+	/// <summary>
+	/// Flaga określająca widoczność etykiety
+	/// </summary>
+	private bool _isEnabled = true;
 
 	/// <summary>
 	/// Referencja na objekt gracza 'FPSPlayer'
 	/// </summary>
-	GameObject player = null;
+	private GameObject _player = null;
 
 	/// <summary>
 	/// Referencja na TextMesh
 	/// </summary>
-	TextMesh textMesh = null;
+	private TextMesh _textMesh = null;
+
+	/// <summary>
+	/// Referencja na obiekt klasy MeshRenderer używany do rysowania etykiety
+	/// </summary>
+	private MeshRenderer _labelRenderer = null;
 
 
 	// Use this for initialization
 	void Start ()
 	{
-		player = GameObject.Find("FPSPlayer");
+		this._player = GameObject.Find("FPSPlayer");
 
-		textMesh = gameObject.AddComponent<TextMesh>();
-		textMesh.text = text;
-		textMesh.characterSize = fontSize;
-		textMesh.color = color;
+		this._textMesh = gameObject.AddComponent<TextMesh>();
+		this._textMesh.text = this._text;
+		this._textMesh.characterSize = this._fontSize;
+		this._textMesh.color = this._color;
+
+		this._labelRenderer = gameObject.GetComponent<MeshRenderer>();
+		this._labelRenderer.enabled = this._isEnabled;
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
+		UpdateLabel();
 		RotateLabelToPlayer();
 	}
 
+	/// <summary>
+	/// Metoda uaktualnia wartość, rozmiar i kolor tekstu 
+	/// </summary>
+	private void UpdateLabel()
+	{
+		this._textMesh.text = this._text;
+		this._textMesh.characterSize = this._fontSize;
+		this._textMesh.color = this._color;
+		this._labelRenderer.enabled = this._isEnabled;
+	}
 
 	/// <summary>
 	/// Metoda obracająca przód/awers etykiety w kierunku do gracza
 	/// </summary>
 	private void RotateLabelToPlayer()
 	{
-		Vector3 playerPosition = player.transform.position;
+		Vector3 playerPosition = this._player.transform.position;
 		Vector3 directionToPlayer = (playerPosition + 2*Vector3.up - gameObject.transform.position).normalized;
 
 		gameObject.transform.rotation = Quaternion.LookRotation(-directionToPlayer);
@@ -72,9 +96,17 @@ public class Label : MonoBehaviour {
 	/// <param name="textColor">Kolor wyświetlanego tekstu</param>
 	public void SetLabel(string text, float fontSize, Color textColor)
 	{
-		this.text = text;
-		this.fontSize = fontSize;
-		this.color = textColor;
+		this._text = text;
+		this._fontSize = fontSize;
+		this._color = textColor;
 	}
 
+	/// <summary>
+	/// Metoda włączająca/wyłączająca widoczność etykiety
+	/// </summary>
+	/// <param name="isEnabled">Jeśli "true" etykieta zacznie być rysowana, jeśli "false" przestanie być rysowana</param>
+	public void SetEnable(bool isEnabled)
+	{
+		this._isEnabled = isEnabled;
+	}
 }
