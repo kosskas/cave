@@ -117,6 +117,7 @@ public class MeshBuilder : MonoBehaviour {
             //nie bylo zadnych rzutow tego pktu
             //bedzie 1
             verticesOnWalls[wall][label] = pointObject;
+            Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObject.transform.position.x} {pointObject.transform.position.y} {pointObject.transform.position.z}");
         }
         else if (currPts.Count == 1)
         {
@@ -133,6 +134,7 @@ public class MeshBuilder : MonoBehaviour {
             if(result == Status.OK)
             {
                 verticesOnWalls[wall][label] = pointObject;
+                Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObject.transform.position.x} {pointObject.transform.position.y} {pointObject.transform.position.z}");
             }
         }
         else
@@ -152,10 +154,11 @@ public class MeshBuilder : MonoBehaviour {
             Debug.Log($"Test2  ---- {test2.x} {test2.y} {test2.z}");
             Debug.Log($"Test3  ---- {test3.x} {test3.y} {test3.z}");
 
-            if (test2 == test3)
+            if (test1 == test2 && test1 == test3 && test2 == test3)
             {
                 Debug.Log("3 polozony OK");
                 verticesOnWalls[wall][label] = pointObject;
+                Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObject.transform.position.x} {pointObject.transform.position.y} {pointObject.transform.position.z}");
             }
             else
             {
@@ -163,7 +166,7 @@ public class MeshBuilder : MonoBehaviour {
                 Debug.Log("3 polozony ZLE");
             }
         }
-        Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObject.transform.position.x} {pointObject.transform.position.y} {pointObject.transform.position.z}");
+       
     }
     /// <summary>
     /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D
