@@ -201,12 +201,18 @@ public class GridCreator : MonoBehaviour {
 
                 BoxCollider boxCollider = obj.AddComponent<BoxCollider>();
                 boxCollider.size = pointWidth * colliderSize;
-                boxCollider.isTrigger = true; 
+                boxCollider.isTrigger = true;
 
+                Vector3 pos = new Vector3(pointPosX, pointPosY, pointPosZ);
+                obj.transform.position = pos;
+
+                /*
+                 * non labeled single point
                 Point point = obj.AddComponent<Point>();
                 point.SetCoordinates(new Vector3(pointPosX, pointPosY, pointPosZ));
                 point.SetStyle(Color.black, pointWidth);
                 point.SetEnable(false);
+                */
             }
         }
     }

@@ -173,12 +173,12 @@ public class MeshBuilder : MonoBehaviour {
     /// </summary>
     /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
     /// <param name="pointObject">Informacje o rzucie</param>
-    public void RemovePointProjection(WallInfo wall, GameObject pointObject)
+    public void RemovePointProjection(WallInfo wall, string label, GameObject labelObject)
 	{
         //rozszerzyć o label
         if (!verticesOnWalls.ContainsKey(wall))
             return;
-        var pointToRemove = verticesOnWalls[wall].FirstOrDefault(kvp => kvp.Value == pointObject);
+        var pointToRemove = verticesOnWalls[wall].FirstOrDefault(kvp => kvp.Value == labelObject);
 
         if (pointToRemove.Key == null)
             return;

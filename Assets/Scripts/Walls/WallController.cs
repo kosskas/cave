@@ -266,4 +266,16 @@ public class WallController : MonoBehaviour {
             );
         }
     }
+
+
+    public int GetWallIndex(WallInfo wall)
+    {
+        if(wall.name == "Wall3")
+            return 1;
+        if (wall.name == "Wall4")
+            return 2;
+        if (wall.name == "Wall6")
+            return 3;
+        return 0;
+    }
 }

@@ -149,9 +149,13 @@ public class PlayerController : MonoBehaviour
     {
         pp.MovePointPrototype(hit);
 
-        if (Input.GetKeyDown("space"))
+        if (Input.GetKeyDown("o"))
         {
-            pp.OnClick(hit);
+            pp.CreateLabel(hit, "A");
+        }
+        if (Input.GetKeyDown("p"))
+        {
+            pp.RemoveLabel(hit, "A");
         }
 
     }

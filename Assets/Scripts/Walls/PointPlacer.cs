@@ -120,7 +120,7 @@ public class PointPlacer : MonoBehaviour {
                 if (point.IsEnabled())
                 {
                     //activePoints.Remove(pointClicked);
-                    mc.RemovePointProjection(wall, pointClicked);
+                    mc.RemovePointProjection(wall, $"{labelText}", pointClicked);
                     point.SetEnable(false);
                 }
                 else
@@ -138,4 +138,51 @@ public class PointPlacer : MonoBehaviour {
         }
     }
 
+    public void CreateLabel(RaycastHit hit, string label)
+    {
+        if (hit.collider != null)
+        {
+            if (hit.collider.tag == "GridPoint")
+            {
+                GameObject pointClicked = hit.collider.gameObject;
+                WallInfo wall = this.EstimateWall(hit.normal, pointClicked.transform.position);
+
+                //sprawdz czy na takiej scianie juz jest taki rzut
+                //nakladanie sie pointów(sphere na siebie, zfighting?)
+
+                int index = wc.GetWallIndex(wall);
+                GameObject labelObj = new GameObject(label);
+                labelObj.transform.parent = pointClicked.transform;
+
+                Point point = labelObj.AddComponent<Point>();
+                point.SetCoordinates(pointClicked.transform.position);
+                point.SetStyle(Color.black, 0.01f); //niech gridcreator wystawia wartosci
+                point.SetEnable(true);
+                point.SetLabel($"{label+new string('\'', index)}", VERTEX_LABEL_SIZE, LABEL_COLOR);
+
+
+                mc.AddPointProjection(wall, $"{labelText}", labelObj);
+            }
+        }
+    }
+
+    public void RemoveLabel(RaycastHit hit, string label)
+    {
+        if (hit.collider != null)
+        {
+            if (hit.collider.tag == "GridPoint")
+            {
+                GameObject pointClicked = hit.collider.gameObject;
+                WallInfo wall = this.EstimateWall(hit.normal, pointClicked.transform.position);
+                
+                GameObject labelObj = pointClicked.transform.Find(label).transform.gameObject;
+                if (labelObj == null)
+                {
+                    Debug.LogError($"Wezel nie ma takiego dziecka jak {label}");
+                }               
+                mc.RemovePointProjection(wall, $"{labelText}", labelObj);
+                Destroy(labelObj);
+            }
+        }
+    }
 }
