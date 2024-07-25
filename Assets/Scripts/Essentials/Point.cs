@@ -148,16 +148,15 @@ public class Point : MonoBehaviour {
 		this._pointColor = pointColor;
 		this._pointSize = pointSize;
 	}
-
-	/// <summary>
-	/// Metoda:
-	/// jeśli komponent etykiety (obiekt klasy Label) został już dołączony do punktu, aktualizuje właściowści wyświetlanego tekstu tej etykiety
-	/// jeśli nie, dołącza komponent etykiety (obiekt klasy Label) i ustawia właściowści wyświetlanego tekstu tej etykiety
-	/// </summary>
-	/// <param name="text">Tekst która ma zostać wyświetlony na etykiecie</param>
-	/// <param name="fontSize">Rozmiar fontu wyświetlanego tekstu</param>
-	/// <param name="textColor">Kolor wyświetlanego tekstu</param>
-	public void SetLabel(string text, float fontSize, Color textColor)
+    /// <summary>
+    /// Metoda:
+    /// jeśli komponent etykiety (obiekt klasy Label) został już dołączony do punktu, aktualizuje właściowści wyświetlanego tekstu tej etykiety
+    /// jeśli nie, dołącza komponent etykiety (obiekt klasy Label) i ustawia właściowści wyświetlanego tekstu tej etykiety
+    /// </summary>
+    /// <param name="text">Tekst która ma zostać wyświetlony na etykiecie</param>
+    /// <param name="fontSize">Rozmiar fontu wyświetlanego tekstu</param>
+    /// <param name="textColor">Kolor wyświetlanego tekstu</param>
+    public void SetLabel(string text, float fontSize, Color textColor)
 	{
 		if (text.Length == 0)
 		{
@@ -175,7 +174,25 @@ public class Point : MonoBehaviour {
 		Label label = this._labelObject.GetComponent<Label>();
 		label.SetLabel(text, fontSize, textColor);
 	}
+    /// <summary>
+    /// Metoda:
+    /// jeśli komponent etykiety (obiekt klasy Label) został już dołączony do punktu, aktualizuje właściowści wyświetlanego tekstu tej etykiety
+    /// jeśli nie, dołącza komponent etykiety (obiekt klasy Label) i ustawia właściowści wyświetlanego tekstu tej etykiety
+    /// </summary>
+    /// <param name="textColor">Kolor wyświetlanego tekstu</param>
+    public void SetLabel(Color textColor)
+    {
+        if (this._labelObject == null)
+        {
+            this._labelObject = new GameObject("Label");
+            this._labelObject.transform.SetParent(gameObject.transform);
+            this._labelObject.transform.position = this.transform.position;
+            this._labelObject.AddComponent<Label>();
+        }
 
+        Label label = this._labelObject.GetComponent<Label>();
+        label.SetLabel(textColor);
+    }
     /// <summary>
     /// Metoda umożliwia włączenie lub wyłączenie widoczności (renderowania) punktu
     /// </summary>

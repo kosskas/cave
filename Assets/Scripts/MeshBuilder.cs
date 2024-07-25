@@ -102,22 +102,22 @@ public class MeshBuilder : MonoBehaviour {
     /// </summary>
     /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
     /// <param name="label">Etykieta rzutu</param>
-    /// <param name="pointObject">Informacje o rzucie: nazywa sie tak jak etykieta, ma komponent Point</param>
-	public void AddPointProjection(WallInfo wall, string label, GameObject pointObject)
+    /// <param name="pointObj">Metadana o rzucie: etykieta, połozenie(position) jest takie jakie ma rodzic</param>
+	public void AddPointProjection(WallInfo wall, string label, GameObject pointObj)
 	{
-		if (!verticesOnWalls.ContainsKey(wall)) {
+        if (!verticesOnWalls.ContainsKey(wall)) {
 			verticesOnWalls[wall] = new Dictionary<string, GameObject>();
         }
-		//sprawdz czy istnieja już dwa
-		List<GameObject> currPts = GetCurrentPointProjections(label);
+        //sprawdz czy istnieja już dwa
+        List<GameObject> currPts = GetCurrentPointProjections(label);
 
 		if(currPts.Count == 0)
 		{
             Debug.Log("Pierwszy");
             //nie bylo zadnych rzutow tego pktu
             //bedzie 1
-            verticesOnWalls[wall][label] = pointObject;
-            Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObject.transform.position.x} {pointObject.transform.position.y} {pointObject.transform.position.z}");
+            verticesOnWalls[wall][label] = pointObj;
+            Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
         }
         else if (currPts.Count == 1)
         {
@@ -125,17 +125,20 @@ public class MeshBuilder : MonoBehaviour {
             //jest juz 1 bedzie 2
             //podejmij rekonstrukcje
             //sprawdz plawszczyzny
-            Status result = ReconstructPoint(pointObject, label);
+            Status result = ReconstructPoint(pointObj, label);
             if(result == Status.PLANE_ERR)
             {
                 //podswietl dodawany na czerwono
-                Debug.Log($"Rzuty pktu nie leza na jednej plaszczyznie");
+                MarkError(currPts[0]);
+                MarkError(pointObj);
 
             }
-            if(result == Status.OK)
+            else if(result == Status.OK)
             {
-                verticesOnWalls[wall][label] = pointObject;
-                Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObject.transform.position.x} {pointObject.transform.position.y} {pointObject.transform.position.z}");
+                verticesOnWalls[wall][label] = pointObj;
+                MarkOK(currPts[0]);
+                MarkOK(pointObj);
+                Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
             }
         }
         else
@@ -146,7 +149,7 @@ public class MeshBuilder : MonoBehaviour {
             Vector3 proj1 = currPts[0].transform.position;
             Vector3 proj2 = currPts[1].transform.position;
 
-			Vector3 third_proj = pointObject.transform.position;
+			Vector3 third_proj = pointObj.transform.position;
 
             Vector3 test1 = RecreatePoint(proj1, proj2);
             Vector3 test2 = RecreatePoint(proj2, third_proj);
@@ -158,14 +161,16 @@ public class MeshBuilder : MonoBehaviour {
             if (test1 == test2 && test1 == test3 && test2 == test3)
             {
                 Debug.Log("3 polozony OK");
-                verticesOnWalls[wall][label] = pointObject;
-                Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObject.transform.position.x} {pointObject.transform.position.y} {pointObject.transform.position.z}");
+                verticesOnWalls[wall][label] = pointObj;
+                Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
             }
             else
             {
                 //podswietl dodawany na czerwono
                 Debug.Log("3 polozony ZLE");
-                
+                MarkError(pointObj);
+
+
             }
         }
        
@@ -174,11 +179,13 @@ public class MeshBuilder : MonoBehaviour {
     /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D
     /// </summary>
     /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
-    /// <param name="pointObject">Informacje o rzucie</param>
-    public void RemovePointProjection(WallInfo wall, string label, GameObject labelObject)
+    /// <param name="label">Etykieta</param>
+    public void RemovePointProjection(WallInfo wall, string label)
 	{
         //rozszerzyć o label
         if (!verticesOnWalls.ContainsKey(wall))
+            return;
+        if (!verticesOnWalls[wall].ContainsKey(label))
             return;
         var pointToRemove = verticesOnWalls[wall][label];
 
@@ -192,12 +199,12 @@ public class MeshBuilder : MonoBehaviour {
         //jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d
 
 	}
-	private Status ReconstructPoint(GameObject pointObject, string label)
+	private Status ReconstructPoint(GameObject pointNode, string label)
 	{
 		int licz = 0;
 
         List<GameObject> pointsInfo = GetCurrentPointProjections(label);
-        pointsInfo.Add(pointObject); //dodaj do listy ten jeszcze nie dodany
+        pointsInfo.Add(pointNode); //dodaj do listy ten jeszcze nie dodany
 
         //sprawdz ile jest juz rzutow jednego pktu
         licz = pointsInfo.Count;
@@ -289,5 +296,29 @@ public class MeshBuilder : MonoBehaviour {
             }
         }
 		return pointsInfo;
+    }
+
+    private void MarkError(GameObject pointObj)
+    {
+        Point et = pointObj.GetComponent<Point>();
+        if (et == null)
+        {
+            Debug.LogError("GameObj nie ma komponentu Point");
+            return;
+        }
+        et.SetLabel(Color.red);
+
+    }
+
+    private void MarkOK(GameObject pointObj)
+    {
+        Point et = pointObj.GetComponent<Point>();
+        if (et == null)
+        {
+            Debug.LogError("GameObj nie ma komponentu Point");
+            return;
+        }
+        et.SetLabel(Color.white);
+
     }
 }

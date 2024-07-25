@@ -100,12 +100,19 @@ public class Label : MonoBehaviour {
 		this._fontSize = fontSize;
 		this._color = textColor;
 	}
-
-	/// <summary>
-	/// Metoda włączająca/wyłączająca widoczność etykiety
-	/// </summary>
-	/// <param name="isEnabled">Jeśli "true" etykieta zacznie być rysowana, jeśli "false" przestanie być rysowana</param>
-	public void SetEnable(bool isEnabled)
+    /// <summary>
+    /// Metoda ustawiająca właściowści wyświetlanego tekstu etykiety
+    /// </summary>
+    /// <param name="textColor">Kolor wyświetlanego tekstu</param>
+    public void SetLabel(Color textColor)
+    {
+        this._color = textColor;
+    }
+    /// <summary>
+    /// Metoda włączająca/wyłączająca widoczność etykiety
+    /// </summary>
+    /// <param name="isEnabled">Jeśli "true" etykieta zacznie być rysowana, jeśli "false" przestanie być rysowana</param>
+    public void SetEnable(bool isEnabled)
 	{
 		this._isEnabled = isEnabled;
 	}

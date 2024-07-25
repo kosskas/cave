@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PointPlacer : MonoBehaviour {
@@ -120,7 +121,7 @@ public class PointPlacer : MonoBehaviour {
                 if (point.IsEnabled())
                 {
                     //activePoints.Remove(pointClicked);
-                    mc.RemovePointProjection(wall, $"{labelText}", pointClicked);
+                    mc.RemovePointProjection(wall, $"{labelText}");
                     point.SetEnable(false);
                 }
                 else
@@ -159,8 +160,6 @@ public class PointPlacer : MonoBehaviour {
                 point.SetStyle(Color.black, 0.01f); //niech gridcreator wystawia wartosci
                 point.SetEnable(true);
                 point.SetLabel($"{label+new string('\'', index)}", VERTEX_LABEL_SIZE, LABEL_COLOR);
-                //Debug.Log($"TEST {label}");
-
                 mc.AddPointProjection(wall, $"{label}", labelObj);
             }
         }
@@ -182,7 +181,7 @@ public class PointPlacer : MonoBehaviour {
                     return;
                 }
                 GameObject labelObj = labelObjTrabs.transform.gameObject;
-                mc.RemovePointProjection(wall, $"{label}", labelObj);
+                mc.RemovePointProjection(wall, $"{label}");
                 Destroy(labelObj);
             }
         }
