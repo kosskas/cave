@@ -45,12 +45,15 @@ public class PlayerController : MonoBehaviour
     Vector3 moveDirection = Vector3.zero;
     float rotationX = 0;
     //[HideInInspector]
-    private int labelText = 1;
+    private int labelIdx = 0;
     SolidImporter si;
     private Ray ray;
     private RaycastHit hit;
+
+    private char[] alpha;
     void Start()
     {
+        alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
         ray =  Camera.main.ScreenPointToRay(Input.mousePosition);
 
         characterController = GetComponentInChildren<CharacterController>();
@@ -151,11 +154,21 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown("o"))
         {
-            pp.CreateLabel(hit, $"{labelText++}");
+            pp.CreateLabel(hit, $"{alpha[labelIdx]}");
         }
         if (Input.GetKeyDown("p"))
         {
             pp.RemoveLabel(hit, "A");
+        }
+        if (Input.GetKeyDown("4"))
+        {
+            labelIdx = (labelIdx - 1 < 0 ? alpha.Length - 1 : labelIdx - 1);
+            Debug.Log($"Current label {alpha[labelIdx]}");
+        }
+        if (Input.GetKeyDown("5"))
+        {
+            labelIdx = (labelIdx+1)% alpha.Length;
+            Debug.Log($"Current label {alpha[labelIdx]}");
         }
 
     }

@@ -174,12 +174,14 @@ public class PointPlacer : MonoBehaviour {
             {
                 GameObject pointClicked = hit.collider.gameObject;
                 WallInfo wall = this.EstimateWall(hit.normal, pointClicked.transform.position);
-                
-                GameObject labelObj = pointClicked.transform.Find(label).transform.gameObject;
-                if (labelObj == null)
+
+                Transform labelObjTrabs = pointClicked.transform.Find(label);             
+                if (labelObjTrabs == null)
                 {
                     Debug.LogError($"Wezel nie ma takiego dziecka jak {label}");
-                }               
+                    return;
+                }
+                GameObject labelObj = labelObjTrabs.transform.gameObject;
                 mc.RemovePointProjection(wall, $"{label}", labelObj);
                 Destroy(labelObj);
             }
