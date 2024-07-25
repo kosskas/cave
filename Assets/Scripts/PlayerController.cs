@@ -158,7 +158,7 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKeyDown("p"))
         {
-            pp.RemoveLabel(hit, "A");
+            pp.RemoveLabel(hit, $"{alpha[labelIdx]}");
         }
         if (Input.GetKeyDown("4"))
         {

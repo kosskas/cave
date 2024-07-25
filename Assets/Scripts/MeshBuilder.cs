@@ -102,7 +102,7 @@ public class MeshBuilder : MonoBehaviour {
     /// </summary>
     /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
     /// <param name="label">Etykieta rzutu</param>
-    /// <param name="pointObject">Informacje o rzucie</param>
+    /// <param name="pointObject">Informacje o rzucie: nazywa sie tak jak etykieta, ma komponent Point</param>
 	public void AddPointProjection(WallInfo wall, string label, GameObject pointObject)
 	{
 		if (!verticesOnWalls.ContainsKey(wall)) {
@@ -130,6 +130,7 @@ public class MeshBuilder : MonoBehaviour {
             {
                 //podswietl dodawany na czerwono
                 Debug.Log($"Rzuty pktu nie leza na jednej plaszczyznie");
+
             }
             if(result == Status.OK)
             {
@@ -164,6 +165,7 @@ public class MeshBuilder : MonoBehaviour {
             {
                 //podswietl dodawany na czerwono
                 Debug.Log("3 polozony ZLE");
+                
             }
         }
        
@@ -178,13 +180,13 @@ public class MeshBuilder : MonoBehaviour {
         //rozszerzyć o label
         if (!verticesOnWalls.ContainsKey(wall))
             return;
-        var pointToRemove = verticesOnWalls[wall].FirstOrDefault(kvp => kvp.Value == labelObject);
+        var pointToRemove = verticesOnWalls[wall][label];
 
-        if (pointToRemove.Key == null)
+        if (pointToRemove == null)
             return;
 
-        verticesOnWalls[wall].Remove(pointToRemove.Key);
-        Debug.Log($"Point removed: wall[{wall.number}] label[{pointToRemove.Key}] ");
+        verticesOnWalls[wall].Remove(label);
+        Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
           
 		//usun takze 3D
         //jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d
