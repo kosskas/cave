@@ -22,10 +22,12 @@ public class MeshBuilder : MonoBehaviour {
     private class PointProjection
 	{
 		public GameObject pointObject;
+		public bool is_ok_placed;
 
-		public PointProjection(GameObject pointObject)
+		public PointProjection(GameObject pointObject, bool is_ok_placed)
 		{
 			this.pointObject = pointObject;
+            this.is_ok_placed = is_ok_placed;
         }
 
     }
@@ -42,6 +44,7 @@ public class MeshBuilder : MonoBehaviour {
     /// 
 
     Dictionary<WallInfo, Dictionary<string, GameObject>> verticesOnWalls;
+    Dictionary<WallInfo, Dictionary<string, GameObject>> wrongplaced_vertices;
 
     /// <summary>
     /// Get compoment Point
@@ -69,6 +72,7 @@ public class MeshBuilder : MonoBehaviour {
         reconstrVertDir.transform.SetParent(gameObject.transform);
 
         verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, GameObject>>();
+        wrongplaced_vertices = new Dictionary<WallInfo, Dictionary<string, GameObject>>();
 
 		edges = new Dictionary<string, List<string>>();
 		vertices3D = new Dictionary<string, GameObject>();
@@ -108,6 +112,11 @@ public class MeshBuilder : MonoBehaviour {
         if (!verticesOnWalls.ContainsKey(wall)) {
 			verticesOnWalls[wall] = new Dictionary<string, GameObject>();
         }
+        if (!wrongplaced_vertices.ContainsKey(wall))
+        {
+            wrongplaced_vertices[wall] = new Dictionary<string, GameObject>();
+        }
+
         //sprawdz czy istnieja już dwa
         List<GameObject> currPts = GetCurrentPointProjections(label);
 
@@ -128,6 +137,7 @@ public class MeshBuilder : MonoBehaviour {
             Status result = ReconstructPoint(pointObj, label);
             if(result == Status.PLANE_ERR)
             {
+                wrongplaced_vertices[wall][label] = pointObj;
                 //podswietl dodawany na czerwono
                 MarkError(currPts[0]);
                 MarkError(pointObj);
@@ -199,7 +209,18 @@ public class MeshBuilder : MonoBehaviour {
         //jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d
 
 	}
-	private Status ReconstructPoint(GameObject pointNode, string label)
+    /// <summary>
+    /// Sprawdza czy na scianie znajduje juz sie rzut
+    /// </summary>
+    /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
+    /// <param name="label">Etykieta</param>
+    /// <returns>Prawda jeśli już taki rzut jest, Fałsz jeżeli nie ma</returns>
+    public bool CheckIfAlreadyExist(WallInfo wall, string label)
+    {
+        return verticesOnWalls.ContainsKey(wall) && verticesOnWalls[wall].ContainsKey(label);       
+    }
+
+    private Status ReconstructPoint(GameObject pointNode, string label)
 	{
 		int licz = 0;
 

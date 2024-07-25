@@ -148,8 +148,12 @@ public class PointPlacer : MonoBehaviour {
                 GameObject pointClicked = hit.collider.gameObject;
                 WallInfo wall = this.EstimateWall(hit.normal, pointClicked.transform.position);
 
-                //sprawdz czy na takiej scianie juz jest taki rzut
-                //nakladanie sie pointów(sphere na siebie, zfighting?)
+                if(mc.CheckIfAlreadyExist(wall, label))
+                {
+                    Debug.LogError("Rzut juz jest na tej scianie");
+                    return;
+                }
+                //TODO zly punkt nie jest dodawany do listy rzutow w mc! 
 
                 int index = wc.GetWallIndex(wall);
                 GameObject labelObj = new GameObject(label);
