@@ -44,7 +44,6 @@ public class MeshBuilder : MonoBehaviour {
     /// 
 
     Dictionary<WallInfo, Dictionary<string, GameObject>> verticesOnWalls;
-    Dictionary<WallInfo, Dictionary<string, GameObject>> wrongplaced_vertices;
 
     /// <summary>
     /// Get compoment Point
@@ -72,7 +71,6 @@ public class MeshBuilder : MonoBehaviour {
         reconstrVertDir.transform.SetParent(gameObject.transform);
 
         verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, GameObject>>();
-        wrongplaced_vertices = new Dictionary<WallInfo, Dictionary<string, GameObject>>();
 
 		edges = new Dictionary<string, List<string>>();
 		vertices3D = new Dictionary<string, GameObject>();
@@ -112,11 +110,6 @@ public class MeshBuilder : MonoBehaviour {
         if (!verticesOnWalls.ContainsKey(wall)) {
 			verticesOnWalls[wall] = new Dictionary<string, GameObject>();
         }
-        if (!wrongplaced_vertices.ContainsKey(wall))
-        {
-            wrongplaced_vertices[wall] = new Dictionary<string, GameObject>();
-        }
-
         //sprawdz czy istnieja już dwa
         List<GameObject> currPts = GetCurrentPointProjections(label);
 
@@ -137,7 +130,6 @@ public class MeshBuilder : MonoBehaviour {
             Status result = ReconstructPoint(pointObj, label);
             if(result == Status.PLANE_ERR)
             {
-                wrongplaced_vertices[wall][label] = pointObj;
                 //podswietl dodawany na czerwono
                 MarkError(currPts[0]);
                 MarkError(pointObj);
