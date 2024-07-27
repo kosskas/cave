@@ -8,16 +8,16 @@ using UnityEditorInternal;
 
 public class MeshBuilder : MonoBehaviour {
     /*TODO
-     * Przypadki przy dodawaniu
-     * Sprawdz numeryczne porownianie
-     * Aktualizuj info jakie krawędzie między wierzchołkami	 
-     * Jak się określi krawędzie to zrób to samo w 3D
-     * Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
-	 * Kiedy jest juz to ten ray tylko do wierch ale nie w INF
-	 * podswietl dodawany na czerwono jesli zla plaszcz, umiejscowienie trzeciego
-	 * usun takze 3D kiedy są tylko 2
-     * jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly
-     * dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
+     [ ] Przypadki przy dodawaniu
+     [ ] Sprawdz numeryczne porownianie
+     [ ] Aktualizuj info jakie krawędzie między wierzchołkami	 
+     [ ] Jak się określi krawędzie to zrób to samo w 3D
+     [ ] Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
+	 [ ] Kiedy jest juz to ten ray tylko do wierch ale nie w INF
+	 [x] podswietl dodawany na czerwono jesli zla plaszcz, umiejscowienie trzeciego
+	 [ ] usun takze 3D kiedy są tylko 2
+     [ ] jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly
+     [ ] dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
 	*/
     private class PointProjection
 	{
@@ -43,7 +43,7 @@ public class MeshBuilder : MonoBehaviour {
     /// </summary>
     /// 
 
-    Dictionary<WallInfo, Dictionary<string, GameObject>> verticesOnWalls;
+    Dictionary<WallInfo, Dictionary<string, PointProjection>> verticesOnWalls;
 
     /// <summary>
     /// Get compoment Point
@@ -70,7 +70,7 @@ public class MeshBuilder : MonoBehaviour {
         reconstrVertDir = new GameObject("Reconstr. Verticies");
         reconstrVertDir.transform.SetParent(gameObject.transform);
 
-        verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, GameObject>>();
+        verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
 
 		edges = new Dictionary<string, List<string>>();
 		vertices3D = new Dictionary<string, GameObject>();
@@ -90,7 +90,7 @@ public class MeshBuilder : MonoBehaviour {
 		{
 			foreach (string label in verticesOnWalls[wall].Keys)
 			{
-				Vector3 vertex = verticesOnWalls[wall][label].transform.position;
+				Vector3 vertex = verticesOnWalls[wall][label].pointObject.transform.position;
 				Vector3 direction = wall.GetNormal();
                 Ray ray = new Ray(vertex, direction);
                 Debug.DrawRay(vertex, direction* 10f);
@@ -108,38 +108,39 @@ public class MeshBuilder : MonoBehaviour {
 	public void AddPointProjection(WallInfo wall, string label, GameObject pointObj)
 	{
         if (!verticesOnWalls.ContainsKey(wall)) {
-			verticesOnWalls[wall] = new Dictionary<string, GameObject>();
+			verticesOnWalls[wall] = new Dictionary<string, PointProjection>();
         }
+        PointProjection toAddProj = new PointProjection(pointObj, false);
+        verticesOnWalls[wall][label] = toAddProj; //zawsze dodawaj, potem sprawdz czy ok
         //sprawdz czy istnieja już dwa
-        List<GameObject> currPts = GetCurrentPointProjections(label);
+        List<PointProjection> currPts = GetCurrentPointProjections(label);
 
-		if(currPts.Count == 0)
+		if(currPts.Count == 1)
 		{
             Debug.Log("Pierwszy");
             //nie bylo zadnych rzutow tego pktu
             //bedzie 1
-            verticesOnWalls[wall][label] = pointObj;
+            MarkOK(currPts[0]);
             Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
         }
-        else if (currPts.Count == 1)
+        else if (currPts.Count == 2)
         {
             Debug.Log("Drugi");
             //jest juz 1 bedzie 2
             //podejmij rekonstrukcje
             //sprawdz plawszczyzny
-            Status result = ReconstructPoint(pointObj, label);
+            Status result = ReconstructPoint(label);
             if(result == Status.PLANE_ERR)
             {
                 //podswietl dodawany na czerwono
                 MarkError(currPts[0]);
-                MarkError(pointObj);
+                MarkError(currPts[1]);
 
             }
             else if(result == Status.OK)
             {
-                verticesOnWalls[wall][label] = pointObj;
                 MarkOK(currPts[0]);
-                MarkOK(pointObj);
+                MarkOK(currPts[1]);
                 Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
             }
         }
@@ -148,8 +149,8 @@ public class MeshBuilder : MonoBehaviour {
             Debug.Log("Trzeci");
             //sa juz 2
             //sprawdz czy dobrze postawiony trzeci
-            Vector3 proj1 = currPts[0].transform.position;
-            Vector3 proj2 = currPts[1].transform.position;
+            Vector3 proj1 = currPts[0].pointObject.transform.position;
+            Vector3 proj2 = currPts[1].pointObject.transform.position;
 
 			Vector3 third_proj = pointObj.transform.position;
 
@@ -163,16 +164,16 @@ public class MeshBuilder : MonoBehaviour {
             if (test1 == test2 && test1 == test3 && test2 == test3)
             {
                 Debug.Log("3 polozony OK");
-                verticesOnWalls[wall][label] = pointObj;
+                MarkOK(currPts[0]);
+                MarkOK(currPts[1]);
+                MarkOK(currPts[2]);
                 Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
             }
             else
             {
                 //podswietl dodawany na czerwono
                 Debug.Log("3 polozony ZLE");
-                MarkError(pointObj);
-
-
+                MarkError(toAddProj);
             }
         }
        
@@ -212,20 +213,20 @@ public class MeshBuilder : MonoBehaviour {
         return verticesOnWalls.ContainsKey(wall) && verticesOnWalls[wall].ContainsKey(label);       
     }
 
-    private Status ReconstructPoint(GameObject pointNode, string label)
+    private Status ReconstructPoint(string label)
 	{
 		int licz = 0;
 
-        List<GameObject> pointsInfo = GetCurrentPointProjections(label);
-        pointsInfo.Add(pointNode); //dodaj do listy ten jeszcze nie dodany
+        List<PointProjection> pointsInfo = GetCurrentPointProjections(label);
+        //pointsInfo.Add(pointNode); //dodaj do listy ten jeszcze nie dodany
 
         //sprawdz ile jest juz rzutow jednego pktu
         licz = pointsInfo.Count;
 		///ja nie wiem w jakiej kolejności to wypluwa rzuty. dopoki sa 2 to ok
 		if(licz == 2)
 		{
-			Vector3 rzut1 = pointsInfo[0].transform.position;
-			Vector3 rzut2 = pointsInfo[1].transform.position;
+			Vector3 rzut1 = pointsInfo[0].pointObject.transform.position;
+			Vector3 rzut2 = pointsInfo[1].pointObject.transform.position;
 
 			Vector3 pkt3D = RecreatePoint(rzut1, rzut2);
 			if (pkt3D != Vector3.zero)
@@ -297,9 +298,9 @@ public class MeshBuilder : MonoBehaviour {
         return ret;
     }
 
-	private List<GameObject> GetCurrentPointProjections(string label)
+	private List<PointProjection> GetCurrentPointProjections(string label)
 	{
-		List<GameObject> pointsInfo = new List<GameObject>();
+		List<PointProjection> pointsInfo = new List<PointProjection>();
         //sprawdz ile jest juz rzutow jednego pktu
         foreach (WallInfo wall in verticesOnWalls.Keys)
         {
@@ -311,27 +312,28 @@ public class MeshBuilder : MonoBehaviour {
 		return pointsInfo;
     }
 
-    private void MarkError(GameObject pointObj)
+    private void MarkError(PointProjection pointProj)
     {
-        Point et = pointObj.GetComponent<Point>();
+        Point et = pointProj.pointObject.GetComponent<Point>();
         if (et == null)
         {
             Debug.LogError("GameObj nie ma komponentu Point");
             return;
         }
         et.SetLabel(Color.red);
+        pointProj.is_ok_placed = false;
 
     }
 
-    private void MarkOK(GameObject pointObj)
+    private void MarkOK(PointProjection pointProj)
     {
-        Point et = pointObj.GetComponent<Point>();
+        Point et = pointProj.pointObject.GetComponent<Point>();
         if (et == null)
         {
             Debug.LogError("GameObj nie ma komponentu Point");
             return;
         }
         et.SetLabel(Color.white);
-
+        pointProj.is_ok_placed = true;
     }
 }
