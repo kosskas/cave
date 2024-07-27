@@ -153,7 +153,6 @@ public class PointPlacer : MonoBehaviour {
                     Debug.LogError("Rzut juz jest na tej scianie");
                     return;
                 }
-                //TODO zly punkt nie jest dodawany do listy rzutow w mc! 
 
                 int index = wc.GetWallIndex(wall);
                 GameObject labelObj = new GameObject(label);

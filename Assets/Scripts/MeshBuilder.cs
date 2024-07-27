@@ -8,16 +8,18 @@ using UnityEditorInternal;
 
 public class MeshBuilder : MonoBehaviour {
     /*TODO
-     [ ] Przypadki przy dodawaniu
-     [ ] Sprawdz numeryczne porownianie
+     [?] Przypadki przy dodawaniu
+     [x] Sprawdz numeryczne porownianie
      [ ] Aktualizuj info jakie krawędzie między wierzchołkami	 
      [ ] Jak się określi krawędzie to zrób to samo w 3D
      [ ] Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
 	 [ ] Kiedy jest juz to ten ray tylko do wierch ale nie w INF
 	 [x] podswietl dodawany na czerwono jesli zla plaszcz, umiejscowienie trzeciego
-	 [ ] usun takze 3D kiedy są tylko 2
-     [ ] jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly
+	 [X] usun takze 3D kiedy są tylko 2
+     [?] jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly  TO TEST xxx
      [ ] dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
+     [ ] Refaktor kodu
+     [ ] 
 	*/
     private class PointProjection
 	{
@@ -42,7 +44,6 @@ public class MeshBuilder : MonoBehaviour {
     /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
     /// </summary>
     /// 
-
     Dictionary<WallInfo, Dictionary<string, PointProjection>> verticesOnWalls;
 
     /// <summary>
@@ -112,6 +113,8 @@ public class MeshBuilder : MonoBehaviour {
         }
         PointProjection toAddProj = new PointProjection(pointObj, false);
         verticesOnWalls[wall][label] = toAddProj; //zawsze dodawaj, potem sprawdz czy ok
+
+        ///DO innej F
         //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
 
@@ -154,9 +157,9 @@ public class MeshBuilder : MonoBehaviour {
 
 			Vector3 third_proj = pointObj.transform.position;
 
-            Vector3 test1 = RecreatePoint(proj1, proj2);
-            Vector3 test2 = RecreatePoint(proj2, third_proj);
-            Vector3 test3 = RecreatePoint(proj1, third_proj);
+            Vector3 test1 = CalcPosIn3D(proj1, proj2);
+            Vector3 test2 = CalcPosIn3D(proj2, third_proj);
+            Vector3 test3 = CalcPosIn3D(proj1, third_proj);
             Debug.Log($"Test1  ---- {test1.x} {test1.y} {test1.z}");
             Debug.Log($"Test2  ---- {test2.x} {test2.y} {test2.z}");
             Debug.Log($"Test3  ---- {test3.x} {test3.y} {test3.z}");
@@ -190,17 +193,39 @@ public class MeshBuilder : MonoBehaviour {
             return;
         if (!verticesOnWalls[wall].ContainsKey(label))
             return;
-        var pointToRemove = verticesOnWalls[wall][label];
+        PointProjection pointToRemove = verticesOnWalls[wall][label];
 
         if (pointToRemove == null)
             return;
 
-        verticesOnWalls[wall].Remove(label);
-        Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
-          
-		//usun takze 3D
-        //jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d
 
+        int count = GetCurrentPointProjections(label).Count;
+        if(count == 2) //sa dwa, usun 3d
+        {
+            if (vertices3D.ContainsKey(label))
+            {
+                GameObject todel3D = vertices3D[label];
+                vertices3D.Remove(label);
+                Destroy(todel3D);
+
+            }
+            verticesOnWalls[wall].Remove(label);
+
+        }
+        if (count == 3) //sa trzy, usun i podejmij reko
+        {
+            verticesOnWalls[wall].Remove(label);
+            if (vertices3D.ContainsKey(label))
+            {
+                GameObject todel3D = vertices3D[label];
+                vertices3D.Remove(label);
+                Destroy(todel3D);
+                Status result = ReconstructPoint(label);
+            }
+            
+        }
+    
+        Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
 	}
     /// <summary>
     /// Sprawdza czy na scianie znajduje juz sie rzut
@@ -228,7 +253,7 @@ public class MeshBuilder : MonoBehaviour {
 			Vector3 rzut1 = pointsInfo[0].pointObject.transform.position;
 			Vector3 rzut2 = pointsInfo[1].pointObject.transform.position;
 
-			Vector3 pkt3D = RecreatePoint(rzut1, rzut2);
+			Vector3 pkt3D = CalcPosIn3D(rzut1, rzut2);
 			if (pkt3D != Vector3.zero)
 			{
                 GameObject obj = new GameObject("Vertex3D " + label);
@@ -259,7 +284,7 @@ public class MeshBuilder : MonoBehaviour {
         return Status.OTHER_ERR;
 
     }
-    private Vector3 RecreatePoint(Vector3 vec1, Vector3 vec2)
+    private Vector3 CalcPosIn3D(Vector3 vec1, Vector3 vec2)
     {
         Vector3 ret = Vector3.zero;
         const float eps = 0.0001f;
