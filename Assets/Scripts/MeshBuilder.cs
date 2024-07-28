@@ -25,11 +25,13 @@ public class MeshBuilder : MonoBehaviour {
     private class PointProjection
 	{
 		public GameObject pointObject;
+		public LineSegment projLine;
 		public bool is_ok_placed;
 
-		public PointProjection(GameObject pointObject, bool is_ok_placed)
+		public PointProjection(GameObject pointObject, LineSegment projLine, bool is_ok_placed)
 		{
 			this.pointObject = pointObject;
+            this.projLine = projLine;
             this.is_ok_placed = is_ok_placed;
         }
 
@@ -81,25 +83,13 @@ public class MeshBuilder : MonoBehaviour {
 	// Update is called once per frame
 	void Update()
 	{
-		/*
+        /*
 		 * Aktualizuj info jakie krawędzie między wierzchołkami
 		 
 		 * Jak się określi krawędzie to zrób to samo w 3D
 		 * Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
 		 */
-		
-		foreach (WallInfo wall in verticesOnWalls.Keys)
-		{
-			foreach (string label in verticesOnWalls[wall].Keys)
-			{
-				Vector3 vertex = verticesOnWalls[wall][label].pointObject.transform.position;
-				Vector3 direction = wall.GetNormal();
-                Ray ray = new Ray(vertex, direction);
-                Debug.DrawRay(vertex, direction* 10f);
-				///Kiedy jest juz to ten ray tylko do wierch ale nie w INF
-				///opt: jezeli jest kilka wspolniliowych to linia tylko to najdluzszego?
-            }
-        }
+        ShowProjectionLines();
     }
     /// <summary>
     /// Dodane rzut punktu z listy punktów odtwarzanego obiektu 3D
@@ -112,12 +102,8 @@ public class MeshBuilder : MonoBehaviour {
         if (!verticesOnWalls.ContainsKey(wall)) {
 			verticesOnWalls[wall] = new Dictionary<string, PointProjection>();
         }
-        PointProjection toAddProj = new PointProjection(pointObj, false);
-        verticesOnWalls[wall][label] = toAddProj; //zawsze dodawaj, potem sprawdz czy ok
-        ReconstructPoint(label);
-    }
-    private void ReconstructPoint(string label)
-    {
+        PointProjection toAddProj = new PointProjection(pointObj, pointObj.GetComponent<LineSegment>(), false);
+        verticesOnWalls[wall][label] = toAddProj;
         //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
 
@@ -167,7 +153,7 @@ public class MeshBuilder : MonoBehaviour {
             Debug.Log($"Test2  ---- {test2.x} {test2.y} {test2.z}");
             Debug.Log($"Test3  ---- {test3.x} {test3.y} {test3.z}");
 
-            if ( !(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3))
+            if (!(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3))
             {
                 Debug.Log("3 polozony OK");
                 MarkOK(currPts[0]);
@@ -177,16 +163,11 @@ public class MeshBuilder : MonoBehaviour {
             }
             else
             {
-                //podswietl na czerwono 
+                MarkError(toAddProj);
                 Debug.Log("3 polozony ZLE");
-                MarkError(currPts[0]);
-                MarkError(currPts[1]);
-                MarkError(currPts[2]);
             }
         }
     }
-
-
     /// <summary>
     /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D
     /// </summary>
@@ -223,7 +204,19 @@ public class MeshBuilder : MonoBehaviour {
                 GameObject todel3D = vertices3D[label];
                 vertices3D.Remove(label);
                 Destroy(todel3D);
-                ReconstructPoint(label);
+                //Rekonstruuj
+                List<PointProjection> currPts = GetCurrentPointProjections(label);
+                Status result = Create3DPoint(label);
+                if (result == Status.PLANE_ERR)
+                {
+                    MarkError(currPts[0]);
+                    MarkError(currPts[1]);
+                }
+                else if (result == Status.OK)
+                {
+                    MarkOK(currPts[0]);
+                    MarkOK(currPts[1]);
+               }
             }           
         }   
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
@@ -324,10 +317,36 @@ public class MeshBuilder : MonoBehaviour {
     }
     private void ShowProjectionLines()
     {
+        foreach (WallInfo wall in verticesOnWalls.Keys)
+        {
+            foreach (string label in verticesOnWalls[wall].Keys)
+            {
+                Vector3 vertexProj = verticesOnWalls[wall][label].pointObject.transform.position;
 
+
+                if (vertices3D.ContainsKey(label) && verticesOnWalls[wall][label].is_ok_placed) //jest juz pkt 3d
+                {
+                    LineSegment projLine = verticesOnWalls[wall][label].projLine;
+                    if (projLine != null)
+                    {
+                        projLine.SetCoordinates(vertexProj, vertices3D[label].transform.position);
+                    }
+                }
+                else //wolny pkt
+                {
+                    const int LEN = 10;
+                    Vector3 direction = wall.GetNormal();
+                    LineSegment projLine = verticesOnWalls[wall][label].projLine;
+                    if (projLine != null)
+                    {
+                        projLine.SetCoordinates(vertexProj, vertexProj + LEN * direction);
+                    }
+                }
+            }
+        }
     }
 
-	private List<PointProjection> GetCurrentPointProjections(string label)
+    private List<PointProjection> GetCurrentPointProjections(string label)
 	{
 		List<PointProjection> pointsInfo = new List<PointProjection>();
         //sprawdz ile jest juz rzutow jednego pktu

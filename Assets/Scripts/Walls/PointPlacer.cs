@@ -163,6 +163,11 @@ public class PointPlacer : MonoBehaviour {
                 point.SetStyle(Color.black, 0.01f); //niech gridcreator wystawia wartosci
                 point.SetEnable(true);
                 point.SetLabel($"{label+new string('\'', index)}", VERTEX_LABEL_SIZE, LABEL_COLOR);
+                ///linia rzutująca
+                LineSegment lineseg = labelObj.AddComponent<LineSegment>();
+                lineseg.SetStyle(Color.blue, 0.002f);
+
+
                 mc.AddPointProjection(wall, $"{label}", labelObj);
             }
         }
