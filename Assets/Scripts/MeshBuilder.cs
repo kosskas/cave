@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using System.Threading;
 using UnityEditorInternal;
+using System.Xml.Serialization;
 
 
 public class MeshBuilder : MonoBehaviour {
@@ -19,7 +20,7 @@ public class MeshBuilder : MonoBehaviour {
      [?] jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly  TO TEST xxx
      [ ] dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
      [ ] Refaktor kodu
-     [ ] 
+     [ ] Przypadek, wszystko zle, potem usuwasz i robi sie ok
 	*/
     private class PointProjection
 	{
@@ -113,17 +114,20 @@ public class MeshBuilder : MonoBehaviour {
         }
         PointProjection toAddProj = new PointProjection(pointObj, false);
         verticesOnWalls[wall][label] = toAddProj; //zawsze dodawaj, potem sprawdz czy ok
-
+        ReconstructPoint(label);
+    }
+    private void ReconstructPoint(string label)
+    {
         //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
 
-		if(currPts.Count == 1)
-		{
+        if (currPts.Count == 1)
+        {
             Debug.Log("Pierwszy");
             //nie bylo zadnych rzutow tego pktu
             //bedzie 1
             MarkOK(currPts[0]);
-            Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
+            //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
         }
         else if (currPts.Count == 2)
         {
@@ -132,54 +136,57 @@ public class MeshBuilder : MonoBehaviour {
             //podejmij rekonstrukcje
             //sprawdz plawszczyzny
             Status result = Create3DPoint(label);
-            if(result == Status.PLANE_ERR)
+            if (result == Status.PLANE_ERR)
             {
                 //podswietl dodawany na czerwono
                 MarkError(currPts[0]);
                 MarkError(currPts[1]);
 
             }
-            else if(result == Status.OK)
+            else if (result == Status.OK)
             {
                 MarkOK(currPts[0]);
                 MarkOK(currPts[1]);
-                Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
+                //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
             }
         }
         else
-		{
+        {
             Debug.Log("Trzeci");
             //sa juz 2
             //sprawdz czy dobrze postawiony trzeci
             Vector3 proj1 = currPts[0].pointObject.transform.position;
             Vector3 proj2 = currPts[1].pointObject.transform.position;
 
-			Vector3 third_proj = pointObj.transform.position;
+            Vector3 proj3 = currPts[2].pointObject.transform.position;
 
             Vector3 test1 = CalcPosIn3D(proj1, proj2);
-            Vector3 test2 = CalcPosIn3D(proj2, third_proj);
-            Vector3 test3 = CalcPosIn3D(proj1, third_proj);
+            Vector3 test2 = CalcPosIn3D(proj2, proj3);
+            Vector3 test3 = CalcPosIn3D(proj1, proj3);
             Debug.Log($"Test1  ---- {test1.x} {test1.y} {test1.z}");
             Debug.Log($"Test2  ---- {test2.x} {test2.y} {test2.z}");
             Debug.Log($"Test3  ---- {test3.x} {test3.y} {test3.z}");
 
-            if (test1 == test2 && test1 == test3 && test2 == test3)
+            if ( !(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3))
             {
                 Debug.Log("3 polozony OK");
                 MarkOK(currPts[0]);
                 MarkOK(currPts[1]);
                 MarkOK(currPts[2]);
-                Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
+                //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
             }
             else
             {
-                //podswietl dodawany na czerwono
+                //podswietl na czerwono 
                 Debug.Log("3 polozony ZLE");
-                MarkError(toAddProj);
+                MarkError(currPts[0]);
+                MarkError(currPts[1]);
+                MarkError(currPts[2]);
             }
         }
-       
     }
+
+
     /// <summary>
     /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D
     /// </summary>
@@ -216,19 +223,7 @@ public class MeshBuilder : MonoBehaviour {
                 GameObject todel3D = vertices3D[label];
                 vertices3D.Remove(label);
                 Destroy(todel3D);
-                //z pozostalych dwoch, podejmij reko
-                Status result = Create3DPoint(label);
-                List<PointProjection> currPts = GetCurrentPointProjections(label);
-                if (result == Status.PLANE_ERR)
-                {
-                    MarkError(currPts[0]);
-                    MarkError(currPts[1]);
-                }
-                else if (result == Status.OK)
-                {
-                    MarkOK(currPts[0]);
-                    MarkOK(currPts[1]);                 
-                }
+                ReconstructPoint(label);
             }           
         }   
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
@@ -326,6 +321,10 @@ public class MeshBuilder : MonoBehaviour {
         }
         ///Jeżeli rzuty nie znajdują sie na jednej płasz. to DO STH
         return ret;
+    }
+    private void ShowProjectionLines()
+    {
+
     }
 
 	private List<PointProjection> GetCurrentPointProjections(string label)
