@@ -114,7 +114,6 @@ public class MeshBuilder : MonoBehaviour {
         PointProjection toAddProj = new PointProjection(pointObj, false);
         verticesOnWalls[wall][label] = toAddProj; //zawsze dodawaj, potem sprawdz czy ok
 
-        ///DO innej F
         //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
 
@@ -132,7 +131,7 @@ public class MeshBuilder : MonoBehaviour {
             //jest juz 1 bedzie 2
             //podejmij rekonstrukcje
             //sprawdz plawszczyzny
-            Status result = ReconstructPoint(label);
+            Status result = Create3DPoint(label);
             if(result == Status.PLANE_ERR)
             {
                 //podswietl dodawany na czerwono
@@ -198,33 +197,40 @@ public class MeshBuilder : MonoBehaviour {
         if (pointToRemove == null)
             return;
 
-
+        
         int count = GetCurrentPointProjections(label).Count;
-        if(count == 2) //sa dwa, usun 3d
+        verticesOnWalls[wall].Remove(label);
+        if (count == 2) //sa dwa, usun 3d
         {
             if (vertices3D.ContainsKey(label))
             {
                 GameObject todel3D = vertices3D[label];
                 vertices3D.Remove(label);
                 Destroy(todel3D);
-
             }
-            verticesOnWalls[wall].Remove(label);
-
         }
-        if (count == 3) //sa trzy, usun i podejmij reko
+        else if (count > 2) //sa trzy
         {
-            verticesOnWalls[wall].Remove(label);
             if (vertices3D.ContainsKey(label))
             {
                 GameObject todel3D = vertices3D[label];
                 vertices3D.Remove(label);
                 Destroy(todel3D);
-                Status result = ReconstructPoint(label);
-            }
-            
-        }
-    
+                //z pozostalych dwoch, podejmij reko
+                Status result = Create3DPoint(label);
+                List<PointProjection> currPts = GetCurrentPointProjections(label);
+                if (result == Status.PLANE_ERR)
+                {
+                    MarkError(currPts[0]);
+                    MarkError(currPts[1]);
+                }
+                else if (result == Status.OK)
+                {
+                    MarkOK(currPts[0]);
+                    MarkOK(currPts[1]);                 
+                }
+            }           
+        }   
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
 	}
     /// <summary>
@@ -237,8 +243,7 @@ public class MeshBuilder : MonoBehaviour {
     {
         return verticesOnWalls.ContainsKey(wall) && verticesOnWalls[wall].ContainsKey(label);       
     }
-
-    private Status ReconstructPoint(string label)
+    private Status Create3DPoint(string label)
 	{
 		int licz = 0;
 
