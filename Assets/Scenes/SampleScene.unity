@@ -598,6 +598,38 @@ Light:
   m_UseColorTemperature: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &1203211519 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1147386543155430, guid: 68ad95220be6f1346b750137917c6f75,
+    type: 2}
+  m_PrefabInternal: {fileID: 1450201496}
+--- !u!114 &1203211520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1203211519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fae024b9fb320884c87a94b5dfa34dcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1351469339 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1769127065229098, guid: a1bc949586948304995fd7bafe3feed7,
+    type: 2}
+  m_PrefabInternal: {fileID: 246759288}
+--- !u!114 &1351469340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1351469339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c511ef17192be949a8a6ff8b83b0c61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1450201496
 Prefab:
   m_ObjectHideFlags: 0
