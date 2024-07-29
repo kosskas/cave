@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class Mode2Dto3D : IMode
@@ -93,3 +94,22 @@ public class Mode2Dto3D : IMode
     }
 
 }
+
+        // if (Input.GetKeyDown("o"))
+        // {
+        //     pp.CreateLabel(hit, $"{alpha[labelIdx]}");
+        // }
+        // if (Input.GetKeyDown("p"))
+        // {
+        //     pp.RemoveLabel(hit, $"{alpha[labelIdx]}");
+        // }
+        // if (Input.GetKeyDown("4"))
+        // {
+        //     labelIdx = (labelIdx - 1 < 0 ? alpha.Length - 1 : labelIdx - 1);
+        //     Debug.Log($"Current label {alpha[labelIdx]}");
+        // }
+        // if (Input.GetKeyDown("5"))
+        // {
+        //     labelIdx = (labelIdx+1)% alpha.Length;
+        //     Debug.Log($"Current label {alpha[labelIdx]}");
+        // }
