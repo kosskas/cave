@@ -599,7 +599,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!1 &1203211519 stripped
 --- !u!1 &1203211519
 GameObject:
   m_ObjectHideFlags: 0
@@ -672,10 +671,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1203211519}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4993591d081da2f468d09bdfec9b42fa, type: 3}
+  m_Script: {fileID: 11500000, guid: c0f10dba5e913454696f335a1065ed4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkingSpeed: 6.5
+  walkingSpeed: 7.5
   playerCamera: {fileID: 1608042725}
   lookSpeed: 2
   lookXLimit: 45
