@@ -9,6 +9,11 @@ using UnityEngine;
 public class Label : MonoBehaviour {
 
 	/// <summary>
+	/// Wektor przesunięcia etykiety względem obiektu rodzica, do którego jest dołączona
+	/// </summary>
+	private Vector3 _offset = Vector3.zero;
+	
+	/// <summary>
 	/// Wyświetlany tekst
 	/// </summary>
 	private string _text = "<?>";
@@ -74,6 +79,7 @@ public class Label : MonoBehaviour {
 		this._textMesh.characterSize = this._fontSize;
 		this._textMesh.color = this._color;
 		this._labelRenderer.enabled = this._isEnabled;
+		gameObject.transform.position = gameObject.transform.parent.transform.position + this._offset;
 	}
 
 	/// <summary>
@@ -108,6 +114,12 @@ public class Label : MonoBehaviour {
     {
         this._color = textColor;
     }
+
+	public void SetLabel(string text)
+	{
+		this._text = text;
+	}
+
     /// <summary>
     /// Metoda włączająca/wyłączająca widoczność etykiety
     /// </summary>
@@ -115,5 +127,10 @@ public class Label : MonoBehaviour {
     public void SetEnable(bool isEnabled)
 	{
 		this._isEnabled = isEnabled;
+	}
+
+	public void SetOffset(Vector3 offset)
+	{
+		this._offset = offset;
 	}
 }
