@@ -139,6 +139,8 @@ public class Mode2Dto3D : IMode
         _pp.Init(_mb, _cd);
         _pp.CreateCursor();
         _pp.MoveCursor(PCref.Hit);
+        
+        SetUpFlystick();
 
         //if (PointsList.ceilingWall != null) //nie dziala, dalej sie psuje
         //{
@@ -149,6 +151,35 @@ public class Mode2Dto3D : IMode
         PointsList.ShowListAndLogs();
 
         Debug.Log($"<color=blue> MODE inzynierka ON </color>");
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1, 
+            FlystickController.ActOn.PRESS, 
+            () => _AddPointProjection()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._2, 
+            FlystickController.ActOn.PRESS, 
+            () => _RemovePointProjection()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK, 
+            FlystickController.ActOn.TILT_LEFT, 
+            () => _ChoosePreviousLabel()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK, 
+            FlystickController.ActOn.TILT_RIGHT, 
+            () => _ChooseNextLabel()
+        );
     }
 
     public void HandleInput()

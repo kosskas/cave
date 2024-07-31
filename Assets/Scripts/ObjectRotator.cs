@@ -14,7 +14,18 @@ public class ObjectRotator : MonoBehaviour {
 	private bool isRotating = false;
 
 	void Start(){
-		tmp = GameObject.Find("FlystickPlaceholder");
+		//tmp = GameObject.Find("FlystickPlaceholder");
+
+		FlystickController.SetAction(
+            FlystickController.Btn.FIRE, 
+            FlystickController.ActOn.PRESS, 
+            () => {isRotating = true;}
+        );
+		FlystickController.SetAction(
+            FlystickController.Btn.FIRE, 
+            FlystickController.ActOn.RELEASE, 
+            () => {isRotating = false;}
+        );
 	}
 
 	void Update(){

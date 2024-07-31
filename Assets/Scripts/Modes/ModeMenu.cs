@@ -9,6 +9,9 @@ public class ModeMenu : IMode
     public ModeMenu(PlayerController pc)
     {
         PCref = pc;
+
+        SetUpFlystick();
+
         Debug.Log($"<color=blue> MODE menu ON </color>");
 
         PointsList.HideListAndLogs();
@@ -48,6 +51,23 @@ public class ModeMenu : IMode
         {
             kreaButton.SetActive(false);
         }
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1, 
+            FlystickController.ActOn.PRESS, 
+            () => _GoToMode3Dto2D()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._2, 
+            FlystickController.ActOn.PRESS, 
+            () => _GoToMode2Dto3D()
+        );
     }
 
     public void HandleInput()
