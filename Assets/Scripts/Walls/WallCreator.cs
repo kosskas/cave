@@ -19,46 +19,22 @@ public class WallCreator : MonoBehaviour
     private List<GameObject> points = new List<GameObject>();
 	private GameObject newWall;
 	private WallController wallController;
-
 	private WallInfo hitWallInfo = null;
 
-
+	private const float POINT_SIZE = 0.05f;
 
     // Use this for initialization
     void Start () {
 		GameObject wallsObject = GameObject.Find("Walls");
 		wallController = wallsObject.GetComponent<WallController>();
-    }
+	}
 	
-	public void SwitchWallVisibility(RaycastHit hit)
-	{
-        if (hit.collider != null)
-        {
-            if (hit.collider.tag == "Wall")
-            {
-                //Debug.Log("hit: " + hit.collider.name);
-                WallInfo info = wallController.FindWallInfoByGameObject(hit.collider.gameObject);
-                if (info != null)
-                {
-                    if (info.showLines)
-                    {
-                        wallController.SetWallInfo(hit.collider.gameObject, false, false, false);
-                    }
-                    else
-                    {
-                        wallController.SetWallInfo(hit.collider.gameObject, true, true, true);
-                    }
-                }
 
-            }
-        }
-    }
-    /// <summary>
-    /// Stworzy punkt na ścianie przez który będzie przechodzić nowa ściana
-    /// </summary>
-    /// <param name="hit">Metadane o kolizji</param>
-    /// <param name="POINT_SIZE">Rozmiar punktu</param>
-    public void CreatePoint(RaycastHit hit,float POINT_SIZE) 
+	/// <summary>
+	/// Stworzy punkt na ścianie przez który będzie przechodzić nowa ściana
+	/// </summary>
+	/// <param name="hit">Metadane o kolizji</param>
+	public void CreatePoint(RaycastHit hit) 
 	{
 		WallInfo justHit = null;
 		
