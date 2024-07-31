@@ -6,27 +6,32 @@ using UnityEngine;
 public class PointPlacer : MonoBehaviour {
 
 	// Use this for initialization
-	private GameObject point;
-    private Renderer pointRenderer;
-	private const float POINT_SIZE = 0.05f;
-    private const float POINT_DIAMETER = 0.015f;
+	private GameObject cursor;
+    private Renderer cursorRenderer;
+    private GameObject cursorLabelObj;
+    private Label cursorLabel;
+	private const float CURSOR_SIZE = 0.05f;
+    private Color CURSOR_COLOR = new Color(1, 1, 1, 0.3f);
+    private Color CURSOR_COLOR_FOCUSED = new Color(1, 0, 0, 1f);
 
-    private const float VERTEX_LABEL_SIZE = 0.04f;
-
-    private Color LABEL_COLOR = Color.white;
-    private int labelText = 1;
+    private const float POINT_SIZE = 0.025f;
     private Color POINT_COLOR = Color.black;
 
-    private GameObject pointsDir;
+    private const float LABEL_SIZE_PLACED = 0.04f;
+    private const float LABEL_SIZE_PICKED = 0.06f;
+    private const float LABEL_OFFSET_FROM_POINT = 0.03f;
+    private Color LABEL_COLOR_PLACED = Color.white;
+    private Color LABEL_COLOR_PICKED = Color.red;
+
+    private char[] labelsColl = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+    private int labelsIdx = 0;
+
     private WallController wc;
     private MeshBuilder mc;
-
-    //private List<GameObject> activePoints = new List<GameObject>();
-
+    
 
     void Start()
     {
-        pointsDir = new GameObject("PointsDir");
         GameObject wallsObject = GameObject.Find("Walls");
         wc = wallsObject.GetComponent<WallController>();
         mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
@@ -39,7 +44,7 @@ public class PointPlacer : MonoBehaviour {
     /// <param name="wallNormal">Wektor normalny collidera punktu trafionego Raycastem</param>
     /// <param name="pointPosition">Współrzędne trafionego punktu</param>
     /// <returns>Obiekt opisujący ścianę, na której najprawdopodobniej znajduje się trafiony punkt</returns>
-    private WallInfo EstimateWall(Vector3 wallNormal, Vector3 pointPosition)
+    private WallInfo _EstimateWall(Vector3 wallNormal, Vector3 pointPosition)
     {
         List<WallInfo> walls = wc.GetWalls();
         WallInfo closestWall = null;
@@ -60,18 +65,50 @@ public class PointPlacer : MonoBehaviour {
         return closestWall;
     }
 
-
-	public void CreatePoint() 
+    private void _LocateLabels(GameObject pointClicked, WallInfo wall)
     {
-		point = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        pointRenderer = point.GetComponent<Renderer>();
+        Vector3 wallNormal = wall.GetNormal();
+        int labelsNum = pointClicked.transform.childCount;
+        float theta = 2.0f * Mathf.PI / (float)labelsNum;
+
+        for (int i = 0; i < labelsNum; i++)
+        {
+            float alpha_i = (float)i * theta;
+            Vector3 offset = Vector3.zero;
+
+            if ((int)Mathf.Abs(wallNormal.x) == 1) {
+                offset.y = 0.01f + LABEL_OFFSET_FROM_POINT * Mathf.Cos(alpha_i);
+                offset.z = 0.02f + LABEL_OFFSET_FROM_POINT * Mathf.Sin(alpha_i);
+            }
+            else if((int)Mathf.Abs(wallNormal.y) == 1) {
+                offset.x = 0.02f + LABEL_OFFSET_FROM_POINT * Mathf.Cos(alpha_i);
+                offset.z = 0.02f + LABEL_OFFSET_FROM_POINT * Mathf.Sin(alpha_i);
+            }
+            else if((int)Mathf.Abs(wallNormal.z) == 1) {
+                offset.x = 0.02f + LABEL_OFFSET_FROM_POINT * Mathf.Cos(alpha_i);
+                offset.y = 0.01f + LABEL_OFFSET_FROM_POINT * Mathf.Sin(alpha_i);
+            }
+
+            pointClicked
+                .transform
+                .GetChild(i)
+                .Find("Label")
+                .GetComponent<Label>()
+                .SetOffset(offset);
+        }
+    }
+
+
+	public void CreateCursor() 
+    {
+		cursor = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        cursorRenderer = cursor.GetComponent<Renderer>();
 
         // Tworzymy nowy materiał
         Material transparentMaterial = new Material(Shader.Find("Standard"));
 
         // Ustawiamy kolor i przezroczystość materiału
-        Color color = new Color(1, 1, 1, 0.3f); // Kolor biały z 50% przezroczystością
-        transparentMaterial.color = color;
+        transparentMaterial.color = CURSOR_COLOR;
 
         // Włączamy renderowanie przezroczystości
         transparentMaterial.SetFloat("_Mode", 3); // Ustawienie trybu renderowania na przeźroczystość
@@ -84,114 +121,123 @@ public class PointPlacer : MonoBehaviour {
         transparentMaterial.renderQueue = 3000;
 
         // Przypisujemy materiał do sfery
-        pointRenderer.material = transparentMaterial;
-        point.layer = LayerMask.NameToLayer("Ignore Raycast");
+        cursorRenderer.material = transparentMaterial;
+        cursor.layer = LayerMask.NameToLayer("Ignore Raycast");
+        
+        // Ustawiamy rozmiar
+        cursor.transform.localScale = new Vector3(CURSOR_SIZE, CURSOR_SIZE, CURSOR_SIZE);
+
+        // Dodajemy obiekt etykiety
+        cursorLabelObj = new GameObject("CursorLabel");
+        cursorLabelObj.transform.SetParent(cursor.transform);
+        cursorLabelObj.transform.position = cursor.transform.position + new Vector3(0, 0.1f, 0);
+
+        // Dodajemy etykietę
+        cursorLabel = cursorLabelObj.AddComponent<Label>();
+        cursorLabel.SetLabel($"{labelsColl[labelsIdx]}", LABEL_SIZE_PICKED, LABEL_COLOR_PICKED);		
     }
 	
-	public void MovePointPrototype(RaycastHit hit)
+	public void MoveCursor(RaycastHit hit)
     {
-		if (hit.collider != null)
-        {
-            if (hit.collider.tag != "Wall" && hit.collider.tag != "GridPoint")
-            {
-                return;
-            }
+		if (hit.collider == null || (hit.collider.tag != "Wall" && hit.collider.tag != "GridPoint")) {
+            return;
+        }
 
-            pointRenderer.material.color = (hit.collider.tag == "GridPoint") ? new Color(1, 0, 0, 1f) : new Color(1, 1, 1, 0.3f);
-            
-            point.transform.localScale = new Vector3(POINT_SIZE, POINT_SIZE, POINT_SIZE);
-            point.transform.position = hit.point;
-			
-		}
-		
+        cursor.transform.position = hit.point;
+
+        if (hit.collider.tag == "GridPoint")
+        {
+            cursorRenderer.material.color = CURSOR_COLOR_FOCUSED;
+            cursorLabel.SetLabel($"{labelsColl[labelsIdx]}");
+            cursorLabel.SetEnable(true);
+        }
+        else
+        {
+            cursorRenderer.material.color = CURSOR_COLOR;
+            cursorLabel.SetEnable(false);
+        }
 	}
 
-    public void OnClick(RaycastHit hit)
+    public void NextLabel()
     {
-        if (hit.collider != null)
-        {
-            if (hit.collider.tag == "GridPoint")
-            {
-                GameObject pointClicked = hit.collider.gameObject;
-                Point point = pointClicked.GetComponent<Point>();
-
-                WallInfo wall = this.EstimateWall(hit.normal, point.GetCoordinates());
-
-                //if (activePoints.Contains(pointClicked))
-                if (point.IsEnabled())
-                {
-                    //activePoints.Remove(pointClicked);
-                    mc.RemovePointProjection(wall, $"{labelText}");
-                    point.SetEnable(false);
-                }
-                else
-                {
-                    point.SetLabel($"{labelText}", VERTEX_LABEL_SIZE, LABEL_COLOR);
-                    mc.AddPointProjection(wall, $"{labelText}", pointClicked);
-                    labelText++;
-
-                    //activePoints.Add(pointClicked);
-                    point.SetEnable(true);
-                }
-
-                //Debug.Log($"Num of activePoints = {activePoints.Count}");
-            }
-        }
+        labelsIdx = (labelsIdx+1) % labelsColl.Length;
     }
 
-    public void CreateLabel(RaycastHit hit, string label)
+    public void PreviousLabel()
     {
-        if (hit.collider != null)
-        {
-            if (hit.collider.tag == "GridPoint")
-            {
-                GameObject pointClicked = hit.collider.gameObject;
-                WallInfo wall = this.EstimateWall(hit.normal, pointClicked.transform.position);
-
-                if(mc.CheckIfAlreadyExist(wall, label))
-                {
-                    Debug.LogError("Rzut juz jest na tej scianie");
-                    return;
-                }
-
-                int index = wc.GetWallIndex(wall);
-                GameObject labelObj = new GameObject(label);
-                labelObj.transform.parent = pointClicked.transform;
-
-                Point point = labelObj.AddComponent<Point>();
-                point.SetCoordinates(pointClicked.transform.position);
-                point.SetStyle(Color.black, 0.01f); //niech gridcreator wystawia wartosci
-                point.SetEnable(true);
-                point.SetLabel($"{label+new string('\'', index)}", VERTEX_LABEL_SIZE, LABEL_COLOR);
-                ///linia rzutująca
-                LineSegment lineseg = labelObj.AddComponent<LineSegment>();
-                lineseg.SetStyle(Color.blue, 0.002f);
-
-
-                mc.AddPointProjection(wall, $"{label}", labelObj);
-            }
-        }
+        labelsIdx = ((labelsIdx-1) < 0) ? (labelsColl.Length-1) : (labelsIdx-1);
     }
 
-    public void RemoveLabel(RaycastHit hit, string label)
+    public void AddPoint(RaycastHit hit)
     {
-        if (hit.collider != null)
-        {
-            if (hit.collider.tag == "GridPoint")
-            {
-                GameObject pointClicked = hit.collider.gameObject;
-                WallInfo wall = this.EstimateWall(hit.normal, pointClicked.transform.position);
-
-                Transform labelObjTrabs = pointClicked.transform.Find(label);             
-                if (labelObjTrabs == null)
-                {
-                    Debug.LogError($"Wezel nie ma takiego dziecka jak {label}");
-                    return;
-                }
-                GameObject labelObj = labelObjTrabs.transform.gameObject;
-                mc.RemovePointProjection(wall, $"{label}");
-                Destroy(labelObj);
-            }
+        if (hit.collider == null || hit.collider.tag != "GridPoint") {
+            return;
         }
+        
+        GameObject pointClicked = hit.collider.gameObject;
+        if (pointClicked == null) {
+            return;
+        }
+        
+        WallInfo wall = this._EstimateWall(hit.normal, pointClicked.transform.position);
+        if (wall == null) {
+            return;
+        }
+
+        string labelText = $"{labelsColl[labelsIdx]}";
+        if(mc.CheckIfAlreadyExist(wall, labelText)) {
+            Debug.LogError($"Rzut {labelText} juz jest na tej scianie");
+            return;
+        }
+
+        int index = wc.GetWallIndex(wall);
+
+        GameObject labelObj = new GameObject(labelText);
+        labelObj.transform.parent = pointClicked.transform;
+
+        Point point = labelObj.AddComponent<Point>();
+        point.SetCoordinates(pointClicked.transform.position);
+        point.SetStyle(POINT_COLOR, POINT_SIZE);
+        point.SetEnable(true);
+        point.SetLabel($"{labelText + new string('\'', index)}", LABEL_SIZE_PLACED, LABEL_COLOR_PLACED);
+        
+        ///linia rzutująca
+        LineSegment lineseg = labelObj.AddComponent<LineSegment>();
+        lineseg.SetStyle(Color.blue, 0.002f);
+
+        mc.AddPointProjection(wall, labelText, labelObj);
+
+        _LocateLabels(pointClicked, wall);
+    }
+
+    public void RemovePoint(RaycastHit hit)
+    {
+        if (hit.collider == null || hit.collider.tag != "GridPoint") {
+            return;
+        }
+
+        GameObject pointClicked = hit.collider.gameObject;
+        if (pointClicked == null) {
+            return;
+        }
+
+        WallInfo wall = this._EstimateWall(hit.normal, pointClicked.transform.position);
+        if (wall == null) {
+            return;
+        }
+
+        string labelText = $"{labelsColl[labelsIdx]}";
+        Transform labelObjTrabs = pointClicked.transform.Find(labelText);             
+        if (labelObjTrabs == null) {
+            Debug.LogError($"Wezel nie ma takiego dziecka jak {labelText}");
+            return;
+        }
+
+        mc.RemovePointProjection(wall, labelText);
+
+        GameObject labelObj = labelObjTrabs.transform.gameObject;
+        Destroy(labelObj);
+
+        _LocateLabels(pointClicked, wall);
     }
 }
