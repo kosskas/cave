@@ -10,10 +10,14 @@ public class Mode2Dto3D : IMode
     public PlayerController PCref { get; private set; }
 
     private void _AddPointProjection()
-    {}
+    {
+        _pp.AddPoint(PCref.Hit);
+    }
 
     private void _RemovePointProjection()
-    {}
+    {
+        _pp.RemovePoint(PCref.Hit);
+    }
 
     private void _AddEdgeProjection()
     {}
@@ -28,10 +32,14 @@ public class Mode2Dto3D : IMode
     {}
 
     private void _ChoosePreviousLabel()
-    {}
+    {
+        _pp.PreviousLabel();
+    }
 
     private void _ChooseNextLabel()
-    {}
+    {
+        _pp.NextLabel();
+    }
 
     public Mode2Dto3D(PlayerController pc)
     {
@@ -42,15 +50,15 @@ public class Mode2Dto3D : IMode
         _gc = new GridCreator();
 
         _pp = PCref.gameObject.GetComponent<PointPlacer>();
-        _pp.CreatePoint();
-        _pp.MovePointPrototype(PCref.Hit);
+        _pp.CreateCursor();
+        _pp.MoveCursor(PCref.Hit);
 
         Debug.Log($"<color=blue> MODE inzynierka ON </color>");
     }
 
     public void HandleInput()
     {
-        _pp.MovePointPrototype(PCref.Hit);
+        _pp.MoveCursor(PCref.Hit);
 
         if (Input.GetKeyDown("1"))
         {
@@ -94,22 +102,3 @@ public class Mode2Dto3D : IMode
     }
 
 }
-
-        // if (Input.GetKeyDown("o"))
-        // {
-        //     pp.CreateLabel(hit, $"{alpha[labelIdx]}");
-        // }
-        // if (Input.GetKeyDown("p"))
-        // {
-        //     pp.RemoveLabel(hit, $"{alpha[labelIdx]}");
-        // }
-        // if (Input.GetKeyDown("4"))
-        // {
-        //     labelIdx = (labelIdx - 1 < 0 ? alpha.Length - 1 : labelIdx - 1);
-        //     Debug.Log($"Current label {alpha[labelIdx]}");
-        // }
-        // if (Input.GetKeyDown("5"))
-        // {
-        //     labelIdx = (labelIdx+1)% alpha.Length;
-        //     Debug.Log($"Current label {alpha[labelIdx]}");
-        // }
