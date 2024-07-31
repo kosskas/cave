@@ -52,8 +52,39 @@ public class Mode2Dto3D : IMode
         _pp = PCref.gameObject.GetComponent<PointPlacer>();
         _pp.CreateCursor();
         _pp.MoveCursor(PCref.Hit);
+        
+        SetUpFlystick();
 
         Debug.Log($"<color=blue> MODE inzynierka ON </color>");
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1, 
+            FlystickController.ActOn.PRESS, 
+            () => _AddPointProjection()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._2, 
+            FlystickController.ActOn.PRESS, 
+            () => _RemovePointProjection()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK, 
+            FlystickController.ActOn.TILT_LEFT, 
+            () => _ChoosePreviousLabel()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK, 
+            FlystickController.ActOn.TILT_RIGHT, 
+            () => _ChooseNextLabel()
+        );
     }
 
     public void HandleInput()

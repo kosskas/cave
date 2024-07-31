@@ -79,7 +79,56 @@ public class Mode3Dto2D : IMode
         _wc = wallsObject.GetComponent<WallController>();
         _wcrt = PCref.gameObject.GetComponent<WallCreator>();
 
+        SetUpFlystick();
+
         Debug.Log($"<color=blue> MODE grupowy ON </color>");
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1, 
+            FlystickController.ActOn.PRESS, 
+            () => _ShowProjectionLines()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._2, 
+            FlystickController.ActOn.PRESS, 
+            () => _ShowReferenceLines()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._3, 
+            FlystickController.ActOn.PRESS, 
+            () => _SetShowingProjection()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._4, 
+            FlystickController.ActOn.PRESS, 
+            () => _AddPointToCreateWall()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK, 
+            FlystickController.ActOn.PRESS, 
+            () => _RemoveWall()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK, 
+            FlystickController.ActOn.TILT_LEFT, 
+            () => _DisplayPreviousSolid()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK, 
+            FlystickController.ActOn.TILT_RIGHT, 
+            () => _DisplayNextSolid()
+        );
     }
 
     ////

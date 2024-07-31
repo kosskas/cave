@@ -15,19 +15,29 @@ public class ObjectRotator : MonoBehaviour {
 
 	void Start(){
 		//tmp = GameObject.Find("FlystickPlaceholder");
-		if (Lzwp.sync.isMaster)
-        {
-			Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Fire).OnPress += () =>
-			{
-				isRotating = true;
-            };
+		// if (Lzwp.sync.isMaster)
+        // {
+		// 	Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Fire).OnPress += () =>
+		// 	{
+		// 		isRotating = true;
+        //     };
 
-            Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Fire).OnRelease += () =>
-            {
-                isRotating = false;
-            };
+        //     Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Fire).OnRelease += () =>
+        //     {
+        //         isRotating = false;
+        //     };
 
-        };
+        // };
+		FlystickController.SetAction(
+            FlystickController.Btn.FIRE, 
+            FlystickController.ActOn.PRESS, 
+            () => {isRotating = true;}
+        );
+		FlystickController.SetAction(
+            FlystickController.Btn.FIRE, 
+            FlystickController.ActOn.RELEASE, 
+            () => {isRotating = false;}
+        );
 	}
 
 	void Update(){
