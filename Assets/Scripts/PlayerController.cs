@@ -6,7 +6,8 @@ using UnityEngine;
 /// <summary>
 /// Klasa PlayerController jest klasą strerującą graczem w aplikacji. Obsługuje ruch gracza po mapie oraz wszelkie dodatkowe czynności inicjowane przyciskiem z klawiatury.
 /// </summary>
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(CharacterController))] // -- DEV
+//[RequireComponent(typeof(CharacterController), typeof(FlystickController))] // -- LZWP
 public class PlayerController : MonoBehaviour
 {
     /// <summary>
@@ -47,6 +48,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 _moveDirection = Vector3.zero;
     private float _rotationX = 0;
     private CharacterController _characterController;
+    //private FlystickController _flystickController; // -- LZWP
     private Ray _ray;
     private IMode _modeController;
     private Mode _mode = Mode.ModeMenu;
@@ -55,8 +57,12 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //_flystickController = GetComponentInChildren<FlystickController>(); // -- LZWP
         _characterController = GetComponentInChildren<CharacterController>();
+
+        _ray = Camera.main.ScreenPointToRay(Input.mousePosition); // -- DEV
+        //_ray = new Ray(_flystickController.RayLineOrigin, _flystickController.RayLineDirection); // -- LZWP
+        
         _SetModeController();
 
         // Lock cursor
@@ -76,7 +82,9 @@ public class PlayerController : MonoBehaviour
 
     private void _UpdateRaycasting()
     {
-        _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        _ray = Camera.main.ScreenPointToRay(Input.mousePosition); // -- DEV
+        //_ray.origin = _flystickController.RayLineOrigin; // -- LZWP
+        //_ray.direction = _flystickController.RayLineDirection; // -- LZWP
         Physics.Raycast(_ray, out Hit, 100);
     }
 

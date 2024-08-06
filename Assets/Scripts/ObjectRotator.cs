@@ -9,17 +9,38 @@ public class ObjectRotator : MonoBehaviour {
 	/// </summary>
 	[SerializeField] public float rotationSpeed = 10f;
 
-	GameObject tmp;
+	GameObject tmp; // -- DEV
 
 	private bool isRotating = false;
 
 	void Start(){
-		tmp = GameObject.Find("FlystickPlaceholder");
+		tmp = GameObject.Find("FlystickPlaceholder"); // -- DEV
+
+		/*
+		FlystickController.SetAction(
+            FlystickController.Btn.FIRE, 
+            FlystickController.ActOn.PRESS, 
+            () => { isRotating = true; }
+        );
+		FlystickController.SetAction(
+            FlystickController.Btn.FIRE, 
+            FlystickController.ActOn.RELEASE, 
+            () => { isRotating = false; }
+        );
+		*/ // -- LZWP
 	}
 
 	void Update(){
-		transform.rotation = tmp.transform.rotation;
+		transform.rotation = tmp.transform.rotation; // -- DEV
+
+		/*
+		if (isRotating)
+        {
+            transform.rotation = Lzwp.input.flysticks[0].pose.rotation;
+        }
+		*/ // -- LZWP
 	}
+	
 	/// <summary>
 	/// Kamera potrzebna do wyliczania obrotu
 	/// </summary>
