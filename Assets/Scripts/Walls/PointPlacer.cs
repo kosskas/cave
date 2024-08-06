@@ -1,7 +1,71 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using UnityEngine;
+
+
+public struct PointInfo {
+    public float X { get; }
+    public float Y { get; }
+    public float Z { get; }
+    public string Label { get; }
+    public string FullLabel { get; }
+    public WallInfo WallInfo { get; }
+    public GameObject GridPoint { get; }
+
+    public static readonly PointInfo Empty = new PointInfo(null, null, "<?>", "<?>");
+
+    public PointInfo(GameObject gridPoint, WallInfo wallInfo, string label, string fullLabel)
+    {
+        X = 0.0f;
+        Y = 0.0f;
+        Z = 0.0f;
+        Label = label;
+        FullLabel = fullLabel;
+        WallInfo = wallInfo;
+        GridPoint = gridPoint;
+
+        if (gridPoint != null)
+        {
+            string name = gridPoint.name;
+            int startIndex = name.IndexOf('(') + 1;
+            int endIndex = name.IndexOf(')') - 1;
+            int length = endIndex - startIndex + 1;
+
+            char[] coordAxis = { name[5], name[6] };
+            string[] coordValuesStr = name.Substring(startIndex, length).Split(',');
+            float[] coordValues = { float.Parse(coordValuesStr[0], CultureInfo.InvariantCulture), float.Parse(coordValuesStr[1], CultureInfo.InvariantCulture) };
+
+            switch (coordAxis[0])
+            {
+                case 'X': X = coordValues[0];
+                    break;
+                case 'Y': Y = coordValues[0];
+                    break;
+                case 'Z': Z = coordValues[0];
+                    break;
+                default:
+                    break;
+            }
+
+            switch (coordAxis[1])
+            {
+                case 'X': X = coordValues[1];
+                    break;
+                case 'Y': Y = coordValues[1];
+                    break;
+                case 'Z': Z = coordValues[1];
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public override string ToString() => $"{FullLabel} (X={X}, Y={Y}, Z={Z})";
+}
+
 
 public class PointPlacer : MonoBehaviour {
 
@@ -168,29 +232,30 @@ public class PointPlacer : MonoBehaviour {
         labelsIdx = ((labelsIdx-1) < 0) ? (labelsColl.Length-1) : (labelsIdx-1);
     }
 
-    public void AddPoint(RaycastHit hit)
+    public PointInfo AddPoint(RaycastHit hit)
     {
         if (hit.collider == null || hit.collider.tag != "GridPoint") {
-            return;
+            return PointInfo.Empty;
         }
         
         GameObject pointClicked = hit.collider.gameObject;
         if (pointClicked == null) {
-            return;
+            return PointInfo.Empty;
         }
         
         WallInfo wall = this._EstimateWall(hit.normal, pointClicked.transform.position);
         if (wall == null) {
-            return;
+            return PointInfo.Empty;
         }
 
         string labelText = $"{labelsColl[labelsIdx]}";
+        int index = wc.GetWallIndex(wall);
+        string fullLabelText = $"{labelText + new string('\'', index)}";
+
         if(mc.CheckIfAlreadyExist(wall, labelText)) {
             Debug.LogError($"Rzut {labelText} juz jest na tej scianie");
-            return;
+            return PointInfo.Empty;
         }
-
-        int index = wc.GetWallIndex(wall);
 
         GameObject labelObj = new GameObject(labelText);
         labelObj.transform.parent = pointClicked.transform;
@@ -199,7 +264,7 @@ public class PointPlacer : MonoBehaviour {
         point.SetCoordinates(pointClicked.transform.position);
         point.SetStyle(POINT_COLOR, POINT_SIZE);
         point.SetEnable(true);
-        point.SetLabel($"{labelText + new string('\'', index)}", LABEL_SIZE_PLACED, LABEL_COLOR_PLACED);
+        point.SetLabel(fullLabelText, LABEL_SIZE_PLACED, LABEL_COLOR_PLACED);
         
         ///linia rzutująca
         LineSegment lineseg = labelObj.AddComponent<LineSegment>();
@@ -208,6 +273,8 @@ public class PointPlacer : MonoBehaviour {
         mc.AddPointProjection(wall, labelText, labelObj);
 
         _LocateLabels(pointClicked, wall);
+
+        return new PointInfo(pointClicked, wall, labelText, fullLabelText);
     }
 
     public void RemovePoint(RaycastHit hit)
@@ -239,5 +306,25 @@ public class PointPlacer : MonoBehaviour {
         Destroy(labelObj);
 
         _LocateLabels(pointClicked, wall);
+    }
+
+    public void RemovePoint(PointInfo pi)
+    {
+        if (pi.GridPoint == null || pi.WallInfo == null) {
+            return;
+        }
+
+        Transform labelObjTrans = pi.GridPoint.transform.Find(pi.Label);  
+        if (labelObjTrans == null) {
+            Debug.LogError($"Wezel nie ma takiego dziecka jak {pi.Label}");
+            return;
+        }
+
+        mc.RemovePointProjection(pi.WallInfo, pi.Label);
+
+        GameObject labelObj = labelObjTrans.transform.gameObject;
+        Destroy(labelObj);
+
+        _LocateLabels(pi.GridPoint, pi.WallInfo);
     }
 }

@@ -11,7 +11,8 @@ public class Mode2Dto3D : IMode
 
     private void _AddPointProjection()
     {
-        _pp.AddPoint(PCref.Hit);
+        PointInfo pi = _pp.AddPoint(PCref.Hit);
+        Debug.Log(pi.ToString());
     }
 
     private void _RemovePointProjection()
