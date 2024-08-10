@@ -277,27 +277,30 @@ public class PointPlacer : MonoBehaviour {
         return new PointInfo(pointClicked, wall, labelText, fullLabelText);
     }
 
-    public void RemovePoint(RaycastHit hit)
+    public PointInfo RemovePoint(RaycastHit hit)
     {
         if (hit.collider == null || hit.collider.tag != "GridPoint") {
-            return;
+            return PointInfo.Empty;
         }
 
         GameObject pointClicked = hit.collider.gameObject;
         if (pointClicked == null) {
-            return;
+            return PointInfo.Empty;
         }
 
         WallInfo wall = this._EstimateWall(hit.normal, pointClicked.transform.position);
         if (wall == null) {
-            return;
+            return PointInfo.Empty;
         }
 
         string labelText = $"{labelsColl[labelsIdx]}";
+        int index = wc.GetWallIndex(wall);
+        string fullLabelText = $"{labelText + new string('\'', index)}";
+        
         Transform labelObjTrabs = pointClicked.transform.Find(labelText);             
         if (labelObjTrabs == null) {
             Debug.LogError($"Wezel nie ma takiego dziecka jak {labelText}");
-            return;
+            return PointInfo.Empty;
         }
 
         mc.RemovePointProjection(wall, labelText);
@@ -306,6 +309,8 @@ public class PointPlacer : MonoBehaviour {
         Destroy(labelObj);
 
         _LocateLabels(pointClicked, wall);
+
+        return new PointInfo(pointClicked, wall, labelText, fullLabelText);
     }
 
     public void RemovePoint(PointInfo pi)
