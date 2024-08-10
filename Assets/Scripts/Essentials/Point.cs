@@ -12,63 +12,110 @@ public class Point : MonoBehaviour {
 	/// <summary>
 	/// Współrzędne punktu, liczone względem położenia obiektu rodzica
 	/// </summary>
-	private Vector3 point = Vector3.zero;
+	private Vector3 _point = Vector3.zero;
 
 	/// <summary>
 	/// Kolor punktu
 	/// </summary>
-	private Color pointColor = Color.black;
+	private Color _pointColor = Color.black;
 
 	/// <summary>
 	/// Średnica punktu
 	/// </summary>
-	private float pointSize = 1.0f;
+	private float _pointSize = 1.0f;
 
 	/// <summary>
-	/// Referencja na obiekt klasy LineRenderer używany do rysowania punktu
+	/// Flaga określająca widoczność punktu
 	/// </summary>
-	LineRenderer lineRenderer = null;
+	private bool _isEnabled = true;
+
+	/// <summary>
+	/// Referencja na GameObject zawierający komponent PrimitiveType.Sphere
+	/// </summary>
+	private GameObject _pointObject = null;
+
+	/// <summary>
+	/// Referencja na obiekt klasy Renderer używany do rysowania punktu
+	/// </summary>
+	private Renderer _pointRenderer = null;
 
 	/// <summary>
 	/// Referencja na GameObject zawierający komponent z objektem klasy Label 
 	/// </summary>
-	GameObject labelObject = null;
+	private GameObject _labelObject = null;
 
 
 	// Use this for initialization
 	void Start ()
 	{
-		lineRenderer = gameObject.AddComponent<LineRenderer>();
+		this._pointObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		this._pointObject.transform.SetParent(gameObject.transform);
+		this._pointRenderer = this._pointObject.GetComponent<Renderer>();
 
-		lineRenderer.positionCount = 2;
-        lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
-        lineRenderer.material.color = pointColor;
-        lineRenderer.numCapVertices = 10;
-		lineRenderer.shadowCastingMode = ShadowCastingMode.Off;
+		Destroy(this._pointObject.GetComponent<SphereCollider>());
 
-		lineRenderer.startColor = pointColor;
-		lineRenderer.endColor = pointColor;
+		this._pointRenderer.material = new Material(Shader.Find("Unlit/Color"));
+		this._pointRenderer.material.color = this._pointColor;
+		this._pointRenderer.enabled = this._isEnabled;
+		this._pointRenderer.shadowCastingMode = ShadowCastingMode.Off;
 
-		lineRenderer.startWidth = pointSize;
-		lineRenderer.endWidth = pointSize;
+		this._pointObject.transform.localScale = new Vector3(this._pointSize, this._pointSize, this._pointSize);
+		this._pointObject.transform.position = this._point;
+
+		// lineRenderer = gameObject.AddComponent<LineRenderer>();
+
+		// lineRenderer.positionCount = 2;
+        // lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
+        // lineRenderer.material.color = pointColor;
+        // lineRenderer.numCapVertices = 10;
+		// lineRenderer.shadowCastingMode = ShadowCastingMode.Off;
+
+		// lineRenderer.startColor = pointColor;
+		// lineRenderer.endColor = pointColor;
+
+		// lineRenderer.startWidth = pointSize;
+		// lineRenderer.endWidth = pointSize;
+
+		// lineRenderer.enabled = isEnabled;
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		TransformPointCoordinates();
+		UpdatePointStyle();
+		UpdatePointCoordinates();
 	}
-
 
 	/// <summary>
 	/// Metoda transformuje współrzędne punktu w zależności od aktualnego położenia obiektu rodzica
 	/// </summary>
-	private void TransformPointCoordinates()
+	private void UpdatePointCoordinates()
 	{
-		point = this.transform.position;
+		this._point = this.transform.position;
+		this._pointObject.transform.position = this._point;
 
-		lineRenderer.SetPosition(0, point);
-		lineRenderer.SetPosition(1, point);
+		// lineRenderer.SetPosition(0, point);
+		// lineRenderer.SetPosition(1, point);
+	}
+
+	/// <summary>
+	/// Metoda uaktualnia wizualne właściowości punktu - kolor, rozmiar, widoczność
+	/// </summary>
+	private void UpdatePointStyle()
+	{
+		this._pointRenderer.material.color = this._pointColor;
+
+		this._pointObject.transform.localScale = new Vector3(this._pointSize, this._pointSize, this._pointSize);
+
+		this._pointRenderer.enabled = this._isEnabled;
+		
+		// lineRenderer.startColor = pointColor;
+		// lineRenderer.endColor = pointColor;
+
+		// lineRenderer.startWidth = pointSize;
+		// lineRenderer.endWidth = pointSize;
+
+		// lineRenderer.enabled = isEnabled;
 	}
 
 
@@ -79,7 +126,7 @@ public class Point : MonoBehaviour {
 	public void SetCoordinates(Vector3 point)
 	{
 		this.transform.position = point;
-		this.point = point;
+		this._point = point;
 	}
 
 	/// <summary>
@@ -88,7 +135,7 @@ public class Point : MonoBehaviour {
 	/// <returns>Obiekt klasy Vector3, współrzędne punktu, liczone względem położenia obiektu rodzica</returns>
 	public Vector3 GetCoordinates()
 	{
-		return point;
+		return this._point;
 	}
 
 	/// <summary>
@@ -98,50 +145,70 @@ public class Point : MonoBehaviour {
 	/// <param name="pointSize">Średnica punktu</param>
 	public void SetStyle(Color pointColor, float pointSize)
 	{
-		this.pointColor = pointColor;
-		this.pointSize = pointSize;
+		this._pointColor = pointColor;
+		this._pointSize = pointSize;
 	}
-
-	/// <summary>
-	/// Metoda:
-	/// jeśli komponent etykiety (obiekt klasy Label) został już dołączony do punktu, aktualizuje właściowści wyświetlanego tekstu tej etykiety
-	/// jeśli nie, dołącza komponent etykiety (obiekt klasy Label) i ustawia właściowści wyświetlanego tekstu tej etykiety
-	/// </summary>
-	/// <param name="text">Tekst która ma zostać wyświetlony na etykiecie</param>
-	/// <param name="fontSize">Rozmiar fontu wyświetlanego tekstu</param>
-	/// <param name="textColor">Kolor wyświetlanego tekstu</param>
-	public void SetLabel(string text, float fontSize, Color textColor)
+    /// <summary>
+    /// Metoda:
+    /// jeśli komponent etykiety (obiekt klasy Label) został już dołączony do punktu, aktualizuje właściowści wyświetlanego tekstu tej etykiety
+    /// jeśli nie, dołącza komponent etykiety (obiekt klasy Label) i ustawia właściowści wyświetlanego tekstu tej etykiety
+    /// </summary>
+    /// <param name="text">Tekst która ma zostać wyświetlony na etykiecie</param>
+    /// <param name="fontSize">Rozmiar fontu wyświetlanego tekstu</param>
+    /// <param name="textColor">Kolor wyświetlanego tekstu</param>
+    public void SetLabel(string text, float fontSize, Color textColor)
 	{
 		if (text.Length == 0)
 		{
 			return;
 		}
 
-		if (labelObject == null)
+		if (this._labelObject == null)
 		{
-			labelObject = new GameObject("Label");
-			labelObject.transform.SetParent(gameObject.transform);
-			labelObject.transform.position = this.transform.position;
-			labelObject.AddComponent<Label>();
+			this._labelObject = new GameObject("Label");
+			this._labelObject.transform.SetParent(gameObject.transform);
+			this._labelObject.transform.position = this.transform.position;
+			this._labelObject.AddComponent<Label>();
 		}
 
-		Label label = labelObject.GetComponent<Label>();
+		Label label = this._labelObject.GetComponent<Label>();
 		label.SetLabel(text, fontSize, textColor);
 	}
     /// <summary>
+    /// Metoda:
+    /// jeśli komponent etykiety (obiekt klasy Label) został już dołączony do punktu, aktualizuje właściowści wyświetlanego tekstu tej etykiety
+    /// jeśli nie, dołącza komponent etykiety (obiekt klasy Label) i ustawia właściowści wyświetlanego tekstu tej etykiety
+    /// </summary>
+    /// <param name="textColor">Kolor wyświetlanego tekstu</param>
+    public void SetLabel(Color textColor)
+    {
+        if (this._labelObject == null)
+        {
+            this._labelObject = new GameObject("Label");
+            this._labelObject.transform.SetParent(gameObject.transform);
+            this._labelObject.transform.position = this.transform.position;
+            this._labelObject.AddComponent<Label>();
+        }
+
+        Label label = this._labelObject.GetComponent<Label>();
+        label.SetLabel(textColor);
+    }
+    /// <summary>
     /// Metoda umożliwia włączenie lub wyłączenie widoczności (renderowania) punktu
     /// </summary>
-    /// <param name="mode">Flaga ustawiająca widoczność. Jeśli "true" punkt zacznie być rysowany, jeśli "false" punkt przestanie być rysowany </param>
-    public void SetEnable(bool mode)
+    /// <param name="isEnabled">Flaga ustawiająca widoczność. Jeśli "true" punkt zacznie być rysowany, jeśli "false" punkt przestanie być rysowany </param>
+    public void SetEnable(bool isEnabled)
     {
-        if (lineRenderer == null)
-        {
-            return;
-        }
-        lineRenderer.enabled = mode;
-        if (labelObject != null)
-        {
-            labelObject.GetComponent<Renderer>().enabled = mode;
-        }
+		this._isEnabled = isEnabled;
+		this._labelObject?.GetComponent<Label>()?.SetEnable(isEnabled);
     }
+
+	/// <summary>
+	/// Metoda zwraca wartość określającą czy punkt jest widoczny
+	/// </summary>
+	/// <returns></returns>
+	public bool IsEnabled()
+	{
+		return this._isEnabled;
+	}
 }
