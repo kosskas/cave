@@ -18,8 +18,8 @@ public class Mode2Dto3D : IMode
 
     private void _RemovePointProjection()
     {
-        _pp.RemovePoint(PCref.Hit);
-        //PointsList.infoList.Remove(pi);
+        PointInfo pi = _pp.RemovePoint(PCref.Hit);
+        Debug.Log(pi.ToString());
     }
 
     private void _AddEdgeProjection()
