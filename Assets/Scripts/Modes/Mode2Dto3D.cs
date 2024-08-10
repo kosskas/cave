@@ -13,11 +13,13 @@ public class Mode2Dto3D : IMode
     {
         PointInfo pi = _pp.AddPoint(PCref.Hit);
         Debug.Log(pi.ToString());
+        PointsList.infoList.Add(pi);
     }
 
     private void _RemovePointProjection()
     {
         _pp.RemovePoint(PCref.Hit);
+        //PointsList.infoList.Remove(pi);
     }
 
     private void _AddEdgeProjection()
