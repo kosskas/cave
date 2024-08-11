@@ -9,6 +9,7 @@ public class PointsList : MonoBehaviour {
 	private List<string> tempList = new List<string>();
 
 	public static List<PointInfo> infoList = new List<PointInfo>();
+	private int lastInfoListLength = 0;
 
 
 	// Use this for initialization
@@ -31,7 +32,11 @@ public class PointsList : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if (infoList.Count != lastInfoListLength) {
+			lastInfoListLength = infoList.Count;
+			Debug.Log($"<color=yellow> -- POINTS LIST ({lastInfoListLength}) -- </color>");
+			infoList.ForEach(entry => Debug.Log($"<color=yellow> {entry.ToString()} </color>"));
+		}
 	}
 
 	public void PointListGoUp() {

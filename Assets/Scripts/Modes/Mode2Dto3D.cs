@@ -12,14 +12,15 @@ public class Mode2Dto3D : IMode
     private void _AddPointProjection()
     {
         PointInfo pi = _pp.AddPoint(PCref.Hit);
-        Debug.Log(pi.ToString());
+        //Debug.Log(pi.ToString());
         PointsList.infoList.Add(pi);
     }
 
     private void _RemovePointProjection()
     {
         PointInfo pi = _pp.RemovePoint(PCref.Hit);
-        Debug.Log(pi.ToString());
+        //Debug.Log(pi.ToString());
+        PointsList.infoList.Remove(pi);
     }
 
     private void _AddEdgeProjection()
@@ -29,7 +30,17 @@ public class Mode2Dto3D : IMode
     {}
 
     private void _MakeActionOnWall()
-    {}
+    {
+        if (PCref.Hit.collider != null)
+        {
+            if (PCref.Hit.collider.tag == "PointButton")
+            {
+                Debug.Log($"[CLICK] on PointButton tag: {PCref.Hit.collider.gameObject}");
+                // PointInfo pointInfo = PointsList.RemovePointOnClick( PCref.Hit.collider.gameObject as PointButton );
+                // _pp.RemovePoint(pointInfo);
+            }
+        }
+    }
 
     private void _SaveSolidAndSwitchToMode3Dto2D()
     {}
