@@ -15,19 +15,8 @@ public class PointsList : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		GameObject[] buttonObjects = GameObject.FindGameObjectsWithTag("PointButton");
-
 		buttonsList.AddRange(buttonObjects);
-
-		tempList.Add("napis1");
-		tempList.Add("napis2");
-		tempList.Add("napis3");
-		tempList.Add("napis4");
-		for (int i = 0; i < buttonObjects.Length; i++)
-        {
-			Transform pointTextTransform = buttonObjects[i].transform.Find("PointText");
-			TMPro.TextMeshPro pointText = pointTextTransform.GetComponent<TMPro.TextMeshPro>();
-			pointText.text = tempList[i];
-		}
+		UpdatePointsList();
 	}
 	
 	// Update is called once per frame
@@ -36,18 +25,57 @@ public class PointsList : MonoBehaviour {
 			lastInfoListLength = infoList.Count;
 			Debug.Log($"<color=yellow> -- POINTS LIST ({lastInfoListLength}) -- </color>");
 			infoList.ForEach(entry => Debug.Log($"<color=yellow> {entry.ToString()} </color>"));
+
+			UpdatePointsList();
+		}
+        if (Input.GetKeyDown("9"))
+        {
+			PointListGoUp();
+			UpdatePointsList();
+        }
+		if (Input.GetKeyDown("0"))
+		{
+			PointListGoDown();
+			UpdatePointsList();
+		}
+	}
+
+	private void UpdatePointsList()
+    {
+		
+
+		for (int i = 0; i < buttonsList.Count; i++)
+		{
+			Transform pointTextTransform = buttonsList[i].transform.Find("PointText");
+			TMPro.TextMeshPro pointText = pointTextTransform.GetComponent<TMPro.TextMeshPro>();
+			//pointText.text = tempList[i];
+			if (infoList.Count > i)
+			{
+				pointText.text = infoList[i].ToString();
+			}
 		}
 	}
 
 	public void PointListGoUp() {
 
-		//wywołać przy kliknięciu w górę
-    }
+		if (infoList.Count > buttonsList.Count)
+		{
+			PointInfo first = infoList[0];
+			infoList.RemoveAt(0);
+			infoList.Add(first);
+		}
+	}
 
 
 	public void PointListGoDown()
 	{
-		//wywołać przy kliknięciu w dół
+		
+		if (infoList.Count > buttonsList.Count)
+		{
+			PointInfo last = infoList[infoList.Count - 1];
+			infoList.RemoveAt(infoList.Count - 1);
+			infoList.Insert(0, last);
+		}
 
 	}
 
