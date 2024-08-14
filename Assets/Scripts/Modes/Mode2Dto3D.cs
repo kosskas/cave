@@ -11,14 +11,28 @@ public class Mode2Dto3D : IMode
 
     private void _AddPointProjection()
     {
-        PointInfo pi = _pp.AddPoint(PCref.Hit);
-        Debug.Log(pi.ToString());
+        if (_pp.Ctx == PointPlacer.Context.AddPoint)
+        {
+            PointInfo pi = _pp.AddPoint();
+            _pp.Ctx = PointPlacer.Context.Idle;
+        }
+        else 
+        {
+            _pp.Ctx = PointPlacer.Context.AddPoint;
+        }
     }
 
     private void _RemovePointProjection()
     {
-        PointInfo pi = _pp.RemovePoint(PCref.Hit);
-        Debug.Log(pi.ToString());
+        if (_pp.Ctx == PointPlacer.Context.RemovePoint)
+        {
+            PointInfo pi = _pp.RemovePoint();
+            _pp.Ctx = PointPlacer.Context.Idle;
+        }
+        else 
+        {
+            _pp.Ctx = PointPlacer.Context.RemovePoint;
+        }
     }
 
     private void _AddEdgeProjection()
