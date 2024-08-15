@@ -36,7 +36,12 @@ public class Mode2Dto3D : IMode
     }
 
     private void _AddEdgeProjection()
-    {}
+    {
+        EdgeINFO edgeInfo = _pp.HandleAddingEdge();
+        if (edgeInfo != EdgeINFO.Empty) {
+            Debug.Log(edgeInfo.ToString());
+        }
+    }
 
     private void _RemoveEdgeProjection()
     {}

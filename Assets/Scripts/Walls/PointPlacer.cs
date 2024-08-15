@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
@@ -66,6 +66,29 @@ public struct PointInfo {
     public override string ToString() => $"{FullLabel} (X={X}, Y={Y}, Z={Z})";
 }
 
+public struct EdgeINFO {
+    public PointInfo P1 { get; }
+    public PointInfo P2 { get; }
+    public GameObject EdgeObj { get; }
+    public LineSegment Edge { get; }
+    
+    public static readonly EdgeINFO Empty = new EdgeINFO(null, null, PointInfo.Empty, PointInfo.Empty);
+
+    public EdgeINFO(GameObject edgeObj, LineSegment edge, PointInfo p1, PointInfo p2)
+    {
+        P1 = p1;
+        P2 = p2;
+        EdgeObj = edgeObj;
+        Edge = edge;
+    }
+
+    public override string ToString() => $"|{P1.FullLabel}{P2.FullLabel}|";
+
+    public static bool operator ==(EdgeINFO left, EdgeINFO right) => left.Equals(right);
+
+    public static bool operator !=(EdgeINFO left, EdgeINFO right) => !left.Equals(right);
+}
+
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 public class PointPlacer : MonoBehaviour {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - STYLES
@@ -86,19 +109,24 @@ public class PointPlacer : MonoBehaviour {
     private GameObject _cursorLabelObj;
     private Label _cursorLabel;
     private RaycastHit _cursorHit;
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ADD/REMOVE POINT
-    private char[] _labelsColl = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
-    private int _labelsIdx = 0;
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ADD/REMOVE EDGE
-    private List<Label> _labelsList = new List<Label>();
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ADD/REMOVE EDGE
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ADD POINT
+    private char[] _addPoint_Labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+    private int _addPoint_LabelIdx = 0;
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - REMOVE POINT
+    private List<Label> _removePoint_Labels = new List<Label>();
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ADD EDGE
+    private Dictionary<GameObject, List<Label>> _addEdge_Labels = new Dictionary<GameObject, List<Label>>();
+    private GameObject _addEdge_CurrentlyFocusedGridPoint;
+    private WallInfo _addEdge_Wall;
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - UTILS
     private WallController _wc;
     private MeshBuilder _mc;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - CONTEXT
     public enum Context {
         Idle,
         AddPoint,
-        RemovePoint
+        RemovePoint,
+        AddEdge
     }
     private Context _ctx = Context.Idle;
     public Context Ctx {
@@ -107,7 +135,16 @@ public class PointPlacer : MonoBehaviour {
             switch (_ctx)
             {
                 case Context.RemovePoint:
-                    _DisableLabelPicker();
+                    _DisableLabelPicker(_removePoint_Labels);
+                    break;
+
+                case Context.AddEdge:
+                    if (_ctx != value) {
+                        foreach (var labels in _addEdge_Labels.Values) { _DisableLabelPicker(labels); }
+                        _addEdge_Labels.Clear();
+                        _addEdge_CurrentlyFocusedGridPoint = null;
+                        _addEdge_Wall = null;
+                    }
                     break;
 
                 default:
@@ -120,10 +157,13 @@ public class PointPlacer : MonoBehaviour {
             {
                 case Context.RemovePoint:
                     if (_IsGridPointWithLabels()) {
-                        _EnableLabelPicker();
+                        _EnableLabelPicker(_removePoint_Labels);
                     } else {
                         _ctx = Context.Idle;
                     }
+                    break;
+
+                case Context.AddEdge:
                     break;
 
                 default:
@@ -211,12 +251,10 @@ public class PointPlacer : MonoBehaviour {
         return (_IsGridPoint() && _cursorHit.collider?.gameObject?.transform.childCount > 0) ? true : false ;
     }
 
-    public void _EnableLabelPicker()
+    private void _EnableLabelPicker(List<Label> labels)
     {
         GameObject pointClicked = _cursorHit.collider.gameObject;
         int labelsNum = pointClicked.transform.childCount;
-        int indexOfLabelToSetAsPickedEdgePoint = 0;
-        List<Label> labels = new List<Label>();
 
         for (int i = 0; i < labelsNum; i++)
         {
@@ -228,19 +266,41 @@ public class PointPlacer : MonoBehaviour {
                     .GetComponent<Label>()
             );                
         }
-
-        if (labels.Count > 0)
-        {
-            labels[0].SetColor(LABEL_COLOR_EDGE_POINT_PICKED);
-        }
-
-        _labelsList = labels;
+        
+        labels[0].SetColor(LABEL_COLOR_EDGE_POINT_PICKED);
     }
 
-    public void _DisableLabelPicker()
+    private void _DisableLabelPicker(List<Label> labels)
     {
-        _labelsList.ForEach(label => label.SetColor(LABEL_COLOR_POINT_PLACED));
-        _labelsList.Clear();
+        labels.ForEach(label => label.SetColor(LABEL_COLOR_POINT_PLACED));
+        labels.Clear();
+    }
+
+    private EdgeINFO _AddEdge()
+    {
+        GameObject[] clickedPoints = _addEdge_Labels.Keys.ToArray();
+
+        Label pickedLabel_1 = _addEdge_Labels[clickedPoints[0]].Find(label => label.GetColor().Equals(LABEL_COLOR_EDGE_POINT_PICKED));
+        Label pickedLabel_2 = _addEdge_Labels[clickedPoints[1]].Find(label => label.GetColor().Equals(LABEL_COLOR_EDGE_POINT_PICKED));
+
+        string fullLabelText_1 = pickedLabel_1.GetText();
+        string fullLabelText_2 = pickedLabel_2.GetText();
+
+        string labelText_1 = fullLabelText_1.Trim('\'');
+        string labelText_2 = fullLabelText_2.Trim('\'');
+
+        var point_1 = new PointInfo(clickedPoints[0], _addEdge_Wall, labelText_1, fullLabelText_1);
+        var point_2 = new PointInfo(clickedPoints[1], _addEdge_Wall, labelText_2, fullLabelText_2);
+
+        GameObject edgeObj = new GameObject($"{fullLabelText_1}-{fullLabelText_2}");
+        LineSegment edge = edgeObj.AddComponent<LineSegment>();
+        edge.SetStyle(Color.white, 0.01f);
+        edge.SetCoordinates(
+            point_1.GridPoint.transform.position,
+            point_2.GridPoint.transform.position
+        );
+
+        return new EdgeINFO(edgeObj, edge, point_1, point_2);
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - PUBLIC()
@@ -279,7 +339,7 @@ public class PointPlacer : MonoBehaviour {
 
         // Dodajemy etykietę
         _cursorLabel = _cursorLabelObj.AddComponent<Label>();
-        _cursorLabel.SetLabel($"{_labelsColl[_labelsIdx]}", LABEL_SIZE_PICKED, LABEL_COLOR_POINT_PICKED);		
+        _cursorLabel.SetLabel($"{_addPoint_Labels[_addPoint_LabelIdx]}", LABEL_SIZE_PICKED, LABEL_COLOR_POINT_PICKED);		
     }
 	
 	public void MoveCursor(RaycastHit hit)
@@ -310,15 +370,29 @@ public class PointPlacer : MonoBehaviour {
         switch (_ctx)
         {
             case Context.AddPoint:
-                _labelsIdx = (_labelsIdx+1) % _labelsColl.Length;
-                _cursorLabel.SetLabel($"{_labelsColl[_labelsIdx]}");
+            {
+                _addPoint_LabelIdx = (_addPoint_LabelIdx+1) % _addPoint_Labels.Length;
+                _cursorLabel.SetLabel($"{_addPoint_Labels[_addPoint_LabelIdx]}");
+            }
                 break;
 
             case Context.RemovePoint:
-                int currIdx = _labelsList.FindIndex(label => label.GetColor().Equals(LABEL_COLOR_EDGE_POINT_PICKED));
-                int nextIdx = (currIdx+1) % _labelsList.Count;
-                _labelsList[currIdx].SetColor(LABEL_COLOR_POINT_PLACED);
-                _labelsList[nextIdx].SetColor(LABEL_COLOR_EDGE_POINT_PICKED);
+            {
+                int currIdx = _removePoint_Labels.FindIndex(label => label.GetColor().Equals(LABEL_COLOR_EDGE_POINT_PICKED));
+                int nextIdx = (currIdx+1) % _removePoint_Labels.Count;
+                _removePoint_Labels[currIdx].SetColor(LABEL_COLOR_POINT_PLACED);
+                _removePoint_Labels[nextIdx].SetColor(LABEL_COLOR_EDGE_POINT_PICKED);
+            }
+                break;
+
+            case Context.AddEdge:
+            {
+                var labels = _addEdge_Labels[_addEdge_CurrentlyFocusedGridPoint];
+                int currIdx = labels.FindIndex(label => label.GetColor().Equals(LABEL_COLOR_EDGE_POINT_PICKED));
+                int nextIdx = (currIdx+1) % labels.Count;
+                labels[currIdx].SetColor(LABEL_COLOR_POINT_PLACED);
+                labels[nextIdx].SetColor(LABEL_COLOR_EDGE_POINT_PICKED);
+            }
                 break;
 
             default:
@@ -331,15 +405,29 @@ public class PointPlacer : MonoBehaviour {
         switch (_ctx)
         {
             case Context.AddPoint:
-                _labelsIdx = ((_labelsIdx-1) < 0) ? (_labelsColl.Length-1) : (_labelsIdx-1);
-                _cursorLabel.SetLabel($"{_labelsColl[_labelsIdx]}");
+            {
+                _addPoint_LabelIdx = ((_addPoint_LabelIdx-1) < 0) ? (_addPoint_Labels.Length-1) : (_addPoint_LabelIdx-1);
+                _cursorLabel.SetLabel($"{_addPoint_Labels[_addPoint_LabelIdx]}");   
+            }
                 break;
 
             case Context.RemovePoint:
-                int currIdx = _labelsList.FindIndex(label => label.GetColor().Equals(LABEL_COLOR_EDGE_POINT_PICKED));
-                int nextIdx = ((currIdx-1) < 0) ? (_labelsList.Count-1) : (currIdx-1);
-                _labelsList[currIdx].SetColor(LABEL_COLOR_POINT_PLACED);
-                _labelsList[nextIdx].SetColor(LABEL_COLOR_EDGE_POINT_PICKED);
+            {
+                int currIdx = _removePoint_Labels.FindIndex(label => label.GetColor().Equals(LABEL_COLOR_EDGE_POINT_PICKED));
+                int nextIdx = ((currIdx-1) < 0) ? (_removePoint_Labels.Count-1) : (currIdx-1);
+                _removePoint_Labels[currIdx].SetColor(LABEL_COLOR_POINT_PLACED);
+                _removePoint_Labels[nextIdx].SetColor(LABEL_COLOR_EDGE_POINT_PICKED);
+            }
+                break;
+            
+            case Context.AddEdge:
+            {
+                var labels = _addEdge_Labels[_addEdge_CurrentlyFocusedGridPoint];
+                int currIdx = labels.FindIndex(label => label.GetColor().Equals(LABEL_COLOR_EDGE_POINT_PICKED));
+                int nextIdx =  ((currIdx-1) < 0) ? (labels.Count-1) : (currIdx-1);
+                labels[currIdx].SetColor(LABEL_COLOR_POINT_PLACED);
+                labels[nextIdx].SetColor(LABEL_COLOR_EDGE_POINT_PICKED);
+            }
                 break;
 
             default:
@@ -366,7 +454,7 @@ public class PointPlacer : MonoBehaviour {
                     return PointInfo.Empty;
                 }
 
-                string labelText = $"{_labelsColl[_labelsIdx]}";
+                string labelText = $"{_addPoint_Labels[_addPoint_LabelIdx]}";
                 int index = _wc.GetWallIndex(wall);
                 string fullLabelText = $"{labelText + new string('\'', index)}";
 
@@ -418,7 +506,7 @@ public class PointPlacer : MonoBehaviour {
                     return PointInfo.Empty;
                 }
                 
-                Label pickedLabel = _labelsList.Find(label => label.GetColor().Equals(LABEL_COLOR_EDGE_POINT_PICKED));
+                Label pickedLabel = _removePoint_Labels.Find(label => label.GetColor().Equals(LABEL_COLOR_EDGE_POINT_PICKED));
                 if (pickedLabel == default(Label)) {
                     return PointInfo.Empty;
                 }
@@ -463,5 +551,69 @@ public class PointPlacer : MonoBehaviour {
         Destroy(labelObj);
 
         _LocateLabels(pi.GridPoint, pi.WallInfo);
+    }
+
+    public EdgeINFO HandleAddingEdge()
+    {
+        Ctx = Context.AddEdge;
+
+        // jeśli kliknięto na punkt siatki...
+        if (_IsGridPointWithLabels())
+        {
+            GameObject clickedPoint = _cursorHit.collider.gameObject;    
+            // ...i jest on już dodany...
+            if (_addEdge_Labels.ContainsKey(clickedPoint))
+            {    
+                // ...i jest sfocusowany...
+                if (clickedPoint.Equals(_addEdge_CurrentlyFocusedGridPoint))
+                {
+                    // ...to zapomnij wybraną etykietę i go usuń
+                    _DisableLabelPicker(_addEdge_Labels[clickedPoint]);
+                    _addEdge_Labels.Remove(clickedPoint);
+                }
+                // ...i nie jest sfocusowany...
+                else
+                {
+                    // ...to ustaw mu focus
+                    _addEdge_CurrentlyFocusedGridPoint = clickedPoint;
+                }
+            }
+            // ...i nie jest jeszcze dodany...
+            else
+            {
+                WallInfo clickedPointWall = _EstimateWall(_cursorHit.normal, clickedPoint.transform.position);
+                // ...i obecnych punktów jest 0 lub (1 i leży na tej samej ścianie)...
+                if (_addEdge_Labels.Count == 0 || (_addEdge_Labels.Count == 1 && _addEdge_Wall?.number == clickedPointWall.number))
+                {
+                    // ...dodaj go, dodaj mu wybieranie etykiety i ustaw mu focus
+                    _addEdge_Labels.Add(clickedPoint, new List<Label>());
+                    _addEdge_Wall = clickedPointWall;
+                    _EnableLabelPicker(_addEdge_Labels[clickedPoint]);
+                    _addEdge_CurrentlyFocusedGridPoint = clickedPoint;
+                }
+                // ...i obecnych punktów jest 2...
+                else if (_addEdge_Labels.Count == 2)
+                {
+                    // ...stwórz krawędź i zakończ
+                    EdgeINFO edgeINFO = _AddEdge();
+                    Ctx = Context.Idle;
+                    return edgeINFO;
+                }
+            }
+        // jeśli kliknięto gdzieś indziej...
+        }
+        else
+        {
+            // ...i obecnych punktów jest 2...
+            if (_addEdge_Labels.Count == 2)
+            {
+                // ...stwórz krawędź i zakończ
+                EdgeINFO edgeINFO = _AddEdge();
+                Ctx = Context.Idle;
+                return edgeINFO;
+            }
+        }
+
+        return EdgeINFO.Empty;
     }
 }
