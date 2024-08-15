@@ -133,4 +133,19 @@ public class Label : MonoBehaviour {
 	{
 		this._offset = offset;
 	}
+
+	public Color GetColor()
+	{
+		return this._color;
+	}
+
+	public void SetColor(Color color)
+	{
+		this._color = color;
+	}
+
+	public string GetText()
+	{
+		return this._text;
+	}
 }
