@@ -14,7 +14,7 @@ public class Mode2Dto3D : IMode
         PointINFO pointInfo = _pp.HandleAddingPoint();
         if (pointInfo != PointINFO.Empty) {
             Debug.Log(pointInfo.ToString());
-            PointsList.infoList.Add(pi);
+            PointsList.infoList.Add(pointInfo);
         }
     }
 
@@ -23,7 +23,7 @@ public class Mode2Dto3D : IMode
         PointINFO pointInfo = _pp.HandleRemovingPoint();
         if (pointInfo != PointINFO.Empty) {
             Debug.Log(pointInfo.ToString());
-            PointsList.infoList.Remove(pi);
+            PointsList.infoList.Remove(pointInfo);
         }
     }
 
@@ -42,10 +42,10 @@ public class Mode2Dto3D : IMode
     {
         if (PCref.Hit.collider != null)
         {
+            Debug.Log($"[CLICK] on object named: {PCref.Hit.collider.gameObject.name}");
             if (PCref.Hit.collider.tag == "PointButton")
             {
-                Debug.Log($"[CLICK] on PointButton tag: {PCref.Hit.collider.gameObject}");
-                // PointInfo pointInfo = PointsList.RemovePointOnClick( PCref.Hit.collider.gameObject as PointButton );
+                // PointINFO pointInfo = PointsList.RemovePointOnClick( PCref.Hit.collider.gameObject as PointButton );
                 // _pp.RemovePoint(pointInfo);
             }
         }

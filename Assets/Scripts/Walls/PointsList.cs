@@ -8,7 +8,7 @@ public class PointsList : MonoBehaviour {
 
 	private List<string> tempList = new List<string>();
 
-	public static List<PointInfo> infoList = new List<PointInfo>();
+	public static List<PointINFO> infoList = new List<PointINFO>();
 	private int lastInfoListLength = 0;
 
 
@@ -60,7 +60,7 @@ public class PointsList : MonoBehaviour {
 
 		if (infoList.Count > buttonsList.Count)
 		{
-			PointInfo first = infoList[0];
+			PointINFO first = infoList[0];
 			infoList.RemoveAt(0);
 			infoList.Add(first);
 		}
@@ -72,7 +72,7 @@ public class PointsList : MonoBehaviour {
 		
 		if (infoList.Count > buttonsList.Count)
 		{
-			PointInfo last = infoList[infoList.Count - 1];
+			PointINFO last = infoList[infoList.Count - 1];
 			infoList.RemoveAt(infoList.Count - 1);
 			infoList.Insert(0, last);
 		}
