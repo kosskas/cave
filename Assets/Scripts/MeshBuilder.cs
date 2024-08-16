@@ -175,6 +175,7 @@ public class MeshBuilder : MonoBehaviour {
     /// <param name="label">Etykieta</param>
     public void RemovePointProjection(WallInfo wall, string label)
 	{
+        Debug.Log($"usuwanie");
         //rozszerzyć o label
         if (!verticesOnWalls.ContainsKey(wall))
             return;
@@ -187,6 +188,7 @@ public class MeshBuilder : MonoBehaviour {
 
         
         int count = GetCurrentPointProjections(label).Count;
+        Debug.Log($"liczba={count}");
         verticesOnWalls[wall].Remove(label);
         if (count == 2) //sa dwa, usun 3d
         {
@@ -199,25 +201,27 @@ public class MeshBuilder : MonoBehaviour {
         }
         else if (count > 2) //sa trzy
         {
-            if (vertices3D.ContainsKey(label))
+            if (vertices3D.ContainsKey(label)) //sa 3 i jest obiekt 3d
             {
                 GameObject todel3D = vertices3D[label];
                 vertices3D.Remove(label);
                 Destroy(todel3D);
-                //Rekonstruuj
-                List<PointProjection> currPts = GetCurrentPointProjections(label);
-                Status result = Create3DPoint(label);
-                if (result == Status.PLANE_ERR)
-                {
-                    MarkError(currPts[0]);
-                    MarkError(currPts[1]);
-                }
-                else if (result == Status.OK)
-                {
-                    MarkOK(currPts[0]);
-                    MarkOK(currPts[1]);
-               }
-            }           
+                
+            }
+            //moga byc 3 i zle polozone
+            //Rekonstruuj
+            List<PointProjection> currPts = GetCurrentPointProjections(label);
+            Status result = Create3DPoint(label);
+            if (result == Status.PLANE_ERR)
+            {
+                MarkError(currPts[0]);
+                MarkError(currPts[1]);
+            }
+            else if (result == Status.OK)
+            {
+                MarkOK(currPts[0]);
+                MarkOK(currPts[1]);
+            }
         }   
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
 	}
