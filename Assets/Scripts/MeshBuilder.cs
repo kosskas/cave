@@ -325,8 +325,41 @@ public class MeshBuilder : MonoBehaviour {
             edges3D[key].wallOrigins++;
         }
     }
+    /// <summary>
+    /// Usuwa informację o krawędzi w 3D. Jeżeli krawędź istnieje na wielu ścianach to krawędź w 3D zostanie usunięta jeśli nie będzie jej na żadnej ścianie.
+    /// </summary>
+    /// <param name="labelA">Etykieta punktu A</param>
+    /// <param name="labelB">Etykieta punktu B</param>
+    /// <param name="nowait">Flaga określająca czy krawędz ma zostać natychmiast usunięta</param>
+    public void RemoveEdgeProjection(string labelA, string labelB, bool nowait = false)
+    {
+        //znajdz klucz
+        string key = null;
+        if (edges3D.ContainsKey(labelA + labelB))
+        {
+            key = labelA + labelB;
+        }
+        else if (edges3D.ContainsKey(labelB + labelA))
+        {
+            key = labelB + labelA;
+        }
+        if(key == null)
+        {
+            Debug.Log("nie ma krawedzi o takich punktach");
+            return;
+        }
+        Edge3D edge = edges3D[key];
 
+        edges3D[key].wallOrigins--; //zmiejsz licznik scian
 
+        if (edges3D[key].wallOrigins < 1 || nowait)
+        {
+            GameObject todel = edge.edgeObject;
+            edges3D.Remove(key);
+            Destroy(todel);
+        }
+
+    }
 
     /// <summary>
     /// Sprawdza czy na scianie znajduje juz sie rzut
