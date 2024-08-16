@@ -214,7 +214,7 @@ public class MeshBuilder : MonoBehaviour {
     /// <param name="label">Etykieta</param>
     public void RemovePointProjection(WallInfo wall, string label)
 	{
-        Debug.Log($"usuwanie");
+        //Debug.Log($"usuwanie");
         //rozszerzyć o label
         if (!verticesOnWalls.ContainsKey(wall))
             return;
@@ -227,7 +227,7 @@ public class MeshBuilder : MonoBehaviour {
 
         
         int count = GetCurrentPointProjections(label).Count;
-        Debug.Log($"liczba={count}");
+        //Debug.Log($"liczba={count}");
         verticesOnWalls[wall].Remove(label);
         if (count == 2) //sa dwa, usun 3d
         {
@@ -270,7 +270,7 @@ public class MeshBuilder : MonoBehaviour {
         //jesli pierwszy raz to stowrz w 3D
         if (edges3D.ContainsKey(labelA + labelB) || edges3D.ContainsKey(labelB + labelA))
         {
-
+            Debug.Log($"nota");
         }
         else //1 raz
         {
@@ -453,7 +453,10 @@ public class MeshBuilder : MonoBehaviour {
     {
         foreach(string label in vertices3D.Keys)
         {
-            vertices3D[label].gameObject.SetActive(!vertices3D[label].deleted || !vertices3D[label].disabled);
+            //Debug.Log(!vertices3D[label].deleted || !vertices3D[label].disabled);
+            Debug.Log($"{vertices3D[label].deleted} || {vertices3D[label].disabled}  ff [{!(vertices3D[label].deleted || vertices3D[label].disabled)}]");
+            vertices3D[label].gameObject.SetActive(!(vertices3D[label].deleted || vertices3D[label].disabled));
+            //vertices3D[label].gameObject.GetComponent<Renderer>().enabled = (!vertices3D[label].deleted || !vertices3D[label].disabled);
         }
     }
     public void ShowEdges3D()
