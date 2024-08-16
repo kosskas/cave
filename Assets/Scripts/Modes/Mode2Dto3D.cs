@@ -58,7 +58,8 @@ public class Mode2Dto3D : IMode
         GameObject wallsObject = GameObject.Find("Walls");
         _wc = wallsObject.GetComponent<WallController>();
 
-        _gc = new GridCreator();
+        _gc = wallsObject.GetComponent<GridCreator>();
+        _gc.Init();
 
         _pp = PCref.gameObject.GetComponent<PointPlacer>();
         _pp.CreateCursor();
