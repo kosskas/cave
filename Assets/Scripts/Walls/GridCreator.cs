@@ -23,8 +23,8 @@ public class GridCreator : MonoBehaviour {
     private Dictionary<string, string> config = new Dictionary<string, string>();
     private GameObject grid = null;
 
-	
-    public GridCreator()
+    int numOfLines;
+    public void Init()
     {
         ParseConfigFile();
 
@@ -34,7 +34,7 @@ public class GridCreator : MonoBehaviour {
         int numOfLinesX = int.Parse(config["number_of_lines"]);
         int numOfLinesY = int.Parse(config["number_of_lines"]);
         int numOfLinesZ = int.Parse(config["number_of_lines"]);
-
+        numOfLines = numOfLinesX;
         AddParallelLines(numOfLinesX, 'Z', 'X'); 
         AddParallelLines(numOfLinesZ, 'X', 'Z');    
 
@@ -211,6 +211,105 @@ public class GridCreator : MonoBehaviour {
                 // point.SetEnable(false);
             }
         }
+    }
+
+    public void FindClosestNode(Vector3 test, float r)
+    {
+        
+        float numOfSpacesInA = numOfLines - 1;
+        float numOfSpacesInB = numOfLines - 1;
+
+        float lineWeight = float.Parse(config["line_weight"], CultureInfo.InvariantCulture);
+        float pointWidth = lineWeight * 5.0f;
+
+        const float offsetFromWall = WALL_WEIGHT / 2;
+        float xMinPos = -(WALL_SIZE / 2) + (offsetFromWall);
+        float xMaxPos = (WALL_SIZE / 2) - (offsetFromWall);
+        float zMinPos = -(WALL_SIZE / 2) + (offsetFromWall);
+        float zMaxPos = (WALL_SIZE / 2) - (offsetFromWall);
+        float yMinPos = 0 + (offsetFromWall);
+        float yMaxPos = WALL_SIZE - (offsetFromWall);
+
+        float xRange = xMaxPos - xMinPos;
+        float yRange = yMaxPos - yMinPos;
+        float zRange = zMaxPos - zMinPos;
+
+        float pointPosX = 0f;
+        float pointPosY = 0f;
+        float pointPosZ = 0f;
+
+        float pointPosXmin = 0f;
+        float pointPosYmin = 0f;
+        float pointPosZmin = 0f;
+
+        float dist = 0f;
+        float distMin = float.MaxValue;
+        //XY
+        for (int ithLineInA = 0; ithLineInA < numOfLines; ithLineInA++)
+        {
+            for (int ithLineInB = 0; ithLineInB < numOfLines; ithLineInB++)
+            {
+                //XY
+                pointPosX = xMinPos + (((float)ithLineInA / (float)numOfSpacesInA) * xRange);
+                pointPosY = yMinPos + (((float)ithLineInB / (float)numOfSpacesInB) * yRange);
+                pointPosZ = zMinPos;
+                dist = Distance(pointPosX, pointPosY,pointPosZ, test.x, test.y, test.z);
+                if (dist * dist <= r * r)
+                {
+                    if (dist < distMin)
+                    {
+                        distMin = dist;
+                        pointPosXmin = pointPosX;
+                        pointPosYmin = pointPosY;
+                        pointPosZmin = pointPosZ;
+                    }
+                }
+                //XZ
+                pointPosX = xMinPos + (((float)ithLineInA / (float)numOfSpacesInA) * xRange);
+                pointPosY = yMinPos;
+                pointPosZ = zMinPos + (((float)ithLineInB / (float)numOfSpacesInB) * zRange);
+
+                dist = Distance(pointPosX, pointPosY, pointPosZ, test.x, test.y, test.z);
+                if (dist * dist <= r * r)
+                {
+                    if (dist < distMin)
+                    {
+                        distMin = dist;
+                        pointPosXmin = pointPosX;
+                        pointPosYmin = pointPosY;
+                        pointPosZmin = pointPosZ;
+                    }
+                }
+                //YZ
+                pointPosX = xMaxPos;
+                pointPosY = yMinPos + (((float)ithLineInA / (float)numOfSpacesInA) * yRange);
+                pointPosZ = zMinPos + (((float)ithLineInB / (float)numOfSpacesInB) * zRange);
+                dist = Distance(pointPosX, pointPosY, pointPosZ, test.x, test.y, test.z);
+                if (dist * dist <= r * r)
+                {
+                    if (dist < distMin)
+                    {
+                        distMin = dist;
+                        pointPosXmin = pointPosX;
+                        pointPosYmin = pointPosY;
+                        pointPosZmin = pointPosZ;
+                    }
+                }
+
+            }
+        }
+        //Debug.Log($"Najbliższy wezel to {pointPosXmin} {pointPosYmin} {pointPosZmin}");
+        GameObject obj = new GameObject($"Test");
+        //obj.transform.position = new Vector3(pointPosXmin, pointPosYmin, pointPosZmin);
+    }
+
+    float Distance(float xA, float yA,float zA, float xB, float yB, float zB)
+    {
+        float dX = xA - xB;
+        float dY = yA - yB;
+        float dZ = zA - zB;
+
+        return (dX * dX + dY * dY + dZ * dZ);
     }
 
     private void ParseConfigFile()
