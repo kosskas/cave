@@ -286,6 +286,7 @@ public class PointPlacer : MonoBehaviour {
             point_2.GridPoint.transform.position
         );
 
+        _mc.AddEdgeProjection(labelText_1, labelText_2);
         return new EdgeINFO(edgeObj, edge, point_1, point_2);
     }
 

@@ -47,7 +47,7 @@ public class MeshBuilder : MonoBehaviour {
         public GameObject edgeObject;
         public string firstPoint;
         public string secondPoint;
-
+        //public bool show = true;
         /// <summary>
         /// Ile krawędzi jest na ścianach
         /// </summary>
@@ -67,6 +67,7 @@ public class MeshBuilder : MonoBehaviour {
     {
         public GameObject gameObject;
         public bool deleted = false;
+        public bool disabled = false;
 
         public Vertice3D(GameObject gameObject)
         {
@@ -127,6 +128,7 @@ public class MeshBuilder : MonoBehaviour {
 		 */
         ShowProjectionLines();
         ShowPoints3D();
+        ShowEdges3D();
     }
     /// <summary>
     /// Dodane rzut punktu z listy punktów odtwarzanego obiektu 3D
@@ -261,21 +263,29 @@ public class MeshBuilder : MonoBehaviour {
         }   
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
 	}
-    public void AddEdgeProjection(WallInfo wall, string labelA, string labelB)
+    public void AddEdgeProjection(string labelA, string labelB)
     {
         //sprawdz czy taka krawedz juz nie istnieje(zostala stworzona z innej sciany)
         //jesli tak to odnotuj to(przy usuwaniu bedzie przydatne)
         //jesli pierwszy raz to stowrz w 3D
-        if(edges3D.ContainsKey(labelA+labelB) || edges3D.ContainsKey(labelB + labelA))
+        if (edges3D.ContainsKey(labelA + labelB) || edges3D.ContainsKey(labelB + labelA))
         {
 
         }
         else //1 raz
         {
-            if(!vertices3D.ContainsKey(labelA) || !vertices3D.ContainsKey(labelB))
+            Vector3 mocker = Vector3.zero;
+            bool show = true;
+            //przypadek kiedy juz jest krawedz ale nie ma okreslonej pos w 3d
+            if (!vertices3D.ContainsKey(labelA))
             {
-                //nie ma jakiegos label3D przerwij
-                Debug.LogError("Brak punktu 3D");
+                CreateEntryForPoint(labelA, mocker);
+                vertices3D[labelA].disabled = true;
+            }
+            if (!vertices3D.ContainsKey(labelB))
+            {
+                CreateEntryForPoint(labelB, mocker);
+                vertices3D[labelB].disabled = true;
             }
             GameObject edgeObj = new GameObject("Edge3D " + labelA+ labelB);
             edgeObj.transform.SetParent(edges3DDir.transform);
@@ -286,7 +296,9 @@ public class MeshBuilder : MonoBehaviour {
                 vertices3D[labelA].gameObject.transform.position,
                 vertices3D[labelB].gameObject.transform.position
             );
-
+            string key = labelA + labelB;
+            edges3D[key] = new Edge3D(edgeObj,labelA,labelB);
+            //edges3D[key].show = show;
         }
 
     }
@@ -327,20 +339,13 @@ public class MeshBuilder : MonoBehaviour {
                     Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
                     vertexObject.SetCoordinates(pkt3D);
                     vertices3D[label].deleted = false;
+                    vertices3D[label].disabled = false;
 
                 }
                 else
                 {
                     //1 raz
-                    GameObject obj = new GameObject("Vertex3D " + label);
-                    obj.transform.SetParent(reconstrVertDir.transform);
-
-                    Point vertexObject = obj.AddComponent<Point>();
-                    vertexObject.SetStyle(POINT_COLOR, POINT_DIAMETER);
-                    vertexObject.SetCoordinates(pkt3D);
-                    vertexObject.SetLabel(label, VERTEX_LABEL_SIZE, Color.white);
-
-                    vertices3D[label] = new Vertice3D(obj);
+                    CreateEntryForPoint(label, pkt3D);
                 }
 
                 return Status.OK;
@@ -361,6 +366,19 @@ public class MeshBuilder : MonoBehaviour {
         }
         return Status.OTHER_ERR;
 
+    }
+
+    private void CreateEntryForPoint(string label, Vector3 pos)
+    {
+        GameObject obj = new GameObject("Vertex3D " + label);
+        obj.transform.SetParent(reconstrVertDir.transform);
+
+        Point vertexObject = obj.AddComponent<Point>();
+        vertexObject.SetStyle(POINT_COLOR, POINT_DIAMETER);
+        vertexObject.SetCoordinates(pos);
+        vertexObject.SetLabel(label, VERTEX_LABEL_SIZE, Color.white);
+
+        vertices3D[label] = new Vertice3D(obj);
     }
     private Vector3 CalcPosIn3D(Vector3 vec1, Vector3 vec2)
     {
@@ -409,7 +427,7 @@ public class MeshBuilder : MonoBehaviour {
                 Vector3 vertexProj = verticesOnWalls[wall][label].pointObject.transform.position;
 
 
-                if (vertices3D.ContainsKey(label) && !vertices3D[label].deleted && verticesOnWalls[wall][label].is_ok_placed) //jest juz pkt 3d
+                if (vertices3D.ContainsKey(label) && !vertices3D[label].deleted && !vertices3D[label].disabled && verticesOnWalls[wall][label].is_ok_placed) //jest juz pkt 3d
                 {
                     LineSegment projLine = verticesOnWalls[wall][label].projLine;
                     if (projLine != null)
@@ -435,10 +453,18 @@ public class MeshBuilder : MonoBehaviour {
     {
         foreach(string label in vertices3D.Keys)
         {
-            vertices3D[label].gameObject.SetActive(!vertices3D[label].deleted);
+            vertices3D[label].gameObject.SetActive(!vertices3D[label].deleted || !vertices3D[label].disabled);
         }
     }
-
+    public void ShowEdges3D()
+    {
+        foreach (string key in edges3D.Keys)
+        {
+            LineSegment line = edges3D[key].edgeObject.GetComponent<LineSegment>();
+            line.SetCoordinates(vertices3D[edges3D[key].firstPoint].gameObject.transform.position, vertices3D[edges3D[key].secondPoint].gameObject.transform.position);
+            line.SetEnable(!(vertices3D[edges3D[key].firstPoint].deleted || vertices3D[edges3D[key].firstPoint].disabled || vertices3D[edges3D[key].secondPoint].deleted || vertices3D[edges3D[key].secondPoint].disabled));
+        }
+    }
     private List<PointProjection> GetCurrentPointProjections(string label)
 	{
 		List<PointProjection> pointsInfo = new List<PointProjection>();
