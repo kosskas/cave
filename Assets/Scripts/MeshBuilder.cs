@@ -62,11 +62,17 @@ public class MeshBuilder : MonoBehaviour {
         }
 
     }
-    ///POmysł - nie usuwac nigdy pukntow 3d calkowice tylko je oznaczac jako usuniete i 
+    
     private class Vertice3D
     {
         public GameObject gameObject;
+        /// <summary>
+        /// Flaga czy pkt3D jest usunięty
+        /// </summary>
         public bool deleted = false;
+        /// <summary>
+        /// Flaga czy pkt3D jest wyłączony
+        /// </summary>
         public bool disabled = false;
 
         public Vertice3D(GameObject gameObject)
@@ -82,14 +88,22 @@ public class MeshBuilder : MonoBehaviour {
     Dictionary<WallInfo, Dictionary<string, PointProjection>> verticesOnWalls;
 
     /// <summary>
-    /// Get compoment Point
+    /// Zbiór wierzchołków rysowanych w trójwymiarze. Elementy nigdy nie są usuwane jedynie oznaczane jako usunięte lub wyłączone.
     /// </summary>
 	Dictionary<string, Vertice3D> vertices3D;
 
+    /// <summary>
+    /// Zbiór krawędzi rysowanych w 3D.
+    /// </summary>
     Dictionary<string, Edge3D> edges3D;
 
-    Dictionary<string, List<string>> edges;
+    /// <summary>
+    /// Folder z wierch. rysowanymi w 3D
+    /// </summary>
 	GameObject reconstrVertDir;
+    /// <summary>
+    /// Folder z krawedz. rysowanymi w 3D
+    /// </summary>
 	GameObject edges3DDir;
 
     private const float POINT_DIAMETER = 0.015f;                        // 0.009f
@@ -111,8 +125,6 @@ public class MeshBuilder : MonoBehaviour {
         edges3DDir = new GameObject("Reconstr. edges3DDir");
         edges3DDir.transform.SetParent(gameObject.transform);
         verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
-
-		edges = new Dictionary<string, List<string>>();
 		vertices3D = new Dictionary<string, Vertice3D>();
         edges3D = new Dictionary<string, Edge3D>();
     }
@@ -263,6 +275,11 @@ public class MeshBuilder : MonoBehaviour {
         }   
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
 	}
+    /// <summary>
+    /// Tworzy krawędź w 3D i jeśli jest odpowiednia ilość informacji wyświetla ją
+    /// </summary>
+    /// <param name="labelA">Etykieta punktu A</param>
+    /// <param name="labelB">Etykieta punktu B</param>
     public void AddEdgeProjection(string labelA, string labelB)
     {
         //sprawdz czy taka krawedz juz nie istnieje(zostala stworzona z innej sciany)
@@ -270,12 +287,19 @@ public class MeshBuilder : MonoBehaviour {
         //jesli pierwszy raz to stowrz w 3D
         if (edges3D.ContainsKey(labelA + labelB) || edges3D.ContainsKey(labelB + labelA))
         {
-            Debug.Log($"nota");
+            Debug.Log("Krawedz juz istnieje");
+            if(edges3D.ContainsKey(labelA + labelB))
+            {
+                edges3D[labelA + labelB].wallOrigins++;
+            }
+            else if (edges3D.ContainsKey(labelB + labelA))
+            {
+                edges3D[labelB + labelA].wallOrigins++;
+            }
         }
         else //1 raz
         {
             Vector3 mocker = Vector3.zero;
-            bool show = true;
             //przypadek kiedy juz jest krawedz ale nie ma okreslonej pos w 3d
             if (!vertices3D.ContainsKey(labelA))
             {
@@ -298,9 +322,8 @@ public class MeshBuilder : MonoBehaviour {
             );
             string key = labelA + labelB;
             edges3D[key] = new Edge3D(edgeObj,labelA,labelB);
-            //edges3D[key].show = show;
+            edges3D[key].wallOrigins++;
         }
-
     }
 
 
@@ -459,7 +482,7 @@ public class MeshBuilder : MonoBehaviour {
             //vertices3D[label].gameObject.GetComponent<Renderer>().enabled = (!vertices3D[label].deleted || !vertices3D[label].disabled);
         }
     }
-    public void ShowEdges3D()
+    private void ShowEdges3D()
     {
         foreach (string key in edges3D.Keys)
         {
