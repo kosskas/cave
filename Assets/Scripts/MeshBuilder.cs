@@ -106,17 +106,6 @@ public class MeshBuilder : MonoBehaviour {
     /// </summary>
 	GameObject edges3DDir;
 
-    private const float POINT_DIAMETER = 0.015f;                        // 0.009f
-    private const float LINE_WEIGHT = 0.008f;                           // 0.005f
-
-    private const float VERTEX_LABEL_SIZE = 0.04f;
-    private const float EDGE_LABEL_SIZE = 0.01f;
-
-
-    private Color LABEL_COLOR = Color.white;
-    private Color POINT_COLOR = Color.black;
-    private Color LINE_COLOR = Color.black;
-
     const int MAXWALLSNUM = 3;
     // Use this for initialization
     void Start () {
@@ -315,14 +304,14 @@ public class MeshBuilder : MonoBehaviour {
             edgeObj.transform.SetParent(edges3DDir.transform);
 
             LineSegment edge = edgeObj.AddComponent<LineSegment>();
-            edge.SetStyle(Color.white, 0.01f);
+            edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, ReconstructionInfo.EDGE_3D_LINE_WIDTH);
             edge.SetCoordinates(
                 vertices3D[labelA].gameObject.transform.position,
                 vertices3D[labelB].gameObject.transform.position
             );
             string key = labelA + labelB;
             edges3D[key] = new Edge3D(edgeObj,labelA,labelB);
-            edges3D[key].wallOrigins++;
+            edges3D[key].wallOrigins++; 
         }
     }
     /// <summary>
@@ -430,9 +419,9 @@ public class MeshBuilder : MonoBehaviour {
         obj.transform.SetParent(reconstrVertDir.transform);
 
         Point vertexObject = obj.AddComponent<Point>();
-        vertexObject.SetStyle(POINT_COLOR, POINT_DIAMETER);
+        vertexObject.SetStyle(ReconstructionInfo.POINT_3D_COLOR, ReconstructionInfo.POINT_3D_DIAMETER);
         vertexObject.SetCoordinates(pos);
-        vertexObject.SetLabel(label, VERTEX_LABEL_SIZE, Color.white);
+        vertexObject.SetLabel(label, ReconstructionInfo.LABEL_3D_SIZE, ReconstructionInfo.LABEL_3D_COLOR);
 
         vertices3D[label] = new Vertice3D(obj);
     }
@@ -509,10 +498,7 @@ public class MeshBuilder : MonoBehaviour {
     {
         foreach(string label in vertices3D.Keys)
         {
-            //Debug.Log(!vertices3D[label].deleted || !vertices3D[label].disabled);
-            Debug.Log($"{vertices3D[label].deleted} || {vertices3D[label].disabled}  ff [{!(vertices3D[label].deleted || vertices3D[label].disabled)}]");
             vertices3D[label].gameObject.SetActive(!(vertices3D[label].deleted || vertices3D[label].disabled));
-            //vertices3D[label].gameObject.GetComponent<Renderer>().enabled = (!vertices3D[label].deleted || !vertices3D[label].disabled);
         }
     }
     private void ShowEdges3D()
@@ -546,7 +532,7 @@ public class MeshBuilder : MonoBehaviour {
             Debug.LogError("GameObj nie ma komponentu Point");
             return;
         }
-        et.SetLabel(Color.red);
+        et.SetLabel(ReconstructionInfo.LABEL_3D_ERR_COLOR);
         pointProj.is_ok_placed = false;
 
     }
@@ -559,7 +545,7 @@ public class MeshBuilder : MonoBehaviour {
             Debug.LogError("GameObj nie ma komponentu Point");
             return;
         }
-        et.SetLabel(Color.white);
+        et.SetLabel(ReconstructionInfo.LABEL_3D_COLOR);
         pointProj.is_ok_placed = true;
     }
 }
