@@ -7,19 +7,21 @@ using UnityEditorInternal;
 using System.Xml.Serialization;
 using System.Reflection;
 
-
+/// <summary>
+/// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny.
+/// </summary>
 public class MeshBuilder : MonoBehaviour {
     /*TODO
      [?] Przypadki przy dodawaniu
      [x] Sprawdz numeryczne porownianie
      [ ] Aktualizuj info jakie krawędzie między wierzchołkami	 
-     [ ] Jak się określi krawędzie to zrób to samo w 3D
+     [x] Jak się określi krawędzie to zrób to samo w 3D
      [ ] Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
 	 [x] Kiedy jest juz to ten ray tylko do wierch ale nie w INF
 	 [x] podswietl dodawany na czerwono jesli zla plaszcz, umiejscowienie trzeciego
 	 [X] usun takze 3D kiedy są tylko 2
      [x] jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly  TO TEST xxx
-     [ ] dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
+     [-] dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
      [ ] Refaktor kodu
      [x] Przypadek, wszystko zle, potem usuwasz i robi sie ok
 	*/
@@ -132,7 +134,7 @@ public class MeshBuilder : MonoBehaviour {
         ShowEdges3D();
     }
     /// <summary>
-    /// Dodane rzut punktu z listy punktów odtwarzanego obiektu 3D
+    /// Dodaje rzut punktu do listy punktów odtwarzanego obiektu 3D. Jeśli jest wystarczająco informacji to próbuje stworzyć go w 3D. 
     /// </summary>
     /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
     /// <param name="label">Etykieta rzutu</param>
@@ -209,7 +211,7 @@ public class MeshBuilder : MonoBehaviour {
         }
     }
     /// <summary>
-    /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D
+    /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D. Jeśli istnieje pkt w 3D to następuje ponownw obliczenie jego pozycji lub usunięcie
     /// </summary>
     /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
     /// <param name="label">Etykieta</param>

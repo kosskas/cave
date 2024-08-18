@@ -6,19 +6,6 @@ using UnityEngine;
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 public class PointPlacer : MonoBehaviour {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - STYLES
-/*	private const float _CURSOR_SIZE = 0.05f;
-    private Color _CURSOR_COLOR = new Color(1, 1, 1, 0.3f);
-    private Color _CURSOR_COLOR_FOCUSED = new Color(1, 0, 0, 1f);
-    private const float POINT_SIZE = 0.025f;
-    private Color POINT_COLOR = Color.black;
-    private const float LABEL_SIZE_PLACED = 0.04f;
-    private const float LABEL_SIZE_PICKED = 0.06f;
-    private const float LABEL_OFFSET_FROM_POINT = 0.03f;
-    private Color LABEL_COLOR_PLACED = Color.white;
-    private Color LABEL_COLOR_CHOSEN = Color.red;
-    private Color LABEL_COLOR_PICKED_FOCUSED = Color.green;
-    private Color LABEL_COLOR_PICKED_UNFOCUSED = new Color(0, 0.8f, 0);*/
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - CURSOR
 	private GameObject _cursor;
     private Renderer _cursorRenderer;
