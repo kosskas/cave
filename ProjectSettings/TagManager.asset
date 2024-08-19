@@ -9,6 +9,7 @@ TagManager:
   - Wall
   - GridLine
   - GridPoint
+  - PointButton
   layers:
   - Default
   - TransparentFX
