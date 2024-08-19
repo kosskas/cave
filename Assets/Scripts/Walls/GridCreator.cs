@@ -24,7 +24,7 @@ public class GridCreator : MonoBehaviour {
     private GameObject grid = null;
 
 	
-    public GridCreator()
+    public void Init()
     {
         ParseConfigFile();
 

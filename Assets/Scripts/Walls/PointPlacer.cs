@@ -4,110 +4,8 @@ using System.Linq;
 using System.Globalization;
 using UnityEngine;
 
-
-public struct PointINFO {
-    public float X { get; }
-    public float Y { get; }
-    public float Z { get; }
-    public string Label { get; }
-    public string FullLabel { get; }
-    public WallInfo WallInfo { get; }
-    public GameObject GridPoint { get; }
-
-    public static readonly PointINFO Empty = new PointINFO(null, null, "<?>", "<?>");
-
-    public PointINFO(GameObject gridPoint, WallInfo wallInfo, string label, string fullLabel)
-    {
-        X = 0.0f;
-        Y = 0.0f;
-        Z = 0.0f;
-        Label = label;
-        FullLabel = fullLabel;
-        WallInfo = wallInfo;
-        GridPoint = gridPoint;
-
-        if (gridPoint != null)
-        {
-            string name = gridPoint.name;
-            int startIndex = name.IndexOf('(') + 1;
-            int endIndex = name.IndexOf(')') - 1;
-            int length = endIndex - startIndex + 1;
-
-            char[] coordAxis = { name[5], name[6] };
-            string[] coordValuesStr = name.Substring(startIndex, length).Split(',');
-            float[] coordValues = { float.Parse(coordValuesStr[0], CultureInfo.InvariantCulture), float.Parse(coordValuesStr[1], CultureInfo.InvariantCulture) };
-
-            switch (coordAxis[0])
-            {
-                case 'X': X = coordValues[0];
-                    break;
-                case 'Y': Y = coordValues[0];
-                    break;
-                case 'Z': Z = coordValues[0];
-                    break;
-                default:
-                    break;
-            }
-
-            switch (coordAxis[1])
-            {
-                case 'X': X = coordValues[1];
-                    break;
-                case 'Y': Y = coordValues[1];
-                    break;
-                case 'Z': Z = coordValues[1];
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    public override string ToString() => $"{FullLabel} (X={X}, Y={Y}, Z={Z})";
-
-    public static bool operator ==(PointINFO left, PointINFO right) => left.Equals(right);
-
-    public static bool operator !=(PointINFO left, PointINFO right) => !left.Equals(right);
-}
-
-public struct EdgeINFO {
-    public PointINFO P1 { get; }
-    public PointINFO P2 { get; }
-    public GameObject EdgeObj { get; }
-    public LineSegment Edge { get; }
-    
-    public static readonly EdgeINFO Empty = new EdgeINFO(null, null, PointINFO.Empty, PointINFO.Empty);
-
-    public EdgeINFO(GameObject edgeObj, LineSegment edge, PointINFO p1, PointINFO p2)
-    {
-        P1 = p1;
-        P2 = p2;
-        EdgeObj = edgeObj;
-        Edge = edge;
-    }
-
-    public override string ToString() => $"|{P1.FullLabel}{P2.FullLabel}|";
-
-    public static bool operator ==(EdgeINFO left, EdgeINFO right) => left.Equals(right);
-
-    public static bool operator !=(EdgeINFO left, EdgeINFO right) => !left.Equals(right);
-}
-
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 public class PointPlacer : MonoBehaviour {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - STYLES
-	private const float _CURSOR_SIZE = 0.05f;
-    private Color _CURSOR_COLOR = new Color(1, 1, 1, 0.3f);
-    private Color _CURSOR_COLOR_FOCUSED = new Color(1, 0, 0, 1f);
-    private const float POINT_SIZE = 0.025f;
-    private Color POINT_COLOR = Color.black;
-    private const float LABEL_SIZE_PLACED = 0.04f;
-    private const float LABEL_SIZE_PICKED = 0.06f;
-    private const float LABEL_OFFSET_FROM_POINT = 0.03f;
-    private Color LABEL_COLOR_PLACED = Color.white;
-    private Color LABEL_COLOR_CHOSEN = Color.red;
-    private Color LABEL_COLOR_PICKED_FOCUSED = Color.green;
-    private Color LABEL_COLOR_PICKED_UNFOCUSED = new Color(0, 0.8f, 0);
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - CURSOR
 	private GameObject _cursor;
     private Renderer _cursorRenderer;
@@ -129,11 +27,11 @@ public class PointPlacer : MonoBehaviour {
         set {
             if (_addEdge_CurrentlyFocusedGridPoint != null && _addEdge_Labels.ContainsKey(_addEdge_CurrentlyFocusedGridPoint)) {
                 Label unfocusedLabel = _FindPickedLabel(_addEdge_Labels[_addEdge_CurrentlyFocusedGridPoint]);
-                unfocusedLabel.SetColor(LABEL_COLOR_PICKED_UNFOCUSED);
+                unfocusedLabel.SetColor(ReconstructionInfo.LABEL_COLOR_PICKED_UNFOCUSED);
             }
             if (value != null && _addEdge_Labels.ContainsKey(value)) {
                 Label focusedLabel = _FindPickedLabel(_addEdge_Labels[value]);
-                focusedLabel.SetColor(LABEL_COLOR_PICKED_FOCUSED);
+                focusedLabel.SetColor(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED);
             }
 
             _addEdge_CurrentlyFocusedGridPoint = value;
@@ -229,16 +127,16 @@ public class PointPlacer : MonoBehaviour {
             Vector3 offset = Vector3.zero;
 
             if ((int)Mathf.Abs(wallNormal.x) == 1) {
-                offset.y = 0.01f + LABEL_OFFSET_FROM_POINT * Mathf.Cos(alpha_i);
-                offset.z = 0.02f + LABEL_OFFSET_FROM_POINT * Mathf.Sin(alpha_i);
+                offset.y = 0.01f + ReconstructionInfo.LABEL_OFFSET_FROM_POINT * Mathf.Cos(alpha_i);
+                offset.z = 0.02f + ReconstructionInfo.LABEL_OFFSET_FROM_POINT * Mathf.Sin(alpha_i);
             }
             else if((int)Mathf.Abs(wallNormal.y) == 1) {
-                offset.x = 0.02f + LABEL_OFFSET_FROM_POINT * Mathf.Cos(alpha_i);
-                offset.z = 0.02f + LABEL_OFFSET_FROM_POINT * Mathf.Sin(alpha_i);
+                offset.x = 0.02f + ReconstructionInfo.LABEL_OFFSET_FROM_POINT * Mathf.Cos(alpha_i);
+                offset.z = 0.02f + ReconstructionInfo.LABEL_OFFSET_FROM_POINT * Mathf.Sin(alpha_i);
             }
             else if((int)Mathf.Abs(wallNormal.z) == 1) {
-                offset.x = 0.02f + LABEL_OFFSET_FROM_POINT * Mathf.Cos(alpha_i);
-                offset.y = 0.01f + LABEL_OFFSET_FROM_POINT * Mathf.Sin(alpha_i);
+                offset.x = 0.02f + ReconstructionInfo.LABEL_OFFSET_FROM_POINT * Mathf.Cos(alpha_i);
+                offset.y = 0.01f + ReconstructionInfo.LABEL_OFFSET_FROM_POINT * Mathf.Sin(alpha_i);
             }
 
             pointClicked
@@ -277,12 +175,12 @@ public class PointPlacer : MonoBehaviour {
             );                
         }
         
-        labels[0].SetColor(LABEL_COLOR_PICKED_FOCUSED);
+        labels[0].SetColor(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED);
     }
 
     private void _DisableLabelPicker(List<Label> labels)
     {
-        labels.ForEach(label => label.SetColor(LABEL_COLOR_PLACED));
+        labels.ForEach(label => label.SetColor(ReconstructionInfo.LABEL_COLOR_PLACED));
         labels.Clear();
     }
 
@@ -312,13 +210,13 @@ public class PointPlacer : MonoBehaviour {
 
         Point point = labelObj.AddComponent<Point>();
         point.SetCoordinates(pointClicked.transform.position);
-        point.SetStyle(POINT_COLOR, POINT_SIZE);
+        point.SetStyle(ReconstructionInfo.POINT_COLOR, ReconstructionInfo.POINT_SIZE);
         point.SetEnable(true);
-        point.SetLabel(fullLabelText, LABEL_SIZE_PLACED, LABEL_COLOR_PLACED);
+        point.SetLabel(fullLabelText, ReconstructionInfo.LABEL_SIZE_PLACED, ReconstructionInfo.LABEL_COLOR_PLACED);
         
         ///linia rzutująca
         LineSegment lineseg = labelObj.AddComponent<LineSegment>();
-        lineseg.SetStyle(Color.blue, 0.002f);
+        lineseg.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
 
         _mc.AddPointProjection(wall, labelText, labelObj);
 
@@ -331,7 +229,7 @@ public class PointPlacer : MonoBehaviour {
     {
         return labels.Find(label => {
             Color color = label.GetColor();
-            return (color.Equals(LABEL_COLOR_PICKED_FOCUSED) || color.Equals(LABEL_COLOR_PICKED_UNFOCUSED));
+            return (color.Equals(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED) || color.Equals(ReconstructionInfo.LABEL_COLOR_PICKED_UNFOCUSED));
         });
     }
 
@@ -369,12 +267,13 @@ public class PointPlacer : MonoBehaviour {
 
         GameObject edgeObj = new GameObject($"{fullLabelText_1}-{fullLabelText_2}");
         LineSegment edge = edgeObj.AddComponent<LineSegment>();
-        edge.SetStyle(Color.white, 0.01f);
+        edge.SetStyle(ReconstructionInfo.EDGE_COLOR, ReconstructionInfo.EDGE_LINE_WIDTH);
         edge.SetCoordinates(
             point_1.GridPoint.transform.position,
             point_2.GridPoint.transform.position
         );
 
+        _mc.AddEdgeProjection(labelText_1, labelText_2);
         return new EdgeINFO(edgeObj, edge, point_1, point_2);
     }
 
@@ -388,7 +287,7 @@ public class PointPlacer : MonoBehaviour {
         Material transparentMaterial = new Material(Shader.Find("Standard"));
 
         // Ustawiamy kolor i przezroczystość materiału
-        transparentMaterial.color = _CURSOR_COLOR;
+        transparentMaterial.color = ReconstructionInfo._CURSOR_COLOR;
 
         // Włączamy renderowanie przezroczystości
         transparentMaterial.SetFloat("_Mode", 3); // Ustawienie trybu renderowania na przeźroczystość
@@ -405,7 +304,7 @@ public class PointPlacer : MonoBehaviour {
         _cursor.layer = LayerMask.NameToLayer("Ignore Raycast");
         
         // Ustawiamy rozmiar
-        _cursor.transform.localScale = new Vector3(_CURSOR_SIZE, _CURSOR_SIZE, _CURSOR_SIZE);
+        _cursor.transform.localScale = new Vector3(ReconstructionInfo._CURSOR_SIZE, ReconstructionInfo._CURSOR_SIZE, ReconstructionInfo._CURSOR_SIZE);
 
         // Dodajemy obiekt etykiety
         _cursorLabelObj = new GameObject("_CursorLabel");
@@ -414,7 +313,7 @@ public class PointPlacer : MonoBehaviour {
 
         // Dodajemy etykietę
         _cursorLabel = _cursorLabelObj.AddComponent<Label>();
-        _cursorLabel.SetLabel($"{_addPoint_Labels[_addPoint_LabelIdx]}", LABEL_SIZE_PICKED, LABEL_COLOR_CHOSEN);		
+        _cursorLabel.SetLabel($"{_addPoint_Labels[_addPoint_LabelIdx]}", ReconstructionInfo.LABEL_SIZE_PICKED, ReconstructionInfo.LABEL_COLOR_CHOSEN);		
     }
 	
 	public void MoveCursor(RaycastHit hit)
@@ -429,12 +328,12 @@ public class PointPlacer : MonoBehaviour {
         switch (Ctx)
         {
             case Context.AddPoint:
-                _cursorRenderer.material.color = (hit.collider.tag == "GridPoint") ? _CURSOR_COLOR_FOCUSED : _CURSOR_COLOR;
+                _cursorRenderer.material.color = (hit.collider.tag == "GridPoint") ? ReconstructionInfo._CURSOR_COLOR_FOCUSED : ReconstructionInfo._CURSOR_COLOR;
                 _cursorLabel.SetEnable((hit.collider.tag == "GridPoint") ? true : false);
                 break;
 
             default:
-                _cursorRenderer.material.color = _CURSOR_COLOR;
+                _cursorRenderer.material.color = ReconstructionInfo._CURSOR_COLOR;
                 _cursorLabel.SetEnable(false);
                 break;
         }
@@ -453,20 +352,20 @@ public class PointPlacer : MonoBehaviour {
 
             case Context.RemovePoint:
             {
-                int currIdx = _removePoint_Labels.FindIndex(label => label.GetColor().Equals(LABEL_COLOR_PICKED_FOCUSED));
+                int currIdx = _removePoint_Labels.FindIndex(label => label.GetColor().Equals(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED));
                 int nextIdx = (currIdx+1) % _removePoint_Labels.Count;
-                _removePoint_Labels[currIdx].SetColor(LABEL_COLOR_PLACED);
-                _removePoint_Labels[nextIdx].SetColor(LABEL_COLOR_PICKED_FOCUSED);
+                _removePoint_Labels[currIdx].SetColor(ReconstructionInfo.LABEL_COLOR_PLACED);
+                _removePoint_Labels[nextIdx].SetColor(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED);
             }
                 break;
 
             case Context.AddEdge:
             {
                 var labels = _addEdge_Labels[_AddEdge_CurrentlyFocusedGridPoint];
-                int currIdx = labels.FindIndex(label => label.GetColor().Equals(LABEL_COLOR_PICKED_FOCUSED));
+                int currIdx = labels.FindIndex(label => label.GetColor().Equals(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED));
                 int nextIdx = (currIdx+1) % labels.Count;
-                labels[currIdx].SetColor(LABEL_COLOR_PLACED);
-                labels[nextIdx].SetColor(LABEL_COLOR_PICKED_FOCUSED);
+                labels[currIdx].SetColor(ReconstructionInfo.LABEL_COLOR_PLACED);
+                labels[nextIdx].SetColor(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED);
             }
                 break;
 
@@ -488,20 +387,20 @@ public class PointPlacer : MonoBehaviour {
 
             case Context.RemovePoint:
             {
-                int currIdx = _removePoint_Labels.FindIndex(label => label.GetColor().Equals(LABEL_COLOR_PICKED_FOCUSED));
+                int currIdx = _removePoint_Labels.FindIndex(label => label.GetColor().Equals(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED));
                 int nextIdx = ((currIdx-1) < 0) ? (_removePoint_Labels.Count-1) : (currIdx-1);
-                _removePoint_Labels[currIdx].SetColor(LABEL_COLOR_PLACED);
-                _removePoint_Labels[nextIdx].SetColor(LABEL_COLOR_PICKED_FOCUSED);
+                _removePoint_Labels[currIdx].SetColor(ReconstructionInfo.LABEL_COLOR_PLACED);
+                _removePoint_Labels[nextIdx].SetColor(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED);
             }
                 break;
             
             case Context.AddEdge:
             {
                 var labels = _addEdge_Labels[_AddEdge_CurrentlyFocusedGridPoint];
-                int currIdx = labels.FindIndex(label => label.GetColor().Equals(LABEL_COLOR_PICKED_FOCUSED));
+                int currIdx = labels.FindIndex(label => label.GetColor().Equals(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED));
                 int nextIdx =  ((currIdx-1) < 0) ? (labels.Count-1) : (currIdx-1);
-                labels[currIdx].SetColor(LABEL_COLOR_PLACED);
-                labels[nextIdx].SetColor(LABEL_COLOR_PICKED_FOCUSED);
+                labels[currIdx].SetColor(ReconstructionInfo.LABEL_COLOR_PLACED);
+                labels[nextIdx].SetColor(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED);
             }
                 break;
 

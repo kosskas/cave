@@ -5,22 +5,25 @@ using System.Linq;
 using System.Threading;
 using UnityEditorInternal;
 using System.Xml.Serialization;
+using System.Reflection;
 
-
+/// <summary>
+/// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny.
+/// </summary>
 public class MeshBuilder : MonoBehaviour {
     /*TODO
      [?] Przypadki przy dodawaniu
      [x] Sprawdz numeryczne porownianie
      [ ] Aktualizuj info jakie krawędzie między wierzchołkami	 
-     [ ] Jak się określi krawędzie to zrób to samo w 3D
+     [x] Jak się określi krawędzie to zrób to samo w 3D
      [ ] Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
-	 [ ] Kiedy jest juz to ten ray tylko do wierch ale nie w INF
+	 [x] Kiedy jest juz to ten ray tylko do wierch ale nie w INF
 	 [x] podswietl dodawany na czerwono jesli zla plaszcz, umiejscowienie trzeciego
 	 [X] usun takze 3D kiedy są tylko 2
-     [?] jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly  TO TEST xxx
-     [ ] dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
+     [x] jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly  TO TEST xxx
+     [-] dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
      [ ] Refaktor kodu
-     [ ] Przypadek, wszystko zle, potem usuwasz i robi sie ok
+     [x] Przypadek, wszystko zle, potem usuwasz i robi sie ok
 	*/
     private class PointProjection
 	{
@@ -41,7 +44,44 @@ public class MeshBuilder : MonoBehaviour {
         PLANE_ERR,
         OTHER_ERR
     }
+    private class Edge3D
+    {
+        public GameObject edgeObject;
+        public string firstPoint;
+        public string secondPoint;
+        //public bool show = true;
+        /// <summary>
+        /// Ile krawędzi jest na ścianach
+        /// </summary>
+        public int wallOrigins;
 
+        public Edge3D(GameObject edgeObject, string firstPoint, string secondPoint)
+        {
+            this.edgeObject = edgeObject;
+            this.firstPoint = firstPoint;
+            this.secondPoint = secondPoint;
+            this.wallOrigins = 0;
+        }
+
+    }
+    
+    private class Vertice3D
+    {
+        public GameObject gameObject;
+        /// <summary>
+        /// Flaga czy pkt3D jest usunięty
+        /// </summary>
+        public bool deleted = false;
+        /// <summary>
+        /// Flaga czy pkt3D jest wyłączony
+        /// </summary>
+        public bool disabled = false;
+
+        public Vertice3D(GameObject gameObject)
+        {
+            this.gameObject = gameObject;
+        }
+    }
 
     /// <summary>
     /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
@@ -50,34 +90,34 @@ public class MeshBuilder : MonoBehaviour {
     Dictionary<WallInfo, Dictionary<string, PointProjection>> verticesOnWalls;
 
     /// <summary>
-    /// Get compoment Point
+    /// Zbiór wierzchołków rysowanych w trójwymiarze. Elementy nigdy nie są usuwane jedynie oznaczane jako usunięte lub wyłączone.
     /// </summary>
-	Dictionary<string, GameObject> vertices3D;
+	Dictionary<string, Vertice3D> vertices3D;
 
-    Dictionary<string, List<string>> edges;
+    /// <summary>
+    /// Zbiór krawędzi rysowanych w 3D.
+    /// </summary>
+    Dictionary<string, Edge3D> edges3D;
+
+    /// <summary>
+    /// Folder z wierch. rysowanymi w 3D
+    /// </summary>
 	GameObject reconstrVertDir;
-
-    private const float POINT_DIAMETER = 0.015f;                        // 0.009f
-    private const float LINE_WEIGHT = 0.008f;                           // 0.005f
-
-    private const float VERTEX_LABEL_SIZE = 0.04f;
-    private const float EDGE_LABEL_SIZE = 0.01f;
-
-
-    private Color LABEL_COLOR = Color.white;
-    private Color POINT_COLOR = Color.black;
-    private Color LINE_COLOR = Color.black;
+    /// <summary>
+    /// Folder z krawedz. rysowanymi w 3D
+    /// </summary>
+	GameObject edges3DDir;
 
     const int MAXWALLSNUM = 3;
     // Use this for initialization
     void Start () {
         reconstrVertDir = new GameObject("Reconstr. Verticies");
         reconstrVertDir.transform.SetParent(gameObject.transform);
-
+        edges3DDir = new GameObject("Reconstr. edges3DDir");
+        edges3DDir.transform.SetParent(gameObject.transform);
         verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
-
-		edges = new Dictionary<string, List<string>>();
-		vertices3D = new Dictionary<string, GameObject>();
+		vertices3D = new Dictionary<string, Vertice3D>();
+        edges3D = new Dictionary<string, Edge3D>();
     }
 
 	// Update is called once per frame
@@ -90,9 +130,11 @@ public class MeshBuilder : MonoBehaviour {
 		 * Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
 		 */
         ShowProjectionLines();
+        ShowPoints3D();
+        ShowEdges3D();
     }
     /// <summary>
-    /// Dodane rzut punktu z listy punktów odtwarzanego obiektu 3D
+    /// Dodaje rzut punktu do listy punktów odtwarzanego obiektu 3D. Jeśli jest wystarczająco informacji to próbuje stworzyć go w 3D. 
     /// </summary>
     /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
     /// <param name="label">Etykieta rzutu</param>
@@ -169,12 +211,13 @@ public class MeshBuilder : MonoBehaviour {
         }
     }
     /// <summary>
-    /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D
+    /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D. Jeśli istnieje pkt w 3D to następuje ponownw obliczenie jego pozycji lub usunięcie
     /// </summary>
     /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
     /// <param name="label">Etykieta</param>
     public void RemovePointProjection(WallInfo wall, string label)
 	{
+        //Debug.Log($"usuwanie");
         //rozszerzyć o label
         if (!verticesOnWalls.ContainsKey(wall))
             return;
@@ -187,40 +230,128 @@ public class MeshBuilder : MonoBehaviour {
 
         
         int count = GetCurrentPointProjections(label).Count;
+        //Debug.Log($"liczba={count}");
         verticesOnWalls[wall].Remove(label);
         if (count == 2) //sa dwa, usun 3d
         {
             if (vertices3D.ContainsKey(label))
             {
-                GameObject todel3D = vertices3D[label];
-                vertices3D.Remove(label);
-                Destroy(todel3D);
+                //GameObject todel3D = vertices3D[label];
+                //vertices3D.Remove(label);
+                //Destroy(todel3D);
+                vertices3D[label].deleted = true;
             }
         }
         else if (count > 2) //sa trzy
         {
-            if (vertices3D.ContainsKey(label))
+            if (vertices3D.ContainsKey(label)) //sa 3 i jest obiekt 3d
             {
-                GameObject todel3D = vertices3D[label];
-                vertices3D.Remove(label);
-                Destroy(todel3D);
-                //Rekonstruuj
-                List<PointProjection> currPts = GetCurrentPointProjections(label);
-                Status result = Create3DPoint(label);
-                if (result == Status.PLANE_ERR)
-                {
-                    MarkError(currPts[0]);
-                    MarkError(currPts[1]);
-                }
-                else if (result == Status.OK)
-                {
-                    MarkOK(currPts[0]);
-                    MarkOK(currPts[1]);
-               }
-            }           
+                vertices3D[label].deleted = true;
+
+            }
+            //moga byc 3 i zle polozone
+            //Rekonstruuj
+            List<PointProjection> currPts = GetCurrentPointProjections(label);
+            Status result = Create3DPoint(label);
+            if (result == Status.PLANE_ERR)
+            {
+                MarkError(currPts[0]);
+                MarkError(currPts[1]);
+            }
+            else if (result == Status.OK)
+            {
+                MarkOK(currPts[0]);
+                MarkOK(currPts[1]);
+            }
         }   
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
 	}
+    /// <summary>
+    /// Tworzy krawędź w 3D i jeśli jest odpowiednia ilość informacji wyświetla ją
+    /// </summary>
+    /// <param name="labelA">Etykieta punktu A</param>
+    /// <param name="labelB">Etykieta punktu B</param>
+    public void AddEdgeProjection(string labelA, string labelB)
+    {
+        //sprawdz czy taka krawedz juz nie istnieje(zostala stworzona z innej sciany)
+        //jesli tak to odnotuj to(przy usuwaniu bedzie przydatne)
+        //jesli pierwszy raz to stowrz w 3D
+        if (edges3D.ContainsKey(labelA + labelB) || edges3D.ContainsKey(labelB + labelA))
+        {
+            Debug.Log("Krawedz juz istnieje");
+            if(edges3D.ContainsKey(labelA + labelB))
+            {
+                edges3D[labelA + labelB].wallOrigins++;
+            }
+            else if (edges3D.ContainsKey(labelB + labelA))
+            {
+                edges3D[labelB + labelA].wallOrigins++;
+            }
+        }
+        else //1 raz
+        {
+            Vector3 mocker = Vector3.zero;
+            //przypadek kiedy juz jest krawedz ale nie ma okreslonej pos w 3d
+            if (!vertices3D.ContainsKey(labelA))
+            {
+                CreateEntryForPoint(labelA, mocker);
+                vertices3D[labelA].disabled = true;
+            }
+            if (!vertices3D.ContainsKey(labelB))
+            {
+                CreateEntryForPoint(labelB, mocker);
+                vertices3D[labelB].disabled = true;
+            }
+            GameObject edgeObj = new GameObject("Edge3D " + labelA+ labelB);
+            edgeObj.transform.SetParent(edges3DDir.transform);
+
+            LineSegment edge = edgeObj.AddComponent<LineSegment>();
+            edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, ReconstructionInfo.EDGE_3D_LINE_WIDTH);
+            edge.SetCoordinates(
+                vertices3D[labelA].gameObject.transform.position,
+                vertices3D[labelB].gameObject.transform.position
+            );
+            string key = labelA + labelB;
+            edges3D[key] = new Edge3D(edgeObj,labelA,labelB);
+            edges3D[key].wallOrigins++; 
+        }
+    }
+    /// <summary>
+    /// Usuwa informację o krawędzi w 3D. Jeżeli krawędź istnieje na wielu ścianach to krawędź w 3D zostanie usunięta jeśli nie będzie jej na żadnej ścianie.
+    /// </summary>
+    /// <param name="labelA">Etykieta punktu A</param>
+    /// <param name="labelB">Etykieta punktu B</param>
+    /// <param name="nowait">Flaga określająca czy krawędz ma zostać natychmiast usunięta</param>
+    public void RemoveEdgeProjection(string labelA, string labelB, bool nowait = false)
+    {
+        //znajdz klucz
+        string key = null;
+        if (edges3D.ContainsKey(labelA + labelB))
+        {
+            key = labelA + labelB;
+        }
+        else if (edges3D.ContainsKey(labelB + labelA))
+        {
+            key = labelB + labelA;
+        }
+        if(key == null)
+        {
+            Debug.Log("nie ma krawedzi o takich punktach");
+            return;
+        }
+        Edge3D edge = edges3D[key];
+
+        edges3D[key].wallOrigins--; //zmiejsz licznik scian
+
+        if (edges3D[key].wallOrigins < 1 || nowait)
+        {
+            GameObject todel = edge.edgeObject;
+            edges3D.Remove(key);
+            Destroy(todel);
+        }
+
+    }
+
     /// <summary>
     /// Sprawdza czy na scianie znajduje juz sie rzut
     /// </summary>
@@ -249,15 +380,21 @@ public class MeshBuilder : MonoBehaviour {
 			Vector3 pkt3D = CalcPosIn3D(rzut1, rzut2);
 			if (pkt3D != Vector3.zero)
 			{
-                GameObject obj = new GameObject("Vertex3D " + label);
-                obj.transform.SetParent(reconstrVertDir.transform);
+                if (vertices3D.ContainsKey(label))
+                {
+                    //byl usuniety?, przywroc go w nowej pozycji
+                    Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
+                    vertexObject.SetCoordinates(pkt3D);
+                    vertices3D[label].deleted = false;
+                    vertices3D[label].disabled = false;
 
-                Point vertexObject = obj.AddComponent<Point>();
-                vertexObject.SetStyle(POINT_COLOR, POINT_DIAMETER);
-                vertexObject.SetCoordinates(pkt3D);
-                vertexObject.SetLabel(label, VERTEX_LABEL_SIZE, Color.white);
+                }
+                else
+                {
+                    //1 raz
+                    CreateEntryForPoint(label, pkt3D);
+                }
 
-                vertices3D[label] = obj;
                 return Status.OK;
 
             }
@@ -276,6 +413,19 @@ public class MeshBuilder : MonoBehaviour {
         }
         return Status.OTHER_ERR;
 
+    }
+
+    private void CreateEntryForPoint(string label, Vector3 pos)
+    {
+        GameObject obj = new GameObject("Vertex3D " + label);
+        obj.transform.SetParent(reconstrVertDir.transform);
+
+        Point vertexObject = obj.AddComponent<Point>();
+        vertexObject.SetStyle(ReconstructionInfo.POINT_3D_COLOR, ReconstructionInfo.POINT_3D_DIAMETER);
+        vertexObject.SetCoordinates(pos);
+        vertexObject.SetLabel(label, ReconstructionInfo.LABEL_3D_SIZE, ReconstructionInfo.LABEL_3D_COLOR);
+
+        vertices3D[label] = new Vertice3D(obj);
     }
     private Vector3 CalcPosIn3D(Vector3 vec1, Vector3 vec2)
     {
@@ -324,12 +474,12 @@ public class MeshBuilder : MonoBehaviour {
                 Vector3 vertexProj = verticesOnWalls[wall][label].pointObject.transform.position;
 
 
-                if (vertices3D.ContainsKey(label) && verticesOnWalls[wall][label].is_ok_placed) //jest juz pkt 3d
+                if (vertices3D.ContainsKey(label) && !vertices3D[label].deleted && !vertices3D[label].disabled && verticesOnWalls[wall][label].is_ok_placed) //jest juz pkt 3d
                 {
                     LineSegment projLine = verticesOnWalls[wall][label].projLine;
                     if (projLine != null)
                     {
-                        projLine.SetCoordinates(vertexProj, vertices3D[label].transform.position);
+                        projLine.SetCoordinates(vertexProj, vertices3D[label].gameObject.transform.position);
                     }
                 }
                 else //wolny pkt
@@ -346,6 +496,22 @@ public class MeshBuilder : MonoBehaviour {
         }
     }
 
+    private void ShowPoints3D()
+    {
+        foreach(string label in vertices3D.Keys)
+        {
+            vertices3D[label].gameObject.SetActive(!(vertices3D[label].deleted || vertices3D[label].disabled));
+        }
+    }
+    private void ShowEdges3D()
+    {
+        foreach (string key in edges3D.Keys)
+        {
+            LineSegment line = edges3D[key].edgeObject.GetComponent<LineSegment>();
+            line.SetCoordinates(vertices3D[edges3D[key].firstPoint].gameObject.transform.position, vertices3D[edges3D[key].secondPoint].gameObject.transform.position);
+            line.SetEnable(!(vertices3D[edges3D[key].firstPoint].deleted || vertices3D[edges3D[key].firstPoint].disabled || vertices3D[edges3D[key].secondPoint].deleted || vertices3D[edges3D[key].secondPoint].disabled));
+        }
+    }
     private List<PointProjection> GetCurrentPointProjections(string label)
 	{
 		List<PointProjection> pointsInfo = new List<PointProjection>();
@@ -368,7 +534,7 @@ public class MeshBuilder : MonoBehaviour {
             Debug.LogError("GameObj nie ma komponentu Point");
             return;
         }
-        et.SetLabel(Color.red);
+        et.SetLabel(ReconstructionInfo.LABEL_3D_ERR_COLOR);
         pointProj.is_ok_placed = false;
 
     }
@@ -381,7 +547,7 @@ public class MeshBuilder : MonoBehaviour {
             Debug.LogError("GameObj nie ma komponentu Point");
             return;
         }
-        et.SetLabel(Color.white);
+        et.SetLabel(ReconstructionInfo.LABEL_3D_COLOR);
         pointProj.is_ok_placed = true;
     }
 }
