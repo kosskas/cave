@@ -81,7 +81,7 @@ public class LineSegment : MonoBehaviour {
 	/// <param name="endPoint">Obiekt klasy Vector3, współrzędne końca odcinka, liczone względem położenia obiektu rodzica</param>
 	public void SetCoordinates(Vector3 startPoint, Vector3 endPoint)
 	{
-		this.transform.position = startPoint + 0.5f * (endPoint - startPoint);
+		//this.transform.position = startPoint + 0.5f * (endPoint - startPoint); //wył przy inz/MeshBuilder
 
 		this.startPoint = startPoint;
 		this.endPoint = endPoint;
