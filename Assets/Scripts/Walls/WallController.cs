@@ -218,7 +218,7 @@ public class WallController : MonoBehaviour {
 		ret = (A, e, f)
 		*/
         Vector3 ret = Vector3.zero;
-        const float eps = 0.0001f;
+        const float eps = 0.01f;
         for (int i = 0; i < 3; i++)
         {
             bool cmp_v12 = Mathf.Abs(vec1[i] - vec2[i]) < eps;
@@ -267,7 +267,11 @@ public class WallController : MonoBehaviour {
         }
     }
 
-
+    /// <summary>
+    /// Wyznacza indeks w zależności od nazwy ściany
+    /// </summary>
+    /// <param name="wall">Metadane o ścianie</param>
+    /// <returns>Numer indeksu</returns>
     public int GetWallIndex(WallInfo wall)
     {
         if(wall.name == "Wall3")
@@ -277,5 +281,20 @@ public class WallController : MonoBehaviour {
         if (wall.name == "Wall6")
             return 3;
         return 0;
+    }
+    /// <summary>
+    /// Znajduje ściane położoną na podłodze.
+    /// </summary>
+    /// <returns>Podłoga jeśli jest, Null jeśli nie ma</returns>
+    public WallInfo GetGroundWall()
+    {
+        foreach (WallInfo wall in walls)
+        {
+            if (wall.GetNormal() == Vector3.up)
+            {
+                return wall;
+            }
+        }
+        return null;
     }
 }

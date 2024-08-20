@@ -28,6 +28,9 @@ public static class ReconstructionInfo
     // -- PROJECTION LINE
     public static Color PROJECTION_LINE_COLOR = Color.blue;
     public static float PROJECTION_LINE_WIDTH = 0.002f;
+    // -- REFERENCE LINE
+    public static Color REFERENCE_LINE_COLOR = Color.green;
+    public static float REFERENCE_LINE_WIDTH = 0.005f;
     // -- 3D POINT
     public static float POINT_3D_DIAMETER = 0.015f;
     public static Color POINT_3D_COLOR = Color.black;
