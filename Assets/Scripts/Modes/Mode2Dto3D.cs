@@ -57,7 +57,24 @@ public class Mode2Dto3D : IMode
     }
 
     private void _SaveSolidAndSwitchToMode3Dto2D()
-    {}
+    {
+        //clear grid
+        _gc.Clear();
+        //clear meshBuilder
+        MeshBuilder mb = (MeshBuilder)GameObject.FindObjectOfType<MeshBuilder>();
+        mb.ClearAndDisable();
+        //clear PointPlacer
+        //PointList?
+        //change LogViewer
+        //usun wskaznik
+        //zaladuj grupowy
+        PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
+        SolidImporter si = (SolidImporter)GameObject.FindObjectOfType<SolidImporter>();
+        _wc.SetBasicWalls();
+        _wc.SetDefaultShowRules();
+        si.SetDownDirection();
+        si.ImportSolid();
+    }
 
     private void _ChoosePreviousLabel()
     {

@@ -90,56 +90,76 @@ public class MeshBuilder : MonoBehaviour {
     /// <summary>
     /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
     /// </summary>
-    Dictionary<WallInfo, Dictionary<string, PointProjection>> verticesOnWalls;
+    Dictionary<WallInfo, Dictionary<string, PointProjection>> verticesOnWalls = null;
 
     /// <summary>
     /// Zbiór wierzchołków rysowanych w trójwymiarze. Elementy nigdy nie są usuwane jedynie oznaczane jako usunięte lub wyłączone.
     /// </summary>
-	Dictionary<string, Vertice3D> vertices3D;
+	Dictionary<string, Vertice3D> vertices3D = null;
 
     /// <summary>
     /// Zbiór krawędzi rysowanych w 3D.
     /// </summary>
-    Dictionary<string, Edge3D> edges3D;
+    Dictionary<string, Edge3D> edges3D = null;
 
     /// <summary>
     /// Folder z wierch. rysowanymi w 3D
     /// </summary>
-	GameObject reconstrVertDir;
+	GameObject reconstrVertDir = null;
     /// <summary>
     /// Folder z krawedz. rysowanymi w 3D
     /// </summary>
-	GameObject edges3DDir;
-
-    WallController wc;
-
+	GameObject edges3DDir = null;
     /// <summary>
     /// Folder z rzutami rzutującymi
     /// </summary>
-    GameObject referenceLinesDir;
+    GameObject referenceLinesDir = null;
+
+    bool blocked = false;
+
+    WallController wc = null;
     const int MAXWALLSNUM = 3;
     // Use this for initialization
     void Start () {
-        reconstrVertDir = new GameObject("Reconstr. Verticies");
-        reconstrVertDir.transform.SetParent(gameObject.transform);
-        edges3DDir = new GameObject("Reconstr. edges3DDir");
-        edges3DDir.transform.SetParent(gameObject.transform);
-        referenceLinesDir = new GameObject("referenceLinesDir");
-        verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
-		vertices3D = new Dictionary<string, Vertice3D>();
-        edges3D = new Dictionary<string, Edge3D>();
-        wc = (WallController)FindObjectOfType(typeof(WallController));
+        Init();
     }
 
 	// Update is called once per frame
 	void Update()
 	{        
+        if (blocked)
+            return;
         ShowPoints3D();
         ShowEdges3D();
         ShowProjectionLines();
         HandleReferenceLines();
         ShowReferenceLines();
     }
+
+    public void Init()
+    {
+        reconstrVertDir = new GameObject("Reconstr. Verticies");
+        reconstrVertDir.transform.SetParent(gameObject.transform);
+        edges3DDir = new GameObject("Reconstr. edges3DDir");
+        edges3DDir.transform.SetParent(gameObject.transform);
+        referenceLinesDir = new GameObject("referenceLinesDir");
+        verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
+        vertices3D = new Dictionary<string, Vertice3D>();
+        edges3D = new Dictionary<string, Edge3D>();
+        wc = (WallController)FindObjectOfType(typeof(WallController));
+        blocked = false;
+    }
+    public void ClearAndDisable()
+    {
+        blocked = true;
+        Destroy(reconstrVertDir);
+        Destroy(edges3DDir);
+        Destroy(referenceLinesDir);
+        verticesOnWalls = null;
+        vertices3D = null;
+        edges3D = null;
+    }
+
     /// <summary>
     /// Dodaje rzut punktu do listy punktów odtwarzanego obiektu 3D. Jeśli jest wystarczająco informacji to próbuje stworzyć go w 3D. 
     /// </summary>
