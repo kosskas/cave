@@ -58,15 +58,15 @@ public class Mode2Dto3D : IMode
 
     private void _SaveSolidAndSwitchToMode3Dto2D()
     {
-        //clear grid
+        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _gc.Clear();
-        //clear meshBuilder
+        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
         MeshBuilder mb = (MeshBuilder)GameObject.FindObjectOfType<MeshBuilder>();
         mb.ClearAndDisable();
-        //clear PointPlacer
+        //clear PointPlacer usuwa krawedzie 2d oraz kursor
+        _pp.Clear();
         //PointList?
         //change LogViewer
-        //usun wskaznik
         //zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
         SolidImporter si = (SolidImporter)GameObject.FindObjectOfType<SolidImporter>();

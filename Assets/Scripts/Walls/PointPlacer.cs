@@ -379,7 +379,15 @@ public class PointPlacer : MonoBehaviour {
         _cursorLabel = _cursorLabelObj.AddComponent<Label>();
         _cursorLabel.SetLabel($"{_addPoint_Labels[_addPoint_LabelIdx]}", ReconstructionInfo.LABEL_SIZE_PICKED, ReconstructionInfo.LABEL_COLOR_CHOSEN);		
     }
-	
+    public void Clear()
+    {
+        Destroy(_cursor);
+        _cursor = null;
+        foreach(Transform child in _edgeRepo.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
 	public void MoveCursor(RaycastHit hit)
     {
 		if (hit.collider == null) {
