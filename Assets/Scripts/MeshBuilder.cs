@@ -11,7 +11,7 @@ using UnityEngine.Internal.Experimental.UIElements;
 using System.Text.RegularExpressions;
 
 /// <summary>
-/// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny.
+/// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi.
 /// </summary>
 public class MeshBuilder : MonoBehaviour {
     /*TODO
@@ -57,7 +57,6 @@ public class MeshBuilder : MonoBehaviour {
         public GameObject edgeObject;
         public string firstPoint;
         public string secondPoint;
-        //public bool show = true;
         /// <summary>
         /// Ile krawędzi jest na ścianach
         /// </summary>
@@ -87,6 +86,7 @@ public class MeshBuilder : MonoBehaviour {
             this.gameObject = gameObject;
         }
     }
+    const int MAXWALLSNUM = 3;
     /// <summary>
     /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
     /// </summary>
@@ -115,10 +115,11 @@ public class MeshBuilder : MonoBehaviour {
     /// </summary>
     GameObject referenceLinesDir = null;
 
-    bool blocked = false;
-
     WallController wc = null;
-    const int MAXWALLSNUM = 3;
+    bool blocked = false;
+    bool showProjectionLines = true;
+    bool showReferenceLines=true;
+
     // Use this for initialization
     void Start () {
         Init();
@@ -135,7 +136,9 @@ public class MeshBuilder : MonoBehaviour {
         HandleReferenceLines();
         ShowReferenceLines();
     }
-
+    /// <summary>
+    /// Inicjalizuje klasę, tworzy katalogi do przechowywania punktów i krawędzi 3D
+    /// </summary>
     public void Init()
     {
         reconstrVertDir = new GameObject("Reconstr. Verticies");
@@ -149,6 +152,9 @@ public class MeshBuilder : MonoBehaviour {
         wc = (WallController)FindObjectOfType(typeof(WallController));
         blocked = false;
     }
+    /// <summary>
+    /// Czyści klasę i blokuje jej działanie
+    /// </summary>
     public void ClearAndDisable()
     {
         blocked = true;
@@ -382,7 +388,22 @@ public class MeshBuilder : MonoBehaviour {
         }
 
     }
-
+    /// <summary>
+    /// Ustawia widoczność linii rzutujących
+    /// </summary>
+    /// <param name="rule">Zadada wyświetlania. True - wyświetlanie, False - brak</param>
+    public void SetShowRulesProjectionLine(bool rule)
+    {
+        showProjectionLines = rule;
+    }
+    /// <summary>
+    /// Ustawia widoczność linii odnoszących
+    /// </summary>
+    /// <param name="rule">Zadada wyświetlania. True - wyświetlanie, False - brak</param>
+    public void SetShowRulesReferencenLine(bool rule)
+    {
+        showReferenceLines = rule;
+    }
     /// <summary>
     /// Sprawdza czy na scianie znajduje juz sie rzut
     /// </summary>
@@ -527,6 +548,7 @@ public class MeshBuilder : MonoBehaviour {
                     if (projLine != null)
                     {
                         projLine.SetCoordinates(vertexProj, vertices3D[label].gameObject.transform.position);
+                        projLine.SetEnable(showProjectionLines);
                     }
                 }
                 else //wolny pkt
@@ -537,6 +559,7 @@ public class MeshBuilder : MonoBehaviour {
                     if (projLine != null)
                     {
                         projLine.SetCoordinates(vertexProj, vertexProj + LEN * direction);
+                        projLine.SetEnable(showProjectionLines);
                     }
                 }
             }
@@ -598,10 +621,18 @@ public class MeshBuilder : MonoBehaviour {
                         WallInfo ground = wc.GetGroundWall();
                         if (wall != ground && verticesOnWalls.ContainsKey(ground) && verticesOnWalls[ground].ContainsKey(label) && verticesOnWalls[ground][label].is_ok_placed)
                         {
-                            Vector3 p1 = verticesOnWalls[wall][label].pointObject.transform.position + antiztrackhit * wall.GetNormal();
-                            Vector3 p2 = verticesOnWalls[ground][label].pointObject.transform.position + antiztrackhit * ground.GetNormal();
-                            Vector3 p_3D = vertices3D[label].gameObject.transform.position;
-                            SetRefLine(verticesOnWalls[wall][label].refLine[0], p1, p2, p_3D);
+                            Vector3 p1 = verticesOnWalls[wall][label].pointObject.transform.position + antiztrackhit * wall.GetNormal(); //rzut na 1 scianie
+                            Vector3 p2 = verticesOnWalls[ground][label].pointObject.transform.position + antiztrackhit * ground.GetNormal(); //rzut na 2 scianie
+                            Vector3 p_3D = vertices3D[label].gameObject.transform.position; // punkt 3d
+                            Vector3 cross = wc.FindCrossingPoint(p1, p2, p_3D); //miejsce przeciecia scian 1 i 2 w plaszczyznie co p1 i p2
+                            LineSegment refp1 = verticesOnWalls[wall][label].refLine[0].Item1.GetComponent<LineSegment>();
+                            LineSegment refp2 = verticesOnWalls[wall][label].refLine[0].Item2.GetComponent<LineSegment>();
+                            refp1.SetStyle(ReconstructionInfo.REFERENCE_LINE_COLOR, ReconstructionInfo.REFERENCE_LINE_WIDTH);
+                            refp2.SetStyle(ReconstructionInfo.REFERENCE_LINE_COLOR, ReconstructionInfo.REFERENCE_LINE_WIDTH);
+                            refp1.SetCoordinates(p1, cross);
+                            refp2.SetCoordinates(p2, cross);
+                            refp1.SetEnable(showReferenceLines);
+                            refp2.SetEnable(showReferenceLines);
                         }
                     }
                 }
@@ -675,17 +706,5 @@ public class MeshBuilder : MonoBehaviour {
         LineSegment drawEdge2 = edge2.AddComponent<LineSegment>();
 
         return new Tuple<GameObject, GameObject>(edge1, edge2);
-    }
-
-    private void SetRefLine(Tuple<GameObject, GameObject> refLine, Vector3 p1, Vector3 p2, Vector3 p_3D)
-    {
-        LineSegment refp1 = refLine.Item1.GetComponent<LineSegment>();
-        LineSegment refp2 = refLine.Item2.GetComponent<LineSegment>();
-        Vector3 cross = wc.FindCrossingPoint(p1, p2, p_3D);
-        refp1.SetStyle(ReconstructionInfo.REFERENCE_LINE_COLOR, ReconstructionInfo.REFERENCE_LINE_WIDTH);
-        refp2.SetStyle(ReconstructionInfo.REFERENCE_LINE_COLOR, ReconstructionInfo.REFERENCE_LINE_WIDTH);
-        refp1.SetCoordinates(p1, cross);
-        refp2.SetCoordinates(p2, cross);
-
     }
 }
