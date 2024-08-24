@@ -414,6 +414,29 @@ public class MeshBuilder : MonoBehaviour {
     {
         return verticesOnWalls.ContainsKey(wall) && verticesOnWalls[wall].ContainsKey(label);       
     }
+    /// <summary>
+    /// Pobiera przechowywane aktywne punkty 3D
+    /// </summary>
+    /// <returns>Zbiór par etykiet i pozycji w 3D</returns>
+    public Dictionary<string, Vector3> GetPoints3D()
+    {
+        Dictionary<string, Vector3> tmp = new Dictionary<string, Vector3>();
+        if(vertices3D == null)
+        {
+            Debug.Log("Nie ma żadnych punktów 3D");
+            return null;
+        }
+        foreach (string label in vertices3D.Keys)
+        {
+            if (!(vertices3D[label].deleted || vertices3D[label].disabled))
+            {
+                tmp[label] = vertices3D[label].gameObject.transform.position;
+                Debug.Log($"{label} = {vertices3D[label].gameObject.transform.position.x}, {vertices3D[label].gameObject.transform.position.y}, {vertices3D[label].gameObject.transform.position.z}");
+            }
+        }
+
+        return tmp;
+    }
     private Status Create3DPoint(string label)
 	{
 		int licz = 0;
