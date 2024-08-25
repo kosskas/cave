@@ -16,6 +16,8 @@ public class PointsList : MonoBehaviour {
 	void Start () {
 		GameObject[] buttonObjects = GameObject.FindGameObjectsWithTag("PointButton");
 		buttonsList.AddRange(buttonObjects);
+		buttonsList.Sort((x, y) => x.name.CompareTo(y.name));
+
 		UpdatePointsList();
 	}
 	
