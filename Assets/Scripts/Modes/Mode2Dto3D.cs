@@ -36,7 +36,12 @@ public class Mode2Dto3D : IMode
     }
 
     private void _RemoveEdgeProjection()
-    {}
+    {
+        EdgeINFO edgeInfo = _pp.HandleRemovingEdge();
+        if (edgeInfo != EdgeINFO.Empty) {
+            Debug.Log(edgeInfo.ToString());
+        }
+    }
 
     private void _MakeActionOnWall()
     {
@@ -52,7 +57,24 @@ public class Mode2Dto3D : IMode
     }
 
     private void _SaveSolidAndSwitchToMode3Dto2D()
-    {}
+    {
+        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
+        _gc.Clear();
+        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
+        MeshBuilder mb = (MeshBuilder)GameObject.FindObjectOfType<MeshBuilder>();
+        mb.ClearAndDisable();
+        //clear PointPlacer usuwa krawedzie 2d oraz kursor
+        _pp.Clear();
+        //PointList?
+        //change LogViewer
+        //zaladuj grupowy
+        PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
+        SolidImporter si = (SolidImporter)GameObject.FindObjectOfType<SolidImporter>();
+        _wc.SetBasicWalls();
+        _wc.SetDefaultShowRules();
+        si.SetDownDirection();
+        si.ImportSolid();
+    }
 
     private void _ChoosePreviousLabel()
     {

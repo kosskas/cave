@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
+using System;
 using UnityEngine;
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
@@ -19,34 +20,36 @@ public class PointPlacer : MonoBehaviour {
     private List<Label> _removePoint_Labels = new List<Label>();
     private GameObject _removePoint_CurrentlyFocusedGridPoint;
     private WallInfo _removePoint_Wall;
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ADD EDGE
-    private Dictionary<GameObject, List<Label>> _addEdge_Labels = new Dictionary<GameObject, List<Label>>();
-    private GameObject _addEdge_CurrentlyFocusedGridPoint;
-    private GameObject _AddEdge_CurrentlyFocusedGridPoint {
-        get { return _addEdge_CurrentlyFocusedGridPoint; }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ADD/REMOVE EDGE
+    private Dictionary<GameObject, List<Label>> _edge_Labels = new Dictionary<GameObject, List<Label>>();
+    private GameObject _edge_CurrentlyFocusedGridPoint;
+    private GameObject _Edge_CurrentlyFocusedGridPoint {
+        get { return _edge_CurrentlyFocusedGridPoint; }
         set {
-            if (_addEdge_CurrentlyFocusedGridPoint != null && _addEdge_Labels.ContainsKey(_addEdge_CurrentlyFocusedGridPoint)) {
-                Label unfocusedLabel = _FindPickedLabel(_addEdge_Labels[_addEdge_CurrentlyFocusedGridPoint]);
+            if (_edge_CurrentlyFocusedGridPoint != null && _edge_Labels.ContainsKey(_edge_CurrentlyFocusedGridPoint)) {
+                Label unfocusedLabel = _FindPickedLabel(_edge_Labels[_edge_CurrentlyFocusedGridPoint]);
                 unfocusedLabel.SetColor(ReconstructionInfo.LABEL_COLOR_PICKED_UNFOCUSED);
             }
-            if (value != null && _addEdge_Labels.ContainsKey(value)) {
-                Label focusedLabel = _FindPickedLabel(_addEdge_Labels[value]);
+            if (value != null && _edge_Labels.ContainsKey(value)) {
+                Label focusedLabel = _FindPickedLabel(_edge_Labels[value]);
                 focusedLabel.SetColor(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED);
             }
 
-            _addEdge_CurrentlyFocusedGridPoint = value;
+            _edge_CurrentlyFocusedGridPoint = value;
         }
     }
-    private WallInfo _addEdge_Wall;
+    private WallInfo _edge_Wall;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - UTILS
     private WallController _wc;
     private MeshBuilder _mc;
+    private GameObject _edgeRepo;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - CONTEXT
     public enum Context {
         Idle,
         AddPoint,
         RemovePoint,
-        AddEdge
+        AddEdge,
+        RemoveEdge
     }
     private Context _ctx = Context.Idle;
     public Context Ctx {
@@ -63,11 +66,12 @@ public class PointPlacer : MonoBehaviour {
                     break;
 
                 case Context.AddEdge:
+                case Context.RemoveEdge:
                     if (_ctx != value) {
-                        foreach (var labels in _addEdge_Labels.Values) { _DisableLabelPicker(labels); }
-                        _addEdge_Labels.Clear();
-                        _AddEdge_CurrentlyFocusedGridPoint = null;
-                        _addEdge_Wall = null;
+                        foreach (var labels in _edge_Labels.Values) { _DisableLabelPicker(labels); }
+                        _edge_Labels.Clear();
+                        _Edge_CurrentlyFocusedGridPoint = null;
+                        _edge_Wall = null;
                     }
                     break;
 
@@ -85,7 +89,8 @@ public class PointPlacer : MonoBehaviour {
         GameObject wallsObject = GameObject.Find("Walls");
         _wc = wallsObject.GetComponent<WallController>();
         _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
-    }
+        _edgeRepo = GameObject.Find("Workspace")?.transform.Find("EdgeRepo").gameObject;
+;    }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - PRIVATE()
     /// <summary>
@@ -240,6 +245,8 @@ public class PointPlacer : MonoBehaviour {
         string fullLabelText = pickedLabel.GetText();
         string labelText = fullLabelText.Trim('\'');
 
+        List<EdgeINFO> removedEdges = _RemoveEdgesWithPointCascade(fullLabelText);
+
         _mc.RemovePointProjection(_removePoint_Wall, labelText);
 
         Destroy(_removePoint_CurrentlyFocusedGridPoint.transform.Find(labelText).gameObject);
@@ -251,10 +258,10 @@ public class PointPlacer : MonoBehaviour {
 
     private EdgeINFO _AddEdge()
     {
-        GameObject[] clickedPoints = _addEdge_Labels.Keys.ToArray();
+        GameObject[] clickedPoints = _edge_Labels.Keys.ToArray();
 
-        Label pickedLabel_1 = _FindPickedLabel(_addEdge_Labels[clickedPoints[0]]);
-        Label pickedLabel_2 = _FindPickedLabel(_addEdge_Labels[clickedPoints[1]]);
+        Label pickedLabel_1 = _FindPickedLabel(_edge_Labels[clickedPoints[0]]);
+        Label pickedLabel_2 = _FindPickedLabel(_edge_Labels[clickedPoints[1]]);
 
         string fullLabelText_1 = pickedLabel_1.GetText();
         string fullLabelText_2 = pickedLabel_2.GetText();
@@ -262,10 +269,11 @@ public class PointPlacer : MonoBehaviour {
         string labelText_1 = fullLabelText_1.Trim('\'');
         string labelText_2 = fullLabelText_2.Trim('\'');
 
-        var point_1 = new PointINFO(clickedPoints[0], _addEdge_Wall, labelText_1, fullLabelText_1);
-        var point_2 = new PointINFO(clickedPoints[1], _addEdge_Wall, labelText_2, fullLabelText_2);
+        var point_1 = new PointINFO(clickedPoints[0], _edge_Wall, labelText_1, fullLabelText_1);
+        var point_2 = new PointINFO(clickedPoints[1], _edge_Wall, labelText_2, fullLabelText_2);
 
         GameObject edgeObj = new GameObject($"{fullLabelText_1}-{fullLabelText_2}");
+        edgeObj.transform.SetParent(_edgeRepo.transform);
         LineSegment edge = edgeObj.AddComponent<LineSegment>();
         edge.SetStyle(ReconstructionInfo.EDGE_COLOR, ReconstructionInfo.EDGE_LINE_WIDTH);
         edge.SetCoordinates(
@@ -275,6 +283,62 @@ public class PointPlacer : MonoBehaviour {
 
         _mc.AddEdgeProjection(labelText_1, labelText_2);
         return new EdgeINFO(edgeObj, edge, point_1, point_2);
+    }
+
+    private EdgeINFO _RemoveEdge()
+    {
+        GameObject[] clickedPoints = _edge_Labels.Keys.ToArray();
+
+        Label pickedLabel_1 = _FindPickedLabel(_edge_Labels[clickedPoints[0]]);
+        Label pickedLabel_2 = _FindPickedLabel(_edge_Labels[clickedPoints[1]]);
+
+        string fullLabelText_1 = pickedLabel_1.GetText();
+        string fullLabelText_2 = pickedLabel_2.GetText();
+
+        string labelText_1 = fullLabelText_1.Trim('\'');
+        string labelText_2 = fullLabelText_2.Trim('\'');
+
+        var point_1 = new PointINFO(clickedPoints[0], _edge_Wall, labelText_1, fullLabelText_1);
+        var point_2 = new PointINFO(clickedPoints[1], _edge_Wall, labelText_2, fullLabelText_2);
+
+        GameObject edgeObj = _edgeRepo.transform.Find($"{fullLabelText_1}-{fullLabelText_2}")?.gameObject ?? _edgeRepo.transform.Find($"{fullLabelText_2}-{fullLabelText_1}")?.gameObject;
+        if (edgeObj == null) {
+            return EdgeINFO.Empty;
+        }
+
+        LineSegment edge = edgeObj.AddComponent<LineSegment>();
+
+        _mc.RemoveEdgeProjection(labelText_1, labelText_2);
+        Destroy(edgeObj);
+        
+        return new EdgeINFO(edgeObj, edge, point_1, point_2);
+    }
+
+    private EdgeINFO _RemoveEdge(GameObject edgeObj)
+    {
+        string[] fullLabelTexts = edgeObj.name.Split('-');
+
+        string labelText_1 = fullLabelTexts[0].Trim('\'');
+        string labelText_2 = fullLabelTexts[1].Trim('\'');
+
+        _mc.RemoveEdgeProjection(labelText_1, labelText_2);
+        Destroy(edgeObj);
+
+        return EdgeINFO.Empty;
+    }
+
+    private List<EdgeINFO> _RemoveEdgesWithPointCascade(string pointLabel)
+    {
+        List<EdgeINFO> removedEdges = new List<EdgeINFO>();
+
+        foreach (Transform edge in _edgeRepo.transform)
+        {
+            if (edge.name.Contains(pointLabel)) {
+                removedEdges.Add(_RemoveEdge(edge.gameObject));
+            }
+        } 
+
+        return removedEdges;
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - PUBLIC()
@@ -315,7 +379,15 @@ public class PointPlacer : MonoBehaviour {
         _cursorLabel = _cursorLabelObj.AddComponent<Label>();
         _cursorLabel.SetLabel($"{_addPoint_Labels[_addPoint_LabelIdx]}", ReconstructionInfo.LABEL_SIZE_PICKED, ReconstructionInfo.LABEL_COLOR_CHOSEN);		
     }
-	
+    public void Clear()
+    {
+        Destroy(_cursor);
+        _cursor = null;
+        foreach(Transform child in _edgeRepo.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
 	public void MoveCursor(RaycastHit hit)
     {
 		if (hit.collider == null) {
@@ -360,8 +432,9 @@ public class PointPlacer : MonoBehaviour {
                 break;
 
             case Context.AddEdge:
+            case Context.RemoveEdge:
             {
-                var labels = _addEdge_Labels[_AddEdge_CurrentlyFocusedGridPoint];
+                var labels = _edge_Labels[_Edge_CurrentlyFocusedGridPoint];
                 int currIdx = labels.FindIndex(label => label.GetColor().Equals(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED));
                 int nextIdx = (currIdx+1) % labels.Count;
                 labels[currIdx].SetColor(ReconstructionInfo.LABEL_COLOR_PLACED);
@@ -395,8 +468,9 @@ public class PointPlacer : MonoBehaviour {
                 break;
             
             case Context.AddEdge:
+            case Context.RemoveEdge:
             {
-                var labels = _addEdge_Labels[_AddEdge_CurrentlyFocusedGridPoint];
+                var labels = _edge_Labels[_Edge_CurrentlyFocusedGridPoint];
                 int currIdx = labels.FindIndex(label => label.GetColor().Equals(ReconstructionInfo.LABEL_COLOR_PICKED_FOCUSED));
                 int nextIdx =  ((currIdx-1) < 0) ? (labels.Count-1) : (currIdx-1);
                 labels[currIdx].SetColor(ReconstructionInfo.LABEL_COLOR_PLACED);
@@ -495,26 +569,26 @@ public class PointPlacer : MonoBehaviour {
         return PointINFO.Empty;
     }
 
-    public EdgeINFO HandleAddingEdge()
+    private EdgeINFO _HandleActingOnEdge(Func<EdgeINFO> makeAction, Context actionContext)
     {
-        Ctx = Context.AddEdge;
+        Ctx = actionContext;
 
         // jeśli kliknięto na punkt siatki z etykietami...
         if (_IsGridPointWithLabels())
         {
             GameObject clickedPoint = _cursorHit.collider.gameObject;    
             // ...i jest on już dodany...
-            if (_addEdge_Labels.ContainsKey(clickedPoint))
+            if (_edge_Labels.ContainsKey(clickedPoint))
             {    
                 // ...i jest sfocusowany...
-                if (clickedPoint.Equals(_AddEdge_CurrentlyFocusedGridPoint))
+                if (clickedPoint.Equals(_Edge_CurrentlyFocusedGridPoint))
                 {
                     // ...to zapomnij wybraną etykietę, usuń mu focus i usuń go
-                    _AddEdge_CurrentlyFocusedGridPoint = null;
-                    _DisableLabelPicker(_addEdge_Labels[clickedPoint]);
-                    _addEdge_Labels.Remove(clickedPoint);
+                    _Edge_CurrentlyFocusedGridPoint = null;
+                    _DisableLabelPicker(_edge_Labels[clickedPoint]);
+                    _edge_Labels.Remove(clickedPoint);
                     // ... jeśli obecnych punktów jest 0...
-                    if (_addEdge_Labels.Count == 0)
+                    if (_edge_Labels.Count == 0)
                     {
                         // ...zakończ
                         Ctx = Context.Idle;
@@ -524,7 +598,7 @@ public class PointPlacer : MonoBehaviour {
                 else
                 {
                     // ...to ustaw mu focus
-                    _AddEdge_CurrentlyFocusedGridPoint = clickedPoint;
+                    _Edge_CurrentlyFocusedGridPoint = clickedPoint;
                 }
             }
             // ...i nie jest jeszcze dodany...
@@ -533,19 +607,19 @@ public class PointPlacer : MonoBehaviour {
                 // ...określ jego ścianę...
                 WallInfo clickedPointWall = _EstimateWall(_cursorHit.normal, clickedPoint.transform.position);
                 // ...i obecnych punktów jest 0 lub (1 i leży na tej samej ścianie)...
-                if (_addEdge_Labels.Count == 0 || (_addEdge_Labels.Count == 1 && _addEdge_Wall?.number == clickedPointWall.number))
+                if (_edge_Labels.Count == 0 || (_edge_Labels.Count == 1 && _edge_Wall?.number == clickedPointWall.number))
                 {
                     // ...dodaj go, dodaj mu wybieranie etykiety i ustaw mu focus
-                    _addEdge_Labels.Add(clickedPoint, new List<Label>());
-                    _addEdge_Wall = clickedPointWall;
-                    _EnableLabelPicker(clickedPoint, _addEdge_Labels[clickedPoint]);
-                    _AddEdge_CurrentlyFocusedGridPoint = clickedPoint;
+                    _edge_Labels.Add(clickedPoint, new List<Label>());
+                    _edge_Wall = clickedPointWall;
+                    _EnableLabelPicker(clickedPoint, _edge_Labels[clickedPoint]);
+                    _Edge_CurrentlyFocusedGridPoint = clickedPoint;
                 }
                 // ...i obecnych punktów jest 2...
-                else if (_addEdge_Labels.Count == 2)
+                else if (_edge_Labels.Count == 2)
                 {
-                    // ...stwórz krawędź i zakończ
-                    EdgeINFO edgeINFO = _AddEdge();
+                    // ...wykonaj akcję na krawędzi i zakończ
+                    EdgeINFO edgeINFO = makeAction();
                     Ctx = Context.Idle;
                     return edgeINFO;
                 }
@@ -555,10 +629,10 @@ public class PointPlacer : MonoBehaviour {
         else
         {
             // ...i obecnych punktów jest 2...
-            if (_addEdge_Labels.Count == 2)
+            if (_edge_Labels.Count == 2)
             {
-                // ...stwórz krawędź i zakończ
-                EdgeINFO edgeINFO = _AddEdge();
+                // ...wykonaj akcję na krawędzi i zakończ
+                EdgeINFO edgeINFO = makeAction();
                 Ctx = Context.Idle;
                 return edgeINFO;
             }
@@ -571,5 +645,15 @@ public class PointPlacer : MonoBehaviour {
         }
 
         return EdgeINFO.Empty;
+    }
+
+    public EdgeINFO HandleAddingEdge()
+    {
+        return _HandleActingOnEdge(_AddEdge, Context.AddEdge);
+    }
+
+    public EdgeINFO HandleRemovingEdge()
+    {
+        return _HandleActingOnEdge(_RemoveEdge, Context.RemoveEdge);
     }
 }

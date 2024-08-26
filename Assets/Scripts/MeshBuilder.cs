@@ -6,36 +6,44 @@ using System.Threading;
 using UnityEditorInternal;
 using System.Xml.Serialization;
 using System.Reflection;
+using System;
+using UnityEngine.Internal.Experimental.UIElements;
+using System.Text.RegularExpressions;
 
 /// <summary>
-/// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny.
+/// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi.
 /// </summary>
 public class MeshBuilder : MonoBehaviour {
     /*TODO
      [?] Przypadki przy dodawaniu
      [x] Sprawdz numeryczne porownianie
-     [ ] Aktualizuj info jakie krawędzie między wierzchołkami	 
+     [x] Aktualizuj info jakie krawędzie między wierzchołkami	 
      [x] Jak się określi krawędzie to zrób to samo w 3D
-     [ ] Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
 	 [x] Kiedy jest juz to ten ray tylko do wierch ale nie w INF
 	 [x] podswietl dodawany na czerwono jesli zla plaszcz, umiejscowienie trzeciego
 	 [X] usun takze 3D kiedy są tylko 2
      [x] jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly  TO TEST xxx
-     [-] dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
-     [ ] Refaktor kodu
      [x] Przypadek, wszystko zle, potem usuwasz i robi sie ok
+     [ ] Dodaj linie odnoszace i poprawnie je usuwaj
+     [ ] Dodaj flage do WallTexta odnosnie pokazywania odnoszacych i rzutujacych
+     [ ] Sprawdz czy pasuja "niewlasciwe" linie odnoszace, pomagajace przy dodawaniu rzutu
 	*/
     private class PointProjection
 	{
+        private const int N_OF_REFLINES = 2; //para do podlogi, druga do scian
 		public GameObject pointObject;
 		public LineSegment projLine;
 		public bool is_ok_placed;
+        public Tuple<GameObject, GameObject>[] refLine;
 
 		public PointProjection(GameObject pointObject, LineSegment projLine, bool is_ok_placed)
 		{
 			this.pointObject = pointObject;
             this.projLine = projLine;
             this.is_ok_placed = is_ok_placed;
+            this.refLine = new Tuple<GameObject, GameObject>[N_OF_REFLINES];
+            this.refLine[0] = null;
+            this.refLine[1] = null;
         }
 
     }
@@ -49,12 +57,10 @@ public class MeshBuilder : MonoBehaviour {
         public GameObject edgeObject;
         public string firstPoint;
         public string secondPoint;
-        //public bool show = true;
         /// <summary>
         /// Ile krawędzi jest na ścianach
         /// </summary>
         public int wallOrigins;
-
         public Edge3D(GameObject edgeObject, string firstPoint, string secondPoint)
         {
             this.edgeObject = edgeObject;
@@ -62,9 +68,7 @@ public class MeshBuilder : MonoBehaviour {
             this.secondPoint = secondPoint;
             this.wallOrigins = 0;
         }
-
-    }
-    
+    }  
     private class Vertice3D
     {
         public GameObject gameObject;
@@ -82,57 +86,86 @@ public class MeshBuilder : MonoBehaviour {
             this.gameObject = gameObject;
         }
     }
-
+    const int MAXWALLSNUM = 3;
     /// <summary>
     /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
     /// </summary>
-    /// 
-    Dictionary<WallInfo, Dictionary<string, PointProjection>> verticesOnWalls;
+    Dictionary<WallInfo, Dictionary<string, PointProjection>> verticesOnWalls = null;
 
     /// <summary>
     /// Zbiór wierzchołków rysowanych w trójwymiarze. Elementy nigdy nie są usuwane jedynie oznaczane jako usunięte lub wyłączone.
     /// </summary>
-	Dictionary<string, Vertice3D> vertices3D;
+	Dictionary<string, Vertice3D> vertices3D = null;
 
     /// <summary>
     /// Zbiór krawędzi rysowanych w 3D.
     /// </summary>
-    Dictionary<string, Edge3D> edges3D;
+    Dictionary<string, Edge3D> edges3D = null;
 
     /// <summary>
     /// Folder z wierch. rysowanymi w 3D
     /// </summary>
-	GameObject reconstrVertDir;
+	GameObject reconstrVertDir = null;
     /// <summary>
     /// Folder z krawedz. rysowanymi w 3D
     /// </summary>
-	GameObject edges3DDir;
+	GameObject edges3DDir = null;
+    /// <summary>
+    /// Folder z rzutami rzutującymi
+    /// </summary>
+    GameObject referenceLinesDir = null;
 
-    const int MAXWALLSNUM = 3;
+    WallController wc = null;
+    bool blocked = false;
+    bool showProjectionLines = true;
+    bool showReferenceLines=true;
+
     // Use this for initialization
     void Start () {
-        reconstrVertDir = new GameObject("Reconstr. Verticies");
-        reconstrVertDir.transform.SetParent(gameObject.transform);
-        edges3DDir = new GameObject("Reconstr. edges3DDir");
-        edges3DDir.transform.SetParent(gameObject.transform);
-        verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
-		vertices3D = new Dictionary<string, Vertice3D>();
-        edges3D = new Dictionary<string, Edge3D>();
+        Init();
     }
 
 	// Update is called once per frame
 	void Update()
-	{
-        /*
-		 * Aktualizuj info jakie krawędzie między wierzchołkami
-		 
-		 * Jak się określi krawędzie to zrób to samo w 3D
-		 * Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
-		 */
-        ShowProjectionLines();
+	{        
+        if (blocked)
+            return;
         ShowPoints3D();
         ShowEdges3D();
+        ShowProjectionLines();
+        HandleReferenceLines();
+        ShowReferenceLines();
     }
+    /// <summary>
+    /// Inicjalizuje klasę, tworzy katalogi do przechowywania punktów i krawędzi 3D
+    /// </summary>
+    public void Init()
+    {
+        reconstrVertDir = new GameObject("Reconstr. Verticies");
+        reconstrVertDir.transform.SetParent(gameObject.transform);
+        edges3DDir = new GameObject("Reconstr. edges3DDir");
+        edges3DDir.transform.SetParent(gameObject.transform);
+        referenceLinesDir = new GameObject("referenceLinesDir");
+        verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
+        vertices3D = new Dictionary<string, Vertice3D>();
+        edges3D = new Dictionary<string, Edge3D>();
+        wc = (WallController)FindObjectOfType(typeof(WallController));
+        blocked = false;
+    }
+    /// <summary>
+    /// Czyści klasę i blokuje jej działanie
+    /// </summary>
+    public void ClearAndDisable()
+    {
+        blocked = true;
+        Destroy(reconstrVertDir);
+        Destroy(edges3DDir);
+        Destroy(referenceLinesDir);
+        verticesOnWalls = null;
+        vertices3D = null;
+        edges3D = null;
+    }
+
     /// <summary>
     /// Dodaje rzut punktu do listy punktów odtwarzanego obiektu 3D. Jeśli jest wystarczająco informacji to próbuje stworzyć go w 3D. 
     /// </summary>
@@ -230,7 +263,7 @@ public class MeshBuilder : MonoBehaviour {
 
         
         int count = GetCurrentPointProjections(label).Count;
-        //Debug.Log($"liczba={count}");
+        CleanProjectionData(wall,label);
         verticesOnWalls[wall].Remove(label);
         if (count == 2) //sa dwa, usun 3d
         {
@@ -241,6 +274,10 @@ public class MeshBuilder : MonoBehaviour {
                 //Destroy(todel3D);
                 vertices3D[label].deleted = true;
             }
+            //byly 2 ale zle polozone
+            List<PointProjection> currPts = GetCurrentPointProjections(label);
+            MarkOK(currPts[0]);
+
         }
         else if (count > 2) //sa trzy
         {
@@ -351,7 +388,22 @@ public class MeshBuilder : MonoBehaviour {
         }
 
     }
-
+    /// <summary>
+    /// Ustawia widoczność linii rzutujących
+    /// </summary>
+    /// <param name="rule">Zadada wyświetlania. True - wyświetlanie, False - brak</param>
+    public void SetShowRulesProjectionLine(bool rule)
+    {
+        showProjectionLines = rule;
+    }
+    /// <summary>
+    /// Ustawia widoczność linii odnoszących
+    /// </summary>
+    /// <param name="rule">Zadada wyświetlania. True - wyświetlanie, False - brak</param>
+    public void SetShowRulesReferencenLine(bool rule)
+    {
+        showReferenceLines = rule;
+    }
     /// <summary>
     /// Sprawdza czy na scianie znajduje juz sie rzut
     /// </summary>
@@ -361,6 +413,29 @@ public class MeshBuilder : MonoBehaviour {
     public bool CheckIfAlreadyExist(WallInfo wall, string label)
     {
         return verticesOnWalls.ContainsKey(wall) && verticesOnWalls[wall].ContainsKey(label);       
+    }
+    /// <summary>
+    /// Pobiera przechowywane aktywne punkty 3D
+    /// </summary>
+    /// <returns>Zbiór par etykiet i pozycji w 3D</returns>
+    public Dictionary<string, Vector3> GetPoints3D()
+    {
+        Dictionary<string, Vector3> tmp = new Dictionary<string, Vector3>();
+        if(vertices3D == null)
+        {
+            Debug.Log("Nie ma żadnych punktów 3D");
+            return null;
+        }
+        foreach (string label in vertices3D.Keys)
+        {
+            if (!(vertices3D[label].deleted || vertices3D[label].disabled))
+            {
+                tmp[label] = vertices3D[label].gameObject.transform.position;
+                Debug.Log($"{label} = {vertices3D[label].gameObject.transform.position.x}, {vertices3D[label].gameObject.transform.position.y}, {vertices3D[label].gameObject.transform.position.z}");
+            }
+        }
+
+        return tmp;
     }
     private Status Create3DPoint(string label)
 	{
@@ -427,6 +502,22 @@ public class MeshBuilder : MonoBehaviour {
 
         vertices3D[label] = new Vertice3D(obj);
     }
+
+    private void CleanProjectionData(WallInfo wall, string label)
+    {
+        PointProjection pointProjection = verticesOnWalls[wall][label];
+        //usun linie odnoszące
+        for(int i = 0; i < pointProjection.refLine.Length; i++)
+        {
+            if (pointProjection.refLine[i] != null)
+            {
+                Destroy(pointProjection.refLine[i].Item1);
+                Destroy(pointProjection.refLine[i].Item2);
+            }
+            pointProjection.refLine[i] = null;
+        }        
+    }
+
     private Vector3 CalcPosIn3D(Vector3 vec1, Vector3 vec2)
     {
         Vector3 ret = Vector3.zero;
@@ -480,6 +571,7 @@ public class MeshBuilder : MonoBehaviour {
                     if (projLine != null)
                     {
                         projLine.SetCoordinates(vertexProj, vertices3D[label].gameObject.transform.position);
+                        projLine.SetEnable(showProjectionLines);
                     }
                 }
                 else //wolny pkt
@@ -490,12 +582,86 @@ public class MeshBuilder : MonoBehaviour {
                     if (projLine != null)
                     {
                         projLine.SetCoordinates(vertexProj, vertexProj + LEN * direction);
+                        projLine.SetEnable(showProjectionLines);
                     }
                 }
             }
         }
     }
 
+    private void HandleReferenceLines()
+    {
+        //create if not exist
+        foreach (WallInfo wall in verticesOnWalls.Keys)
+        {
+            foreach (string label in verticesOnWalls[wall].Keys)
+            {
+                if(vertices3D.ContainsKey(label) && !(vertices3D[label].deleted || vertices3D[label].disabled))
+                {
+                    //is in 3D
+                    WallInfo ground = wc.GetGroundWall();
+                    if (verticesOnWalls[wall][label].refLine[0] == null && verticesOnWalls[wall][label].is_ok_placed)
+                    {                  
+                        if(wall != ground && verticesOnWalls.ContainsKey(ground) && verticesOnWalls[ground].ContainsKey(label) && verticesOnWalls[ground][label].is_ok_placed)
+                        {
+                            verticesOnWalls[wall][label].refLine[0] = CreateRefLine(referenceLinesDir, wall, ground, label);
+                        }                       
+                    }
+                    if (verticesOnWalls.ContainsKey(ground) && !verticesOnWalls[ground].ContainsKey(label))
+                    {
+                        //przypadek kiedy sa jeszcze 2 rzuty sa na bocznych scianach
+                        //usun linie odnoszące
+                        CleanProjectionData(wall, label);
+                    }
+                }
+                else
+                {
+                    //Debug.Log("Rzuty rzutujace, nie ma pkt w 3D");
+                    WallInfo ground = wc.GetGroundWall();
+                    if (verticesOnWalls.ContainsKey(ground) && !verticesOnWalls[ground].ContainsKey(label))
+                    {
+                        //przypadek kiedy zostanie tylko rzut na scianie
+                        //usun linie odnoszące
+                        CleanProjectionData(wall, label);
+                    }
+                }
+            }
+        }      
+    }
+
+    private void ShowReferenceLines()
+    {
+        const float antiztrackhit = 0.01f;
+        foreach (WallInfo wall in verticesOnWalls.Keys)
+        {
+            foreach (string label in verticesOnWalls[wall].Keys)
+            {
+                if (vertices3D.ContainsKey(label) && !(vertices3D[label].deleted || vertices3D[label].disabled))
+                {
+                    //is in 3D
+                    if (verticesOnWalls[wall][label].refLine[0] != null)
+                    {
+                        WallInfo ground = wc.GetGroundWall();
+                        if (wall != ground && verticesOnWalls.ContainsKey(ground) && verticesOnWalls[ground].ContainsKey(label) && verticesOnWalls[ground][label].is_ok_placed)
+                        {
+                            Vector3 p1 = verticesOnWalls[wall][label].pointObject.transform.position + antiztrackhit * wall.GetNormal(); //rzut na 1 scianie
+                            Vector3 p2 = verticesOnWalls[ground][label].pointObject.transform.position + antiztrackhit * ground.GetNormal(); //rzut na 2 scianie
+                            Vector3 p_3D = vertices3D[label].gameObject.transform.position; // punkt 3d
+                            Vector3 cross = wc.FindCrossingPoint(p1, p2, p_3D); //miejsce przeciecia scian 1 i 2 w plaszczyznie co p1 i p2
+                            LineSegment refp1 = verticesOnWalls[wall][label].refLine[0].Item1.GetComponent<LineSegment>();
+                            LineSegment refp2 = verticesOnWalls[wall][label].refLine[0].Item2.GetComponent<LineSegment>();
+                            refp1.SetStyle(ReconstructionInfo.REFERENCE_LINE_COLOR, ReconstructionInfo.REFERENCE_LINE_WIDTH);
+                            refp2.SetStyle(ReconstructionInfo.REFERENCE_LINE_COLOR, ReconstructionInfo.REFERENCE_LINE_WIDTH);
+                            refp1.SetCoordinates(p1, cross);
+                            refp2.SetCoordinates(p2, cross);
+                            refp1.SetEnable(showReferenceLines);
+                            refp2.SetEnable(showReferenceLines);
+                        }
+                    }
+                }
+            }
+        }
+    }
     private void ShowPoints3D()
     {
         foreach(string label in vertices3D.Keys)
@@ -549,5 +715,19 @@ public class MeshBuilder : MonoBehaviour {
         }
         et.SetLabel(ReconstructionInfo.LABEL_3D_COLOR);
         pointProj.is_ok_placed = true;
+    }
+
+    private Tuple<GameObject, GameObject> CreateRefLine(GameObject dir, WallInfo w1, WallInfo w2, string label)
+    {
+        GameObject edge1 = new GameObject($"RzutRzutujacy ({label}) {w1.number}" );
+        edge1.transform.SetParent(dir.transform);
+        LineSegment drawEdge1 = edge1.AddComponent<LineSegment>();
+
+        
+        GameObject edge2 = new GameObject($"RzutRzutujacy ({label}) {w2.number}");
+        edge2.transform.SetParent(dir.transform);
+        LineSegment drawEdge2 = edge2.AddComponent<LineSegment>();
+
+        return new Tuple<GameObject, GameObject>(edge1, edge2);
     }
 }

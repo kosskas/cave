@@ -53,6 +53,10 @@ public class GridCreator : MonoBehaviour {
 
     }
 
+    public void Clear()
+    {
+        Destroy(grid);
+    }
     private void AddParallelLines(int numOfLines, char parallelAxisName, char perpendicularAxisName)
     {
         float numOfSpaces = numOfLines-1;
