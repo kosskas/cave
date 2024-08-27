@@ -98,9 +98,11 @@ public class MeshBuilder : MonoBehaviour {
 	Dictionary<string, Vertice3D> vertices3D = null;
 
     /// <summary>
-    /// Zbiór krawędzi rysowanych w 3D.
+    /// Zbiór krawędzi rysowanych w 3D. (klucz to suma etykiet)
     /// </summary>
     Dictionary<string, Edge3D> edges3D = null;
+
+    Dictionary<string, List<string>> adjList = null;
 
     /// <summary>
     /// Folder z wierch. rysowanymi w 3D
@@ -149,6 +151,7 @@ public class MeshBuilder : MonoBehaviour {
         verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
         vertices3D = new Dictionary<string, Vertice3D>();
         edges3D = new Dictionary<string, Edge3D>();
+        adjList = new Dictionary<string, List<string>>();
         wc = (WallController)FindObjectOfType(typeof(WallController));
         blocked = false;
     }
@@ -164,6 +167,7 @@ public class MeshBuilder : MonoBehaviour {
         verticesOnWalls = null;
         vertices3D = null;
         edges3D = null;
+        adjList = null;
     }
 
     /// <summary>
@@ -350,7 +354,7 @@ public class MeshBuilder : MonoBehaviour {
             );
             string key = labelA + labelB;
             edges3D[key] = new Edge3D(edgeObj,labelA,labelB);
-            edges3D[key].wallOrigins++; 
+            edges3D[key].wallOrigins++;
         }
     }
     /// <summary>
@@ -437,6 +441,23 @@ public class MeshBuilder : MonoBehaviour {
 
         return tmp;
     }
+    /// <summary>
+    /// Pobiera przechowywaną listę krawędzi wierzchołków 3D
+    /// </summary>
+    /// <returns>Zbiór par krawędzi</returns>
+    public List<Tuple<string, string>> GetEdges3D()
+    {
+        List<Tuple<string, string>> tmp = new List<Tuple<string, string>>();
+        foreach(string key in edges3D.Keys)
+        {
+            string a = edges3D[key].firstPoint;
+            string b = edges3D[key].secondPoint;
+            if (!(vertices3D[a].deleted || vertices3D[a].disabled) && (!(vertices3D[b].deleted || vertices3D[b].disabled)))
+                tmp.Add(new Tuple<string, string>(edges3D[key].firstPoint, edges3D[key].secondPoint));
+        }
+        return tmp;
+    }
+
     private Status Create3DPoint(string label)
 	{
 		int licz = 0;

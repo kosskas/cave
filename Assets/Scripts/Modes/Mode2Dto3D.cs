@@ -57,23 +57,25 @@ public class Mode2Dto3D : IMode
     }
 
     private void _SaveSolidAndSwitchToMode3Dto2D()
-    {
+    {   
+        MeshBuilder mb = (MeshBuilder)GameObject.FindObjectOfType<MeshBuilder>();
+        //export solid
+        string solid = SolidExporter.ExportSolid(mb.GetPoints3D(), mb.GetEdges3D());
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _gc.Clear();
         //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
-        MeshBuilder mb = (MeshBuilder)GameObject.FindObjectOfType<MeshBuilder>();
         mb.ClearAndDisable();
         //clear PointPlacer usuwa krawedzie 2d oraz kursor
         _pp.Clear();
         //PointList?
         //change LogViewer
-        //zaladuj grupowy
+        ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
         SolidImporter si = (SolidImporter)GameObject.FindObjectOfType<SolidImporter>();
         _wc.SetBasicWalls();
         _wc.SetDefaultShowRules();
-        si.SetDownDirection();
-        si.ImportSolid();
+        si.SetUpDirection();
+        si.ImportSolid(solid);
     }
 
     private void _ChoosePreviousLabel()

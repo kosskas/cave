@@ -393,6 +393,8 @@ public class PointPlacer : MonoBehaviour {
 		if (hit.collider == null) {
             return;
         }
+        if (_cursor == null)
+            return;
 
         _cursor.transform.position = hit.point;
         _cursorHit = hit;
