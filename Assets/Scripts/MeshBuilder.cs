@@ -442,15 +442,18 @@ public class MeshBuilder : MonoBehaviour {
         return tmp;
     }
     /// <summary>
-    /// Pobiera przechowywaną listę krawędzi
+    /// Pobiera przechowywaną listę krawędzi wierzchołków 3D
     /// </summary>
     /// <returns>Zbiór par krawędzi</returns>
-    public List<Tuple<string, string>> GetEdges()
+    public List<Tuple<string, string>> GetEdges3D()
     {
         List<Tuple<string, string>> tmp = new List<Tuple<string, string>>();
         foreach(string key in edges3D.Keys)
         {
-            tmp.Add(new Tuple<string, string>(edges3D[key].firstPoint, edges3D[key].secondPoint));
+            string a = edges3D[key].firstPoint;
+            string b = edges3D[key].secondPoint;
+            if (!(vertices3D[a].deleted || vertices3D[a].disabled) && (!(vertices3D[b].deleted || vertices3D[b].disabled)))
+                tmp.Add(new Tuple<string, string>(edges3D[key].firstPoint, edges3D[key].secondPoint));
         }
         return tmp;
     }
