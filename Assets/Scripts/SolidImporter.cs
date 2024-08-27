@@ -227,29 +227,31 @@ public class SolidImporter : MonoBehaviour {
 	{
 		mainObj = GameObject.Find("MainObject");
 
-		try 
-		{
-			solidFiles = Directory.GetFiles(pathToFolderWithSolids, solidFileExt);
-			Debug.Log(solidFiles);
-		}
-		catch (System.Exception) 
-		{
-			solidFiles = null;
-			Debug.LogError("[CAVE] It seems that folder " + Application.dataPath + pathToFolderWithSolids + " does not exist.");
-		}
-		
-		currentSolidFileIndex = 0;
-
-		isSolidFolderValid = (solidFiles == null || solidFiles.Length == 0) ? false : true;
-	}
+		GetSolidDir();
+    }
 
 
-	/// <summary>
-	/// Zawiera cały proces usuniecia dotychczas renderowanej bryły i załadowania oraz wyrenderowania kolejnej bryły z 'solidFiles'
-	/// Szuka następną bryłę do załadowania w folderze i ładuje ją. W trakcie działania parsuje plik w formacie wobj, środkuje bryłę względem 0,0,0. Ładuje Object3D -centralną, klasę, która podłącza resztę komponentów
-	/// </summary>
-	public void ImportSolid () 
+    /// <summary>
+    /// Zawiera cały proces usuniecia dotychczas renderowanej bryły i załadowania oraz wyrenderowania kolejnej bryły z 'solidFiles'
+    /// Szuka następną bryłę do załadowania w folderze i ładuje ją. W trakcie działania parsuje plik w formacie wobj, środkuje bryłę względem 0,0,0. Ładuje Object3D -centralną, klasę, która podłącza resztę komponentów
+    /// </summary>
+    /// <param name="solid">Dane zapisane w pliku .wobj jeśli były eksportowane</param>
+    public void ImportSolid (string solid = null) 
 	{
+		bool isPath = false;
+		if(solid == null)
+		{
+			isPath = true;
+            solid = GetCurrentSolid();
+            if (!File.Exists(solid))
+            {
+                Debug.LogError(Path.GetFileName(solid) + " not found!");
+            }
+        }
+		else
+		{
+            GetSolidDir();
+        }
 		DeleteMainObjChild();
 		DeleteSolid();
 		ClearSolid();
@@ -257,7 +259,7 @@ public class SolidImporter : MonoBehaviour {
 		if (isSolidFolderValid)
 		{
 			PickNextSolid();
-			ReadSolid();
+            ReadSolid(solid, isPath);
 			CentralizePosition();
 			ScaleSolid();
 			NormalizeSolid();
@@ -269,11 +271,30 @@ public class SolidImporter : MonoBehaviour {
 
 		LogStatus();
 	}
-
 	/// <summary>
-	/// Usuń dziecko obiektu 'mainObj', jeśli ono istnieje
+	/// Podejmuje próbę wyszukania katalogu z plikami .wobj
 	/// </summary>
-	private void DeleteMainObjChild() 
+	private void GetSolidDir()
+	{
+        try
+        {
+            solidFiles = Directory.GetFiles(pathToFolderWithSolids, solidFileExt);
+            Debug.Log(solidFiles);
+        }
+        catch (System.Exception)
+        {
+            solidFiles = null;
+            Debug.LogError("[CAVE] It seems that folder " + Application.dataPath + pathToFolderWithSolids + " does not exist.");
+        }
+
+        currentSolidFileIndex = 0;
+
+        isSolidFolderValid = (solidFiles == null || solidFiles.Length == 0) ? false : true;
+    }
+    /// <summary>
+    /// Usuń dziecko obiektu 'mainObj', jeśli ono istnieje
+    /// </summary>
+    private void DeleteMainObjChild() 
 	{
 		if (mainObj.transform.childCount > 0) 
 		{
@@ -326,32 +347,40 @@ public class SolidImporter : MonoBehaviour {
         }
     }
 
-	/// <summary>
-	/// Metoda rozpoznaje sekcje wczytanego pliku i odpowiednio je interpretuje
-	/// </summary>
-	private void ReadSolid() 
+    /// <summary>
+    /// Metoda rozpoznaje sekcje wczytanego pliku i odpowiednio je interpretuje
+    /// </summary>
+    /// <param name="solid">Ścieżka do pliku lub dane do wczytania</param>
+	/// <param name="isPath">Flaga czy pierwszy argument jest ścieżką</param>
+    private void ReadSolid(string solid, bool isPath = true) 
 	{
-		if (File.Exists(GetCurrentSolid()))
+        // Zmienna StreamReader
+        StreamReader reader;
+
+        // Jeśli solid jest ścieżką do pliku
+        if (isPath && File.Exists(solid))
         {
-            using (StreamReader reader = new StreamReader(GetCurrentSolid()))
-            {
-				int part = 0;
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-					if (line.Contains("###")) part++;
-					else if (String.IsNullOrEmpty(line)) continue;
-					else if (part == 1) { ReadVertex(line); }
-					else if (part == 2) { ReadFace(line); ReadEdges(line); }
-					else if (part > 2) break;
-                }
-            }
+            reader = new StreamReader(solid);
         }
         else
         {
-			Debug.LogError(Path.GetFileName(GetCurrentSolid()) + " not found!");
+            // Jeśli solid jest już zawartością pliku
+            reader = new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(solid)));
         }
-	}
+        using (reader)
+        {
+            int part = 0;
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (line.Contains("###")) part++;
+                else if (String.IsNullOrEmpty(line)) continue;
+                else if (part == 1) { ReadVertex(line); }
+                else if (part == 2) { ReadFace(line); ReadEdges(line); }
+                else if (part > 2) break;
+            }
+        }
+    }
 
 	/// <summary>
 	/// Metoda wczytuje dane wierzchołków z pliku
