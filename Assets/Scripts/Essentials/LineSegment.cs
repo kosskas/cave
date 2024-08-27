@@ -105,6 +105,15 @@ public class LineSegment : MonoBehaviour {
 	{
 		this.lineColor = lineColor;
 		this.lineWidth = lineWidth;
+		if (lineRenderer)
+		{
+            lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
+            lineRenderer.material.color = this.lineColor;
+            lineRenderer.startColor = this.lineColor;
+            lineRenderer.endColor = this.lineColor;
+            lineRenderer.startWidth = this.lineWidth;
+            lineRenderer.endWidth = this.lineWidth;
+		}
     }
 
 	/// <summary>
