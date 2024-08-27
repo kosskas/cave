@@ -27,6 +27,7 @@ public static class ReconstructionInfo
     public static Color LABEL_COLOR_PICKED_UNFOCUSED = new Color(0, 0.8f, 0);
     // -- PROJECTION LINE
     public static Color PROJECTION_LINE_COLOR = Color.blue;
+    public static Color PROJECTION_LINE_ERROR_COLOR = Color.red;
     public static float PROJECTION_LINE_WIDTH = 0.002f;
     // -- REFERENCE LINE
     public static Color REFERENCE_LINE_COLOR = Color.green;

@@ -722,6 +722,7 @@ public class MeshBuilder : MonoBehaviour {
             return;
         }
         et.SetLabel(ReconstructionInfo.LABEL_3D_ERR_COLOR);
+        pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_ERROR_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
         pointProj.is_ok_placed = false;
 
     }
@@ -735,6 +736,7 @@ public class MeshBuilder : MonoBehaviour {
             return;
         }
         et.SetLabel(ReconstructionInfo.LABEL_3D_COLOR);
+        pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
         pointProj.is_ok_placed = true;
     }
 
