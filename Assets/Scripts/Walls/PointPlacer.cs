@@ -333,7 +333,7 @@ public class PointPlacer : MonoBehaviour {
 
         foreach (Transform edge in _edgeRepo.transform)
         {
-            if (edge.name.Contains(pointLabel)) {
+            if (edge.name.StartsWith($"{pointLabel}-") || edge.name.EndsWith($"-{pointLabel}")) {
                 removedEdges.Add(_RemoveEdge(edge.gameObject));
             }
         } 
