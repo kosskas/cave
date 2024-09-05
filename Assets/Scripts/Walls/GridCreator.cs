@@ -75,7 +75,7 @@ public class GridCreator : MonoBehaviour {
         float yRange = yMaxPos-yMinPos;
         float zRange = zMaxPos-zMinPos;
 
-        for (int ithLine = 0; ithLine < numOfLines; ithLine++)
+        for (int ithLine = 0; ithLine < numOfLines-1; ithLine++)
         {
             Vector3 start = Vector3.zero;
             Vector3 stop = Vector3.zero;
@@ -139,6 +139,11 @@ public class GridCreator : MonoBehaviour {
             if (ithLine == 0)
             {
                 line.SetStyle(Color.black, lineWeight*2);
+                ///przybliz linie do srodka tak aby sie nie zlewala ze sciana
+                Vector3 center = new Vector3(0, 2, 0);
+                const float scale = 0.005f;
+                start = Vector3.Lerp(start, center, scale);
+                stop = Vector3.Lerp(stop, center, scale);
             }
             else
             {
@@ -168,9 +173,9 @@ public class GridCreator : MonoBehaviour {
         float yRange = yMaxPos-yMinPos;
         float zRange = zMaxPos-zMinPos;
 
-        for (int ithLineInA = 0; ithLineInA < numOfLinesInAxisA; ithLineInA++)
+        for (int ithLineInA = 1; ithLineInA < numOfLinesInAxisA-1; ithLineInA++)
         {
-            for (int ithLineInB = 0; ithLineInB < numOfLinesInAxisB; ithLineInB++)
+            for (int ithLineInB = 1; ithLineInB < numOfLinesInAxisB-1; ithLineInB++)
             {
                 float pointPosX = 0f;
                 float pointPosY = 0f;

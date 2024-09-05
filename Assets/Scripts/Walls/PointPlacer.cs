@@ -8,7 +8,7 @@ using UnityEngine;
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 public class PointPlacer : MonoBehaviour {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - CURSOR
-	private GameObject _cursor;
+    private GameObject _cursor;
     private Renderer _cursorRenderer;
     private GameObject _cursorLabelObj;
     private Label _cursorLabel;
@@ -206,7 +206,7 @@ public class PointPlacer : MonoBehaviour {
         string fullLabelText = $"{labelText + new string('\'', index)}";
 
         if(_mc.CheckIfAlreadyExist(wall, labelText)) {
-            Debug.LogError($"Rzut {labelText} juz jest na tej scianie");
+            Debug.Log($"Rzut {labelText} juz jest na tej scianie");
             return PointINFO.Empty;
         }
 
@@ -493,7 +493,7 @@ public class PointPlacer : MonoBehaviour {
 
         Transform labelObjTrans = pi.GridPoint.transform.Find(pi.Label);  
         if (labelObjTrans == null) {
-            Debug.LogError($"Wezel nie ma takiego dziecka jak {pi.Label}");
+            Debug.Log($"Wezel nie ma takiego dziecka jak {pi.Label}");
             return;
         }
 
