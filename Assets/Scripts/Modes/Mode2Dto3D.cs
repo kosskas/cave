@@ -50,8 +50,8 @@ public class Mode2Dto3D : IMode
             Debug.Log($"[CLICK] on object named: {PCref.Hit.collider.gameObject.name}");
             if (PCref.Hit.collider.tag == "PointButton")
             {
-                // PointINFO pointInfo = PointsList.RemovePointOnClick( PCref.Hit.collider.gameObject as PointButton );
-                // _pp.RemovePoint(pointInfo);
+                PointINFO pointInfo = PointsList.RemovePointOnClick(PCref.Hit.collider.gameObject);
+                _pp.RemovePoint(pointInfo);
             }
         }
     }
