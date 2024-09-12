@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LogViewer : MonoBehaviour {
 
-    [SerializeField] private TMPro.TextMeshPro textMesh;
+    private TMPro.TextMeshPro textMesh;
     private string output = "";
 
     // Use this for initialization

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PointsList : MonoBehaviour {
 
-	private List<GameObject> buttonsList = new List<GameObject>();
+	private static List<GameObject> buttonsList = new List<GameObject>();
 
 	private List<string> tempList = new List<string>();
 
@@ -42,7 +42,7 @@ public class PointsList : MonoBehaviour {
 		}
 	}
 
-	private void UpdatePointsList()
+	private static void UpdatePointsList()
     {
 		
 
@@ -54,6 +54,10 @@ public class PointsList : MonoBehaviour {
 			if (infoList.Count > i)
 			{
 				pointText.text = infoList[i].ToString();
+			}
+			else
+            {
+				pointText.text = "EMPTY";
 			}
 		}
 	}
@@ -80,5 +84,25 @@ public class PointsList : MonoBehaviour {
 		}
 
 	}
+
+	public static PointINFO RemovePointOnClick(GameObject clickedButton)
+    {
+		int index = buttonsList.IndexOf(clickedButton);
+		Debug.Log("Clicked button number:" + index.ToString());
+		if (index < infoList.Count)
+        {
+			PointINFO clickedPoint = infoList[index];
+			infoList.RemoveAt(index);
+			UpdatePointsList();
+			return clickedPoint;
+		}
+        else
+        {
+			PointINFO notFoundPoint = new PointINFO(null,null,null,null); //troche dziwne, moze trzeba poprawic
+			return notFoundPoint;
+        }
+		
+
+    }
 
 }
