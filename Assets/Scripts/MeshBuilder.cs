@@ -9,6 +9,7 @@ using System.Reflection;
 using System;
 using UnityEngine.Internal.Experimental.UIElements;
 using System.Text.RegularExpressions;
+using System.Diagnostics.Eventing.Reader;
 
 /// <summary>
 /// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi.
@@ -225,14 +226,9 @@ public class MeshBuilder : MonoBehaviour {
 
             Vector3 proj3 = currPts[2].pointObject.transform.position;
 
-            Vector3 test1 = CalcPosIn3D(proj1, proj2);
-            Vector3 test2 = CalcPosIn3D(proj2, proj3);
-            Vector3 test3 = CalcPosIn3D(proj1, proj3);
-            Debug.Log($"Test1  ---- {test1.x} {test1.y} {test1.z}");
-            Debug.Log($"Test2  ---- {test2.x} {test2.y} {test2.z}");
-            Debug.Log($"Test3  ---- {test3.x} {test3.y} {test3.z}");
+            Status result = CheckProjsPlacement(proj1, proj2, proj3);
 
-            if (!(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3))
+            if (result == Status.OK)
             {
                 Debug.Log("3 polozony OK");
                 MarkOK(currPts[0]);
@@ -739,7 +735,21 @@ public class MeshBuilder : MonoBehaviour {
         pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
         pointProj.is_ok_placed = true;
     }
+    private Status CheckProjsPlacement(Vector3 proj1, Vector3 proj2, Vector3 proj3)
+    {
+        Vector3 test1 = CalcPosIn3D(proj1, proj2);
+        Vector3 test2 = CalcPosIn3D(proj2, proj3);
+        Vector3 test3 = CalcPosIn3D(proj1, proj3);
+        //Debug.Log($"Test1  ---- {test1.x} {test1.y} {test1.z}");
+        //Debug.Log($"Test2  ---- {test2.x} {test2.y} {test2.z}");
+        //Debug.Log($"Test3  ---- {test3.x} {test3.y} {test3.z}");
 
+        if ((test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3))
+        {
+            return Status.OK;
+        }
+        return Status.PLANE_ERR;
+    }
     private Tuple<GameObject, GameObject> CreateRefLine(GameObject dir, WallInfo w1, WallInfo w2, string label)
     {
         GameObject edge1 = new GameObject($"RzutRzutujacy ({label}) {w1.number}" );
