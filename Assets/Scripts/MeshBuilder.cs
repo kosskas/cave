@@ -200,7 +200,8 @@ public class MeshBuilder : MonoBehaviour {
             //jest juz 1 bedzie 2
             //podejmij rekonstrukcje
             //sprawdz plawszczyzny
-            Status result = Create3DPoint(label);
+            bool p1 = false, p2 = false, p3 = false;
+            Status result = Create3DPoint(label,ref p1, ref p2,ref p3);
             if (result == Status.PLANE_ERR)
             {
                 //podswietl dodawany na czerwono
@@ -218,32 +219,68 @@ public class MeshBuilder : MonoBehaviour {
         else
         {
             Debug.Log("Trzeci");
-            //sa juz 2
-            //sprawdz czy dobrze postawiony trzeci
-            Vector3 proj1 = currPts[0].pointObject.transform.position;
-            Vector3 proj2 = currPts[1].pointObject.transform.position;
 
-            Vector3 proj3 = currPts[2].pointObject.transform.position;
-
-            Vector3 test1 = CalcPosIn3D(proj1, proj2);
-            Vector3 test2 = CalcPosIn3D(proj2, proj3);
-            Vector3 test3 = CalcPosIn3D(proj1, proj3);
-            Debug.Log($"Test1  ---- {test1.x} {test1.y} {test1.z}");
-            Debug.Log($"Test2  ---- {test2.x} {test2.y} {test2.z}");
-            Debug.Log($"Test3  ---- {test3.x} {test3.y} {test3.z}");
-
-            if (!(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3))
+            if (vertices3D.ContainsKey(label) && !(vertices3D[label].deleted || vertices3D[label].disabled))
             {
-                Debug.Log("3 polozony OK");
-                MarkOK(currPts[0]);
-                MarkOK(currPts[1]);
-                MarkOK(currPts[2]);
-                //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
+                //sa juz 2
+                //sprawdz czy dobrze postawiony trzeci
+                Vector3 proj1 = currPts[0].pointObject.transform.position;
+                Vector3 proj2 = currPts[1].pointObject.transform.position;
+
+                Vector3 proj3 = currPts[2].pointObject.transform.position;
+
+                Vector3 test1 = CalcPosIn3D(proj1, proj2);
+                Vector3 test2 = CalcPosIn3D(proj2, proj3);
+                Vector3 test3 = CalcPosIn3D(proj1, proj3);
+                Debug.Log($"Test1  ---- {test1.x} {test1.y} {test1.z}");
+                Debug.Log($"Test2  ---- {test2.x} {test2.y} {test2.z}");
+                Debug.Log($"Test3  ---- {test3.x} {test3.y} {test3.z}");
+                if (!(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3))
+                {
+                    Debug.Log("3 polozony OK");
+                    MarkOK(currPts[0]);
+                    MarkOK(currPts[1]);
+                    MarkOK(currPts[2]);
+                    //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
+                }
+                else
+                {
+                    MarkError(toAddProj);
+                    Debug.Log("3 polozony ZLE");
+                }
             }
             else
             {
-                MarkError(toAddProj);
-                Debug.Log("3 polozony ZLE");
+                //nie bylo wczesnej pktu, moze byc psrawdz
+                Debug.Log("nie ma pktu 3d");
+                bool p1 = false, p2 = false, p3 = false;
+                Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
+                if(result == Status.OK)
+                {
+                    if (p1)
+                    {
+                        MarkOK(currPts[0]);
+                        MarkOK(currPts[1]);
+                        MarkError(currPts[2]);
+                    }
+                    else if (p2)
+                    {
+                        MarkError(currPts[0]);
+                        MarkOK(currPts[1]);
+                        MarkOK(currPts[2]);                     
+                    }
+                    else // (!p3)
+                    {
+                        MarkOK(currPts[0]);
+                        MarkError(currPts[1]);
+                        MarkOK(currPts[2]);
+                    }
+                }
+                else
+                {
+                    MarkError(toAddProj);
+                    Debug.Log("3 polozony ZLE");
+                }
             }
         }
     }
@@ -293,7 +330,8 @@ public class MeshBuilder : MonoBehaviour {
             //moga byc 3 i zle polozone
             //Rekonstruuj
             List<PointProjection> currPts = GetCurrentPointProjections(label);
-            Status result = Create3DPoint(label);
+            bool p1 = false, p2 = false, p3 = false;
+            Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
             if (result == Status.PLANE_ERR)
             {
                 MarkError(currPts[0]);
@@ -458,7 +496,7 @@ public class MeshBuilder : MonoBehaviour {
         return tmp;
     }
 
-    private Status Create3DPoint(string label)
+    private Status Create3DPoint(string label,ref bool p1, ref bool p2, ref bool p3)
 	{
 		int licz = 0;
 
@@ -499,12 +537,77 @@ public class MeshBuilder : MonoBehaviour {
                 return Status.PLANE_ERR;
             }
         }
-		if (licz > 2)
+		if (licz > 2) //sa 3 rzuty, zadne moga nie byc wspolne
 		{
-            //Problem
-			//Sprawdz czy 3 jest dobrze polozony
-            Debug.Log($"Jest więcej rzutow pktu niz 2");
-            return Status.OTHER_ERR;
+            Vector3 proj1 = pointsInfo[0].pointObject.transform.position;
+            Vector3 proj2 = pointsInfo[1].pointObject.transform.position;
+            Vector3 proj3 = pointsInfo[2].pointObject.transform.position;
+
+            Vector3 test1 = CalcPosIn3D(proj1, proj2);
+            Vector3 test2 = CalcPosIn3D(proj2, proj3);
+            Vector3 test3 = CalcPosIn3D(proj1, proj3);
+            //Sprawdz czy 3 jest dobrze polozony
+            p1 = (test1 != Vector3.zero);
+            p2 = (test2 != Vector3.zero);
+            p3 = (test3 != Vector3.zero);
+            if (p1)
+            {
+                if (vertices3D.ContainsKey(label))
+                {
+                    //byl usuniety?, przywroc go w nowej pozycji
+                    Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
+                    vertexObject.SetCoordinates(test1);
+                    vertices3D[label].deleted = false;
+                    vertices3D[label].disabled = false;
+
+                }
+                else
+                {
+                    //1 raz
+                    CreateEntryForPoint(label, test1);
+                }
+
+                return Status.OK;
+            }
+            if (p2)
+            {
+                if (vertices3D.ContainsKey(label))
+                {
+                    //byl usuniety?, przywroc go w nowej pozycji
+                    Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
+                    vertexObject.SetCoordinates(test2);
+                    vertices3D[label].deleted = false;
+                    vertices3D[label].disabled = false;
+
+                }
+                else
+                {
+                    //1 raz
+                    CreateEntryForPoint(label, test2);
+                }
+
+                return Status.OK;
+            }
+            if (p3)
+            {
+                if (vertices3D.ContainsKey(label))
+                {
+                    //byl usuniety?, przywroc go w nowej pozycji
+                    Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
+                    vertexObject.SetCoordinates(test3);
+                    vertices3D[label].deleted = false;
+                    vertices3D[label].disabled = false;
+
+                }
+                else
+                {
+                    //1 raz
+                    CreateEntryForPoint(label, test3);
+                }
+
+                return Status.OK;
+            }
+            return Status.PLANE_ERR;
 
         }
         return Status.OTHER_ERR;
