@@ -42,6 +42,8 @@ public class PointPlacer : MonoBehaviour {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - UTILS
     private WallController _wc;
     private MeshBuilder _mc;
+    private GameObject _workspace;
+    private GameObject _pointRepo;
     private GameObject _edgeRepo;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - CONTEXT
     public enum Context {
@@ -89,8 +91,15 @@ public class PointPlacer : MonoBehaviour {
         GameObject wallsObject = GameObject.Find("Walls");
         _wc = wallsObject.GetComponent<WallController>();
         _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
-        _edgeRepo = GameObject.Find("Workspace")?.transform.Find("EdgeRepo").gameObject;
-;    }
+
+        _workspace = GameObject.Find("Workspace") ?? new GameObject("Workspace");
+
+        _edgeRepo = _workspace.transform.Find("EdgeRepo")?.gameObject ?? new GameObject("EdgeRepo");
+        _edgeRepo.transform.SetParent(_workspace.transform);
+
+        _pointRepo = _workspace.transform.Find("PointRepo")?.gameObject ?? new GameObject("PointRepo");
+        _pointRepo.transform.SetParent(_workspace.transform);
+    }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - PRIVATE()
     /// <summary>

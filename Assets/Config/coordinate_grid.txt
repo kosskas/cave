@@ -1,3 +1,5 @@
-scale_in_number_of_units=1
+number_of_units_per_interval=1
 number_of_lines=30
-line_weight=0.005
+line_width=0.005
+distance_from_the_wall=0.01
+margin=0.01
