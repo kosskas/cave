@@ -149,6 +149,8 @@ public class Grid : MonoBehaviour {
                     BoxCollider boxCollider = pointObj.AddComponent<BoxCollider>();
                     boxCollider.size = new Vector3(colsPointSize, rowsPointSize, 0f);
                     boxCollider.isTrigger = true;
+
+                    pointObj.layer = LayerMask.NameToLayer("GridPoint");
                 }
             }
         }
