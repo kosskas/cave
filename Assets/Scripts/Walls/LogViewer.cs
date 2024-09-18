@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class LogViewer : MonoBehaviour {
 
-    private TMPro.TextMeshPro textMesh;
+    [SerializeField] private TMPro.TextMeshPro textMesh;
     private string output = "";
 
     // Use this for initialization
     void Start () {
-        GameObject textObject = GameObject.Find("WallText");
-        textMesh = textObject.GetComponent<TMPro.TextMeshPro>();
+        //GameObject textObject = GameObject.Find("WallText");
+        //textMesh = textObject.GetComponent<TMPro.TextMeshPro>();
 	}
 	
 	// Update is called once per frame
