@@ -37,8 +37,9 @@ public class PointsList : MonoBehaviour {
         }
 		if (Input.GetKeyDown("0"))
 		{
-			PointListGoDown();
+			//PointListGoDown();
 			//UpdatePointsList();
+			HideListAndLogs();
 		}
 	}
 
@@ -85,6 +86,21 @@ public class PointsList : MonoBehaviour {
 			UpdatePointsList();
 		}
 
+	}
+
+	public static void HideListAndLogs()
+    {
+		GameObject wallText = GameObject.Find("WallText");
+		GameObject list = GameObject.Find("PointsList");
+
+		if (wallText != null)
+        {
+			wallText.SetActive(false);
+        }
+		if (list != null)
+		{
+			list.SetActive(false);
+		}
 	}
 
 	public static PointINFO RemovePointOnClick(GameObject clickedButton)
