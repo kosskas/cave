@@ -49,6 +49,7 @@ public static class SolidExporter{
         catch (Exception e)
         {
             Debug.LogError("[CAVE] Cannot save file");
+            return null;
         }
         return solid;
     }
