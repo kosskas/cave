@@ -33,12 +33,12 @@ public class PointsList : MonoBehaviour {
         if (Input.GetKeyDown("9"))
         {
 			PointListGoUp();
-			UpdatePointsList();
+			//UpdatePointsList();
         }
 		if (Input.GetKeyDown("0"))
 		{
 			PointListGoDown();
-			UpdatePointsList();
+			//UpdatePointsList();
 		}
 	}
 
@@ -62,18 +62,19 @@ public class PointsList : MonoBehaviour {
 		}
 	}
 
-	public void PointListGoUp() {
+	public static void PointListGoUp() {
 
 		if (infoList.Count > buttonsList.Count)
 		{
 			PointINFO first = infoList[0];
 			infoList.RemoveAt(0);
 			infoList.Add(first);
+			UpdatePointsList();
 		}
 	}
 
 
-	public void PointListGoDown()
+	public static void PointListGoDown()
 	{
 		
 		if (infoList.Count > buttonsList.Count)
@@ -81,6 +82,7 @@ public class PointsList : MonoBehaviour {
 			PointINFO last = infoList[infoList.Count - 1];
 			infoList.RemoveAt(infoList.Count - 1);
 			infoList.Insert(0, last);
+			UpdatePointsList();
 		}
 
 	}

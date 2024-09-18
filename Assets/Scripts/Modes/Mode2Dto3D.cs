@@ -53,6 +53,14 @@ public class Mode2Dto3D : IMode
                 PointINFO pointInfo = PointsList.RemovePointOnClick(PCref.Hit.collider.gameObject);
                 _pp.RemovePoint(pointInfo);
             }
+            else if (PCref.Hit.collider.gameObject.name == "UpButton")
+            {
+                PointsList.PointListGoUp();
+            }
+            else if (PCref.Hit.collider.gameObject.name == "DownButton")
+            {
+                PointsList.PointListGoDown();
+            }
         }
     }
 
