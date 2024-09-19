@@ -61,6 +61,10 @@ public class Mode2Dto3D : IMode
             {
                 PointsList.PointListGoDown();
             }
+            else if (PCref.Hit.collider.gameObject.name == "SaveButton")
+            {
+                State.Save();
+            }
         }
     }
 

@@ -236,7 +236,9 @@ public class PointPlacer : MonoBehaviour {
 
         _LocateLabels(pointClicked, wall);
 
-        return new PointINFO(pointClicked, wall, labelText, fullLabelText);
+        PointINFO pointINFO = new PointINFO(pointClicked, wall, labelText, fullLabelText);
+        State.Points.Add(pointINFO);
+        return pointINFO;
     }
 
     private Label _FindPickedLabel(List<Label> labels)
@@ -262,7 +264,9 @@ public class PointPlacer : MonoBehaviour {
 
         _LocateLabels(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall);
 
-        return new PointINFO(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall, labelText, fullLabelText);
+        PointINFO pointINFO = new PointINFO(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall, labelText, fullLabelText);
+        State.Points.Remove(pointINFO);
+        return pointINFO;
     }
 
     private EdgeINFO _AddEdge()
@@ -291,7 +295,10 @@ public class PointPlacer : MonoBehaviour {
         );
 
         _mc.AddEdgeProjection(labelText_1, labelText_2);
-        return new EdgeINFO(edgeObj, edge, point_1, point_2);
+
+        EdgeINFO edgeINFO = new EdgeINFO(edgeObj, edge, point_1, point_2);
+        State.Edges.Add(edgeINFO);
+        return edgeINFO;
     }
 
     private EdgeINFO _RemoveEdge()
@@ -320,7 +327,9 @@ public class PointPlacer : MonoBehaviour {
         _mc.RemoveEdgeProjection(labelText_1, labelText_2);
         Destroy(edgeObj);
         
-        return new EdgeINFO(edgeObj, edge, point_1, point_2);
+        EdgeINFO edgeINFO = new EdgeINFO(edgeObj, edge, point_1, point_2);
+        State.Edges.Remove(edgeINFO);
+        return edgeINFO;
     }
 
     private EdgeINFO _RemoveEdge(GameObject edgeObj)
@@ -333,7 +342,11 @@ public class PointPlacer : MonoBehaviour {
         _mc.RemoveEdgeProjection(labelText_1, labelText_2);
         Destroy(edgeObj);
 
-        return EdgeINFO.Empty;
+        EdgeINFO edgeINFO = State.Edges.First(e => 
+            e.P1.FullLabel.Equals(fullLabelTexts[0]) && e.P2.FullLabel.Equals(fullLabelTexts[1])
+        );
+        State.Edges.Remove(edgeINFO);
+        return edgeINFO;
     }
 
     private List<EdgeINFO> _RemoveEdgesWithPointCascade(string pointLabel)
@@ -506,12 +519,16 @@ public class PointPlacer : MonoBehaviour {
             return;
         }
 
+        List<EdgeINFO> removedEdges = _RemoveEdgesWithPointCascade(pi.FullLabel);
+
         _mc.RemovePointProjection(pi.WallInfo, pi.Label);
 
         GameObject labelObj = labelObjTrans.transform.gameObject;
         Destroy(labelObj);
 
         _LocateLabels(pi.GridPoint, pi.WallInfo);
+
+        State.Points.Remove(pi);
     }
 
 

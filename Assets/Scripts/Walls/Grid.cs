@@ -19,38 +19,46 @@ public class Grid : MonoBehaviour {
     private float _scale;
 
     public Grid(
-        float height, 
-        float length, 
-        int rowsNumber, 
-        int colsNumber, 
-        string rowsAxis, 
-        string colsAxis, 
-        float lineWidth, 
-        int scale, 
-        GameObject parentObj,
-        Vector3 position,
-        Vector3 eulerAngles
+        GridINFO gridINFO,
+        GameObject parentObj
     )
     {
         Quaternion rotation = Quaternion.identity;
-        rotation.eulerAngles = eulerAngles;
+        rotation.eulerAngles = gridINFO.EulerAngles;
 
-        _gridObj = new GameObject($"grid_{rowsAxis}{colsAxis}");
+        _gridObj = new GameObject($"grid_{gridINFO.RowsAxis}{gridINFO.ColsAxis}");
         _gridObj.transform.SetParent(parentObj.transform);
 
         _gridObj.transform.rotation = rotation;
         _gridObjRotation = _gridObj.transform.rotation;
 
-        _gridObj.transform.position = position;
+        _gridObj.transform.position = gridINFO.Position;
         _gridObjPosition = _gridObj.transform.position;
 
-        _lineWidth = lineWidth;
-        _scale = scale;
+        _lineWidth = gridINFO.LineWidth;
+        _scale = gridINFO.Scale;
 
-        _CreateLines(rowsNumber, height, Line.ROW, rowsAxis);
-        _CreateLines(colsNumber, length, Line.COL, colsAxis);
+        _CreateLines(
+            gridINFO.RowsNumber, 
+            gridINFO.Height, 
+            Line.ROW, 
+            gridINFO.RowsAxis
+        );
 
-        _CreatePoints($"{rowsAxis}{colsAxis}", rowsNumber, height, colsNumber, length);
+        _CreateLines(
+            gridINFO.ColsNumber, 
+            gridINFO.Length, 
+            Line.COL, 
+            gridINFO.ColsAxis
+        );
+
+        _CreatePoints(
+            $"{gridINFO.RowsAxis}{gridINFO.ColsAxis}", 
+            gridINFO.RowsNumber, 
+            gridINFO.Height, 
+            gridINFO.ColsNumber, 
+            gridINFO.Length
+        );
 
         //Point pp = gridObj.AddComponent<Point>();
         //pp.SetStyle(Color.red, 0.05f);     
