@@ -21,5 +21,10 @@ public class ModeMenu : IMode
         {
             PCref.ChangeMode(PlayerController.Mode.Mode2Dto3D);
         }
+
+        if (Input.GetKeyDown("3"))
+        {
+            PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
+        }
     }
 }
