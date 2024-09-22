@@ -1,4 +1,4 @@
-
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Mode2Dto3D : IMode
@@ -64,6 +64,11 @@ public class Mode2Dto3D : IMode
             else if (PCref.Hit.collider.gameObject.name == "SaveButton")
             {
                 State.Save();
+            }
+            else if (PCref.Hit.collider.gameObject.name == "RestoreButton")
+            {
+                State.Restore(_pp);
+                State.Points.ForEach(p => PointsList.infoList.Add(p));
             }
         }
     }

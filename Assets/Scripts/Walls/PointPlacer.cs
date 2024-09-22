@@ -241,6 +241,26 @@ public class PointPlacer : MonoBehaviour {
         return pointINFO;
     }
 
+    public void AddPoint(PointINFO pointINFO)
+    {   
+        GameObject labelObj = new GameObject(pointINFO.Label);
+        labelObj.transform.parent = pointINFO.GridPoint.transform;
+
+        Point point = labelObj.AddComponent<Point>();
+        point.SetCoordinates(pointINFO.GridPoint.transform.position);
+        point.SetStyle(ReconstructionInfo.POINT_COLOR, ReconstructionInfo.POINT_SIZE);
+        point.SetEnable(true);
+        point.SetLabel(pointINFO.FullLabel, ReconstructionInfo.LABEL_SIZE_PLACED, ReconstructionInfo.LABEL_COLOR_PLACED);
+        
+        ///linia rzutująca
+        LineSegment lineseg = labelObj.AddComponent<LineSegment>();
+        lineseg.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+
+        _mc.AddPointProjection(pointINFO.WallInfo, pointINFO.Label, labelObj);
+
+        _LocateLabels(pointINFO.GridPoint, pointINFO.WallInfo);
+    }
+
     private Label _FindPickedLabel(List<Label> labels)
     {
         return labels.Find(label => {
@@ -299,6 +319,22 @@ public class PointPlacer : MonoBehaviour {
         EdgeINFO edgeINFO = new EdgeINFO(edgeObj, edge, point_1, point_2);
         State.Edges.Add(edgeINFO);
         return edgeINFO;
+    }
+
+    public EdgeINFO AddEdge(PointINFO point_1, PointINFO point_2)
+    {
+        GameObject edgeObj = new GameObject($"{point_1.FullLabel}-{point_2.FullLabel}");
+        edgeObj.transform.SetParent(_edgeRepo.transform);
+        LineSegment edge = edgeObj.AddComponent<LineSegment>();
+        edge.SetStyle(ReconstructionInfo.EDGE_COLOR, ReconstructionInfo.EDGE_LINE_WIDTH);
+        edge.SetCoordinates(
+            point_1.GridPoint.transform.position,
+            point_2.GridPoint.transform.position
+        );
+
+        _mc.AddEdgeProjection(point_1.Label, point_2.Label);
+
+        return new EdgeINFO(edgeObj, edge, point_1, point_2);
     }
 
     private EdgeINFO _RemoveEdge()
