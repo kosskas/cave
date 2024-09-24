@@ -185,7 +185,11 @@ public class MeshBuilder : MonoBehaviour {
         verticesOnWalls[wall][label] = toAddProj;
         //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
+        ResolveAddProjection(currPts, toAddProj, label);
+    }
 
+    private void ResolveAddProjection(List<PointProjection> currPts, PointProjection toAddProj, string label)
+    {
         if (currPts.Count == 1)
         {
             Debug.Log("Pierwszy");
@@ -201,7 +205,7 @@ public class MeshBuilder : MonoBehaviour {
             //podejmij rekonstrukcje
             //sprawdz plawszczyzny
             bool p1 = false, p2 = false, p3 = false;
-            Status result = Create3DPoint(label,ref p1, ref p2,ref p3);
+            Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
             if (result == Status.PLANE_ERR)
             {
                 //podswietl dodawany na czerwono
@@ -224,18 +228,7 @@ public class MeshBuilder : MonoBehaviour {
             {
                 //sa juz 2
                 //sprawdz czy dobrze postawiony trzeci
-                Vector3 proj1 = currPts[0].pointObject.transform.position;
-                Vector3 proj2 = currPts[1].pointObject.transform.position;
-
-                Vector3 proj3 = currPts[2].pointObject.transform.position;
-
-                Vector3 test1 = CalcPosIn3D(proj1, proj2);
-                Vector3 test2 = CalcPosIn3D(proj2, proj3);
-                Vector3 test3 = CalcPosIn3D(proj1, proj3);
-                Debug.Log($"Test1  ---- {test1.x} {test1.y} {test1.z}");
-                Debug.Log($"Test2  ---- {test2.x} {test2.y} {test2.z}");
-                Debug.Log($"Test3  ---- {test3.x} {test3.y} {test3.z}");
-                if (!(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3))
+                if (Check3Pos(currPts[0].pointObject.transform.position, currPts[1].pointObject.transform.position, currPts[2].pointObject.transform.position))
                 {
                     Debug.Log("3 polozony OK");
                     MarkOK(currPts[0]);
@@ -255,7 +248,7 @@ public class MeshBuilder : MonoBehaviour {
                 Debug.Log("nie ma pktu 3d");
                 bool p1 = false, p2 = false, p3 = false;
                 Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-                if(result == Status.OK)
+                if (result == Status.OK)
                 {
                     if (p1)
                     {
@@ -267,7 +260,7 @@ public class MeshBuilder : MonoBehaviour {
                     {
                         MarkError(currPts[0]);
                         MarkOK(currPts[1]);
-                        MarkOK(currPts[2]);                     
+                        MarkOK(currPts[2]);
                     }
                     else // (!p3)
                     {
@@ -283,6 +276,13 @@ public class MeshBuilder : MonoBehaviour {
                 }
             }
         }
+    }
+    private bool Check3Pos(Vector3 proj1, Vector3 proj2, Vector3 proj3)
+    {
+        Vector3 test1 = CalcPosIn3D(proj1, proj2);
+        Vector3 test2 = CalcPosIn3D(proj2, proj3);
+        Vector3 test3 = CalcPosIn3D(proj1, proj3);
+        return (!(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3));
     }
     /// <summary>
     /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D. Jeśli istnieje pkt w 3D to następuje ponownw obliczenie jego pozycji lub usunięcie
