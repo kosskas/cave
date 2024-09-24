@@ -755,7 +755,6 @@ public class MeshBuilder : MonoBehaviour {
 
     private void ShowReferenceLines()
     {
-        const float antiztrackhit = 0.01f;
         foreach (WallInfo wall in verticesOnWalls.Keys)
         {
             foreach (string label in verticesOnWalls[wall].Keys)
@@ -765,25 +764,29 @@ public class MeshBuilder : MonoBehaviour {
                     //is in 3D
                     if (verticesOnWalls[wall][label].refLine[0] != null)
                     {
-                        WallInfo ground = wc.GetGroundWall();
-                        if (wall != ground && verticesOnWalls.ContainsKey(ground) && verticesOnWalls[ground].ContainsKey(label) && verticesOnWalls[ground][label].is_ok_placed)
-                        {
-                            Vector3 p1 = verticesOnWalls[wall][label].pointObject.transform.position + antiztrackhit * wall.GetNormal(); //rzut na 1 scianie
-                            Vector3 p2 = verticesOnWalls[ground][label].pointObject.transform.position + antiztrackhit * ground.GetNormal(); //rzut na 2 scianie
-                            Vector3 p_3D = vertices3D[label].gameObject.transform.position; // punkt 3d
-                            Vector3 cross = wc.FindCrossingPoint(p1, p2, p_3D); //miejsce przeciecia scian 1 i 2 w plaszczyznie co p1 i p2
-                            LineSegment refp1 = verticesOnWalls[wall][label].refLine[0].Item1.GetComponent<LineSegment>();
-                            LineSegment refp2 = verticesOnWalls[wall][label].refLine[0].Item2.GetComponent<LineSegment>();
-                            refp1.SetStyle(ReconstructionInfo.REFERENCE_LINE_COLOR, ReconstructionInfo.REFERENCE_LINE_WIDTH);
-                            refp2.SetStyle(ReconstructionInfo.REFERENCE_LINE_COLOR, ReconstructionInfo.REFERENCE_LINE_WIDTH);
-                            refp1.SetCoordinates(p1, cross);
-                            refp2.SetCoordinates(p2, cross);
-                            refp1.SetEnable(showReferenceLines);
-                            refp2.SetEnable(showReferenceLines);
-                        }
+                        SetRefLine(wall, label);
                     }
                 }
             }
+        }
+    }
+    private void SetRefLine(WallInfo wall, string label)
+    {
+        const float antiztrackhit = 0.01f;
+        WallInfo ground = wc.GetGroundWall();
+        if (wall != ground && verticesOnWalls.ContainsKey(ground) && verticesOnWalls[ground].ContainsKey(label) && verticesOnWalls[ground][label].is_ok_placed)
+        {
+            Vector3 p1 = verticesOnWalls[wall][label].pointObject.transform.position + antiztrackhit * wall.GetNormal(); //rzut na 1 scianie
+            Vector3 p2 = verticesOnWalls[ground][label].pointObject.transform.position + antiztrackhit * ground.GetNormal(); //rzut na 2 scianie
+            Vector3 p_3D = vertices3D[label].gameObject.transform.position; // punkt 3d
+            Vector3 cross = wc.FindCrossingPoint(p1, p2, p_3D); //miejsce przeciecia scian 1 i 2 w plaszczyznie co p1 i p2
+            LineSegment refp1 = verticesOnWalls[wall][label].refLine[0].Item1.GetComponent<LineSegment>();
+            LineSegment refp2 = verticesOnWalls[wall][label].refLine[0].Item2.GetComponent<LineSegment>();
+            ///kazda linie rzutujaca rysuj wdlusz i wszesz bez znazzenia czy jest tam pkt czy nie
+            refp1.SetCoordinates(p1, cross);
+            refp2.SetCoordinates(p2, cross);
+            refp1.SetEnable(showReferenceLines);
+            refp2.SetEnable(showReferenceLines);
         }
     }
     private void ShowPoints3D()
@@ -848,12 +851,12 @@ public class MeshBuilder : MonoBehaviour {
         GameObject edge1 = new GameObject($"RzutRzutujacy ({label}) {w1.number}" );
         edge1.transform.SetParent(dir.transform);
         LineSegment drawEdge1 = edge1.AddComponent<LineSegment>();
+        drawEdge1.SetStyle(ReconstructionInfo.REFERENCE_LINE_COLOR, ReconstructionInfo.REFERENCE_LINE_WIDTH);
 
-        
         GameObject edge2 = new GameObject($"RzutRzutujacy ({label}) {w2.number}");
         edge2.transform.SetParent(dir.transform);
         LineSegment drawEdge2 = edge2.AddComponent<LineSegment>();
-
+        drawEdge2.SetStyle(ReconstructionInfo.REFERENCE_LINE_COLOR, ReconstructionInfo.REFERENCE_LINE_WIDTH);
         return new Tuple<GameObject, GameObject>(edge1, edge2);
     }
 }
