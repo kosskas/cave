@@ -87,7 +87,6 @@ public class MeshBuilder : MonoBehaviour {
             this.gameObject = gameObject;
         }
     }
-    Action<List<PointProjection>, PointProjection, string>[] addPointProjScenarios = new Action<List<PointProjection>, PointProjection, string>[3];
     const int MAXWALLSNUM = 3;
     /// <summary>
     /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
@@ -156,9 +155,6 @@ public class MeshBuilder : MonoBehaviour {
         adjList = new Dictionary<string, List<string>>();
         wc = (WallController)FindObjectOfType(typeof(WallController));
         blocked = false;
-        addPointProjScenarios[0] = AddFrstPProjScenario;
-        addPointProjScenarios[1] = AddScndPProjScenario;
-        addPointProjScenarios[2] = AddThrdPProjScenario;
     }
     /// <summary>
     /// Czyści klasę i blokuje jej działanie
@@ -182,100 +178,103 @@ public class MeshBuilder : MonoBehaviour {
     /// <param name="label">Etykieta rzutu</param>
     /// <param name="pointObj">Metadana o rzucie: etykieta, połozenie(position) jest takie jakie ma rodzic</param>
 	public void AddPointProjection(WallInfo wall, string label, GameObject pointObj)
-    {
-        if (!verticesOnWalls.ContainsKey(wall))
-        {
-            verticesOnWalls[wall] = new Dictionary<string, PointProjection>();
+	{
+        if (!verticesOnWalls.ContainsKey(wall)) {
+			verticesOnWalls[wall] = new Dictionary<string, PointProjection>();
         }
         PointProjection toAddProj = new PointProjection(pointObj, pointObj.GetComponent<LineSegment>(), false);
         verticesOnWalls[wall][label] = toAddProj;
+        //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
-        int scenario = currPts.Count;
-        addPointProjScenarios[scenario](currPts, toAddProj, label);
+        ResolveAddProjection(currPts, toAddProj, label);
     }
-    private void AddFrstPProjScenario(List<PointProjection> currPts, PointProjection toAddProj, string label)
-    {
-        Debug.Log("Pierwszy");
-        //nie bylo zadnych rzutow tego pktu
-        //bedzie 1
-        MarkOK(currPts[0]);
-        //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
-    }
-    private void AddScndPProjScenario(List<PointProjection> currPts, PointProjection toAddProj, string label)
-    {
-        Debug.Log("Drugi");
-        //jest juz 1 bedzie 2
-        //podejmij rekonstrukcje
-        //sprawdz plawszczyzny
-        bool p1 = false, p2 = false, p3 = false;
-        Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-        if (result == Status.PLANE_ERR)
-        {
-            //podswietl dodawany na czerwono
-            MarkError(currPts[0]);
-            MarkError(currPts[1]);
 
-        }
-        else if (result == Status.OK)
+    private void ResolveAddProjection(List<PointProjection> currPts, PointProjection toAddProj, string label)
+    {
+        if (currPts.Count == 1)
         {
+            Debug.Log("Pierwszy");
+            //nie bylo zadnych rzutow tego pktu
+            //bedzie 1
             MarkOK(currPts[0]);
-            MarkOK(currPts[1]);
             //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
         }
-    }
-    private void AddThrdPProjScenario(List<PointProjection> currPts, PointProjection toAddProj, string label)
-    {
-        Debug.Log("Trzeci");
-
-        if (vertices3D.ContainsKey(label) && !(vertices3D[label].deleted || vertices3D[label].disabled))
+        else if (currPts.Count == 2)
         {
-            //sa juz 2
-            //sprawdz czy dobrze postawiony trzeci
-            if (Check3Pos(currPts[0].pointObject.transform.position, currPts[1].pointObject.transform.position, currPts[2].pointObject.transform.position))
+            Debug.Log("Drugi");
+            //jest juz 1 bedzie 2
+            //podejmij rekonstrukcje
+            //sprawdz plawszczyzny
+            bool p1 = false, p2 = false, p3 = false;
+            Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
+            if (result == Status.PLANE_ERR)
             {
-                Debug.Log("3 polozony OK");
+                //podswietl dodawany na czerwono
+                MarkError(currPts[0]);
+                MarkError(currPts[1]);
+
+            }
+            else if (result == Status.OK)
+            {
                 MarkOK(currPts[0]);
                 MarkOK(currPts[1]);
-                MarkOK(currPts[2]);
                 //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
-            }
-            else
-            {
-                MarkError(toAddProj);
-                Debug.Log("3 polozony ZLE");
             }
         }
         else
         {
-            //nie bylo wczesnej pktu, moze byc psrawdz
-            Debug.Log("nie ma pktu 3d");
-            bool p1 = false, p2 = false, p3 = false;
-            Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-            if (result == Status.OK)
+            Debug.Log("Trzeci");
+
+            if (vertices3D.ContainsKey(label) && !(vertices3D[label].deleted || vertices3D[label].disabled))
             {
-                if (p1)
+                //sa juz 2
+                //sprawdz czy dobrze postawiony trzeci
+                if (Check3Pos(currPts[0].pointObject.transform.position, currPts[1].pointObject.transform.position, currPts[2].pointObject.transform.position))
                 {
+                    Debug.Log("3 polozony OK");
                     MarkOK(currPts[0]);
                     MarkOK(currPts[1]);
-                    MarkError(currPts[2]);
-                }
-                else if (p2)
-                {
-                    MarkError(currPts[0]);
-                    MarkOK(currPts[1]);
                     MarkOK(currPts[2]);
+                    //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
                 }
-                else // (!p3)
+                else
                 {
-                    MarkOK(currPts[0]);
-                    MarkError(currPts[1]);
-                    MarkOK(currPts[2]);
+                    MarkError(toAddProj);
+                    Debug.Log("3 polozony ZLE");
                 }
             }
             else
             {
-                MarkError(toAddProj);
-                Debug.Log("3 polozony ZLE");
+                //nie bylo wczesnej pktu, moze byc psrawdz
+                Debug.Log("nie ma pktu 3d");
+                bool p1 = false, p2 = false, p3 = false;
+                Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
+                if (result == Status.OK)
+                {
+                    if (p1)
+                    {
+                        MarkOK(currPts[0]);
+                        MarkOK(currPts[1]);
+                        MarkError(currPts[2]);
+                    }
+                    else if (p2)
+                    {
+                        MarkError(currPts[0]);
+                        MarkOK(currPts[1]);
+                        MarkOK(currPts[2]);
+                    }
+                    else // (!p3)
+                    {
+                        MarkOK(currPts[0]);
+                        MarkError(currPts[1]);
+                        MarkOK(currPts[2]);
+                    }
+                }
+                else
+                {
+                    MarkError(toAddProj);
+                    Debug.Log("3 polozony ZLE");
+                }
             }
         }
     }
