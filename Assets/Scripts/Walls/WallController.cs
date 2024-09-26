@@ -243,7 +243,63 @@ public class WallController : MonoBehaviour {
         }
         return ret;
     }
+    /// <summary>
+    /// Znajduje punkt przecięcia dwóch prostopadłych ścian na podstawie rzutu na jednej z nich oraz punkt końca rysowania linii
+    /// </summary>
+    /// <param name="basicwall">Ściana 1</param>
+    /// <param name="proj">Rzut na jedenj ze ścian</param>
+    /// <param name="wall2">Ściana 2</param>
+    /// <returns>Para wektorów(przecięcie, koniec rysowania)</returns>
+    public Tuple<Vector3,Vector3> FindCrossingPointEx(WallInfo basicwall, Vector3 proj, WallInfo wall2)
+    {
+        Vector3 Croos = Vector3.zero,Eod = Vector3.zero;
+        const float LEN = 10f;
 
+        Vector3 cross46 = new Vector3(1.63f, 0, -1.63f);
+        Vector3 cross36 = new Vector3(0f, 0.07f, -1.63f);
+        Vector3 cross34 = new Vector3(1.63f, 0.07f, 0);
+        if (basicwall.name == "Wall3") ///wall6 (+x), wall4 (-z)
+        {
+            if (wall2.name == "Wall6")
+            {
+                Croos = cross36;
+                Croos.x = proj.x;
+            }
+            if (wall2.name == "Wall4")
+            {
+                Croos = cross34;
+                Croos.z = proj.z;
+            }
+        }
+        else if (basicwall.name == "Wall4") ///wall6 po prawej(-z), wall3 na dole(-y)
+        {
+            if (wall2.name == "Wall6")
+            {
+                Croos = cross46;
+                Croos.y = proj.y;
+            }
+            if (wall2.name == "Wall3")
+            {
+                Croos = cross34;
+                Croos.z = proj.z;
+            }
+        }
+        else if (basicwall.name == "Wall6") ///wall4 po lewej(+x), wall3 na dole(-y)
+        {
+            if (wall2.name == "Wall4")
+            {
+                Croos = cross46;
+                Croos.y = proj.y;
+            }
+            if (wall2.name == "Wall3")
+            {
+                Croos = cross36;
+                Croos.x = proj.x;             
+            }
+        }
+        Eod = Croos + basicwall.GetNormal() * LEN;
+        return new Tuple<Vector3, Vector3>(Croos, Eod);
+    }
     private void ResetProjection()
     {
         ObjectProjecter op = (ObjectProjecter)GameObject.FindObjectOfType(typeof(ObjectProjecter));
@@ -296,5 +352,51 @@ public class WallController : MonoBehaviour {
             }
         }
         return null;
+    }
+    /// <summary>
+    /// Znajduje ściane na podstawie nazwy
+    /// </summary>
+    /// <param name="name">Nazwa ściany</param>
+    /// <returns></returns>
+    public WallInfo GetWallByName(string name)
+    {
+        foreach (WallInfo wall in walls)
+        {
+            if (wall.name == name)
+            {
+                return wall;
+            }
+        }
+        return null;
+    }
+    /// <summary>
+    /// Znajduje dwie pozostałe ściany z trybu rekonstrukcji
+    /// </summary>
+    /// <param name="wall">Sciana</param>
+    /// <returns></returns>
+    public WallInfo[] RecGetRemainingWalls(WallInfo wall)
+    {
+        WallInfo wall3 = GetWallByName("Wall3");
+        WallInfo wall4 = GetWallByName("Wall4");
+        WallInfo wall6 = GetWallByName("Wall6");
+        WallInfo[] remainingWalls = new WallInfo[2];
+
+        if(wall.name == "Wall3")
+        {
+            remainingWalls[0] = wall4;
+            remainingWalls[1] = wall6;
+        }
+        else if(wall.name == "Wall4")
+        {
+            remainingWalls[0] = wall3;
+            remainingWalls[1] = wall6;
+        }
+        else//Wall6
+        {
+            remainingWalls[0] = wall3;
+            remainingWalls[1] = wall4;
+        }
+
+        return remainingWalls;
     }
 }
