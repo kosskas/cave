@@ -721,7 +721,7 @@ public class MeshBuilder : MonoBehaviour {
         {
             foreach (string label in verticesOnWalls[wall].Keys)
             {
-                if (verticesOnWalls[wall][label].refLine[0] == null && verticesOnWalls[wall][label].is_ok_placed)
+                if (verticesOnWalls[wall][label].refLine[0] == null)// && verticesOnWalls[wall][label].is_ok_placed)
                 {
                     CreateReferenceLines(referenceLinesDir, wall, label);
                 }
@@ -807,7 +807,7 @@ public class MeshBuilder : MonoBehaviour {
 
     private void CreateReferenceLines(GameObject dir, WallInfo wall, string label)
     {
-        const float antiztrackhit = 0.01f;
+        const float antiztrackhit = 0.001f;
         PointProjection pointProjection = verticesOnWalls[wall][label];
         for (int idx = 0; idx < pointProjection.refLine.Length; idx++)
         {
