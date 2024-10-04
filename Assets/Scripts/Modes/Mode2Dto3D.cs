@@ -112,12 +112,25 @@ public class Mode2Dto3D : IMode
         GameObject wallsObject = GameObject.Find("Walls");
         _wc = wallsObject.GetComponent<WallController>();
 
+        
+
         _gc = wallsObject.GetComponent<GridCreator>();
         _gc.Init();
+
+        
+        
 
         _pp = PCref.gameObject.GetComponent<PointPlacer>();
         _pp.CreateCursor();
         _pp.MoveCursor(PCref.Hit);
+
+        if (PointsList.ceilingWall != null) //nie dziala, dalej sie psuje
+        {
+            Debug.Log("ceiling found");
+            PointsList.ceilingWall.SetActive(true);
+        }
+
+        PointsList.ShowListAndLogs();
 
         Debug.Log($"<color=blue> MODE inzynierka ON </color>");
     }
