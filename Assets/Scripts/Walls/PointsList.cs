@@ -11,9 +11,18 @@ public class PointsList : MonoBehaviour {
 	public static List<PointINFO> infoList = new List<PointINFO>();
 	private int lastInfoListLength = 0;
 
+	public static GameObject ceilingWall;
+	public static GameObject pointsList;
+	public static GameObject wallText;
+
 
 	// Use this for initialization
 	void Start () {
+		ceilingWall = GameObject.Find("Wall5");
+		pointsList = GameObject.Find("PointsList");
+		wallText = GameObject.Find("WallText");
+
+
 		GameObject[] buttonObjects = GameObject.FindGameObjectsWithTag("PointButton");
 		buttonsList.AddRange(buttonObjects);
 		buttonsList.Sort((x, y) => x.name.CompareTo(y.name));
@@ -90,16 +99,31 @@ public class PointsList : MonoBehaviour {
 
 	public static void HideListAndLogs()
     {
-		GameObject wallText = GameObject.Find("WallText");
-		GameObject list = GameObject.Find("PointsList");
+		//GameObject wallText = GameObject.Find("WallText");
+		//GameObject list = GameObject.Find("PointsList");
 
 		if (wallText != null)
         {
 			wallText.SetActive(false);
         }
-		if (list != null)
+		if (pointsList != null)
 		{
-			list.SetActive(false);
+			pointsList.SetActive(false);
+		}
+	}
+
+	public static void ShowListAndLogs()
+	{
+		//GameObject wallText = GameObject.Find("WallText");
+		//GameObject list = GameObject.Find("PointsList");
+
+		if (wallText != null)
+		{
+			wallText.SetActive(true);
+		}
+		if (pointsList != null)
+		{
+			pointsList.SetActive(true);
 		}
 	}
 
