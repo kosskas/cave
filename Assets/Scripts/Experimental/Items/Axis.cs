@@ -23,7 +23,7 @@ namespace Assets.Scripts.Experimental.Items
         private LineRenderer _lineRenderer;
         
 
-        void Awake()
+        void Start()
         {
             _lineRenderer = gameObject.AddComponent<LineRenderer>();
             _lineRenderer.material = new Material(Shader.Find("Unlit/Color"))
@@ -36,13 +36,22 @@ namespace Assets.Scripts.Experimental.Items
             _lineRenderer.endWidth = _WIDTH;
         }
 
+        void Update()
+        {
+            _lineRenderer.SetPositions(new[] { _from, _to });
+
+            Vector3 newPosition = _from;
+            Quaternion newRotation = Quaternion.LookRotation((_to - _from).normalized, Vector3.up) * Quaternion.Euler(0, -90, 0);
+
+            gameObject.transform.position = newPosition;
+            gameObject.transform.rotation = newRotation;
+        }
+
 
         public void Draw(params Vector3[] positions)
         {
             _from = positions[0];
             _to = positions[1];
-
-            _lineRenderer.SetPositions(new[] { _from, _to });
         }
 
         public void Erase()

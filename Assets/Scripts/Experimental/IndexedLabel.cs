@@ -9,49 +9,37 @@ using UnityEngine;
 
 namespace Assets.Scripts.Experimental
 {
-    public class IndexedLabel : MonoBehaviour, IDrawable
+    public class IndexedLabel : MonoBehaviour
     {
-        private readonly Vector3 _OFFSET = 0.06f * Vector3.up;
+        private Vector3 Offset(Transform t) => 0.08f * _fontSize * t.up + 0.05f * t.right;
 
 
         private string _text = "";
         private string _upperIndex = "";
         private string _lowerIndex = "";
 
+        private float _fontSize = 1;
+
         private TextMeshPro _textMeshPro;
 
         private Vector3 _pos;
 
 
-        private void SetLabel()
-        {
-            _textMeshPro.text = $"{_text}<sup>{_upperIndex}</sup><sub>{_lowerIndex}</sub>";
-        }
-
-
-        void Awake()
+        void Start()
         {
             GameObject textObj = new GameObject("LABEL");
             textObj.transform.SetParent(transform);
-            textObj.transform.Rotate(Vector3.up, 90f);
 
             _textMeshPro = textObj.AddComponent<TextMeshPro>();
-            _textMeshPro.fontSize = 1;
-            _textMeshPro.color = Color.red;
+            _textMeshPro.color = Color.black;
             _textMeshPro.alignment = TextAlignmentOptions.Center;
         }
 
-
-        public void Draw(params Vector3[] positions)
+        void Update()
         {
-            _pos = positions[0] + _OFFSET;
-
-            _textMeshPro.transform.position = _pos;
-        }
-
-        public void Erase()
-        {
-            throw new NotImplementedException();
+            _textMeshPro.transform.position = gameObject.transform.position + Offset(gameObject.transform);
+            _textMeshPro.fontSize = _fontSize;
+            _textMeshPro.text = String.IsNullOrWhiteSpace(_text) ? "" : $"{_text}<sup>{_upperIndex}</sup><sub>{_lowerIndex}</sub>";
         }
 
 
@@ -66,7 +54,6 @@ namespace Assets.Scripts.Experimental
             set
             {
                 _text = value;
-                SetLabel();
             }
         }
 
@@ -80,7 +67,6 @@ namespace Assets.Scripts.Experimental
             set
             {
                 _upperIndex = value;
-                SetLabel();
             }
         }
 
@@ -94,7 +80,19 @@ namespace Assets.Scripts.Experimental
             set
             {
                 _lowerIndex = value;
-                SetLabel();
+            }
+        }
+
+        public float FontSize
+        {
+            get
+            {
+                return _fontSize;
+            }
+
+            set
+            {
+                _fontSize = value;
             }
         }
     }
