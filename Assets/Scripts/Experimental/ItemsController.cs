@@ -1,5 +1,6 @@
 
 
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Assets.Scripts.Experimental;
@@ -14,6 +15,7 @@ public class ItemsController
 
     private readonly GameObject _workspace;
     private readonly GameObject _axisRepo;
+    private readonly GameObject _lineRepo;
 
 
     public ItemsController()
@@ -22,6 +24,9 @@ public class ItemsController
 
         _axisRepo = new GameObject("AxisRepo");
         _axisRepo.transform.SetParent(_workspace.transform);
+
+        _lineRepo = new GameObject("LineRepo");
+        _lineRepo.transform.SetParent(_workspace.transform);
     }
 
     public void AddAxisBetweenPlanes(WallInfo planeA, WallInfo planeB)
@@ -50,6 +55,32 @@ public class ItemsController
         var labelComponent = axis.AddComponent<IndexedLabel>();
         labelComponent.Text = "X";
         labelComponent.LowerIndex = $"{planeA.number}{planeB.number}";
-        labelComponent.Draw(from);
+    }
+
+    public Action<WallInfo, Vector3> AddLine(WallInfo plane, Vector3 from)
+    {
+        Vector3 normal = plane.GetNormal();
+
+        Vector3 offsetVector = normal * _OFFSET_FROM_WALL;
+
+        var line = new GameObject("LINE");
+        line.transform.SetParent(_lineRepo.transform);
+
+        var lineComponent = line.AddComponent<Line>();
+        lineComponent.Draw(from + offsetVector, from + offsetVector);
+
+        var labelComponent = line.AddComponent<IndexedLabel>();
+        labelComponent.UpperIndex = new string('\'', plane.number);
+        labelComponent.FontSize = 0.6f;
+
+        return (toPlane, to) =>
+        {
+            if (toPlane != plane)
+            {
+                return;
+            }
+
+            lineComponent.Draw(default(Vector3), to + offsetVector);
+        };
     }
 }
