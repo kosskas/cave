@@ -23,7 +23,7 @@ public class ModeExperimental : IMode
         _wc = GameObject.Find("Walls").GetComponent<WallController>();
 
         _items = new ItemsController();
-        
+        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
