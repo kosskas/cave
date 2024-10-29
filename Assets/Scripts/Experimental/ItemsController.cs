@@ -16,6 +16,7 @@ public class ItemsController
     private readonly GameObject _workspace;
     private readonly GameObject _axisRepo;
     private readonly GameObject _lineRepo;
+    private readonly GameObject _pointRepo;
 
 
     public ItemsController()
@@ -27,6 +28,9 @@ public class ItemsController
 
         _lineRepo = new GameObject("LineRepo");
         _lineRepo.transform.SetParent(_workspace.transform);
+
+        _pointRepo = new GameObject("PointRepo");
+        _pointRepo.transform.SetParent(_workspace.transform);
     }
 
     public void AddAxisBetweenPlanes(WallInfo planeA, WallInfo planeB)
@@ -82,5 +86,22 @@ public class ItemsController
 
             lineComponent.Draw(default(Vector3), to + offsetVector);
         };
+    }
+
+    public void AddPoint(WallInfo plane, Vector3 pos)
+    {
+        Vector3 normal = plane.GetNormal();
+
+        Vector3 offsetVector = normal * _OFFSET_FROM_WALL;
+
+        var point = new GameObject("POINT");
+        point.transform.SetParent(_pointRepo.transform);
+
+        var pointComponent = point.AddComponent<Assets.Scripts.Experimental.Items.Point>();
+        pointComponent.Draw(pos + offsetVector);
+
+        var labelComponent = point.AddComponent<IndexedLabel>();
+        labelComponent.UpperIndex = new string('\'', plane.number);
+        labelComponent.FontSize = 0.6f;
     }
 }
