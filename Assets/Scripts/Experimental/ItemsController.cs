@@ -88,6 +88,26 @@ public class ItemsController
         };
     }
 
+    public Action<Vector3, bool> AddLineBetweenPoints(Vector3 fromPoint)
+    {
+        var line = new GameObject("LINE_BETWEEN_POINTS");
+        line.transform.SetParent(_lineRepo.transform);
+
+        var lineComponent = line.AddComponent<Line>();
+        lineComponent.ColliderEnabled = false;
+        lineComponent.Draw(fromPoint, fromPoint);
+
+        return (toPoint, isEnd) =>
+        {
+            lineComponent.Draw(default(Vector3), toPoint);
+
+            if (isEnd)
+            {
+                lineComponent.ColliderEnabled = true;
+            }
+        };
+    }
+
     public void AddPoint(WallInfo plane, Vector3 pos)
     {
         Vector3 normal = plane.GetNormal();
