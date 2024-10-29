@@ -178,6 +178,11 @@ public class Mode2Dto3D : IMode
         {
             _ChooseNextLabel();
         }
+
+        if (Input.GetKeyDown("9"))
+        {
+            _pp.AddCircle();
+        }
     }
 
 }
