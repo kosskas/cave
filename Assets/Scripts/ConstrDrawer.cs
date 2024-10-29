@@ -51,10 +51,10 @@ public class ConstrDrawer : MonoBehaviour
         lineRenderer.positionCount = 2;
 
         lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
-        lineRenderer.startColor = Color.white;
-        lineRenderer.endColor = Color.white;
-        lineRenderer.startWidth = 0.02f;
-        lineRenderer.endWidth = 0.02f;
+        lineRenderer.startColor = ReconstructionInfo.LINE_2D_COLOR;
+        lineRenderer.endColor = ReconstructionInfo.LINE_2D_COLOR;
+        lineRenderer.startWidth = ReconstructionInfo.LINE_2D_WIDTH;
+        lineRenderer.endWidth = ReconstructionInfo.LINE_2D_WIDTH;
 
         Vector3 direction = (fixedpos2 - fixedpos1).normalized;
 
@@ -70,12 +70,12 @@ public class ConstrDrawer : MonoBehaviour
         Vector3 fixedpos1 = pos1 + antiztrackhit * wall.GetNormal();
         Vector3 fixedpos2 = pos2 + antiztrackhit * wall.GetNormal();
         const int steps = 100;
-        float radius = Vector3.Distance(fixedpos1, fixedpos2);
+        float radius = Vector3.Distance(fixedpos1, fixedpos2)/2f;
         Vector3 center = (fixedpos1 + fixedpos2) / 2f; //?
 
 
         Vector3 normal = wall.GetNormal().normalized;
-        Vector3 right = Vector3.Cross(Vector3.up, normal).normalized;
+        Vector3 right = Vector3.Cross(wall.gameObject.transform.right, normal).normalized;
         Vector3 up = Vector3.Cross(normal, right).normalized;
 
         GameObject circle = new GameObject($"Circle {fixedpos1}{fixedpos2}");
@@ -86,10 +86,10 @@ public class ConstrDrawer : MonoBehaviour
         circleRenderer.loop = true;
 
         circleRenderer.material = new Material(Shader.Find("Unlit/Color"));
-        circleRenderer.startColor = Color.white;
-        circleRenderer.endColor = Color.white;
-        circleRenderer.startWidth = 0.02f; 
-        circleRenderer.endWidth = 0.02f;
+        circleRenderer.startColor = ReconstructionInfo.CIRCLE_2D_COLOR;
+        circleRenderer.endColor = ReconstructionInfo.CIRCLE_2D_COLOR;
+        circleRenderer.startWidth = ReconstructionInfo.CIRCLE_2D_WIDTH; 
+        circleRenderer.endWidth = ReconstructionInfo.CIRCLE_2D_WIDTH;
 
         for (int step = 0; step <= steps; step++)
         {
