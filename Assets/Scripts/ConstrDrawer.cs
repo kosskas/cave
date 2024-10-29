@@ -75,7 +75,7 @@ public class ConstrDrawer : MonoBehaviour
 
 
         Vector3 normal = wall.GetNormal().normalized;
-        Vector3 right = Vector3.Cross(wall.gameObject.transform.right, normal).normalized;
+        Vector3 right = Vector3.Cross(wall.gameObject.transform.up, normal).normalized;
         Vector3 up = Vector3.Cross(normal, right).normalized;
 
         GameObject circle = new GameObject($"Circle {fixedpos1}{fixedpos2}");
