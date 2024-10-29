@@ -181,7 +181,7 @@ public class Mode2Dto3D : IMode
 
         if (Input.GetKeyDown("9"))
         {
-            _pp.AddCircle();
+            _pp.HandleAddingCircle();
         }
     }
 

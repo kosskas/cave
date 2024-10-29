@@ -70,6 +70,7 @@ public class PointPlacer : MonoBehaviour {
                     break;
 
                 case Context.AddEdge:
+                case Context.AddCircle:
                 case Context.RemoveEdge:
                     if (_ctx != value) {
                         foreach (var labels in _edge_Labels.Values) { _DisableLabelPicker(labels); }
@@ -298,6 +299,15 @@ public class PointPlacer : MonoBehaviour {
         return new EdgeINFO(edgeObj, edge, point_1, point_2);
     }
 
+    private EdgeINFO _AddCircle()
+    {
+        GameObject[] clickedPoints = _edge_Labels.Keys.ToArray();
+
+        _cd.CreateHelpingCircle(clickedPoints[0].transform.position, clickedPoints[1].transform.position, _edge_Wall);
+
+        return EdgeINFO.Empty;
+    }
+
     private EdgeINFO _RemoveEdge()
     {
         GameObject[] clickedPoints = _edge_Labels.Keys.ToArray();
@@ -415,7 +425,6 @@ public class PointPlacer : MonoBehaviour {
         switch (Ctx)
         {
             case Context.AddPoint:
-            case Context.AddCircle:
                 _cursorRenderer.material.color = (hit.collider.tag == "GridPoint") ? ReconstructionInfo._CURSOR_COLOR_FOCUSED : ReconstructionInfo._CURSOR_COLOR;
                 _cursorLabel.SetEnable((hit.collider.tag == "GridPoint") ? true : false);
                 break;
@@ -426,42 +435,6 @@ public class PointPlacer : MonoBehaviour {
                 break;
         }
 	}
-
-
-    private GameObject circle_p1 = null;
-    private GameObject circle_p2 = null;
-    private WallInfo circle_wall = null;
-    public void AddCircle()
-    {
-        if (Ctx != Context.AddCircle)
-        {
-            circle_p1 = null;
-            circle_p2 = null;
-            circle_wall = null;
-            Ctx = Context.AddCircle;
-        }
-        else
-        {
-            if (_IsGridPoint())
-            {
-                Debug.Log("FOO");
-                if (circle_p1 == null)
-                {
-                    circle_p1 = _cursorHit.collider.gameObject;
-                    circle_wall = _EstimateWall(_cursorHit.normal, circle_p1.transform.position);
-                }
-                else if (circle_p2 == null)
-                {
-                    circle_p2 = _cursorHit.collider.gameObject;
-                }
-                else
-                {
-                    _cd.CreateHelpingCircle(circle_p1.transform.position, circle_p2.transform.position, circle_wall);
-                    Ctx = Context.Idle;
-                }
-            }
-        }
-    }
 
     public void NextLabel()
     {
@@ -484,6 +457,7 @@ public class PointPlacer : MonoBehaviour {
                 break;
 
             case Context.AddEdge:
+            case Context.AddCircle:
             case Context.RemoveEdge:
             {
                 var labels = _edge_Labels[_Edge_CurrentlyFocusedGridPoint];
@@ -520,6 +494,7 @@ public class PointPlacer : MonoBehaviour {
                 break;
             
             case Context.AddEdge:
+            case Context.AddCircle:
             case Context.RemoveEdge:
             {
                 var labels = _edge_Labels[_Edge_CurrentlyFocusedGridPoint];
@@ -702,6 +677,11 @@ public class PointPlacer : MonoBehaviour {
     public EdgeINFO HandleAddingEdge()
     {
         return _HandleActingOnEdge(_AddEdge, Context.AddEdge);
+    }
+
+    public EdgeINFO HandleAddingCircle()
+    {
+        return _HandleActingOnEdge(_AddCircle, Context.AddCircle);
     }
 
     public EdgeINFO HandleRemovingEdge()
