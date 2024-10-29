@@ -23,6 +23,8 @@ namespace Assets.Scripts.Experimental.Items
 
         private Vector3 _to;
 
+        public bool ColliderEnabled { get; set; } = true;
+
         private LineRenderer _lineRenderer;
 
         private BoxCollider _boxCollider;
@@ -57,6 +59,7 @@ namespace Assets.Scripts.Experimental.Items
             gameObject.transform.rotation = newRotation;
             _boxCollider.size = newColliderSize;
             _boxCollider.center = newColliderCenter;
+            _boxCollider.enabled = ColliderEnabled;
         }
 
         public void Draw(params Vector3[] positions)
