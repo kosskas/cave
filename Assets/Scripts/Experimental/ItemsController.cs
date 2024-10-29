@@ -61,7 +61,7 @@ public class ItemsController
         labelComponent.LowerIndex = $"{planeA.number}{planeB.number}";
     }
 
-    public Action<WallInfo, Vector3> AddLine(WallInfo plane, Vector3 from)
+    public Action<WallInfo, Vector3, bool> AddLine(WallInfo plane, Vector3 from)
     {
         Vector3 normal = plane.GetNormal();
 
@@ -71,13 +71,14 @@ public class ItemsController
         line.transform.SetParent(_lineRepo.transform);
 
         var lineComponent = line.AddComponent<Line>();
+        lineComponent.ColliderEnabled = false;
         lineComponent.Draw(from + offsetVector, from + offsetVector);
 
         var labelComponent = line.AddComponent<IndexedLabel>();
         labelComponent.UpperIndex = new string('\'', plane.number);
         labelComponent.FontSize = 0.6f;
 
-        return (toPlane, to) =>
+        return (toPlane, to, isEnd) =>
         {
             if (toPlane != plane)
             {
@@ -85,6 +86,11 @@ public class ItemsController
             }
 
             lineComponent.Draw(default(Vector3), to + offsetVector);
+
+            if (isEnd)
+            {
+                lineComponent.ColliderEnabled = true;
+            }
         };
     }
 
@@ -123,5 +129,26 @@ public class ItemsController
         var labelComponent = point.AddComponent<IndexedLabel>();
         labelComponent.UpperIndex = new string('\'', plane.number);
         labelComponent.FontSize = 0.6f;
+    }
+
+    public Action<Vector3, bool> AddCircle(Vector3 fromPoint)
+    {
+        var circle = new GameObject("CIRCLE");
+        circle.transform.SetParent(_lineRepo.transform);
+
+
+        var circleComponent = circle.AddComponent<Circle>();
+        circleComponent.ColliderEnabled = false;
+        circleComponent.Draw(fromPoint, fromPoint);
+
+        return (toPoint, isEnd) =>
+        {
+            circleComponent.Draw(default(Vector3), toPoint);
+
+            if (isEnd)
+            {
+                circleComponent.ColliderEnabled = true;
+            }
+        };
     }
 }

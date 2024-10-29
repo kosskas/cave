@@ -18,13 +18,15 @@ public class ModeExperimental : IMode
         Idle,
         Point,
         LineBetweenPoints,
-        Line
+        Line,
+        Circle
     }
 
     private Ctx _ctx = Ctx.Idle;
 
-    private Action<WallInfo, Vector3> _drawLineAction;
+    private Action<WallInfo, Vector3, bool> _drawLineAction;
     private Action<Vector3, bool> _drawLineBetweenPointsAction;
+    private Action<Vector3, bool> _drawCircleAction;
 
     private IRaycastable _hitObject;
 
@@ -63,6 +65,26 @@ public class ModeExperimental : IMode
             }
                 break;
 
+            case Ctx.Circle:
+            {
+                var hitPoint = _hitObject as Assets.Scripts.Experimental.Items.Point;
+                if (hitPoint != null)
+                {
+                    if (_drawCircleAction == null)
+                    {
+                        Vector3 from = hitPoint.Position;
+                        _drawCircleAction = _items.AddCircle(from);
+                    }
+                    else
+                    {
+                        Vector3 to = hitPoint.Position;
+                        _drawCircleAction(to, true);
+                        _drawCircleAction = null;
+                    }
+                }
+            }
+                break;
+
             case Ctx.Line:
             {
                 WallInfo hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
@@ -76,7 +98,7 @@ public class ModeExperimental : IMode
                     else
                     {
                         Vector3 to = PCref.Hit.point;
-                        _drawLineAction(hitWall, to);
+                        _drawLineAction(hitWall, to, true);
                         _drawLineAction = null;
                     }
                 }
@@ -102,7 +124,8 @@ public class ModeExperimental : IMode
         }
 
         _drawLineBetweenPointsAction?.Invoke(hitPoint, false);
-        _drawLineAction?.Invoke(hitWall, hitPoint);
+        _drawCircleAction?.Invoke(hitPoint, false);
+        _drawLineAction?.Invoke(hitWall, hitPoint, false);
     }
 
     public ModeExperimental(PlayerController pc)
@@ -165,8 +188,16 @@ public class ModeExperimental : IMode
             // Debug.Log("MODE POINT");
         }
 
-
         if (Input.GetKeyDown("5"))
+        {
+            _ctx = Ctx.Circle;
+            // _ctx = "POINT";
+            // _drawAction = null;
+            // Debug.Log("MODE POINT");
+        }
+
+
+        if (Input.GetKeyDown("7"))
         {
             _MakeActionOnWall();
         }
