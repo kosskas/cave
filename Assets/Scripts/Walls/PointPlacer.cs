@@ -53,7 +53,8 @@ public class PointPlacer : MonoBehaviour {
         RemovePoint,
         AddEdge,
         RemoveEdge,
-        AddCircle
+        AddCircle,
+        AddLine
     }
     private Context _ctx = Context.Idle;
     public Context Ctx {
@@ -71,6 +72,7 @@ public class PointPlacer : MonoBehaviour {
 
                 case Context.AddEdge:
                 case Context.AddCircle:
+                case Context.AddLine:
                 case Context.RemoveEdge:
                     if (_ctx != value) {
                         foreach (var labels in _edge_Labels.Values) { _DisableLabelPicker(labels); }
@@ -308,6 +310,15 @@ public class PointPlacer : MonoBehaviour {
         return EdgeINFO.Empty;
     }
 
+    private EdgeINFO _AddLine()
+    {
+        GameObject[] clickedPoints = _edge_Labels.Keys.ToArray();
+
+        _cd.CreateHelpingLine(clickedPoints[0].transform.position, clickedPoints[1].transform.position, _edge_Wall);
+
+        return EdgeINFO.Empty;
+    }
+
     private EdgeINFO _RemoveEdge()
     {
         GameObject[] clickedPoints = _edge_Labels.Keys.ToArray();
@@ -458,6 +469,7 @@ public class PointPlacer : MonoBehaviour {
 
             case Context.AddEdge:
             case Context.AddCircle:
+            case Context.AddLine:
             case Context.RemoveEdge:
             {
                 var labels = _edge_Labels[_Edge_CurrentlyFocusedGridPoint];
@@ -495,6 +507,7 @@ public class PointPlacer : MonoBehaviour {
             
             case Context.AddEdge:
             case Context.AddCircle:
+            case Context.AddLine:
             case Context.RemoveEdge:
             {
                 var labels = _edge_Labels[_Edge_CurrentlyFocusedGridPoint];
@@ -687,5 +700,10 @@ public class PointPlacer : MonoBehaviour {
     public EdgeINFO HandleRemovingEdge()
     {
         return _HandleActingOnEdge(_RemoveEdge, Context.RemoveEdge);
+    }
+
+    public EdgeINFO HandleAddingLine()
+    {
+        return _HandleActingOnEdge(_AddLine, Context.AddLine);
     }
 }

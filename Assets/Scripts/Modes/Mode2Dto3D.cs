@@ -183,6 +183,11 @@ public class Mode2Dto3D : IMode
         {
             _pp.HandleAddingCircle();
         }
+
+        if (Input.GetKeyDown("0"))
+        {
+            _pp.HandleAddingLine();
+        }
     }
 
 }
