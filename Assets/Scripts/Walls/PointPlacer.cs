@@ -42,6 +42,7 @@ public class PointPlacer : MonoBehaviour {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - UTILS
     private WallController _wc;
     private MeshBuilder _mc;
+    private ConstrDrawer _cd;
     private GameObject _workspace;
     private GameObject _pointRepo;
     private GameObject _edgeRepo;
@@ -51,7 +52,8 @@ public class PointPlacer : MonoBehaviour {
         AddPoint,
         RemovePoint,
         AddEdge,
-        RemoveEdge
+        RemoveEdge,
+        AddCircle
     }
     private Context _ctx = Context.Idle;
     public Context Ctx {
@@ -91,6 +93,8 @@ public class PointPlacer : MonoBehaviour {
         GameObject wallsObject = GameObject.Find("Walls");
         _wc = wallsObject.GetComponent<WallController>();
         _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
+
+        _cd = wallsObject.AddComponent<ConstrDrawer>();
 
         _workspace = GameObject.Find("Workspace") ?? new GameObject("Workspace");
 
@@ -411,6 +415,7 @@ public class PointPlacer : MonoBehaviour {
         switch (Ctx)
         {
             case Context.AddPoint:
+            case Context.AddCircle:
                 _cursorRenderer.material.color = (hit.collider.tag == "GridPoint") ? ReconstructionInfo._CURSOR_COLOR_FOCUSED : ReconstructionInfo._CURSOR_COLOR;
                 _cursorLabel.SetEnable((hit.collider.tag == "GridPoint") ? true : false);
                 break;
@@ -421,6 +426,42 @@ public class PointPlacer : MonoBehaviour {
                 break;
         }
 	}
+
+
+    private GameObject circle_p1 = null;
+    private GameObject circle_p2 = null;
+    private WallInfo circle_wall = null;
+    public void AddCircle()
+    {
+        if (Ctx != Context.AddCircle)
+        {
+            circle_p1 = null;
+            circle_p2 = null;
+            circle_wall = null;
+            Ctx = Context.AddCircle;
+        }
+        else
+        {
+            if (_IsGridPoint())
+            {
+                Debug.Log("FOO");
+                if (circle_p1 == null)
+                {
+                    circle_p1 = _cursorHit.collider.gameObject;
+                    circle_wall = _EstimateWall(_cursorHit.normal, circle_p1.transform.position);
+                }
+                else if (circle_p2 == null)
+                {
+                    circle_p2 = _cursorHit.collider.gameObject;
+                }
+                else
+                {
+                    _cd.CreateHelpingCircle(circle_p1.transform.position, circle_p2.transform.position, circle_wall);
+                    Ctx = Context.Idle;
+                }
+            }
+        }
+    }
 
     public void NextLabel()
     {
