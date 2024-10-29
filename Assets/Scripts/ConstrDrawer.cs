@@ -39,7 +39,7 @@ public class ConstrDrawer : MonoBehaviour
 
     public void CreateHelpingLine(Vector3 pos1, Vector3 pos2, WallInfo wall)
     {
-        const float antiztrackhit = 0.0001f;
+        const float antiztrackhit = 0.002f;
         const float lineLen = 10f;
         Vector3 fixedpos1 = pos1 + antiztrackhit * wall.GetNormal();
         Vector3 fixedpos2 = pos2 + antiztrackhit * wall.GetNormal();
@@ -51,6 +51,7 @@ public class ConstrDrawer : MonoBehaviour
         lineRenderer.positionCount = 2;
 
         lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
+        lineRenderer.material.color = ReconstructionInfo.LINE_2D_COLOR;
         lineRenderer.startColor = ReconstructionInfo.LINE_2D_COLOR;
         lineRenderer.endColor = ReconstructionInfo.LINE_2D_COLOR;
         lineRenderer.startWidth = ReconstructionInfo.LINE_2D_WIDTH;
@@ -66,7 +67,7 @@ public class ConstrDrawer : MonoBehaviour
     }
     public void CreateHelpingCircle(Vector3 pos1, Vector3 pos2, WallInfo wall)
     {
-        const float antiztrackhit = 0.0001f;
+        const float antiztrackhit = 0.002f;
         Vector3 fixedpos1 = pos1 + antiztrackhit * wall.GetNormal();
         Vector3 fixedpos2 = pos2 + antiztrackhit * wall.GetNormal();
         const int steps = 100;
@@ -86,6 +87,7 @@ public class ConstrDrawer : MonoBehaviour
         circleRenderer.loop = true;
 
         circleRenderer.material = new Material(Shader.Find("Unlit/Color"));
+        circleRenderer.material.color = ReconstructionInfo.CIRCLE_2D_COLOR;
         circleRenderer.startColor = ReconstructionInfo.CIRCLE_2D_COLOR;
         circleRenderer.endColor = ReconstructionInfo.CIRCLE_2D_COLOR;
         circleRenderer.startWidth = ReconstructionInfo.CIRCLE_2D_WIDTH; 
