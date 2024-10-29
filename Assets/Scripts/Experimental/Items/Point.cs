@@ -20,7 +20,7 @@ namespace Assets.Scripts.Experimental.Items
         private int _labelIdx = 0;
 
 
-        private Vector3 _pos;
+        public Vector3 Position { get; private set; }
 
         private GameObject _pointObject;
 
@@ -52,13 +52,13 @@ namespace Assets.Scripts.Experimental.Items
 
         void Update()
         {
-            gameObject.transform.position = _pos;
+            gameObject.transform.position = Position;
         }
 
 
         public void Draw(params Vector3[] positions)
         {
-            _pos = (positions.ElementAtOrDefault(0) == default(Vector3)) ? _pos : positions[0];
+            Position = (positions.ElementAtOrDefault(0) == default(Vector3)) ? Position : positions[0];
         }
 
         public void Erase()
