@@ -72,7 +72,7 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverEnter()
         {
-            _lineRenderer.material.color = Color.red;
+            _lineRenderer.material.color = ColorFocused;
         }
 
         public void OnHoverExit()
