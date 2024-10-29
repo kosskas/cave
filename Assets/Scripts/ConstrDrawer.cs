@@ -11,8 +11,12 @@ public class ConstrDrawer : MonoBehaviour
 	GameObject constrDrawingsDir = null;
 
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start()
+    {
+        Init();
+    }
+    public void Init()
     {
         constrDrawingsDir = new GameObject("constrDrawingsDir");
         constrDrawingsDir.transform.SetParent(gameObject.transform);
@@ -24,22 +28,45 @@ public class ConstrDrawer : MonoBehaviour
         {
             WallController wc = (WallController)FindObjectOfType(typeof(WallController));
             CreateHelpingCircle(new Vector3(1.6f, 1.0f, 0.2f), new Vector3(1.6f, 1.0f, -0.4f), wc.GetWallByName("Wall4"));
+            CreateHelpingLine(new Vector3(1.6f, 1.0f, 0.2f), new Vector3(1.6f, 1.0f, -0.4f), wc.GetWallByName("Wall4"));
         }
     }
 
     public void Clear()
     {
-
+        Destroy(constrDrawingsDir);
     }
 
     public void CreateHelpingLine(Vector3 pos1, Vector3 pos2, WallInfo wall)
     {
+        const float antiztrackhit = 0.0001f;
+        const float lineLen = 10f;
+        Vector3 fixedpos1 = pos1 + antiztrackhit * wall.GetNormal();
+        Vector3 fixedpos2 = pos2 + antiztrackhit * wall.GetNormal();
 
+        GameObject hline = new GameObject($"Line {fixedpos1}{fixedpos2}");
+        LineRenderer lineRenderer = hline.AddComponent<LineRenderer>();
+
+        hline.transform.SetParent(constrDrawingsDir.transform);
+        lineRenderer.positionCount = 2;
+
+        lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
+        lineRenderer.startColor = Color.white;
+        lineRenderer.endColor = Color.white;
+        lineRenderer.startWidth = 0.02f;
+        lineRenderer.endWidth = 0.02f;
+
+        Vector3 direction = (fixedpos2 - fixedpos1).normalized;
+
+        Vector3 start = fixedpos1 - direction * lineLen;
+        Vector3 end = fixedpos2 + direction * lineLen;
+
+        lineRenderer.SetPosition(0, start);
+        lineRenderer.SetPosition(1, end);
     }
     public void CreateHelpingCircle(Vector3 pos1, Vector3 pos2, WallInfo wall)
     {
         const float antiztrackhit = 0.0001f;
-
         Vector3 fixedpos1 = pos1 + antiztrackhit * wall.GetNormal();
         Vector3 fixedpos2 = pos2 + antiztrackhit * wall.GetNormal();
         const int steps = 100;
@@ -57,7 +84,6 @@ public class ConstrDrawer : MonoBehaviour
         circle.transform.SetParent(constrDrawingsDir.transform);
         circleRenderer.positionCount = steps + 1;
         circleRenderer.loop = true;
-        circleRenderer.useWorldSpace = true;
 
         circleRenderer.material = new Material(Shader.Find("Unlit/Color"));
         circleRenderer.startColor = Color.white;
