@@ -206,6 +206,7 @@ namespace Assets.Scripts.Experimental
                     Vector3 offsetVector = toPlane.GetNormal() * _OFFSET_FROM_WALL;
                     var projectionPoint = toPos + offsetToFromPosProjection;
 
+                    projectionComponent1.Draw(default(WallInfo), default(Vector3), fromPosProjection);
                     projectionComponent2.Draw(toPlane, fromPosProjection, projectionPoint + offsetVector);
 
                     if (isEnd)
