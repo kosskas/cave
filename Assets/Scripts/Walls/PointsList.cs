@@ -25,8 +25,8 @@ public class PointsList : MonoBehaviour {
 	void Update () {
 		if (infoList.Count != lastInfoListLength) {
 			lastInfoListLength = infoList.Count;
-			Debug.Log($"<color=yellow> -- POINTS LIST ({lastInfoListLength}) -- </color>");
-			infoList.ForEach(entry => Debug.Log($"<color=yellow> {entry.ToString()} </color>"));
+			//Debug.Log($"<color=yellow> -- POINTS LIST ({lastInfoListLength}) -- </color>");
+			//infoList.ForEach(entry => Debug.Log($"<color=yellow> {entry.ToString()} </color>"));
 
 			UpdatePointsList();
 		}

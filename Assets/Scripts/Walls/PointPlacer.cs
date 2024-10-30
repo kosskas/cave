@@ -236,7 +236,29 @@ public class PointPlacer : MonoBehaviour {
 
         _LocateLabels(pointClicked, wall);
 
-        return new PointINFO(pointClicked, wall, labelText, fullLabelText);
+        PointINFO pointINFO = new PointINFO(pointClicked, wall, labelText, fullLabelText);
+        State.Points.Add(pointINFO);
+        return pointINFO;
+    }
+
+    public void AddPoint(PointINFO pointINFO)
+    {   
+        GameObject labelObj = new GameObject(pointINFO.Label);
+        labelObj.transform.parent = pointINFO.GridPoint.transform;
+
+        Point point = labelObj.AddComponent<Point>();
+        point.SetCoordinates(pointINFO.GridPoint.transform.position);
+        point.SetStyle(ReconstructionInfo.POINT_COLOR, ReconstructionInfo.POINT_SIZE);
+        point.SetEnable(true);
+        point.SetLabel(pointINFO.FullLabel, ReconstructionInfo.LABEL_SIZE_PLACED, ReconstructionInfo.LABEL_COLOR_PLACED);
+        
+        ///linia rzutująca
+        LineSegment lineseg = labelObj.AddComponent<LineSegment>();
+        lineseg.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+
+        _mc.AddPointProjection(pointINFO.WallInfo, pointINFO.Label, labelObj);
+
+        _LocateLabels(pointINFO.GridPoint, pointINFO.WallInfo);
     }
 
     private Label _FindPickedLabel(List<Label> labels)
@@ -262,7 +284,9 @@ public class PointPlacer : MonoBehaviour {
 
         _LocateLabels(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall);
 
-        return new PointINFO(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall, labelText, fullLabelText);
+        PointINFO pointINFO = new PointINFO(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall, labelText, fullLabelText);
+        State.Points.Remove(pointINFO);
+        return pointINFO;
     }
 
     private EdgeINFO _AddEdge()
@@ -291,6 +315,25 @@ public class PointPlacer : MonoBehaviour {
         );
 
         _mc.AddEdgeProjection(labelText_1, labelText_2);
+
+        EdgeINFO edgeINFO = new EdgeINFO(edgeObj, edge, point_1, point_2);
+        State.Edges.Add(edgeINFO);
+        return edgeINFO;
+    }
+
+    public EdgeINFO AddEdge(PointINFO point_1, PointINFO point_2)
+    {
+        GameObject edgeObj = new GameObject($"{point_1.FullLabel}-{point_2.FullLabel}");
+        edgeObj.transform.SetParent(_edgeRepo.transform);
+        LineSegment edge = edgeObj.AddComponent<LineSegment>();
+        edge.SetStyle(ReconstructionInfo.EDGE_COLOR, ReconstructionInfo.EDGE_LINE_WIDTH);
+        edge.SetCoordinates(
+            point_1.GridPoint.transform.position,
+            point_2.GridPoint.transform.position
+        );
+
+        _mc.AddEdgeProjection(point_1.Label, point_2.Label);
+
         return new EdgeINFO(edgeObj, edge, point_1, point_2);
     }
 
@@ -320,7 +363,9 @@ public class PointPlacer : MonoBehaviour {
         _mc.RemoveEdgeProjection(labelText_1, labelText_2);
         Destroy(edgeObj);
         
-        return new EdgeINFO(edgeObj, edge, point_1, point_2);
+        EdgeINFO edgeINFO = new EdgeINFO(edgeObj, edge, point_1, point_2);
+        State.Edges.Remove(edgeINFO);
+        return edgeINFO;
     }
 
     private EdgeINFO _RemoveEdge(GameObject edgeObj)
@@ -333,7 +378,11 @@ public class PointPlacer : MonoBehaviour {
         _mc.RemoveEdgeProjection(labelText_1, labelText_2);
         Destroy(edgeObj);
 
-        return EdgeINFO.Empty;
+        EdgeINFO edgeINFO = State.Edges.First(e => 
+            e.P1.FullLabel.Equals(fullLabelTexts[0]) && e.P2.FullLabel.Equals(fullLabelTexts[1])
+        );
+        State.Edges.Remove(edgeINFO);
+        return edgeINFO;
     }
 
     private List<EdgeINFO> _RemoveEdgesWithPointCascade(string pointLabel)
@@ -506,12 +555,16 @@ public class PointPlacer : MonoBehaviour {
             return;
         }
 
+        List<EdgeINFO> removedEdges = _RemoveEdgesWithPointCascade(pi.FullLabel);
+
         _mc.RemovePointProjection(pi.WallInfo, pi.Label);
 
         GameObject labelObj = labelObjTrans.transform.gameObject;
         Destroy(labelObj);
 
         _LocateLabels(pi.GridPoint, pi.WallInfo);
+
+        State.Points.Remove(pi);
     }
 
 

@@ -16,7 +16,7 @@ public class GridCreator : MonoBehaviour {
 		private const string pathToConfigFile = "./Config/coordinate_grid.txt";
 	#endif
 
-    private new Dictionary<string, dynamic> config = new Dictionary<string, dynamic>
+    private Dictionary<string, dynamic> config = new Dictionary<string, dynamic>
     {
         { "wall_width", 0.1f },
         { "wall_length", 3.4f },
@@ -49,6 +49,8 @@ public class GridCreator : MonoBehaviour {
         float lineWidth = config["line_width"];
         int scale = config["number_of_units_per_interval"];
 
+        // left grid
+
         const int leftWallIdx = 1;
         Vector3 leftGridRotation = new Vector3(0f, -90f, 0f);
         Vector3 leftGridPosition = 
@@ -56,7 +58,7 @@ public class GridCreator : MonoBehaviour {
             + _GetOffsetFromWall(walls[leftWallIdx], config["distance_from_the_wall"])
             + new Vector3(0f, -height/2f, -length/2f);
 
-        Grid leftGrid = new Grid(
+        GridINFO leftGridINFO = new GridINFO(
             height,
             length,
             rowsNumber,
@@ -65,10 +67,18 @@ public class GridCreator : MonoBehaviour {
             "X",
             lineWidth,
             scale,
-            _gridRepo,
             leftGridPosition,
             leftGridRotation
         );
+
+        Grid leftGrid = new Grid(
+            leftGridINFO,
+            _gridRepo
+        );
+
+        State.Grids.Add(leftGridINFO);
+
+        // right grid
 
         const int rightWallIdx = 0;
         Vector3 rightGridRotation = new Vector3(0f, 180f, 0f);
@@ -77,8 +87,8 @@ public class GridCreator : MonoBehaviour {
             + _GetOffsetFromWall(walls[rightWallIdx], config["distance_from_the_wall"])
             + new Vector3(length/2f, -height/2f, 0f);
 
-        Grid rightGrid = new Grid(
-            height,
+        GridINFO rightGridINFO = new GridINFO(
+             height,
             length,
             rowsNumber,
             colsNumber,
@@ -86,10 +96,18 @@ public class GridCreator : MonoBehaviour {
             "Z",
             lineWidth,
             scale,
-            _gridRepo,
             rightGridPosition,
             rightGridRotation
         );
+
+        Grid rightGrid = new Grid(
+            rightGridINFO,
+            _gridRepo
+        );
+
+        State.Grids.Add(rightGridINFO);
+
+        // bottom grid
 
         const int bottomWallIdx = 2;
         Vector3 bottomGridRotation = new Vector3(90f, -90f, 0f);
@@ -98,7 +116,7 @@ public class GridCreator : MonoBehaviour {
             + _GetOffsetFromWall(walls[bottomWallIdx], config["distance_from_the_wall"])
             + new Vector3(length/2f, 0f, -height/2f);  
 
-        Grid bottomGrid = new Grid(
+        GridINFO bottomGridINFO = new GridINFO(
             height,
             length,
             rowsNumber,
@@ -107,10 +125,16 @@ public class GridCreator : MonoBehaviour {
             "X",
             lineWidth,
             scale,
-            _gridRepo,
             bottomGridPosition,
             bottomGridRotation
         );
+
+        Grid bottomGrid = new Grid(
+            bottomGridINFO,
+            _gridRepo
+        );
+
+        State.Grids.Add(bottomGridINFO);
     }
 
     private Vector3 _GetOffsetFromWall(WallInfo wall, float distanceFromWallEdge)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public struct EdgeINFO
 {
     public PointINFO P1 { get; }
