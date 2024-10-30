@@ -12,7 +12,7 @@ namespace Assets.Scripts.Experimental.Items
     {
         private static readonly Color ColorNormal = Color.black;
 
-        private static readonly float Width = 0.001f;
+        private static readonly float Width = 0.002f;
 
         private static readonly int PositionsCount = 100;
 
@@ -23,6 +23,8 @@ namespace Assets.Scripts.Experimental.Items
         private Vector3 _radiusEnd;
 
         public bool ColliderEnabled { get; set; } = true;
+
+        public WallInfo Plane { get; private set; }
 
         private LineRenderer _circleRenderer;
 
@@ -52,27 +54,26 @@ namespace Assets.Scripts.Experimental.Items
                 float x = Mathf.Cos(radian) * _radius;
                 float y = Mathf.Sin(radian) * _radius;
 
-                Vector3 currPos = _center + gameObject.transform.right * x + gameObject.transform.up * y;
+                Vector3 currPos = _center + gameObject.transform.forward * x + gameObject.transform.up * y;
                 _circleRenderer.SetPosition(step, currPos);
             }
 
             Vector3 newPosition = _center;
-            Quaternion newRotation = Quaternion.LookRotation((_radiusEnd - _center).normalized, Vector3.up) * Quaternion.Euler(0, -90, 0);
 
             gameObject.transform.position = newPosition;
-            gameObject.transform.rotation = newRotation;
         }
 
-        public void Draw(params Vector3[] positions)
+        public void Draw(WallInfo plane, params Vector3[] positions)
         {
+            if (plane != default(WallInfo))
+            {
+                Plane = plane;
+                gameObject.transform.rotation = plane.gameObject.transform.rotation;
+            }
+
             _center = (positions.ElementAtOrDefault(0) == default(Vector3)) ? _center : positions[0];
             _radiusEnd = (positions.ElementAtOrDefault(1) == default(Vector3)) ? _radiusEnd : positions[1];
             _radius = Vector3.Distance(_radiusEnd, _center);
-        }
-
-        public void Erase()
-        {
-            throw new NotImplementedException();
         }
 
         public void OnHoverAction(Action<GameObject> action)

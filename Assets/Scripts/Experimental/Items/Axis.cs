@@ -16,9 +16,9 @@ namespace Assets.Scripts.Experimental.Items
         private const float _WIDTH = 0.01f;
 
 
-        private Vector3 _from;
+        public Vector3 From { get; private set; }
 
-        private Vector3 _to;
+        public Vector3 To { get; private set; }
 
         private LineRenderer _lineRenderer;
         
@@ -38,25 +38,20 @@ namespace Assets.Scripts.Experimental.Items
 
         void Update()
         {
-            _lineRenderer.SetPositions(new[] { _from, _to });
+            _lineRenderer.SetPositions(new[] { From, To });
 
-            Vector3 newPosition = _from;
-            Quaternion newRotation = Quaternion.LookRotation((_to - _from).normalized, Vector3.up) * Quaternion.Euler(0, -90, 0);
+            Vector3 newPosition = From;
+            Quaternion newRotation = Quaternion.LookRotation((To - From).normalized, Vector3.up) * Quaternion.Euler(0, -90, 0);
 
             gameObject.transform.position = newPosition;
             gameObject.transform.rotation = newRotation;
         }
 
 
-        public void Draw(params Vector3[] positions)
+        public void Draw(WallInfo plane, params Vector3[] positions)
         {
-            _from = positions[0];
-            _to = positions[1];
-        }
-
-        public void Erase()
-        {
-            throw new NotImplementedException();
+            From = positions[0];
+            To = positions[1];
         }
     }
 }

@@ -19,14 +19,14 @@ namespace Assets.Scripts.Experimental.Items
         private static readonly char[] Labels = " ABCDEFGHIJKLMNOPRQSTUVWXYZ".ToCharArray();
         private int _labelIdx = 0;
 
-
         public Vector3 Position { get; private set; }
+
+        public WallInfo Plane { get; private set; }
 
         private GameObject _pointObject;
 
         private Renderer _pointRenderer;
 
-        private SphereCollider _sphereCollider;
         private BoxCollider _boxCollider;
 
         void Start()
@@ -55,15 +55,15 @@ namespace Assets.Scripts.Experimental.Items
             gameObject.transform.position = Position;
         }
 
-
-        public void Draw(params Vector3[] positions)
+        public void Draw(WallInfo plane, params Vector3[] positions)
         {
+            if (plane != default(WallInfo))
+            {
+                Plane = plane;
+                gameObject.transform.rotation = plane.gameObject.transform.rotation;
+            }
+
             Position = (positions.ElementAtOrDefault(0) == default(Vector3)) ? Position : positions[0];
-        }
-
-        public void Erase()
-        {
-            throw new NotImplementedException();
         }
 
         public void OnHoverAction(Action<GameObject> action)

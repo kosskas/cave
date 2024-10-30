@@ -25,6 +25,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public bool ColliderEnabled { get; set; } = true;
 
+        public WallInfo Plane { get; private set; }
+
         private LineRenderer _lineRenderer;
 
         private BoxCollider _boxCollider;
@@ -51,7 +53,7 @@ namespace Assets.Scripts.Experimental.Items
             _lineRenderer.SetPositions(new[] { _from, _to });
 
             Vector3 newPosition = _from;
-            Quaternion newRotation = Quaternion.LookRotation((_to - _from).normalized, Vector3.up) * Quaternion.Euler(0, -90, 0);
+            Quaternion newRotation = Quaternion.LookRotation((_to - _from).normalized, gameObject.transform.up) * Quaternion.Euler(0, -90, 0);
             Vector3 newColliderSize = new Vector3(Vector3.Distance(_from, _to), Width * 3, Width * 3);
             Vector3 newColliderCenter = new Vector3(Vector3.Distance(_from, _to) * 0.5f, 0, 0);
 
@@ -62,15 +64,16 @@ namespace Assets.Scripts.Experimental.Items
             _boxCollider.enabled = ColliderEnabled;
         }
 
-        public void Draw(params Vector3[] positions)
+        public void Draw(WallInfo plane, params Vector3[] positions)
         {
+            if (plane != default(WallInfo))
+            {
+                Plane = plane;
+                gameObject.transform.rotation = plane.gameObject.transform.rotation;
+            }
+
             _from = (positions.ElementAtOrDefault(0) == default(Vector3)) ? _from : positions[0];
             _to = (positions.ElementAtOrDefault(1) == default(Vector3)) ? _to : positions[1];
-        }
-
-        public void Erase()
-        {
-            throw new NotImplementedException();
         }
 
         public void OnHoverEnter()

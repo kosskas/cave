@@ -5,6 +5,8 @@ using System.Linq;
 using Assets.Scripts.Experimental.Items;
 using UnityEngine;
 
+using ExPoint = Assets.Scripts.Experimental.Items.Point;
+
 public class ModeExperimental : IMode
 {
     public PlayerController PCref { get; private set; }
@@ -19,14 +21,16 @@ public class ModeExperimental : IMode
         Point,
         LineBetweenPoints,
         Line,
-        Circle
+        Circle,
+        Projection
     }
 
     private Ctx _ctx = Ctx.Idle;
 
     private Action<WallInfo, Vector3, bool> _drawLineAction;
-    private Action<Vector3, bool> _drawLineBetweenPointsAction;
-    private Action<Vector3, bool> _drawCircleAction;
+    private Action<WallInfo, Vector3, bool> _drawLineBetweenPointsAction;
+    private Action<WallInfo, Vector3, bool> _drawCircleAction;
+    private Action<WallInfo, Vector3, bool> _drawProjectionAction;
 
     private IRaycastable _hitObject;
 
@@ -47,18 +51,16 @@ public class ModeExperimental : IMode
 
             case Ctx.LineBetweenPoints:
             {
-                var hitPoint = _hitObject as Assets.Scripts.Experimental.Items.Point;
+                var hitPoint = _hitObject as ExPoint;
                 if (hitPoint != null)
                 {
                     if (_drawLineBetweenPointsAction == null)
                     {
-                        Vector3 from = hitPoint.Position;
-                        _drawLineBetweenPointsAction = _items.AddLineBetweenPoints(from);
+                        _drawLineBetweenPointsAction = _items.AddLineBetweenPoints(hitPoint.Plane, hitPoint.Position);
                     }
                     else
                     {
-                        Vector3 to = hitPoint.Position;
-                        _drawLineBetweenPointsAction(to, true);
+                        _drawLineBetweenPointsAction(hitPoint.Plane, hitPoint.Position, true);
                         _drawLineBetweenPointsAction = null;
                     }
                 }
@@ -67,18 +69,16 @@ public class ModeExperimental : IMode
 
             case Ctx.Circle:
             {
-                var hitPoint = _hitObject as Assets.Scripts.Experimental.Items.Point;
+                var hitPoint = _hitObject as ExPoint;
                 if (hitPoint != null)
                 {
                     if (_drawCircleAction == null)
                     {
-                        Vector3 from = hitPoint.Position;
-                        _drawCircleAction = _items.AddCircle(from);
+                        _drawCircleAction = _items.AddCircle(hitPoint.Plane, hitPoint.Position);
                     }
                     else
                     {
-                        Vector3 to = hitPoint.Position;
-                        _drawCircleAction(to, true);
+                        _drawCircleAction(hitPoint.Plane, hitPoint.Position, true);
                         _drawCircleAction = null;
                     }
                 }
@@ -105,6 +105,25 @@ public class ModeExperimental : IMode
             }
                 break;
 
+            case Ctx.Projection:
+            {
+                var hitPoint = _hitObject as ExPoint;
+                WallInfo hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
+
+                if (hitPoint != null && _drawProjectionAction == null)
+                {
+                    _drawProjectionAction = _items.AddProjection(hitPoint.Plane, hitPoint.Position);
+                }
+                else if (hitWall != null && _drawProjectionAction != null)
+                {
+                    _drawProjectionAction(hitWall, PCref.Hit.point, true);
+                    _drawProjectionAction = null;
+                }
+
+            }
+                break;
+
+
             default:
                 break;
         }
@@ -123,9 +142,10 @@ public class ModeExperimental : IMode
             _hitObject?.OnHoverEnter();
         }
 
-        _drawLineBetweenPointsAction?.Invoke(hitPoint, false);
-        _drawCircleAction?.Invoke(hitPoint, false);
+        _drawLineBetweenPointsAction?.Invoke(hitWall, hitPoint, false);
+        _drawCircleAction?.Invoke(hitWall, hitPoint, false);
         _drawLineAction?.Invoke(hitWall, hitPoint, false);
+        _drawProjectionAction?.Invoke(hitWall, hitPoint, false);
     }
 
     public ModeExperimental(PlayerController pc)
@@ -191,6 +211,14 @@ public class ModeExperimental : IMode
         if (Input.GetKeyDown("5"))
         {
             _ctx = Ctx.Circle;
+            // _ctx = "POINT";
+            // _drawAction = null;
+            // Debug.Log("MODE POINT");
+        }
+
+        if (Input.GetKeyDown("6"))
+        {
+            _ctx = Ctx.Projection;
             // _ctx = "POINT";
             // _drawAction = null;
             // Debug.Log("MODE POINT");

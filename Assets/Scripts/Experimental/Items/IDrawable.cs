@@ -9,8 +9,6 @@ namespace Assets.Scripts.Experimental.Items
 {
     public interface IDrawable
     {
-        void Draw(params Vector3[] positions);
-
-        void Erase();
+        void Draw(WallInfo plane, params Vector3[] positions);
     }
 }
