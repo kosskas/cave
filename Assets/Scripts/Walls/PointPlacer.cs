@@ -91,13 +91,13 @@ public class PointPlacer : MonoBehaviour {
     }
     
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - UNITY()
-    void Start()
+    public void Init(MeshBuilder mb, ConstrDrawer cd)
     {
         GameObject wallsObject = GameObject.Find("Walls");
         _wc = wallsObject.GetComponent<WallController>();
-        _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
+        _mc = mb;
 
-        _cd = wallsObject.AddComponent<ConstrDrawer>();
+        _cd = cd;
 
         _workspace = GameObject.Find("Workspace") ?? new GameObject("Workspace");
 

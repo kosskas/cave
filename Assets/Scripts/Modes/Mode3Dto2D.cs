@@ -73,8 +73,13 @@ public class Mode3Dto2D : IMode
         PCref = pc;
 
         GameObject mainObject = GameObject.Find("MainObject");
-        _si = mainObject.GetComponent<SolidImporter>();
-        
+        _si = GameObject.FindObjectOfType<SolidImporter>(); //z trybu rek. zostal juz zainicjalizowany
+        if (_si == null)
+        {
+            _si = mainObject.AddComponent<SolidImporter>();
+            _si.Init();
+        }
+
         GameObject wallsObject = GameObject.Find("Walls");
         _wc = wallsObject.GetComponent<WallController>();
         _wcrt = PCref.gameObject.GetComponent<WallCreator>();

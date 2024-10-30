@@ -6,7 +6,8 @@ public class Mode2Dto3D : IMode
     private WallController _wc;
     private PointPlacer _pp;
     private GridCreator _gc;
-
+    private ConstrDrawer _cd;
+    private MeshBuilder _mb;
     public PlayerController PCref { get; private set; }
 
     private void _AddPointProjection()
@@ -65,26 +66,34 @@ public class Mode2Dto3D : IMode
     }
 
     private void _SaveSolidAndSwitchToMode3Dto2D()
-    {   
-        MeshBuilder mb = (MeshBuilder)GameObject.FindObjectOfType<MeshBuilder>();
+    {
+        GameObject mainObject = GameObject.Find("MainObject");
         //export solid
-        string solid = SolidExporter.ExportSolid(mb.GetPoints3D(), mb.GetEdges3D());
+        string solid = SolidExporter.ExportSolid(_mb.GetPoints3D(), _mb.GetEdges3D());
         if(solid == null)
         {
             Debug.LogError("Error - save failed");
         }
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _gc.Clear();
+        GameObject.Destroy(_gc);
+
         //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
-        mb.ClearAndDisable();
+        _mb.ClearAndDisable();
+        GameObject.Destroy(_mb);
         //clear PointPlacer usuwa krawedzie 2d oraz kursor
         _pp.Clear();
+        GameObject.Destroy(_pp);
+
+        _cd.Clear();
+        GameObject.Destroy(_cd);
         //Hide point list
         PointsList.HideListAndLogs();
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
         
-        SolidImporter si = (SolidImporter)GameObject.FindObjectOfType<SolidImporter>();
+        SolidImporter si = mainObject.AddComponent<SolidImporter>();
+        si.Init();
         if(si == null)
         {
             Debug.LogError("Error - cannot find SolidImporter");
@@ -112,15 +121,19 @@ public class Mode2Dto3D : IMode
         GameObject wallsObject = GameObject.Find("Walls");
         _wc = wallsObject.GetComponent<WallController>();
 
-        
+        GameObject mainObject = GameObject.Find("MainObject");
+        _mb = mainObject.AddComponent<MeshBuilder>();
+        _mb.Init();
 
-        _gc = wallsObject.GetComponent<GridCreator>();
+        _gc = wallsObject.AddComponent<GridCreator>();
         _gc.Init();
 
-        
-        
+        _cd = wallsObject.AddComponent<ConstrDrawer>();
+        _cd.Init();
 
-        _pp = PCref.gameObject.GetComponent<PointPlacer>();
+
+        _pp = PCref.gameObject.AddComponent<PointPlacer>();
+        _pp.Init(_mb, _cd);
         _pp.CreateCursor();
         _pp.MoveCursor(PCref.Hit);
 

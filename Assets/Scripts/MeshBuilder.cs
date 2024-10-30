@@ -123,11 +123,6 @@ public class MeshBuilder : MonoBehaviour {
     bool showProjectionLines = true;
     bool showReferenceLines=true;
 
-    // Use this for initialization
-    void Start () {
-        Init();
-    }
-
 	// Update is called once per frame
 	void Update()
 	{        

@@ -223,7 +223,7 @@ public class SolidImporter : MonoBehaviour {
 
 	private int direction = 1;
 	// Use this for initialization
-	void Start ()
+	public void Init ()
 	{
 		mainObj = GameObject.Find("MainObject");
 

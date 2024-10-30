@@ -10,28 +10,11 @@ public class ConstrDrawer : MonoBehaviour
 
 	GameObject constrDrawingsDir = null;
 
-
-    // Use this for initialization
-    void Start()
-    {
-        Init();
-    }
     public void Init()
     {
         constrDrawingsDir = new GameObject("constrDrawingsDir");
         constrDrawingsDir.transform.SetParent(gameObject.transform);
     }
-
-    void Update()
-    {
-        if (Input.GetKeyDown("h"))
-        {
-            WallController wc = (WallController)FindObjectOfType(typeof(WallController));
-            CreateHelpingCircle(new Vector3(1.6f, 1.0f, 0.2f), new Vector3(1.6f, 1.0f, -0.4f), wc.GetWallByName("Wall4"));
-            CreateHelpingLine(new Vector3(1.6f, 1.0f, 0.2f), new Vector3(1.6f, 1.0f, -0.4f), wc.GetWallByName("Wall4"));
-        }
-    }
-
     public void Clear()
     {
         Destroy(constrDrawingsDir);
