@@ -30,7 +30,7 @@ namespace Assets.Scripts.Experimental.Items
         private LineRenderer _lineRenderer;
 
         private BoxCollider _boxCollider;
-
+        private MeshBuilder _mc;
 
         void Start()
         {
@@ -46,6 +46,8 @@ namespace Assets.Scripts.Experimental.Items
 
             _boxCollider = gameObject.AddComponent<BoxCollider>();
             _boxCollider.isTrigger = true;
+
+            _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
         }
 
         void Update()
@@ -64,6 +66,12 @@ namespace Assets.Scripts.Experimental.Items
             _boxCollider.size = newColliderSize;
             _boxCollider.center = newColliderCenter;
             _boxCollider.enabled = ColliderEnabled;
+        }
+
+        public void AddEdgeProjTest(string labelText_1, string labelText_2)
+        {
+            _mc.AddEdgeProjection(labelText_1, labelText_2);
+
         }
 
         public void Draw(WallInfo plane, params Vector3[] positions)

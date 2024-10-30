@@ -28,6 +28,7 @@ namespace Assets.Scripts.Experimental.Items
         private Renderer _pointRenderer;
 
         private BoxCollider _boxCollider;
+        private MeshBuilder _mc;
 
         void Start()
         {
@@ -48,6 +49,8 @@ namespace Assets.Scripts.Experimental.Items
             _boxCollider.size = new Vector3(Size, Size, Size);
             _boxCollider.center = Vector3.zero;
             _boxCollider.isTrigger = true;
+
+            _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
         }
 
         void Update()
@@ -83,24 +86,57 @@ namespace Assets.Scripts.Experimental.Items
 
         public void NextLabel()
         {
-            _labelIdx = (_labelIdx + 1 == Labels.Length) ? 0 : _labelIdx + 1;
-
             var label = gameObject.GetComponent<IndexedLabel>();
-            if (label != null)
+            if (label == null)
             {
-                label.Text = Labels[_labelIdx].ToString();
+                return;
+            }
+
+            while (true)
+            {
+                _labelIdx = (_labelIdx + 1 == Labels.Length) ? 0 : _labelIdx + 1;
+                var newText = Labels[_labelIdx].ToString();
+
+                if (!_mc.CheckIfAlreadyExist(Plane, newText))
+                {
+                    _mc.RemovePointProjection(Plane, label.Text);
+                    label.Text = newText;
+                    if (newText != " ")
+                    {
+                        _mc.AddPointProjection(Plane, newText, gameObject);
+                    }
+
+                    break;
+                }
             }
         }
 
         public void PrevLabel()
         {
-            _labelIdx = (_labelIdx == 0) ? Labels.Length - 1 : _labelIdx - 1;
-
             var label = gameObject.GetComponent<IndexedLabel>();
-            if (label != null)
+            if (label == null)
             {
-                label.Text = Labels[_labelIdx].ToString();
+                return;
+            }
+
+            while (true)
+            {
+                _labelIdx = (_labelIdx == 0) ? Labels.Length - 1 : _labelIdx - 1;
+                var newText = Labels[_labelIdx].ToString();
+
+                if (!_mc.CheckIfAlreadyExist(Plane, newText))
+                {
+                    _mc.RemovePointProjection(Plane, label.Text);
+                    label.Text = newText;
+                    if (newText != " ")
+                    {
+                        _mc.AddPointProjection(Plane, newText, gameObject);
+                    }
+
+                    break;
+                }
             }
         }
+
     }
 }

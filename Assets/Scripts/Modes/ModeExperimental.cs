@@ -28,7 +28,7 @@ public class ModeExperimental : IMode
     private Ctx _ctx = Ctx.Idle;
 
     private Action<WallInfo, Vector3, bool> _drawLineAction;
-    private Action<WallInfo, Vector3, bool> _drawLineBetweenPointsAction;
+    private Action<WallInfo, ExPoint, Vector3, bool> _drawLineBetweenPointsAction;
     private Action<WallInfo, Vector3, bool> _drawCircleAction;
     private Action<WallInfo, Vector3, bool> _drawProjectionAction;
 
@@ -56,11 +56,11 @@ public class ModeExperimental : IMode
                 {
                     if (_drawLineBetweenPointsAction == null)
                     {
-                        _drawLineBetweenPointsAction = _items.AddLineBetweenPoints(hitPoint.Plane, hitPoint.Position);
+                        _drawLineBetweenPointsAction = _items.AddLineBetweenPoints(hitPoint.Plane, hitPoint, hitPoint.Position);
                     }
                     else
                     {
-                        _drawLineBetweenPointsAction(hitPoint.Plane, hitPoint.Position, true);
+                        _drawLineBetweenPointsAction(hitPoint.Plane, hitPoint, hitPoint.Position, true);
                         _drawLineBetweenPointsAction = null;
                     }
                 }
@@ -142,7 +142,7 @@ public class ModeExperimental : IMode
             _hitObject?.OnHoverEnter();
         }
 
-        _drawLineBetweenPointsAction?.Invoke(hitWall, hitPoint, false);
+        _drawLineBetweenPointsAction?.Invoke(hitWall, default(ExPoint), hitPoint, false);
         _drawCircleAction?.Invoke(hitWall, hitPoint, false);
         _drawLineAction?.Invoke(hitWall, hitPoint, false);
         _drawProjectionAction?.Invoke(hitWall, hitPoint, false);
@@ -159,6 +159,9 @@ public class ModeExperimental : IMode
 
         _items = new ItemsController();
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
+
+        var mc = (MeshBuilder)UnityEngine.Object.FindObjectOfType(typeof(MeshBuilder));
+        mc.SetGenerateRulesReferenceLine(false);
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }

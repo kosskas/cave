@@ -132,7 +132,7 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public Action<WallInfo, Vector3, bool> AddLineBetweenPoints(WallInfo fromPlane, Vector3 fromPos)
+        public Action<WallInfo, ExPoint, Vector3, bool> AddLineBetweenPoints(WallInfo fromPlane, ExPoint fromPoint, Vector3 fromPos)
         {
             var line = new GameObject("LINE_BETWEEN_POINTS");
             line.transform.SetParent(_lineRepo.transform);
@@ -141,7 +141,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.ColliderEnabled = false;
             lineComponent.Draw(fromPlane, fromPos, fromPos);
 
-            return (toPlane, toPos, isEnd) =>
+            return (toPlane, toPoint, toPos, isEnd) =>
             {
                 if (toPlane != fromPlane)
                 {
@@ -153,6 +153,7 @@ namespace Assets.Scripts.Experimental
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
+                    //lineComponent.AddEdgeProjTest(fromPoint.GetComponent<IndexedLabel>().Text, toPoint.GetComponent<IndexedLabel>().Text);
                 }
             };
         }
