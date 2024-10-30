@@ -133,6 +133,7 @@ public class Mode2Dto3D : IMode
         _pp.CreateCursor();
         _pp.MoveCursor(PCref.Hit);
 
+
         if (PointsList.ceilingWall != null) //nie dziala, dalej sie psuje
         {
             Debug.Log("ceiling found");
