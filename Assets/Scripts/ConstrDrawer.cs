@@ -71,8 +71,8 @@ public class ConstrDrawer : MonoBehaviour
         Vector3 fixedpos1 = pos1 + antiztrackhit * wall.GetNormal();
         Vector3 fixedpos2 = pos2 + antiztrackhit * wall.GetNormal();
         const int steps = 100;
-        float radius = Vector3.Distance(fixedpos1, fixedpos2)/2f;
-        Vector3 center = (fixedpos1 + fixedpos2) / 2f; //?
+        float radius = Vector3.Distance(fixedpos1, fixedpos2);
+        Vector3 center = fixedpos1; //?
 
 
         Vector3 normal = wall.GetNormal().normalized;
