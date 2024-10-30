@@ -42,6 +42,7 @@ public class PointPlacer : MonoBehaviour {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - UTILS
     private WallController _wc;
     private MeshBuilder _mc;
+    private ConstrDrawer _cd;
     private GameObject _workspace;
     private GameObject _pointRepo;
     private GameObject _edgeRepo;
@@ -51,7 +52,9 @@ public class PointPlacer : MonoBehaviour {
         AddPoint,
         RemovePoint,
         AddEdge,
-        RemoveEdge
+        RemoveEdge,
+        AddCircle,
+        AddLine
     }
     private Context _ctx = Context.Idle;
     public Context Ctx {
@@ -68,6 +71,8 @@ public class PointPlacer : MonoBehaviour {
                     break;
 
                 case Context.AddEdge:
+                case Context.AddCircle:
+                case Context.AddLine:
                 case Context.RemoveEdge:
                     if (_ctx != value) {
                         foreach (var labels in _edge_Labels.Values) { _DisableLabelPicker(labels); }
@@ -91,6 +96,8 @@ public class PointPlacer : MonoBehaviour {
         GameObject wallsObject = GameObject.Find("Walls");
         _wc = wallsObject.GetComponent<WallController>();
         _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
+
+        _cd = wallsObject.AddComponent<ConstrDrawer>();
 
         _workspace = GameObject.Find("Workspace") ?? new GameObject("Workspace");
 
@@ -304,14 +311,14 @@ public class PointPlacer : MonoBehaviour {
 
         var point_1 = new PointINFO(clickedPoints[0], _edge_Wall, labelText_1, fullLabelText_1);
         var point_2 = new PointINFO(clickedPoints[1], _edge_Wall, labelText_2, fullLabelText_2);
-
+        const float antiztrack = 0.007f;
         GameObject edgeObj = new GameObject($"{fullLabelText_1}-{fullLabelText_2}");
         edgeObj.transform.SetParent(_edgeRepo.transform);
         LineSegment edge = edgeObj.AddComponent<LineSegment>();
         edge.SetStyle(ReconstructionInfo.EDGE_COLOR, ReconstructionInfo.EDGE_LINE_WIDTH);
         edge.SetCoordinates(
-            point_1.GridPoint.transform.position,
-            point_2.GridPoint.transform.position
+            point_1.GridPoint.transform.position + antiztrack * point_1.WallInfo.GetNormal(),
+            point_2.GridPoint.transform.position + antiztrack * point_2.WallInfo.GetNormal()
         );
 
         _mc.AddEdgeProjection(labelText_1, labelText_2);
@@ -335,6 +342,24 @@ public class PointPlacer : MonoBehaviour {
         _mc.AddEdgeProjection(point_1.Label, point_2.Label);
 
         return new EdgeINFO(edgeObj, edge, point_1, point_2);
+    }
+
+    private EdgeINFO _AddCircle()
+    {
+        GameObject[] clickedPoints = _edge_Labels.Keys.ToArray();
+
+        _cd.CreateHelpingCircle(clickedPoints[0].transform.position, clickedPoints[1].transform.position, _edge_Wall);
+
+        return EdgeINFO.Empty;
+    }
+
+    private EdgeINFO _AddLine()
+    {
+        GameObject[] clickedPoints = _edge_Labels.Keys.ToArray();
+
+        _cd.CreateHelpingLine(clickedPoints[0].transform.position, clickedPoints[1].transform.position, _edge_Wall);
+
+        return EdgeINFO.Empty;
     }
 
     private EdgeINFO _RemoveEdge()
@@ -492,6 +517,8 @@ public class PointPlacer : MonoBehaviour {
                 break;
 
             case Context.AddEdge:
+            case Context.AddCircle:
+            case Context.AddLine:
             case Context.RemoveEdge:
             {
                 var labels = _edge_Labels[_Edge_CurrentlyFocusedGridPoint];
@@ -528,6 +555,8 @@ public class PointPlacer : MonoBehaviour {
                 break;
             
             case Context.AddEdge:
+            case Context.AddCircle:
+            case Context.AddLine:
             case Context.RemoveEdge:
             {
                 var labels = _edge_Labels[_Edge_CurrentlyFocusedGridPoint];
@@ -716,8 +745,18 @@ public class PointPlacer : MonoBehaviour {
         return _HandleActingOnEdge(_AddEdge, Context.AddEdge);
     }
 
+    public EdgeINFO HandleAddingCircle()
+    {
+        return _HandleActingOnEdge(_AddCircle, Context.AddCircle);
+    }
+
     public EdgeINFO HandleRemovingEdge()
     {
         return _HandleActingOnEdge(_RemoveEdge, Context.RemoveEdge);
+    }
+
+    public EdgeINFO HandleAddingLine()
+    {
+        return _HandleActingOnEdge(_AddLine, Context.AddLine);
     }
 }

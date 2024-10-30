@@ -123,7 +123,7 @@ public class Grid : MonoBehaviour {
             else
             {
                 axisObj.name = $"axis_point_{axis}={lineValue}";
-                p.SetLabel($"{lineValue}", 0.03f, Color.white);
+                //p.SetLabel($"{lineValue}", 0.03f, Color.white);
             }
         }
     }

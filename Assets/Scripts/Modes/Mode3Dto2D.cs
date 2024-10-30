@@ -79,6 +79,8 @@ public class Mode3Dto2D : IMode
         _wc = wallsObject.GetComponent<WallController>();
         _wcrt = PCref.gameObject.GetComponent<WallCreator>();
 
+        PointsList.ceilingWall.SetActive(true);
+
         Debug.Log($"<color=blue> MODE grupowy ON </color>");
     }
 

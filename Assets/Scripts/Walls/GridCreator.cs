@@ -52,10 +52,11 @@ public class GridCreator : MonoBehaviour {
         // left grid
 
         const int leftWallIdx = 1;
+        WallInfo leftWall = _wc.GetWallByName("Wall4");
         Vector3 leftGridRotation = new Vector3(0f, -90f, 0f);
         Vector3 leftGridPosition = 
-            walls[leftWallIdx].gameObject.transform.position
-            + _GetOffsetFromWall(walls[leftWallIdx], config["distance_from_the_wall"])
+            leftWall.gameObject.transform.position
+            + _GetOffsetFromWall(leftWall, config["distance_from_the_wall"])
             + new Vector3(0f, -height/2f, -length/2f);
 
         GridINFO leftGridINFO = new GridINFO(
@@ -63,7 +64,7 @@ public class GridCreator : MonoBehaviour {
             length,
             rowsNumber,
             colsNumber,
-            "Y",
+            "Z",
             "X",
             lineWidth,
             scale,
@@ -81,10 +82,11 @@ public class GridCreator : MonoBehaviour {
         // right grid
 
         const int rightWallIdx = 0;
+        WallInfo rightWall = _wc.GetWallByName("Wall6");
         Vector3 rightGridRotation = new Vector3(0f, 180f, 0f);
         Vector3 rightGridPosition = 
-            walls[rightWallIdx].gameObject.transform.position
-            + _GetOffsetFromWall(walls[rightWallIdx], config["distance_from_the_wall"])
+            rightWall.gameObject.transform.position
+            + _GetOffsetFromWall(rightWall, config["distance_from_the_wall"])
             + new Vector3(length/2f, -height/2f, 0f);
 
         GridINFO rightGridINFO = new GridINFO(
@@ -92,8 +94,8 @@ public class GridCreator : MonoBehaviour {
             length,
             rowsNumber,
             colsNumber,
-            "Y",
             "Z",
+            "Y",
             lineWidth,
             scale,
             rightGridPosition,
@@ -110,10 +112,11 @@ public class GridCreator : MonoBehaviour {
         // bottom grid
 
         const int bottomWallIdx = 2;
+        WallInfo bottomWall = _wc.GetWallByName("Wall3");
         Vector3 bottomGridRotation = new Vector3(90f, -90f, 0f);
         Vector3 bottomGridPosition = 
-            walls[bottomWallIdx].gameObject.transform.position
-            + _GetOffsetFromWall(walls[bottomWallIdx], config["distance_from_the_wall"])
+            bottomWall.gameObject.transform.position
+            + _GetOffsetFromWall(bottomWall, config["distance_from_the_wall"])
             + new Vector3(length/2f, 0f, -height/2f);  
 
         GridINFO bottomGridINFO = new GridINFO(
@@ -121,7 +124,7 @@ public class GridCreator : MonoBehaviour {
             length,
             rowsNumber,
             colsNumber,
-            "Z",
+            "Y",
             "X",
             lineWidth,
             scale,
