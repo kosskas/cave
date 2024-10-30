@@ -14,7 +14,7 @@ namespace Assets.Scripts.Experimental.Items
 
         private static readonly Color ColorFocused = Color.red;
 
-        private static readonly float Width = 0.005f;
+        public float Width { get; set; } = 0.005f;
 
         private static readonly char[] Labels = " abcdefghijklmnoprqstuvwxyz".ToCharArray();
         private int _labelIdx = 0;
@@ -50,6 +50,8 @@ namespace Assets.Scripts.Experimental.Items
 
         void Update()
         {
+            _lineRenderer.startWidth = Width;
+            _lineRenderer.endWidth = Width;
             _lineRenderer.SetPositions(new[] { _from, _to });
 
             Vector3 newPosition = _from;

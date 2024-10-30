@@ -165,6 +165,7 @@ namespace Assets.Scripts.Experimental
 
             var projectionComponent1 = projection1.AddComponent<Line>();
             projectionComponent1.ColliderEnabled = false;
+            projectionComponent1.Width = 0.002f;
             projectionComponent1.Draw(fromPlane, fromPos, fromPos);
 
             // SECOND PART
@@ -173,6 +174,7 @@ namespace Assets.Scripts.Experimental
 
             var projectionComponent2 = projection2.AddComponent<Line>();
             projectionComponent2.ColliderEnabled = false;
+            projectionComponent2.Width = 0.002f;
 
             // PROJECTION ON AXIS
             var axis = GetAxis(fromPlane);
