@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Experimental.Utils;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,7 @@ namespace Assets.Scripts.Experimental.Items
 
         public float Width { get; set; } = 0.005f;
 
-        private static readonly char[] Labels = " abcdefghijklmnoprqstuvwxyz".ToCharArray();
-        private int _labelIdx = 0;
+        private CircularIterator<char> _labels;
 
         private Vector3 _from;
 
@@ -48,6 +48,10 @@ namespace Assets.Scripts.Experimental.Items
             _boxCollider.isTrigger = true;
 
             _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
+
+            _labels = new CircularIterator<char>(
+                "abcdefghijklmnoprqstuvwxyz".ToList(),
+                ' ');
         }
 
         void Update()
@@ -103,24 +107,28 @@ namespace Assets.Scripts.Experimental.Items
 
         public void NextLabel()
         {
-            _labelIdx = (_labelIdx + 1 == Labels.Length) ? 0 : _labelIdx + 1;
-
-            var label = gameObject.GetComponent<IndexedLabel>();
-            if (label != null)
+            var labelComponent = gameObject.GetComponent<IndexedLabel>();
+            if (labelComponent == null)
             {
-                label.Text = Labels[_labelIdx].ToString();
+                return;
             }
+
+            _labels.Next();
+
+            labelComponent.Text = _labels.Current.ToString();
         }
 
         public void PrevLabel()
         {
-            _labelIdx = (_labelIdx == 0) ? Labels.Length - 1 : _labelIdx - 1;
-
-            var label = gameObject.GetComponent<IndexedLabel>();
-            if (label != null)
+            var labelComponent = gameObject.GetComponent<IndexedLabel>();
+            if (labelComponent == null)
             {
-                label.Text = Labels[_labelIdx].ToString();
+                return;
             }
+
+            _labels.Previous();
+
+            labelComponent.Text = _labels.Current.ToString();
         }
     }
 }

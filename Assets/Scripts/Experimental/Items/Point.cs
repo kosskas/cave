@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Assets.Scripts.Experimental.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -16,8 +17,7 @@ namespace Assets.Scripts.Experimental.Items
 
         private static readonly float Size = 0.025f;
 
-        private static readonly char[] Labels = " ABCDEFGHIJKLMNOPRQSTUVWXYZ".ToCharArray();
-        private int _labelIdx = 0;
+        private CircularIterator<char> _labels;
 
         public Vector3 Position { get; private set; }
 
@@ -28,6 +28,7 @@ namespace Assets.Scripts.Experimental.Items
         private Renderer _pointRenderer;
 
         private BoxCollider _boxCollider;
+
         private MeshBuilder _mc;
 
         void Start()
@@ -51,6 +52,10 @@ namespace Assets.Scripts.Experimental.Items
             _boxCollider.isTrigger = true;
 
             _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
+
+            _labels = new CircularIterator<char>(
+                "ABCDEFGHIJKLMNOPRQSTUVWXYZ123456789".ToList(),
+                ' ');
         }
 
         void Update()
@@ -86,57 +91,38 @@ namespace Assets.Scripts.Experimental.Items
 
         public void NextLabel()
         {
-            var label = gameObject.GetComponent<IndexedLabel>();
-            if (label == null)
+            var labelComponent = gameObject.GetComponent<IndexedLabel>();
+            if (labelComponent == null)
             {
                 return;
             }
 
-            while (true)
+            _labels.NextWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()));
+
+            _mc.RemovePointProjection(Plane, labelComponent.Text);
+            labelComponent.Text = _labels.Current.ToString();
+            if (!_labels.CurrentIsDefault)
             {
-                _labelIdx = (_labelIdx + 1 == Labels.Length) ? 0 : _labelIdx + 1;
-                var newText = Labels[_labelIdx].ToString();
-
-                if (!_mc.CheckIfAlreadyExist(Plane, newText))
-                {
-                    _mc.RemovePointProjection(Plane, label.Text);
-                    label.Text = newText;
-                    if (newText != " ")
-                    {
-                        _mc.AddPointProjection(Plane, newText, gameObject);
-                    }
-
-                    break;
-                }
+                _mc.AddPointProjection(Plane, _labels.Current.ToString(), gameObject);
             }
         }
 
         public void PrevLabel()
         {
-            var label = gameObject.GetComponent<IndexedLabel>();
-            if (label == null)
+            var labelComponent = gameObject.GetComponent<IndexedLabel>();
+            if (labelComponent == null)
             {
                 return;
             }
 
-            while (true)
+            _labels.PreviousWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()));
+
+            _mc.RemovePointProjection(Plane, labelComponent.Text);
+            labelComponent.Text = _labels.Current.ToString();
+            if (!_labels.CurrentIsDefault)
             {
-                _labelIdx = (_labelIdx == 0) ? Labels.Length - 1 : _labelIdx - 1;
-                var newText = Labels[_labelIdx].ToString();
-
-                if (!_mc.CheckIfAlreadyExist(Plane, newText))
-                {
-                    _mc.RemovePointProjection(Plane, label.Text);
-                    label.Text = newText;
-                    if (newText != " ")
-                    {
-                        _mc.AddPointProjection(Plane, newText, gameObject);
-                    }
-
-                    break;
-                }
+                _mc.AddPointProjection(Plane, _labels.Current.ToString(), gameObject);
             }
         }
-
     }
 }
