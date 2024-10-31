@@ -142,9 +142,9 @@ public class ModeExperimental : IMode
 
         _items = new ItemsController();
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
-
-        var mc = (MeshBuilder)UnityEngine.Object.FindObjectOfType(typeof(MeshBuilder));
-        mc.SetGenerateRulesReferenceLine(false);
+        GameObject mainObject = GameObject.Find("MainObject");
+        var mc = mainObject.AddComponent<MeshBuilder>();
+        mc.Init(true,false);
 
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()

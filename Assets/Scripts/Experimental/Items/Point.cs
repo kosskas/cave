@@ -103,6 +103,8 @@ namespace Assets.Scripts.Experimental.Items
             labelComponent.Text = _labels.Current.ToString();
             if (!_labels.CurrentIsDefault)
             {
+                LineSegment lineseg = gameObject.AddComponent<LineSegment>();
+                lineseg.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
                 _mc.AddPointProjection(Plane, _labels.Current.ToString(), gameObject);
             }
         }
@@ -121,6 +123,8 @@ namespace Assets.Scripts.Experimental.Items
             labelComponent.Text = _labels.Current.ToString();
             if (!_labels.CurrentIsDefault)
             {
+                LineSegment lineseg = gameObject.AddComponent<LineSegment>();
+                lineseg.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
                 _mc.AddPointProjection(Plane, _labels.Current.ToString(), gameObject);
             }
         }

@@ -29,7 +29,7 @@ public class ModeMenu : IMode
             else if (PCref.Hit.collider.gameObject.name == "KreaButton")
             {
                 _HideModesButtons();
-                PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
+                PCref.ChangeMode(PlayerController.Mode.Mode2Dto3D);
             }
             
         }
@@ -68,6 +68,7 @@ public class ModeMenu : IMode
 
         if (Input.GetKeyDown("3"))
         {
+            _HideModesButtons();
             PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
         }
     }

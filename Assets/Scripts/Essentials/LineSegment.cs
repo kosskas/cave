@@ -43,8 +43,13 @@ public class LineSegment : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		lineRenderer = gameObject.AddComponent<LineRenderer>();
-		lineRenderer.positionCount = 2;
+        lineRenderer = gameObject.GetComponent<LineRenderer>();
+        if (lineRenderer == null)
+        {
+            lineRenderer = gameObject.AddComponent<LineRenderer>();
+        }
+
+        lineRenderer.positionCount = 2;
         lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
         lineRenderer.material.color = lineColor;
         lineRenderer.numCapVertices = 10;
