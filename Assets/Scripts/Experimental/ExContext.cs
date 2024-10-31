@@ -4,22 +4,22 @@ namespace Assets.Scripts.Experimental
 {
     public enum ExContext
     {
-        [Description("Idle")]
+        [Description("- - -")]
         Idle,
 
-        [Description("Point")]
+        [Description("Punkt")]
         Point,
 
-        [Description("LineBetweenPoints")]
+        [Description("Odcinek")]
         LineBetweenPoints,
 
-        [Description("Line")]
+        [Description("Linia")]
         Line,
 
-        [Description("Circle")]
+        [Description("Okr\u0105g")]
         Circle,
 
-        [Description("Projection")]
+        [Description("Rzut")]
         Projection
     }
 

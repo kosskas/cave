@@ -17,7 +17,7 @@ public class ModeExperimental : IMode
     private ItemsController _items;
 
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
-
+    private ExContextMenuView _contextMenuView;
     private Action<WallInfo, Vector3, bool> _drawLineAction;
     private Action<WallInfo, ExPoint, Vector3, bool> _drawLineBetweenPointsAction;
     private Action<WallInfo, Vector3, bool> _drawCircleAction;
@@ -155,7 +155,10 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, ActCircle),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, ActProjection)
             },
-            new KeyValuePair<ExContext, Action>(ExContext.Point, () => {}));
+            new KeyValuePair<ExContext, Action>(ExContext.Idle, () => {}));
+
+        _contextMenuView = new ExContextMenuView();
+        _contextMenuView.SetCurrentContext(_context.Current.Key);
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
@@ -174,7 +177,7 @@ public class ModeExperimental : IMode
         if (Input.GetKeyDown("1"))
         {
             _context.Next();
-            Debug.Log($"CONTEXT --> {_context.Current.Key.GetDescription()}");
+            _contextMenuView.SetCurrentContext(_context.Current.Key);
         }
 
         if (Input.GetKeyDown("2"))
