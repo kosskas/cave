@@ -663,7 +663,8 @@ Prefab:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 114961186758209068, guid: a1bc949586948304995fd7bafe3feed7, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: a1bc949586948304995fd7bafe3feed7, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &249239967
@@ -956,17 +957,6 @@ GameObject:
   m_PrefabParentObject: {fileID: 1431898105162406, guid: 75be152eec880ed40aeffcec13bd0db0,
     type: 2}
   m_PrefabInternal: {fileID: 1459257734}
---- !u!114 &394546283
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 394546282}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52d90cb5abc60004c8b3007485ca689a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &394546284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3204,7 +3194,6 @@ GameObject:
   - component: {fileID: 1203211523}
   - component: {fileID: 1203211522}
   - component: {fileID: 1203211521}
-  - component: {fileID: 1203211520}
   m_Layer: 2
   m_Name: FPSPlayer
   m_TagString: Player
@@ -3212,17 +3201,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1203211520
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1203211519}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fae024b9fb320884c87a94b5dfa34dcd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1203211521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3573,22 +3551,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1333964896}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1351469339 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 1769127065229098, guid: a1bc949586948304995fd7bafe3feed7,
-    type: 2}
-  m_PrefabInternal: {fileID: 246759288}
---- !u!114 &1351469340
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1351469339}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c511ef17192be949a8a6ff8b83b0c61, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1417718164
 GameObject:
   m_ObjectHideFlags: 0
