@@ -122,6 +122,7 @@ public class MeshBuilder : MonoBehaviour {
     bool blocked = false;
     bool showProjectionLines = true;
     bool showReferenceLines=true;
+    bool generateReferenceLines = true;
 
 	// Update is called once per frame
 	void Update()
@@ -442,6 +443,16 @@ public class MeshBuilder : MonoBehaviour {
     {
         showReferenceLines = rule;
     }
+
+    /// <summary>
+    /// Ustawia tworzenie linii odnoszących
+    /// </summary>
+    /// <param name="rule">Zadada wyświetlania. True - wyświetlanie, False - brak</param>
+    public void SetGenerateRulesReferenceLine(bool rule)
+    {
+        generateReferenceLines = rule;
+    }
+
     /// <summary>
     /// Sprawdza czy na scianie znajduje juz sie rzut
     /// </summary>
@@ -711,6 +722,11 @@ public class MeshBuilder : MonoBehaviour {
 
     private void HandleReferenceLines()
     {
+        if (!generateReferenceLines)
+        {
+            return;
+        }
+
         //create if not exist
         foreach (WallInfo wall in verticesOnWalls.Keys)
         {
