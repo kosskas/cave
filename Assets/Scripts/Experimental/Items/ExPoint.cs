@@ -53,9 +53,7 @@ namespace Assets.Scripts.Experimental.Items
 
             _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
 
-            _labels = new CircularIterator<char>(
-                "ABCDEFGHIJKLMNOPRQSTUVWXYZ123456789".ToList(),
-                ' ');
+            _labels = new CircularIterator<char>("ABCDEFGHIJKLMNOPRQSTUVWXYZ123456789".ToList(), ' ');
         }
 
         void Update()
