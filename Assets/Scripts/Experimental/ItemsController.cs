@@ -170,6 +170,46 @@ namespace Assets.Scripts.Experimental
             };
         }
 
+        public Action<WallInfo, Vector3, bool> AddParallelLine(WallInfo fromPlane, Vector3 fromPos)
+        {
+            Vector3 normal = fromPlane.GetNormal();
+
+            Vector3 offsetVector = normal * _OFFSET_FROM_WALL;
+
+            var line = new GameObject("LINE");
+            line.transform.SetParent(_lineRepo.transform);
+
+            var lineComponent = line.AddComponent<Line>();
+            lineComponent.ColliderEnabled = false;
+            lineComponent.Width = 0.002f;
+            lineComponent.Draw(fromPlane, fromPos + offsetVector, fromPos + offsetVector);
+
+            var labelComponent = line.AddComponent<IndexedLabel>();
+            labelComponent.UpperIndex = new string('\'', fromPlane.number);
+            labelComponent.FontSize = 0.6f;
+
+            var axis = GetAxis(fromPlane);
+            var fromPosProjection = CalculateProjectionOnLine(axis.From, axis.To, fromPos + offsetVector);
+            var fromPosOffsetFromAxis = fromPos + offsetVector - fromPosProjection;
+
+            return (toPlane, toPos, isEnd) =>
+            {
+                if (toPlane != fromPlane)
+                {
+                    return;
+                }
+
+                var toPosProjection = CalculateProjectionOnLine(axis.From, axis.To, toPos + offsetVector);
+
+                lineComponent.Draw(default(WallInfo), default(Vector3), toPosProjection + fromPosOffsetFromAxis);
+
+                if (isEnd)
+                {
+                    lineComponent.ColliderEnabled = true;
+                }
+            };
+        }
+
         public Action<WallInfo, ExPoint, Vector3, bool> AddLineBetweenPoints(WallInfo fromPlane, ExPoint fromPoint, Vector3 fromPos)
         {
             var line = new GameObject("LINE_BETWEEN_POINTS");

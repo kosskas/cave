@@ -18,6 +18,7 @@ public class ModeExperimental : IMode
     private ExContextMenuView _contextMenuView;
     private Action<WallInfo, Vector3, bool> _drawLineAction;
     private Action<WallInfo, Vector3, bool> _drawPerpendicularLineAction;
+    private Action<WallInfo, Vector3, bool> _drawParallelLineAction;
     private Action<WallInfo, ExPoint, Vector3, bool> _drawLineBetweenPointsAction;
     private Action<WallInfo, Vector3, bool> _drawCircleAction;
     private Action<WallInfo, Vector3, bool> _drawProjectionAction;
@@ -105,6 +106,24 @@ public class ModeExperimental : IMode
         }
     }
 
+    private void ActParallelLine()
+    {
+        WallInfo hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
+        if (hitWall == null) return;
+
+        if (_drawParallelLineAction == null)
+        {
+            Vector3 from = PCref.Hit.point;
+            _drawParallelLineAction = _items.AddParallelLine(hitWall, from);
+        }
+        else
+        {
+            Vector3 to = PCref.Hit.point;
+            _drawParallelLineAction(hitWall, to, true);
+            _drawParallelLineAction = null;
+        }
+    }
+
     private void ActProjection()
     {
         var hitPoint = _hitObject as ExPoint;
@@ -146,6 +165,7 @@ public class ModeExperimental : IMode
         _drawCircleAction?.Invoke(hitWall, hitPoint, false);
         _drawLineAction?.Invoke(hitWall, hitPoint, false);
         _drawPerpendicularLineAction?.Invoke(hitWall, hitPoint, false);
+        _drawParallelLineAction?.Invoke(hitWall, hitPoint, false);
         _drawProjectionAction?.Invoke(hitWall, hitPoint, false);
     }
 
@@ -171,6 +191,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.LineBetweenPoints, ActLineBetweenPoints),
                 new KeyValuePair<ExContext, Action>(ExContext.Line, ActLine),
                 new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActPerpendicularLine),
+                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActParallelLine),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, ActCircle),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, ActProjection)
             },

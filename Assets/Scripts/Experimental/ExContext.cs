@@ -19,6 +19,9 @@ namespace Assets.Scripts.Experimental
         [Description("Linia prostopad\u0142a")]
         PerpendicularLine,
 
+        [Description("Linia r\u00F3wnoleg\u0142a")]
+        ParallelLine,
+
         [Description("Okr\u0105g")]
         Circle,
 
