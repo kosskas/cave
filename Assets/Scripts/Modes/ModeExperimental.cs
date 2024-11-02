@@ -17,6 +17,7 @@ public class ModeExperimental : IMode
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
     private ExContextMenuView _contextMenuView;
     private Action<WallInfo, Vector3, bool> _drawLineAction;
+    private Action<WallInfo, Vector3, bool> _drawPerpendicularLineAction;
     private Action<WallInfo, ExPoint, Vector3, bool> _drawLineBetweenPointsAction;
     private Action<WallInfo, Vector3, bool> _drawCircleAction;
     private Action<WallInfo, Vector3, bool> _drawProjectionAction;
@@ -86,6 +87,24 @@ public class ModeExperimental : IMode
         }
     }
 
+    private void ActPerpendicularLine()
+    {
+        WallInfo hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
+        if (hitWall == null) return;
+
+        if (_drawPerpendicularLineAction == null)
+        {
+            Vector3 from = PCref.Hit.point;
+            _drawPerpendicularLineAction = _items.AddPerpendicularLine(hitWall, from);
+        }
+        else
+        {
+            Vector3 to = PCref.Hit.point;
+            _drawPerpendicularLineAction(hitWall, to, true);
+            _drawPerpendicularLineAction = null;
+        }
+    }
+
     private void ActProjection()
     {
         var hitPoint = _hitObject as ExPoint;
@@ -126,6 +145,7 @@ public class ModeExperimental : IMode
         _drawLineBetweenPointsAction?.Invoke(hitWall, default(ExPoint), hitPoint, false);
         _drawCircleAction?.Invoke(hitWall, hitPoint, false);
         _drawLineAction?.Invoke(hitWall, hitPoint, false);
+        _drawPerpendicularLineAction?.Invoke(hitWall, hitPoint, false);
         _drawProjectionAction?.Invoke(hitWall, hitPoint, false);
     }
 
@@ -150,6 +170,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Point, ActPoint),
                 new KeyValuePair<ExContext, Action>(ExContext.LineBetweenPoints, ActLineBetweenPoints),
                 new KeyValuePair<ExContext, Action>(ExContext.Line, ActLine),
+                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActPerpendicularLine),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, ActCircle),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, ActProjection)
             },

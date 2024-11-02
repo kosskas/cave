@@ -16,6 +16,9 @@ namespace Assets.Scripts.Experimental
         [Description("Linia")]
         Line,
 
+        [Description("Linia prostopad\u0142a")]
+        PerpendicularLine,
+
         [Description("Okr\u0105g")]
         Circle,
 
