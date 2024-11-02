@@ -6,8 +6,6 @@ using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using UnityEngine;
 
-using ExPoint = Assets.Scripts.Experimental.Items.Point;
-
 public class ModeExperimental : IMode
 {
     public PlayerController PCref { get; private set; }

@@ -8,8 +8,6 @@ using Assets.Scripts.Experimental;
 using Assets.Scripts.Experimental.Items;
 using UnityEngine;
 
-using ExPoint = Assets.Scripts.Experimental.Items.Point;
-
 public static class Vector3Extensions
 {
     public static bool ApproximatelyEqual(this Vector3 a, Vector3 b, float tolerance = 0.0001f)
@@ -253,7 +251,7 @@ namespace Assets.Scripts.Experimental
             var point = new GameObject("POINT");
             point.transform.SetParent(_pointRepo.transform);
 
-            var pointComponent = point.AddComponent<Assets.Scripts.Experimental.Items.Point>();
+            var pointComponent = point.AddComponent<ExPoint>();
             pointComponent.Draw(plane, pos + offsetVector);
 
             var labelComponent = point.AddComponent<IndexedLabel>();

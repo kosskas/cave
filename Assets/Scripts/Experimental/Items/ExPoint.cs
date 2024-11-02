@@ -9,7 +9,7 @@ using UnityEngine.Rendering;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Point : MonoBehaviour, IDrawable, IRaycastable, ILabelable
+    public class ExPoint : MonoBehaviour, IDrawable, IRaycastable, ILabelable
     {
         private static readonly Color ColorNormal = Color.black;
 
