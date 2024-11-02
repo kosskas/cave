@@ -61,6 +61,13 @@ namespace Assets.Scripts.Experimental.Items
             gameObject.transform.position = Position;
         }
 
+        void OnDestroy()
+        {
+            var labelComponent = gameObject.GetComponent<IndexedLabel>();
+            _mc.RemovePointProjection(Plane, labelComponent.Text);
+            RemoveProjectionLine();
+        }
+
         public void Draw(WallInfo plane, params Vector3[] positions)
         {
             if (plane != default(WallInfo))

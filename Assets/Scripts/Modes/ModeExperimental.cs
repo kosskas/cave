@@ -142,6 +142,15 @@ public class ModeExperimental : IMode
 
     /* * * * CONTEXT ACTIONS end * * * */
 
+    private void _DeleteHoveredObject()
+    {
+        GameObject hitGameObject = null;
+        _hitObject?.OnHoverAction(gameObject => hitGameObject = gameObject);
+        if (hitGameObject == null) return;
+
+        UnityEngine.Object.Destroy(hitGameObject);
+        _hitObject = null;
+    }
 
     private void _MakeAction()
     {
@@ -223,6 +232,11 @@ public class ModeExperimental : IMode
         if (Input.GetKeyDown("2"))
         {
             _MakeAction();
+        }
+
+        if (Input.GetKeyDown("3"))
+        {
+            _DeleteHoveredObject();
         }
 
         if (Input.GetKeyDown("8"))
