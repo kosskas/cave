@@ -108,6 +108,7 @@ namespace Assets.Scripts.Experimental
 
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
+            lineComponent.Width = 0.002f;
             lineComponent.Draw(fromPlane, fromPos + offsetVector, fromPos + offsetVector);
 
             var labelComponent = line.AddComponent<IndexedLabel>();
