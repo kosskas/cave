@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Assets.Scripts.Experimental.Utils;
 using UnityEngine;
 using UnityEngine.Analytics;
 
@@ -11,6 +12,7 @@ namespace Assets.Scripts.Experimental.Items
     public class Circle : MonoBehaviour, IDrawable, IRaycastable
     {
         private static readonly Color ColorNormal = Color.black;
+        private static readonly Color ColorFocused = Color.red;
 
         private static readonly float Width = 0.002f;
 
@@ -28,7 +30,7 @@ namespace Assets.Scripts.Experimental.Items
 
         private LineRenderer _circleRenderer;
 
-        private BoxCollider _boxCollider;
+        private RingCollider _ringCollider;
 
 
         void Start()
@@ -42,6 +44,9 @@ namespace Assets.Scripts.Experimental.Items
 
             _circleRenderer.startWidth = Width;
             _circleRenderer.endWidth = Width;
+
+            _ringCollider = gameObject.AddComponent<RingCollider>();
+            UpdateRingCollider();
         }
 
         void Update()
@@ -61,6 +66,16 @@ namespace Assets.Scripts.Experimental.Items
             Vector3 newPosition = _center;
 
             gameObject.transform.position = newPosition;
+
+            UpdateRingCollider();
+        }
+
+        private void UpdateRingCollider()
+        {
+            _ringCollider.Center = _center;
+            _ringCollider.Radius = _radius;
+            _ringCollider.Width = Width;
+            _ringCollider.ColliderEnabled = ColliderEnabled;
         }
 
         public void Draw(WallInfo plane, params Vector3[] positions)
@@ -78,17 +93,17 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverAction(Action<GameObject> action)
         {
-            throw new NotImplementedException();
+            action(gameObject);
         }
 
         public void OnHoverEnter()
         {
-            throw new NotImplementedException();
+            _circleRenderer.material.color = ColorFocused;
         }
 
         public void OnHoverExit()
         {
-            throw new NotImplementedException();
+            _circleRenderer.material.color = ColorNormal;
         }
     }
 }
