@@ -165,4 +165,12 @@ public class LineSegment : MonoBehaviour {
         }
     }
 
+    void OnDestroy()
+    {
+        if (lineRenderer != null)
+        {
+			Destroy(lineRenderer);
+        }
+    }
+
 }

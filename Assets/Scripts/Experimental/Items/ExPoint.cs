@@ -100,12 +100,17 @@ namespace Assets.Scripts.Experimental.Items
             _labels.NextWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()));
 
             _mc.RemovePointProjection(Plane, labelComponent.Text);
+
             labelComponent.Text = _labels.Current.ToString();
+
             if (!_labels.CurrentIsDefault)
             {
-                LineSegment lineseg = gameObject.AddComponent<LineSegment>();
-                lineseg.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+                AddProjectionLine();
                 _mc.AddPointProjection(Plane, _labels.Current.ToString(), gameObject);
+            }
+            else
+            {
+                RemoveProjectionLine();
             }
         }
 
@@ -120,12 +125,37 @@ namespace Assets.Scripts.Experimental.Items
             _labels.PreviousWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()));
 
             _mc.RemovePointProjection(Plane, labelComponent.Text);
+
             labelComponent.Text = _labels.Current.ToString();
+
             if (!_labels.CurrentIsDefault)
             {
-                LineSegment lineseg = gameObject.AddComponent<LineSegment>();
-                lineseg.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+                AddProjectionLine();
                 _mc.AddPointProjection(Plane, _labels.Current.ToString(), gameObject);
+            }
+            else
+            {
+                RemoveProjectionLine();
+            }
+        }
+
+        private void AddProjectionLine()
+        {
+            var ls = gameObject.GetComponent<LineSegment>();
+            if (ls == null)
+            {
+                gameObject
+                    .AddComponent<LineSegment>()
+                    .SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+            }
+        }
+
+        private void RemoveProjectionLine()
+        {
+            var ls = gameObject.GetComponent<LineSegment>();
+            if (ls != null)
+            {
+                Destroy(gameObject.GetComponent<LineSegment>());
             }
         }
     }
