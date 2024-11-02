@@ -16,6 +16,7 @@ public class ModeExperimental : IMode
 
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
     private ExContextMenuView _contextMenuView;
+    private ExControlMenuView _controlMenuView;
     private Action<WallInfo, Vector3, bool> _drawLineAction;
     private Action<WallInfo, Vector3, bool> _drawPerpendicularLineAction;
     private Action<WallInfo, Vector3, bool> _drawParallelLineAction;
@@ -208,6 +209,8 @@ public class ModeExperimental : IMode
 
         _contextMenuView = new ExContextMenuView();
         _contextMenuView.SetCurrentContext(_context.Current.Key);
+
+        _controlMenuView = new ExControlMenuView();
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
