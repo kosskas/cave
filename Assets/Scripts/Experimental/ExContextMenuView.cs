@@ -11,7 +11,17 @@ namespace Assets.Scripts.Experimental
 {
     public class ExContextMenuView
     {
-        private readonly TextMeshPro _contextMenu = GameObject.Find("ExperimentalModeContextMenu")?.GetComponent<TextMeshPro>();
+        private readonly TextMeshPro _contextMenu;
+
+        public ExContextMenuView()
+        {
+            _contextMenu = GameObject.Find("ExperimentalModeContextMenu")?.GetComponent<TextMeshPro>();
+
+            if (_contextMenu == null)
+                return;
+
+            _contextMenu.fontMaterial.shader = Shader.Find("TextMeshPro/Distance Field Overlay");
+        }
 
         public void SetCurrentContext(ExContext currentContext)
         {
