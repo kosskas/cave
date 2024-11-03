@@ -86,7 +86,41 @@ public class WallGenerator : MonoBehaviour {
 
     //}
 
-    private void generateWall(List<Point> points)
+    private void CreateWall(List<Point> pointList)
+    {
+        List<Vector3> points = new List<Vector3>();
+        foreach (Point point in pointList)
+        {
+            points.Add(point.GetCoordinates());
+        }
+        // 1. Pobierz komponent MeshFilter i stwórz nowy mesh
+        MeshFilter meshFilter = GetComponent<MeshFilter>();
+        Mesh mesh = new Mesh();
+
+        // 2. Ustaw wierzchołki na podstawie punktów
+        mesh.vertices = points.ToArray();
+
+        // 3. Określ trójkąty tworzące ścianę (muszą być zgodne z kolejnością punktów)
+        List<int> triangles = new List<int>();
+
+        // Tworzymy ścianę jako fan trójkątów
+        for (int i = 1; i < points.Count - 1; i++)
+        {
+            triangles.Add(0);       // pierwszy punkt jako środek
+            triangles.Add(i);       // aktualny punkt
+            triangles.Add(i + 1);   // następny punkt
+        }
+
+        mesh.triangles = triangles.ToArray();
+
+        // 4. Oblicz normalne, aby uzyskać prawidłowe oświetlenie
+        mesh.RecalculateNormals();
+
+        // 5. Przypisz mesh do MeshFilter
+        meshFilter.mesh = mesh;
+    }
+
+    private void GenerateWall(List<Point> points)
     {
         if (points.Count() < 3)
         {
@@ -95,13 +129,13 @@ public class WallGenerator : MonoBehaviour {
         }
         else if (points.Count() == 3)
         {
-            //wygeneruj ściane
+            CreateWall(points);
         }
         else
         {
             if (CheckIfPointsAreOnTheSamePlane(points))
             {
-                //wygeneruj ściane
+                CreateWall(points);
             }
         }
 
