@@ -42,4 +42,10 @@ public static class ReconstructionInfo
     public static float LABEL_3D_SIZE = 0.04f;
     public static Color LABEL_3D_COLOR = Color.white;
     public static Color LABEL_3D_ERR_COLOR = Color.red;
+    // -- 2D CIRCLE
+    public static float CIRCLE_2D_WIDTH = 0.005f;
+    public static Color CIRCLE_2D_COLOR = Color.green;
+    // -- 2D LINE
+    public static float LINE_2D_WIDTH = 0.005f;
+    public static Color LINE_2D_COLOR = Color.green;
 }
