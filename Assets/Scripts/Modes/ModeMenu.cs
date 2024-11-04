@@ -12,7 +12,7 @@ public class ModeMenu : IMode
         Debug.Log($"<color=blue> MODE menu ON </color>");
 
         PointsList.HideListAndLogs();
-        PointsList.ceilingWall.SetActive(false);
+        //PointsList.ceilingWall.SetActive(false);
     }
 
 

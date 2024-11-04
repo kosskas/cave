@@ -8,6 +8,7 @@ public class Mode2Dto3D : IMode
     private GridCreator _gc;
     private ConstrDrawer _cd;
     private MeshBuilder _mb;
+    private WallGenerator _wg;
     public PlayerController PCref { get; private set; }
 
     private void _AddPointProjection()
@@ -15,7 +16,7 @@ public class Mode2Dto3D : IMode
         PointINFO pointInfo = _pp.HandleAddingPoint();
         if (pointInfo != PointINFO.Empty) {
             Debug.Log(pointInfo.ToString());
-            PointsList.infoList.Add(pointInfo);
+            //PointsList.infoList.Add(pointInfo);
         }
     }
 
@@ -24,7 +25,7 @@ public class Mode2Dto3D : IMode
         PointINFO pointInfo = _pp.HandleRemovingPoint();
         if (pointInfo != PointINFO.Empty) {
             Debug.Log(pointInfo.ToString());
-            PointsList.infoList.Remove(pointInfo);
+            //PointsList.infoList.Remove(pointInfo);
         }
     }
 
@@ -51,8 +52,9 @@ public class Mode2Dto3D : IMode
             Debug.Log($"[CLICK] on object named: {PCref.Hit.collider.gameObject.name}");
             if (PCref.Hit.collider.tag == "PointButton")
             {
-                PointINFO pointInfo = PointsList.RemovePointOnClick(PCref.Hit.collider.gameObject);
-                _pp.RemovePoint(pointInfo);
+                _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
+                //PointINFO pointInfo = PointsList.RemovePointOnClick(PCref.Hit.collider.gameObject);
+                //_pp.RemovePoint(pointInfo);
             }
             else if (PCref.Hit.collider.gameObject.name == "UpButton")
             {
@@ -131,17 +133,18 @@ public class Mode2Dto3D : IMode
         _cd = wallsObject.AddComponent<ConstrDrawer>();
         _cd.Init();
 
+        _wg = mainObject.AddComponent<WallGenerator>();
 
         _pp = PCref.gameObject.AddComponent<PointPlacer>();
         _pp.Init(_mb, _cd);
         _pp.CreateCursor();
         _pp.MoveCursor(PCref.Hit);
 
-        if (PointsList.ceilingWall != null) //nie dziala, dalej sie psuje
-        {
-            Debug.Log("ceiling found");
-            PointsList.ceilingWall.SetActive(true);
-        }
+        //if (PointsList.ceilingWall != null) //nie dziala, dalej sie psuje
+        //{
+        //    Debug.Log("ceiling found");
+        //    PointsList.ceilingWall.SetActive(true);
+        //}
 
         PointsList.ShowListAndLogs();
 
@@ -200,6 +203,11 @@ public class Mode2Dto3D : IMode
         if (Input.GetKeyDown("0"))
         {
             _pp.HandleAddingLine();
+        }
+
+        if (Input.GetKeyDown("g"))
+        {
+            _wg.GenerateWall(_wg.points);
         }
     }
 

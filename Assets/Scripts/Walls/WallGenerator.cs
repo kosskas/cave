@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class WallGenerator : MonoBehaviour {
 
 	// Use this for initialization
-	void Start () {
+    public List<KeyValuePair<string, Vector3>> points = new List<KeyValuePair<string, Vector3>>();
+    void Start () {
 		
 	}
 	
@@ -20,7 +22,7 @@ public class WallGenerator : MonoBehaviour {
         //}
     }
 
-    private bool CheckIfPointsAreOnTheSamePlane(List<Point> points)
+    private bool CheckIfPointsAreOnTheSamePlane(List<KeyValuePair<string, Vector3>> points)
     {
         bool areOnSamePlane = true;
         if (points.Count() < 3)
@@ -29,13 +31,13 @@ public class WallGenerator : MonoBehaviour {
         }
         else
         {
-            Vector3 cords1 = points[0].GetCoordinates();
-            Vector3 cords2 = points[1].GetCoordinates();
-            Vector3 cords3 = points[2].GetCoordinates();
+            Vector3 cords1 = points[0].Value;
+            Vector3 cords2 = points[1].Value;
+            Vector3 cords3 = points[2].Value;
 
             for (int i = 3; i < points.Count(); i++)
             {
-                Vector3 cords4 = points[i].GetCoordinates();
+                Vector3 cords4 = points[i].Value;
 
                 float a11a22a33 = (cords4.x - cords1.x) * (cords4.y - cords2.y) * (cords4.z - cords3.z);
                 float a12a23a31 = (cords4.y - cords1.y) * (cords4.z - cords2.z) * (cords4.x - cords3.x);
@@ -86,59 +88,83 @@ public class WallGenerator : MonoBehaviour {
 
     //}
 
-    private void CreateWall(List<Point> pointList)
+    public void CreateWall(List<KeyValuePair<string, Vector3>> points)
     {
-        List<Vector3> points = new List<Vector3>();
-        foreach (Point point in pointList)
-        {
-            points.Add(point.GetCoordinates());
-        }
-        // 1. Pobierz komponent MeshFilter i stwórz nowy mesh
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
+        // 1. Tworzymy nowy obiekt dla ściany
+        GameObject wallObject = new GameObject("Face");
+        wallObject.transform.SetParent(this.transform);
+
+        // Dodaj komponenty MeshFilter i MeshRenderer
+        MeshFilter meshFilter = wallObject.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = wallObject.AddComponent<MeshRenderer>();
+
+        // Ustawienie materiału dla ściany (upewnij się, że materiał jest przypisany w Unity)
+        meshRenderer.material = new Material(Shader.Find("Standard"));
+
+        // Stwórz nowy mesh
         Mesh mesh = new Mesh();
 
-        // 2. Ustaw wierzchołki na podstawie punktów
-        mesh.vertices = points.ToArray();
+        // 2. Przekształć punkty do listy Vector3
+        List<Vector3> vertices = new List<Vector3>();
+        foreach (var point in points)
+        {
+            vertices.Add(point.Value);
+        }
 
-        // 3. Określ trójkąty tworzące ścianę (muszą być zgodne z kolejnością punktów)
+        // 3. Przypisz wierzchołki do mesh
+        mesh.vertices = vertices.ToArray();
+
+        // 4. Tworzenie trójkątów dla obu stron
         List<int> triangles = new List<int>();
 
-        // Tworzymy ścianę jako fan trójkątów
-        for (int i = 1; i < points.Count - 1; i++)
+        // Tworzymy trójkąty w standardowej kolejności
+        for (int i = 1; i < vertices.Count - 1; i++)
         {
             triangles.Add(0);       // pierwszy punkt jako środek
             triangles.Add(i);       // aktualny punkt
             triangles.Add(i + 1);   // następny punkt
         }
 
+        // Tworzymy trójkąty w odwrotnej kolejności dla drugiej strony
+        for (int i = 1; i < vertices.Count - 1; i++)
+        {
+            triangles.Add(0);       // pierwszy punkt jako środek
+            triangles.Add(i + 1);   // następny punkt
+            triangles.Add(i);       // aktualny punkt
+        }
+
+        // Przypisz trójkąty do mesh
         mesh.triangles = triangles.ToArray();
 
-        // 4. Oblicz normalne, aby uzyskać prawidłowe oświetlenie
+        // 5. Oblicz normalne, aby uzyskać prawidłowe oświetlenie
         mesh.RecalculateNormals();
 
-        // 5. Przypisz mesh do MeshFilter
+        // 6. Przypisz mesh do MeshFilter
         meshFilter.mesh = mesh;
     }
 
-    private void GenerateWall(List<Point> points)
+    public void GenerateWall(List<KeyValuePair<string, Vector3>> points)
     {
         if (points.Count() < 3)
         {
             Debug.Log("Conajmniej 3 punkty muszą zostać wybrane, by ściana mogła powstać.");
-            return;
+            
         }
         else if (points.Count() == 3)
         {
+            //Debug.Log(CheckIfPointsAreOnTheSamePlane(points));
             CreateWall(points);
         }
         else
         {
             if (CheckIfPointsAreOnTheSamePlane(points))
             {
+                //Debug.Log(CheckIfPointsAreOnTheSamePlane(points));
                 CreateWall(points);
             }
         }
 
-
+        points.Clear();
+        PointsList.listTextComponent.text = "";
     }
 }
