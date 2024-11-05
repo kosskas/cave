@@ -25,9 +25,8 @@ public class MeshBuilder : MonoBehaviour {
 	 [X] usun takze 3D kiedy są tylko 2
      [x] jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly  TO TEST xxx
      [x] Przypadek, wszystko zle, potem usuwasz i robi sie ok
-     [ ] Dodaj linie odnoszace i poprawnie je usuwaj
-     [ ] Dodaj flage do WallTexta odnosnie pokazywania odnoszacych i rzutujacych
-     [ ] Sprawdz czy pasuja "niewlasciwe" linie odnoszace, pomagajace przy dodawaniu rzutu
+     [x] Dodaj linie odnoszace i poprawnie je usuwaj
+     [x] Sprawdz czy pasuja "niewlasciwe" linie odnoszace, pomagajace przy dodawaniu rzutu
 	*/
     private class PointProjection
 	{
@@ -87,6 +86,8 @@ public class MeshBuilder : MonoBehaviour {
             this.gameObject = gameObject;
         }
     }
+    const float REFERENCE_LINE_ANTIZFIGHT = 0.0007f;
+
     const int MAXWALLSNUM = 3;
     /// <summary>
     /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
@@ -807,7 +808,6 @@ public class MeshBuilder : MonoBehaviour {
 
     private void CreateReferenceLines(GameObject dir, WallInfo wall, string label)
     {
-        const float antiztrackhit = 0.0007f;
         PointProjection pointProjection = verticesOnWalls[wall][label];
         for (int idx = 0; idx < pointProjection.refLine.Length; idx++)
         {
@@ -832,7 +832,7 @@ public class MeshBuilder : MonoBehaviour {
 
             Vector3 pproj, cross, end_of_draw;
             Tuple<Vector3, Vector3> cro_eod;
-            pproj = verticesOnWalls[wall][label].pointObject.transform.position + antiztrackhit * wall.GetNormal(); //rzut na scianie
+            pproj = verticesOnWalls[wall][label].pointObject.transform.position + REFERENCE_LINE_ANTIZFIGHT * wall.GetNormal(); //rzut na scianie
             cro_eod = wc.FindCrossingPointEx(wall, pproj, wallsIdx[idx]);
             cross = cro_eod.Item1;
             end_of_draw = cro_eod.Item2;
