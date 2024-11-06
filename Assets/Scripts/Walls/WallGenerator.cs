@@ -167,4 +167,10 @@ public class WallGenerator : MonoBehaviour {
         points.Clear();
         PointsList.listTextComponent.text = "";
     }
+
+    public Dictionary<GameObject, List<string>> GetFaces()
+    {
+        Dictionary<GameObject, List<string>> ret = null;
+        return ret;
+    }
 }

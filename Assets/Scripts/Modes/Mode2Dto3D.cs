@@ -71,7 +71,7 @@ public class Mode2Dto3D : IMode
     {
         GameObject mainObject = GameObject.Find("MainObject");
         //export solid
-        string solid = SolidExporter.ExportSolid(_mb.GetPoints3D(), _mb.GetEdges3D());
+        string solid = SolidExporter.ExportSolid(_mb.GetPoints3D(), _mb.GetEdges3D(),null /*GetFaces()*/);
         if(solid == null)
         {
             Debug.LogError("Error - save failed");

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -20,14 +21,14 @@ public static class SolidExporter{
     /// </summary>
     private const string solidFileExt = ".wobj";
     private const string startSection = "###\n";
-    private const string endSection = "\n";
+    private const string newline = "\n";
     /// <summary>
     /// Eksportuje punkty i krawędzie wyświetlane w 3D do pliku .wobj
     /// </summary>
     /// <param name="points">Zbiór punktów w 3D</param>
     /// <param name="edges">Zbiór krawędzi w 3D</param>
     /// <returns>Zwraca dane obiektu zapisane w formacie wobj lub null jeśli coś pójdzie nie tak</returns>
-    public static string ExportSolid(Dictionary<string, Vector3> points, List<Tuple<string, string>> edges)
+    public static string ExportSolid(Dictionary<string, Vector3> points, List<Tuple<string, string>> edges, Dictionary<GameObject, List<string>> faces)
     {
         if(points == null || points.Count == 0 || edges == null)
         {
@@ -38,7 +39,11 @@ public static class SolidExporter{
             Debug.LogError("[CAVE] It seems that folder " + Application.dataPath + pathToFolderWithSolids + " does not exist.");
             return null;
         }
-        string solid = AddPointSection(points) + AddEdgesSection(edges) + startSection;
+
+        string points_section = AddPointSection(points);
+        string edgesAndFaces_section = AddEdgesAndFacesSection(edges, faces);
+
+        string solid = points_section + edgesAndFaces_section + startSection;
         string fileName = DateTime.Now.ToString("HHmmss")+solidFileExt;
         string path = Path.Combine(pathToFolderWithSolids, fileName);
         try
@@ -60,17 +65,28 @@ public static class SolidExporter{
         {
             section += $"{key} {points[key].x} {points[key].y} {points[key].z}\n";
         }
-        section += endSection;
+        section += newline;
         return section;
     }
-    private static string AddEdgesSection(List<Tuple<string, string>> edges)
+    private static string AddEdgesAndFacesSection(List<Tuple<string, string>> edges, Dictionary<GameObject, List<string>> faces)
     {
         string section = startSection;
-        foreach (var pair in edges)
+        if (edges != null)
         {
-            section += $"{pair.Item1},{pair.Item2}\n";
+            foreach (var pair in edges)
+            {
+                section += $"{pair.Item1},{pair.Item2}\n";
+            }
         }
-        section += endSection;
+        if (faces != null)
+        {
+			section += newline;
+            foreach (var edgelist in faces)
+            {
+                section += string.Join(",", edgelist.Value)+newline;
+            }
+        }
+        section += newline;
         return section;
     }
 }
