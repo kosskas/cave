@@ -7,7 +7,8 @@ using UnityEngine;
 
 public class WallGenerator : MonoBehaviour {
 
-	// Use this for initialization
+    private const float SOLID_WALL_TRANSPARENCY = 0.3f;
+    // Use this for initialization
     public List<KeyValuePair<string, Vector3>> points = new List<KeyValuePair<string, Vector3>>();
     void Start () {
 		
@@ -138,6 +139,17 @@ public class WallGenerator : MonoBehaviour {
 
         // 5. Oblicz normalne, aby uzyskać prawidłowe oświetlenie
         mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+
+        // Set the material for the MeshRenderer (you can create your own material or use an existing one)
+        meshRenderer.material = new Material(Shader.Find("Transparent/Diffuse"));
+        Color color = Color.white;
+        color.a = SOLID_WALL_TRANSPARENCY;
+
+        // Ustawienie koloru na biały
+        meshRenderer.material.color = color;
+
+       
 
         // 6. Przypisz mesh do MeshFilter
         meshFilter.mesh = mesh;
