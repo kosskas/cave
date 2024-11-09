@@ -7,6 +7,8 @@ using UnityEngine;
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 public class PointPlacer : MonoBehaviour {
+    // - - - - - - - CONST
+    const float EDGE_PROJ_ANTIZFIGHT = 0.01f;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - CURSOR
     private GameObject _cursor;
     private Renderer _cursorRenderer;
@@ -287,14 +289,14 @@ public class PointPlacer : MonoBehaviour {
 
         var point_1 = new PointINFO(clickedPoints[0], _edge_Wall, labelText_1, fullLabelText_1);
         var point_2 = new PointINFO(clickedPoints[1], _edge_Wall, labelText_2, fullLabelText_2);
-        const float antiztrack = 0.007f;
+
         GameObject edgeObj = new GameObject($"{fullLabelText_1}-{fullLabelText_2}");
         edgeObj.transform.SetParent(_edgeRepo.transform);
         LineSegment edge = edgeObj.AddComponent<LineSegment>();
         edge.SetStyle(ReconstructionInfo.EDGE_COLOR, ReconstructionInfo.EDGE_LINE_WIDTH);
         edge.SetCoordinates(
-            point_1.GridPoint.transform.position + antiztrack * point_1.WallInfo.GetNormal(),
-            point_2.GridPoint.transform.position + antiztrack * point_2.WallInfo.GetNormal()
+            point_1.GridPoint.transform.position + EDGE_PROJ_ANTIZFIGHT * point_1.WallInfo.GetNormal(),
+            point_2.GridPoint.transform.position + EDGE_PROJ_ANTIZFIGHT * point_2.WallInfo.GetNormal()
         );
 
         _mc.AddEdgeProjection(labelText_1, labelText_2);
