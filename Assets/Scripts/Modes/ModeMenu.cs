@@ -68,6 +68,7 @@ public class ModeMenu : IMode
 
         if (Input.GetKeyDown("3"))
         {
+            _HideModesButtons();
             PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
         }
     }

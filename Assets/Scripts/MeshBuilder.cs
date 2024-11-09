@@ -122,11 +122,7 @@ public class MeshBuilder : MonoBehaviour {
     bool blocked = false;
     bool showProjectionLines = true;
     bool showReferenceLines=true;
-
-    // Use this for initialization
-    void Start () {
-        Init();
-    }
+    bool generateReferenceLines = true;
 
 	// Update is called once per frame
 	void Update()
@@ -142,7 +138,7 @@ public class MeshBuilder : MonoBehaviour {
     /// <summary>
     /// Inicjalizuje klasę, tworzy katalogi do przechowywania punktów i krawędzi 3D
     /// </summary>
-    public void Init()
+    public void Init(bool showProjectionLines, bool generateReferenceLines)
     {
         reconstrVertDir = new GameObject("Reconstr. Verticies");
         reconstrVertDir.transform.SetParent(gameObject.transform);
@@ -155,6 +151,10 @@ public class MeshBuilder : MonoBehaviour {
         adjList = new Dictionary<string, List<string>>();
         wc = (WallController)FindObjectOfType(typeof(WallController));
         blocked = false;
+        this.showProjectionLines = showProjectionLines;
+        this.generateReferenceLines = generateReferenceLines;
+        this.showReferenceLines = generateReferenceLines;
+
     }
     /// <summary>
     /// Czyści klasę i blokuje jej działanie
@@ -447,6 +447,16 @@ public class MeshBuilder : MonoBehaviour {
     {
         showReferenceLines = rule;
     }
+
+    /// <summary>
+    /// Ustawia tworzenie linii odnoszących
+    /// </summary>
+    /// <param name="rule">Zadada wyświetlania. True - wyświetlanie, False - brak</param>
+    public void SetGenerateRulesReferenceLine(bool rule)
+    {
+        generateReferenceLines = rule;
+    }
+
     /// <summary>
     /// Sprawdza czy na scianie znajduje juz sie rzut
     /// </summary>
@@ -716,6 +726,11 @@ public class MeshBuilder : MonoBehaviour {
 
     private void HandleReferenceLines()
     {
+        if (!generateReferenceLines)
+        {
+            return;
+        }
+
         //create if not exist
         foreach (WallInfo wall in verticesOnWalls.Keys)
         {
@@ -783,13 +798,18 @@ public class MeshBuilder : MonoBehaviour {
         Point et = pointProj.pointObject.GetComponent<Point>();
         if (et == null)
         {
-            Debug.LogError("GameObj nie ma komponentu Point");
-            return;
+            Debug.LogError("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
+            //return;
         }
-        et.SetLabel(ReconstructionInfo.LABEL_3D_ERR_COLOR);
-        pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_ERROR_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+        else
+        {
+            et.SetLabel(ReconstructionInfo.LABEL_3D_ERR_COLOR);
+        }
+        if (pointProj.projLine != null)
+        {
+            pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_ERROR_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+        }
         pointProj.is_ok_placed = false;
-
     }
 
     private void MarkOK(PointProjection pointProj)
@@ -797,11 +817,17 @@ public class MeshBuilder : MonoBehaviour {
         Point et = pointProj.pointObject.GetComponent<Point>();
         if (et == null)
         {
-            Debug.LogError("GameObj nie ma komponentu Point");
-            return;
+            Debug.LogError("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
+            //return;
         }
-        et.SetLabel(ReconstructionInfo.LABEL_3D_COLOR);
-        pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+        else
+        {
+            et.SetLabel(ReconstructionInfo.LABEL_3D_COLOR);
+        }
+
+        if (pointProj.projLine != null){
+            pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+        }
         pointProj.is_ok_placed = true;
     }
 
