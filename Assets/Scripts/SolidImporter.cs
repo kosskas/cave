@@ -261,7 +261,7 @@ public class SolidImporter : MonoBehaviour {
 			PickNextSolid();
             ReadSolid(solid, isPath);
 			CentralizePosition();
-			ScaleSolid();
+			//ScaleSolid();
 			NormalizeSolid();
 			SetUpVertices();
 			SetUpTriangles();

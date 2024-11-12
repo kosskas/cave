@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -63,8 +64,11 @@ public static class SolidExporter{
         string section = startSection;
         foreach (string key in points.Keys)
         {
-            section += $"{key} {points[key].x} {points[key].y} {points[key].z}\n";
+            section += $"{key} {points[key].x.ToString(CultureInfo.InvariantCulture)} " +
+                       $"{points[key].y.ToString(CultureInfo.InvariantCulture)} " +
+                       $"{points[key].z.ToString(CultureInfo.InvariantCulture)}\n";
         }
+
         section += newline;
         return section;
     }
