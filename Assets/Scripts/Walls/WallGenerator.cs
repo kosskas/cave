@@ -10,6 +10,7 @@ public class WallGenerator : MonoBehaviour {
     private const float SOLID_WALL_TRANSPARENCY = 0.3f;
     // Use this for initialization
     public List<KeyValuePair<string, Vector3>> points = new List<KeyValuePair<string, Vector3>>();
+    public static List<FaceInfo> faceInfoList = new List<FaceInfo>();
     void Start () {
 		
 	}
@@ -63,31 +64,7 @@ public class WallGenerator : MonoBehaviour {
         return areOnSamePlane;
     }
 
-    //private void TestPunktow()
-    //{
-    //    Point point1 = new Point();
-    //    Point point2 = new Point();
-    //    Point point3 = new Point();
-    //    Point point4 = new Point();
-    //    Point point5 = new Point();
-    //    point1.SetCoordinates(new Vector3(1f,2f,3f));
-    //    point2.SetCoordinates(new Vector3(4f,5f,6f));
-    //    point3.SetCoordinates(new Vector3(7f, 0f, 5f));
-    //    point4.SetCoordinates(new Vector3(3f, 1f, 4f));
-    //    point5.SetCoordinates(new Vector3(2f, 4f, 2f));
-    //    List<Point> points = new List<Point>
-    //    {
-    //        point1,
-    //        point2,
-    //        point3,
-    //        point4,
-    //        point5
-    //    };
 
-    //    CheckIfPointsAreOnTheSamePlane(points);
-
-
-    //}
 
     public void CreateWall(List<KeyValuePair<string, Vector3>> points)
     {
@@ -153,6 +130,13 @@ public class WallGenerator : MonoBehaviour {
 
         // 6. Przypisz mesh do MeshFilter
         meshFilter.mesh = mesh;
+
+        List<KeyValuePair<string, Vector3>> copied_points = points
+            .Select(point => new KeyValuePair<string, Vector3>(point.Key, point.Value))
+            .ToList();
+
+
+        faceInfoList.Add(new FaceInfo(copied_points,wallObject));
     }
 
     public void GenerateWall(List<KeyValuePair<string, Vector3>> points)
@@ -180,9 +164,36 @@ public class WallGenerator : MonoBehaviour {
         PointsList.listTextComponent.text = "";
     }
 
-    public Dictionary<GameObject, List<string>> GetFaces()
+    public static List<FaceInfo> GetFaceInfosFromPointLabel(string pointLabel)
     {
-        Dictionary<GameObject, List<string>> ret = null;
+        List<FaceInfo> faceInfosFromPoint = new List<FaceInfo>();
+
+        foreach (var faceInfo in faceInfoList)
+        {
+            if (faceInfo.Points.Any(point => point.Key == pointLabel))
+            {
+                faceInfosFromPoint.Add(faceInfo);
+            }
+        }
+
+        return faceInfosFromPoint;
+    }
+
+    public static Dictionary<GameObject, List<string>> GetFaces()
+    {
+        
+        Dictionary<GameObject, List<string>> ret = new Dictionary<GameObject, List<string>>();
+        foreach (FaceInfo faceInfo in faceInfoList)
+        {
+            List<string> pointsLabels = new List<string>();
+            foreach (var faceInfoPoint in faceInfo.Points)
+            {
+                pointsLabels.Add(faceInfoPoint.Key);
+            }
+            ret.Add(faceInfo.FaceObject, pointsLabels);
+        }
         return ret;
     }
+
+    
 }
