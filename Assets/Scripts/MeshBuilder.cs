@@ -320,6 +320,7 @@ public class MeshBuilder : MonoBehaviour {
                 //vertices3D.Remove(label);
                 //Destroy(todel3D);
                 vertices3D[label].deleted = true;
+                WallGenerator.RemoveFacesFromPoint(label);
                 //TUTAJ USUŃ Z LISTY!!!!!!
                 PointsList.UpdatePointsList();
             }
@@ -352,6 +353,12 @@ public class MeshBuilder : MonoBehaviour {
             {
                 MarkOK(currPts[0]);
                 MarkOK(currPts[1]);
+            }
+
+            if (vertices3D[label].deleted)
+            {
+                PointsList.UpdatePointsList();
+                WallGenerator.RemoveFacesFromPoint(label);
             }
         }   
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");

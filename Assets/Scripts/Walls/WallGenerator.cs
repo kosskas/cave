@@ -194,6 +194,17 @@ public class WallGenerator : MonoBehaviour {
         }
         return ret;
     }
-
-    
+    public static void RemoveFacesFromPoint(string pointLabel)
+    {
+        ///////UWAGA NIE WIADOMO CZY DZIAŁA------------------------
+        List<FaceInfo> faceInfos = WallGenerator.GetFaceInfosFromPointLabel(pointLabel);
+        Debug.Log("faceinfos:" + WallGenerator.faceInfoList.Count);
+        foreach (var faceInfo in faceInfos)
+        {
+            Destroy(faceInfo.FaceObject.gameObject);
+        }
+        WallGenerator.faceInfoList.RemoveAll(faceInfo => faceInfos.Contains(faceInfo));
+        Debug.Log("faceinfos:" + WallGenerator.faceInfoList.Count);
+        /////////----------------------------------------------------
+    }
 }
