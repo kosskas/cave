@@ -262,7 +262,16 @@ public class PointPlacer : MonoBehaviour {
         string labelText = fullLabelText.Trim('\'');
 
         List<EdgeINFO> removedEdges = _RemoveEdgesWithPointCascade(fullLabelText);
-
+        ///////UWAGA NIE WIADOMO CZY DZIAŁA------------------------
+        List<FaceInfo> faceInfos = WallGenerator.GetFaceInfosFromPointLabel(labelText);
+        Debug.Log("faceinfos:" + WallGenerator.faceInfoList.Count);
+        foreach (var faceInfo in faceInfos)
+        {
+            Destroy(faceInfo.FaceObject.gameObject);
+        }
+        WallGenerator.faceInfoList.RemoveAll(faceInfo => faceInfos.Contains(faceInfo));
+        Debug.Log("faceinfos:" + WallGenerator.faceInfoList.Count);
+        /////////----------------------------------------------------
         _mc.RemovePointProjection(_removePoint_Wall, labelText);
 
         Destroy(_removePoint_CurrentlyFocusedGridPoint.transform.Find(labelText).gameObject);
