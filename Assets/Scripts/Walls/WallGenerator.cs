@@ -179,7 +179,7 @@ public class WallGenerator : MonoBehaviour {
         return faceInfosFromPoint;
     }
 
-    public Dictionary<GameObject, List<string>> GetFaces()
+    public static Dictionary<GameObject, List<string>> GetFaces()
     {
         
         Dictionary<GameObject, List<string>> ret = new Dictionary<GameObject, List<string>>();
