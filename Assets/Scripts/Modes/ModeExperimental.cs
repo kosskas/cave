@@ -12,6 +12,10 @@ public class ModeExperimental : IMode
 
     private WallController _wc;
 
+    private MeshBuilder _mc;
+
+    private WallGenerator _wg;
+
     private ItemsController _items;
 
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
@@ -22,8 +26,7 @@ public class ModeExperimental : IMode
     private IRaycastable _hitObject;
 
     private DrawAction _drawAction;
-
-
+    
     /* * * * CONTEXT ACTIONS begin * * * */
 
     private void Act()
@@ -44,6 +47,37 @@ public class ModeExperimental : IMode
     }
 
     /* * * * CONTEXT ACTIONS end * * * */
+
+    private void _BuildWall()
+    {
+        ExPoint point = null;
+
+        _hitObject?.OnHoverAction(gameObject =>
+        {
+            point = gameObject.GetComponent<ExPoint>();
+        });
+
+        if (point == null)
+        {
+            if (_wg.points.Count == 0)
+                return;
+
+            // BUILD WALL
+            _wg.GenerateWall(_wg.points);
+            _wg.points.Clear();
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(point.Label))
+            return;
+
+        Vector3 position;
+        if (!_mc.GetPoints3D().TryGetValue(point.Label, out position))
+            return;
+
+        // ASSIGN TO WALL
+        _wg.points.Add(new KeyValuePair<string, Vector3>(point.Label, position));
+    }
 
     private void _DeleteHoveredObject()
     {
@@ -88,8 +122,9 @@ public class ModeExperimental : IMode
         _items = new ItemsController();
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
         GameObject mainObject = GameObject.Find("MainObject");
-        var mc = mainObject.AddComponent<MeshBuilder>();
-        mc.Init(true,false);
+        _mc = mainObject.AddComponent<MeshBuilder>();
+        _mc.Init(true,false);
+        _wg = mainObject.AddComponent<WallGenerator>();
 
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
@@ -130,6 +165,11 @@ public class ModeExperimental : IMode
         if (Input.GetKeyDown("3"))
         {
             _DeleteHoveredObject();
+        }
+
+        if (Input.GetKeyDown("4"))
+        {
+            _BuildWall();
         }
 
         if (Input.GetKeyDown("8"))
