@@ -34,6 +34,12 @@ namespace Assets.Scripts.Experimental.Items
         private BoxCollider _boxCollider;
         private MeshBuilder _mc;
 
+        private ExPoint _startPoint;
+        private ExPoint _endPoint;
+        private string _startPointLabel;
+        private string _endPointLabel;
+        private bool _isBoundToPoints = false;
+
         void Start()
         {
             _lineRenderer = gameObject.AddComponent<LineRenderer>();
@@ -70,12 +76,15 @@ namespace Assets.Scripts.Experimental.Items
             _boxCollider.size = newColliderSize;
             _boxCollider.center = newColliderCenter;
             _boxCollider.enabled = ColliderEnabled;
+
+            if (_isBoundToPoints)
+                RefreshEdgeProjection();
         }
 
-        public void AddEdgeProjTest(string labelText_1, string labelText_2)
+        void OnDestroy()
         {
-            _mc.AddEdgeProjection(labelText_1, labelText_2);
-
+            if (_isBoundToPoints)
+                RemoveEdgeProjection();
         }
 
         public void Draw(WallInfo plane, params Vector3[] positions)
@@ -131,6 +140,52 @@ namespace Assets.Scripts.Experimental.Items
 
             labelComponent.Text = _labels.Current.ToString();
             Label = _labels.Current.ToString();
+        }
+
+        public void BindPoints(ExPoint startPoint, ExPoint endPoint)
+        {
+            if (_isBoundToPoints)
+                return;
+
+            _startPoint = startPoint;
+            _endPoint = endPoint;
+
+            _startPointLabel = startPoint.Label;
+            _endPointLabel = endPoint.Label;
+
+            AddEdgeProjection();
+
+            _isBoundToPoints = true;
+        }
+
+        private void RefreshEdgeProjection()
+        {
+            if (_startPoint == null || _endPoint == null)
+            {
+                RemoveEdgeProjection();
+                _isBoundToPoints = false;
+                return;
+            }
+
+            if (_startPointLabel == _startPoint.Label && _endPointLabel == _endPoint.Label)
+                return;
+
+            RemoveEdgeProjection();
+
+            _startPointLabel = _startPoint.Label;
+            _endPointLabel = _endPoint.Label;
+
+            AddEdgeProjection();
+        }
+
+        private void RemoveEdgeProjection()
+        {
+            _mc.RemoveEdgeProjection(_startPointLabel, _endPointLabel);
+        }
+
+        private void AddEdgeProjection()
+        {
+            _mc.AddEdgeProjection(_startPointLabel, _endPointLabel);
         }
     }
 }

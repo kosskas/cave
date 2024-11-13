@@ -165,7 +165,7 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.Point: return DrawPoint(plane, position);
 
-                case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, _BOLD_LINE_WIDTH);
+                case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, _BOLD_LINE_WIDTH);
                 
                 case ExContext.Line: return DrawLine(plane, positionWithPointSensitivity);
 
@@ -196,7 +196,7 @@ namespace Assets.Scripts.Experimental
             return null;
         }
 
-        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, float lineWidth = _HELP_LINE_WIDTH)
+        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -220,7 +220,14 @@ namespace Assets.Scripts.Experimental
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
 
                 if (isEnd)
+                {
                     lineComponent.ColliderEnabled = true;
+
+                    var endPoint = hitObject as ExPoint;
+
+                    if (startPoint != null && endPoint != null)
+                        lineComponent.BindPoints(startPoint, endPoint);
+                }
             };
         }
 
