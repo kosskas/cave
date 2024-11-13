@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Assets.Scripts.Experimental.Items;
 using UnityEngine;
 
 namespace Assets.Scripts.Experimental.Utils
@@ -40,7 +41,7 @@ namespace Assets.Scripts.Experimental.Utils
                 boxCollider.center = Vector3.zero;
                 boxCollider.isTrigger = true;
 
-                boxColliderBox.AddComponent<RaycastableComponent>();
+                boxColliderBox.AddComponent<RaycastableDrawableComponent>();
 
                 colliders.Add(boxCollider);
             }
@@ -78,8 +79,16 @@ namespace Assets.Scripts.Experimental.Utils
         }
 
 
-        private class RaycastableComponent : MonoBehaviour, IRaycastable
+        private class RaycastableDrawableComponent : MonoBehaviour, IRaycastable, IDrawable
         {
+
+            void Start()
+            {
+                Plane = gameObject.transform.parent?.parent?.GetComponent<IDrawable>()?.Plane;
+            }
+
+            // IRaycastable
+
             public void OnHoverAction(Action<GameObject> action)
             {
                 gameObject.transform.parent?.parent?.GetComponent<IRaycastable>()?.OnHoverAction(action);
@@ -94,6 +103,13 @@ namespace Assets.Scripts.Experimental.Utils
             {
                 gameObject.transform.parent?.parent?.GetComponent<IRaycastable>()?.OnHoverExit();
             }
+
+            // IDrawable
+
+            public WallInfo Plane { get; private set; }
+
+            public void Draw(WallInfo plane, params Vector3[] positions)
+            {}
         }
     }
 }
