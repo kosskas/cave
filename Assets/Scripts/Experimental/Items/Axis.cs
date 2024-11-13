@@ -15,6 +15,7 @@ namespace Assets.Scripts.Experimental.Items
 
         private const float _WIDTH = 0.01f;
 
+        public WallInfo Plane { get; private set; }
 
         public Vector3 From { get; private set; }
 
@@ -52,6 +53,8 @@ namespace Assets.Scripts.Experimental.Items
         {
             From = positions[0];
             To = positions[1];
+
+            Plane = plane;
         }
     }
 }
