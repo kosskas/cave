@@ -23,6 +23,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public WallInfo Plane { get; private set; }
 
+        public string Label { get; private set; }
+
         private GameObject _pointObject;
 
         private Renderer _pointRenderer;
@@ -107,6 +109,7 @@ namespace Assets.Scripts.Experimental.Items
             _mc.RemovePointProjection(Plane, labelComponent.Text);
 
             labelComponent.Text = _labels.Current.ToString();
+            Label = _labels.Current.ToString();
 
             if (!_labels.CurrentIsDefault)
             {
@@ -132,6 +135,7 @@ namespace Assets.Scripts.Experimental.Items
             _mc.RemovePointProjection(Plane, labelComponent.Text);
 
             labelComponent.Text = _labels.Current.ToString();
+            Label = _labels.Current.ToString();
 
             if (!_labels.CurrentIsDefault)
             {

@@ -27,6 +27,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public WallInfo Plane { get; private set; }
 
+        public string Label { get; private set; }
+
         private LineRenderer _lineRenderer;
 
         private BoxCollider _boxCollider;
@@ -114,6 +116,7 @@ namespace Assets.Scripts.Experimental.Items
             _labels.Next();
 
             labelComponent.Text = _labels.Current.ToString();
+            Label = _labels.Current.ToString();
         }
 
         public void PrevLabel()
@@ -127,6 +130,7 @@ namespace Assets.Scripts.Experimental.Items
             _labels.Previous();
 
             labelComponent.Text = _labels.Current.ToString();
+            Label = _labels.Current.ToString();
         }
     }
 }

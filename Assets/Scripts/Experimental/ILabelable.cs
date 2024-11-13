@@ -8,6 +8,8 @@ namespace Assets.Scripts.Experimental
 {
     public interface ILabelable
     {
+        string Label { get; }
+
         void NextLabel();
 
         void PrevLabel();
