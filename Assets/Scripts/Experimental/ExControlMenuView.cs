@@ -27,6 +27,7 @@ namespace Assets.Scripts.Experimental
             text.AppendLine("1 - zmień rysowany obiekt");
             text.AppendLine("2 - start/stop rysowania");
             text.AppendLine("3 - usuń wskazany obiekt");
+            text.AppendLine("4 - budowanie ścian");
             text.AppendLine("8/9 - zmień etykietę");
 
             _controlMenu.text = text.ToString();

@@ -22,6 +22,7 @@ public class ModeExperimental : IMode
 
     private ExContextMenuView _contextMenuView;
     private ExControlMenuView _controlMenuView;
+    private ExWallBuilderView _wallBuilderView;
 
     private IRaycastable _hitObject;
 
@@ -65,6 +66,7 @@ public class ModeExperimental : IMode
             // BUILD WALL
             _wg.GenerateWall(_wg.points);
             _wg.points.Clear();
+            _wallBuilderView.ClearList();
             return;
         }
 
@@ -77,6 +79,7 @@ public class ModeExperimental : IMode
 
         // ASSIGN TO WALL
         _wg.points.Add(new KeyValuePair<string, Vector3>(point.Label, position));
+        _wallBuilderView.AppendToList(point.Label);
     }
 
     private void _DeleteHoveredObject()
@@ -143,6 +146,8 @@ public class ModeExperimental : IMode
         _contextMenuView.SetCurrentContext(_context.Current.Key);
 
         _controlMenuView = new ExControlMenuView();
+
+        _wallBuilderView = new ExWallBuilderView();
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
