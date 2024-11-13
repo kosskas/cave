@@ -10,8 +10,8 @@ namespace Assets.Scripts.Experimental
         [Description("Punkt")]
         Point,
 
-        [Description("Odcinek")]
-        LineBetweenPoints,
+        [Description("Gruba linia")]
+        BoldLine,
 
         [Description("Linia")]
         Line,

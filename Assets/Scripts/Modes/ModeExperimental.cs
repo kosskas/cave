@@ -15,129 +15,31 @@ public class ModeExperimental : IMode
     private ItemsController _items;
 
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
+
     private ExContextMenuView _contextMenuView;
     private ExControlMenuView _controlMenuView;
-    private Action<WallInfo, Vector3, bool> _drawLineAction;
-    private Action<WallInfo, Vector3, bool> _drawPerpendicularLineAction;
-    private Action<WallInfo, Vector3, bool> _drawParallelLineAction;
-    private Action<WallInfo, ExPoint, Vector3, bool> _drawLineBetweenPointsAction;
-    private Action<WallInfo, Vector3, bool> _drawCircleAction;
-    private Action<WallInfo, Vector3, bool> _drawProjectionAction;
 
     private IRaycastable _hitObject;
+
+    private DrawAction _drawAction;
 
 
     /* * * * CONTEXT ACTIONS begin * * * */
 
-    private void ActPoint()
+    private void Act()
     {
-        WallInfo hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
-        Vector3 pos = PCref.Hit.point;
-        if (hitWall != null)
-        {
-            _items.AddPoint(hitWall, pos);
-        }
-    }
+        var hitObject = _hitObject;
+        var hitPosition = PCref.Hit.point;
+        var hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
 
-    private void ActLineBetweenPoints()
-    {
-        var hitPoint = _hitObject as ExPoint;
-        if (hitPoint == null) return;
-        
-        if (_drawLineBetweenPointsAction == null)
+        if (_drawAction == null)
         {
-            _drawLineBetweenPointsAction = _items.AddLineBetweenPoints(hitPoint.Plane, hitPoint, hitPoint.Position);
+            _drawAction = _items.Add(_context.Current.Key, hitObject, hitPosition, hitWall);
         }
         else
         {
-            _drawLineBetweenPointsAction(hitPoint.Plane, hitPoint, hitPoint.Position, true);
-            _drawLineBetweenPointsAction = null;
-        }
-    }
-
-    private void ActCircle()
-    {
-        var hitPoint = _hitObject as ExPoint;
-        if (hitPoint == null) return;
-        
-        if (_drawCircleAction == null)
-        {
-            _drawCircleAction = _items.AddCircle(hitPoint.Plane, hitPoint.Position);
-        }
-        else
-        {
-            _drawCircleAction(hitPoint.Plane, hitPoint.Position, true);
-            _drawCircleAction = null;
-        }
-    }
-
-    private void ActLine()
-    {
-        WallInfo hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
-        if (hitWall == null) return;
-        
-        if (_drawLineAction == null)
-        {
-            Vector3 from = PCref.Hit.point;
-            _drawLineAction = _items.AddLine(hitWall, from);
-        }
-        else
-        {
-            Vector3 to = PCref.Hit.point;
-            _drawLineAction(hitWall, to, true);
-            _drawLineAction = null;
-        }
-    }
-
-    private void ActPerpendicularLine()
-    {
-        WallInfo hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
-        if (hitWall == null) return;
-
-        if (_drawPerpendicularLineAction == null)
-        {
-            Vector3 from = PCref.Hit.point;
-            _drawPerpendicularLineAction = _items.AddPerpendicularLine(hitWall, from);
-        }
-        else
-        {
-            Vector3 to = PCref.Hit.point;
-            _drawPerpendicularLineAction(hitWall, to, true);
-            _drawPerpendicularLineAction = null;
-        }
-    }
-
-    private void ActParallelLine()
-    {
-        WallInfo hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
-        if (hitWall == null) return;
-
-        if (_drawParallelLineAction == null)
-        {
-            Vector3 from = PCref.Hit.point;
-            _drawParallelLineAction = _items.AddParallelLine(hitWall, from);
-        }
-        else
-        {
-            Vector3 to = PCref.Hit.point;
-            _drawParallelLineAction(hitWall, to, true);
-            _drawParallelLineAction = null;
-        }
-    }
-
-    private void ActProjection()
-    {
-        var hitPoint = _hitObject as ExPoint;
-        WallInfo hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
-
-        if (hitPoint != null && _drawProjectionAction == null)
-        {
-            _drawProjectionAction = _items.AddProjection(hitPoint.Plane, hitPoint.Position);
-        }
-        else if (hitWall != null && _drawProjectionAction != null)
-        {
-            _drawProjectionAction(hitWall, PCref.Hit.point, true);
-            _drawProjectionAction = null;
+            _drawAction(hitObject, hitPosition, hitWall, true);
+            _drawAction = null;
         }
     }
 
@@ -150,6 +52,7 @@ public class ModeExperimental : IMode
         if (hitGameObject == null) return;
 
         UnityEngine.Object.Destroy(hitGameObject);
+
         _hitObject = null;
     }
 
@@ -161,9 +64,9 @@ public class ModeExperimental : IMode
     private void _MoveCursor()
     {
         var hitObject = PCref.Hit.collider.gameObject.GetComponent<IRaycastable>();
+        var hitPosition = PCref.Hit.point;
         var hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
-        var hitPoint = PCref.Hit.point;
-
+        
         if (_hitObject != hitObject)
         {
             _hitObject?.OnHoverExit();
@@ -171,12 +74,7 @@ public class ModeExperimental : IMode
             _hitObject?.OnHoverEnter();
         }
 
-        _drawLineBetweenPointsAction?.Invoke(hitWall, default(ExPoint), hitPoint, false);
-        _drawCircleAction?.Invoke(hitWall, hitPoint, false);
-        _drawLineAction?.Invoke(hitWall, hitPoint, false);
-        _drawPerpendicularLineAction?.Invoke(hitWall, hitPoint, false);
-        _drawParallelLineAction?.Invoke(hitWall, hitPoint, false);
-        _drawProjectionAction?.Invoke(hitWall, hitPoint, false);
+        _drawAction?.Invoke(hitObject, hitPosition, hitWall, false);
     }
 
     public ModeExperimental(PlayerController pc)
@@ -184,8 +82,7 @@ public class ModeExperimental : IMode
         PCref = pc;
         _wc = GameObject.Find("Walls").GetComponent<WallController>();
 
-        _drawLineAction = null;
-        _drawLineBetweenPointsAction = null;
+        _drawAction = null;
         _hitObject = null;
 
         _items = new ItemsController();
@@ -197,13 +94,13 @@ public class ModeExperimental : IMode
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
             {
-                new KeyValuePair<ExContext, Action>(ExContext.Point, ActPoint),
-                new KeyValuePair<ExContext, Action>(ExContext.LineBetweenPoints, ActLineBetweenPoints),
-                new KeyValuePair<ExContext, Action>(ExContext.Line, ActLine),
-                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActPerpendicularLine),
-                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActParallelLine),
-                new KeyValuePair<ExContext, Action>(ExContext.Circle, ActCircle),
-                new KeyValuePair<ExContext, Action>(ExContext.Projection, ActProjection)
+                new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.Line, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.Projection, Act)
             },
             new KeyValuePair<ExContext, Action>(ExContext.Idle, () => {}));
 
@@ -218,13 +115,6 @@ public class ModeExperimental : IMode
     public void HandleInput()
     {
         _MoveCursor();
-
-        // List<Collider> overlappingColliders = Physics.OverlapSphere(PCref.Hit.point, 0.007f).ToList();
-        // if (overlappingColliders.Select(o => o.gameObject.name == "LINE").Count() > 1)
-        // {
-        //     Debug.Log("Multiple colliders intersect.");
-        // }
-
 
         if (Input.GetKeyDown("1"))
         {
