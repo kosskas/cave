@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Assets.Scripts.Experimental.Items;
+using Assets.Scripts.Experimental.Utils;
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 
@@ -13,17 +15,79 @@ namespace Assets.Scripts.Experimental
     {
         private Vector3 Offset(Transform t) => 0.08f * FontSize * t.up;
 
+        private const float LabelFontSize = 0.6f;
+
+        private static readonly Color ColorNormal = Color.black;
+
         private TextMeshPro _textMeshPro;
 
         private GameObject _player;
 
-        public string Text { get; set; } = "";
+        // ------
 
-        public string UpperIndex { get; set; } = "";
+        private CircularIterator<AtomicLabel> _labels = null;
 
-        public string LowerIndex { get; set; } = "";
+        private string ParseLabels()
+        {
+            if (_labels == null)
+                return string.Empty;
 
-        public float FontSize { get; set; } = 1;
+            var sb = new StringBuilder();
+
+            foreach (var label in _labels.All())
+            {
+                if (string.IsNullOrWhiteSpace(label.Text))
+                    continue;
+
+                if (sb.Length > 0)
+                    sb.Append(" = ");
+
+                if (label == _labels.Current)
+                    sb.Append($"<color=#{ColorUtility.ToHtmlStringRGB(FocusedLabelColor)}>");
+
+                sb.Append($"{label.Text}<sup>{label.UpperIndex}</sup><sub>{label.LowerIndex}</sub>");
+
+                if (label == _labels.Current)
+                    sb.Append("</color>");
+            }
+            
+            return sb.ToString();
+        }
+
+        // ---
+
+        public Color FocusedLabelColor { get; set; } = ColorNormal;
+
+        public List<AtomicLabel> Labels => _labels.All().ToList();
+
+        public AtomicLabel FocusedLabel => _labels.Current;
+
+        public void AddLabel(string text, string upperIndex, string lowerIndex)
+        {
+            if (_labels == null)
+                _labels = new CircularIterator<AtomicLabel>(new List<AtomicLabel>());
+
+            _labels.Push(new AtomicLabel(text, upperIndex, lowerIndex));
+        }
+
+        public void RemoveFocusedLabel()
+        {
+            _labels.RemoveCurrent();
+        }
+
+        public void NextLabel()
+        {
+            _labels.Next();
+        }
+
+        public void PrevLabel()
+        {
+            _labels.Previous();
+        }
+
+        // -------
+
+        public float FontSize { get; set; } = LabelFontSize;
 
 
         void Start()
@@ -35,7 +99,7 @@ namespace Assets.Scripts.Experimental
 
             _textMeshPro = textObj.AddComponent<TextMeshPro>();
             _textMeshPro.fontMaterial.shader = Shader.Find("TextMeshPro/Distance Field Overlay");
-            _textMeshPro.color = Color.black;
+            _textMeshPro.color = ColorNormal;
             _textMeshPro.alignment = TextAlignmentOptions.Center;
         }
 
@@ -43,7 +107,7 @@ namespace Assets.Scripts.Experimental
         {
             _textMeshPro.transform.position = gameObject.transform.position + Offset(gameObject.transform);
             _textMeshPro.fontSize = FontSize;
-            _textMeshPro.text = String.IsNullOrWhiteSpace(Text) ? "" : $"{Text}<sup>{UpperIndex}</sup><sub>{LowerIndex}</sub>";
+            _textMeshPro.text = ParseLabels();
 
             Vector3 directionToPlayer = _player.transform.position - _textMeshPro.transform.position;
             _textMeshPro.transform.rotation = Quaternion.LookRotation(-directionToPlayer);

@@ -10,21 +10,14 @@ namespace Assets.Scripts.Experimental.Utils
     public class CircularIterator<TItem>
     {
         private readonly IList<TItem> _items;
-        private readonly TItem _defaultItem;
 
         private int _index;
 
         public TItem Current => _items[_index];
 
-        public bool CurrentIsDefault => Current.Equals(_defaultItem);
-
-        public CircularIterator(IList<TItem> items, TItem defaultItem)
+        public CircularIterator(IList<TItem> items)
         {
-            _defaultItem = defaultItem;
-
             _items = items;
-            _items.Insert(0, defaultItem);
-
             _index = 0;
         }
 
@@ -54,6 +47,30 @@ namespace Assets.Scripts.Experimental.Utils
                 Next();
 
             } while (notAccepted(Current));
+        }
+
+        public void Push(TItem item)
+        {
+            _items.Add(item);
+            _index = _items.Count - 1;
+        }
+
+        public void RemoveCurrent()
+        {
+            _items.RemoveAt(_index);
+
+            if (_index == _items.Count)
+            {
+                _index--;
+            }
+        }
+
+        public IEnumerable<TItem> All()
+        {
+            foreach (var item in _items)
+            {
+                yield return item;
+            }
         }
     }
 }

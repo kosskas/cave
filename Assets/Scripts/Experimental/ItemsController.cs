@@ -18,8 +18,6 @@ namespace Assets.Scripts.Experimental
         private const float _HELP_LINE_WIDTH = 0.002f;
         private const float _BOLD_LINE_WIDTH = 0.005f;
 
-        private const float _LABEL_FONT_SIZE = 0.6f;
-
         private readonly GameObject _workspace;
         private readonly GameObject _axisRepo;
         private readonly GameObject _lineRepo;
@@ -134,8 +132,8 @@ namespace Assets.Scripts.Experimental
             axisComponent.Draw(default(WallInfo), from, to);
 
             var labelComponent = axis.AddComponent<IndexedLabel>();
-            labelComponent.Text = "X";
-            labelComponent.LowerIndex = $"{planeA.number}{planeB.number}";
+            labelComponent.AddLabel("X", "", $"{planeA.number}{planeB.number}");
+            labelComponent.FontSize = 1;
 
             _axisWalls.Add(axisComponent, new Tuple<WallInfo, WallInfo>(planeA, planeB));
         }
@@ -188,10 +186,7 @@ namespace Assets.Scripts.Experimental
 
             var pointComponent = point.AddComponent<ExPoint>();
             pointComponent.Draw(plane, position);
-
-            var labelComponent = point.AddComponent<IndexedLabel>();
-            labelComponent.UpperIndex = new string('\'', plane.number);
-            labelComponent.FontSize = _LABEL_FONT_SIZE;
+            pointComponent.EnabledLabels = true;
 
             return null;
         }
@@ -205,10 +200,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.ColliderEnabled = false;
             lineComponent.Width = lineWidth;
             lineComponent.Draw(plane, startPosition, startPosition);
-
-            var labelComponent = line.AddComponent<IndexedLabel>();
-            labelComponent.UpperIndex = new string('\'', plane.number);
-            labelComponent.FontSize = _LABEL_FONT_SIZE;
+            lineComponent.EnabledLabels = true;
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
@@ -332,11 +324,8 @@ namespace Assets.Scripts.Experimental
             lineComponent.ColliderEnabled = false;
             lineComponent.Width = 0.002f;
             lineComponent.Draw(plane, startPosition, startPosition);
-        
-            var labelComponent = line.AddComponent<IndexedLabel>();
-            labelComponent.UpperIndex = new string('\'', plane.number);
-            labelComponent.FontSize = _LABEL_FONT_SIZE;
-        
+            lineComponent.EnabledLabels = true;
+
             var axis = GetAxis(plane);
             var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
             var startPositionOffsetFromAxis = startPosition - startPositionProjection;
@@ -368,11 +357,8 @@ namespace Assets.Scripts.Experimental
             lineComponent.ColliderEnabled = false;
             lineComponent.Width = 0.002f;
             lineComponent.Draw(plane, startPosition, startPosition);
-        
-            var labelComponent = line.AddComponent<IndexedLabel>();
-            labelComponent.UpperIndex = new string('\'', plane.number);
-            labelComponent.FontSize = _LABEL_FONT_SIZE;
-        
+            lineComponent.EnabledLabels = true;
+
             var axis = GetAxis(plane);
             var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
 

@@ -70,16 +70,16 @@ public class ModeExperimental : IMode
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(point.Label))
+        if (string.IsNullOrWhiteSpace(point.FocusedLabel))
             return;
 
         Vector3 position;
-        if (!_mc.GetPoints3D().TryGetValue(point.Label, out position))
+        if (!_mc.GetPoints3D().TryGetValue(point.FocusedLabel, out position))
             return;
 
         // ASSIGN TO WALL
-        _wg.points.Add(new KeyValuePair<string, Vector3>(point.Label, position));
-        _wallBuilderView.AppendToList(point.Label);
+        _wg.points.Add(new KeyValuePair<string, Vector3>(point.FocusedLabel, position));
+        _wallBuilderView.AppendToList(point.FocusedLabel);
     }
 
     private void _DeleteHoveredObject()
@@ -132,6 +132,7 @@ public class ModeExperimental : IMode
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
             {
+                new KeyValuePair<ExContext, Action>(ExContext.Idle, () => {}),
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Line, Act),
@@ -139,8 +140,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act)
-            },
-            new KeyValuePair<ExContext, Action>(ExContext.Idle, () => {}));
+            });
 
         _contextMenuView = new ExContextMenuView();
         _contextMenuView.SetCurrentContext(_context.Current.Key);
@@ -177,11 +177,35 @@ public class ModeExperimental : IMode
             _BuildWall();
         }
 
+        if (Input.GetKeyDown("5"))
+        {
+            _hitObject?.OnHoverAction((gameObject) =>
+            {
+                gameObject.GetComponent<ILabelable>()?.AddLabel();
+            });
+        }
+
+        if (Input.GetKeyDown("6"))
+        {
+            _hitObject?.OnHoverAction((gameObject) =>
+            {
+                gameObject.GetComponent<ILabelable>()?.RemoveFocusedLabel();
+            });
+        }
+
+        if (Input.GetKeyDown("7"))
+        {
+            _hitObject?.OnHoverAction((gameObject) =>
+            {
+                gameObject.GetComponent<ILabelable>()?.NextLabel();
+            });
+        }
+
         if (Input.GetKeyDown("8"))
         {
             _hitObject?.OnHoverAction((gameObject) =>
             {
-                gameObject.GetComponent<ILabelable>()?.PrevLabel();
+                gameObject.GetComponent<ILabelable>()?.PrevText();
             });
         }
 
@@ -189,7 +213,7 @@ public class ModeExperimental : IMode
         {
             _hitObject?.OnHoverAction((gameObject) =>
             {
-                gameObject.GetComponent<ILabelable>()?.NextLabel();
+                gameObject.GetComponent<ILabelable>()?.NextText();
             });
         }
     }

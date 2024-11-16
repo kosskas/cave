@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Assets.Scripts.Experimental.Utils;
@@ -17,17 +18,13 @@ namespace Assets.Scripts.Experimental.Items
 
         private static readonly float Size = 0.025f;
 
-        private CircularIterator<char> _labels;
-
         public Vector3 Position { get; private set; }
-
-        public WallInfo Plane { get; private set; }
-
-        public string Label { get; private set; }
 
         private GameObject _pointObject;
 
         private Renderer _pointRenderer;
+
+        private IndexedLabel _labelComponent;
 
         private BoxCollider _boxCollider;
 
@@ -54,9 +51,6 @@ namespace Assets.Scripts.Experimental.Items
             _boxCollider.isTrigger = true;
 
             _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
-
-            _labels = new CircularIterator<char>("ABCDEFGHIJKLMNOPRQSTUVWXYZ123456789".ToList(), ' ');
-            Label = _labels.Current.ToString();
         }
 
         void Update()
@@ -66,10 +60,43 @@ namespace Assets.Scripts.Experimental.Items
 
         void OnDestroy()
         {
-            var labelComponent = gameObject.GetComponent<IndexedLabel>();
-            _mc.RemovePointProjection(Plane, labelComponent.Text);
-            RemoveProjectionLine();
+            Labels?.ForEach(label =>
+            {
+                _mc.RemovePointProjection(Plane, label);
+            });
         }
+
+        private GameObject AddProjectionLine(string labelText)
+        {
+            var projectionLineObj = new GameObject(labelText);
+            projectionLineObj.transform.SetParent(gameObject.transform);
+            projectionLineObj.transform.SetPositionAndRotation(gameObject.transform.position, gameObject.transform.rotation);
+
+            projectionLineObj
+                .AddComponent<LineSegment>()
+                .SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+
+            return projectionLineObj;
+        }
+
+        private void RemoveProjectionLine(string labelText)
+        {
+            GameObject projectionLineObjToRemove = null;
+
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.name == labelText)
+                    projectionLineObjToRemove = child.gameObject;
+            }
+
+            if (projectionLineObjToRemove != null)
+                Destroy(projectionLineObjToRemove);
+        }
+
+
+        // IDRAWABLE interface
+
+        public WallInfo Plane { get; private set; }
 
         public void Draw(WallInfo plane, params Vector3[] positions)
         {
@@ -82,6 +109,9 @@ namespace Assets.Scripts.Experimental.Items
             Position = (positions.ElementAtOrDefault(0) == default(Vector3)) ? Position : positions[0];
         }
 
+
+        // IRAYCASTABLE interface
+
         public void OnHoverAction(Action<GameObject> action)
         {
             action(gameObject);
@@ -90,83 +120,114 @@ namespace Assets.Scripts.Experimental.Items
         public void OnHoverEnter()
         {
             _pointRenderer.material.color = ColorFocused;
+
+            if (_labelComponent != null)
+                _labelComponent.FocusedLabelColor = ColorFocused;
         }
 
         public void OnHoverExit()
         {
             _pointRenderer.material.color = ColorNormal;
+
+            if (_labelComponent != null)
+                _labelComponent.FocusedLabelColor = ColorNormal;
+        }
+
+
+        // ILABELABLE interface
+
+        private const char DefaultLabelText = ' ';
+        private const string LabelTexts = "ABCDEFGHIJKLMNOPRQSTUVWXYZ123456789";
+        private readonly CircularIterator<char> _labelTexts = new CircularIterator<char>($"{DefaultLabelText}{LabelTexts}".ToList());
+
+        public bool EnabledLabels { get; set; } = false;
+
+        public string FocusedLabel
+        {
+            get
+            {
+                return _labelComponent?.FocusedLabel.Text
+                       ?? string.Empty;
+            }
+            set
+            {
+                if (_labelComponent != null)
+                    _labelComponent.FocusedLabel.Text = value;
+            }
+        }
+
+        public List<string> Labels => _labelComponent?.Labels.Select(l => l.Text).ToList()
+                                      ?? new List<string>();
+
+        public void AddLabel()
+        {
+            if (!EnabledLabels)
+                return;
+
+            if (_labelComponent == null)
+                _labelComponent = gameObject.AddComponent<IndexedLabel>();
+            
+            _labelComponent.AddLabel(DefaultLabelText.ToString(), new string('\'', Plane.number), "");
+            
+            NextText();
+        }
+
+        public void RemoveFocusedLabel()
+        {
+            if (_labelComponent == null)
+                return;
+
+            _mc.RemovePointProjection(Plane, FocusedLabel);
+            RemoveProjectionLine(FocusedLabel);
+            _labelComponent.RemoveFocusedLabel();
         }
 
         public void NextLabel()
         {
-            var labelComponent = gameObject.GetComponent<IndexedLabel>();
-            if (labelComponent == null)
-            {
-                return;
-            }
-
-            _labels.NextWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()));
-
-            _mc.RemovePointProjection(Plane, labelComponent.Text);
-
-            labelComponent.Text = _labels.Current.ToString();
-            Label = _labels.Current.ToString();
-
-            if (!_labels.CurrentIsDefault)
-            {
-                AddProjectionLine();
-                _mc.AddPointProjection(Plane, _labels.Current.ToString(), gameObject);
-            }
-            else
-            {
-                RemoveProjectionLine();
-            }
+            _labelComponent?.NextLabel();
         }
 
         public void PrevLabel()
         {
-            var labelComponent = gameObject.GetComponent<IndexedLabel>();
-            if (labelComponent == null)
-            {
+            _labelComponent?.PrevLabel();
+        }
+
+        public void NextText()
+        {
+            if (_labelComponent == null)
                 return;
-            }
 
-            _labels.PreviousWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()));
+            _labelTexts.NextWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()));
 
-            _mc.RemovePointProjection(Plane, labelComponent.Text);
-
-            labelComponent.Text = _labels.Current.ToString();
-            Label = _labels.Current.ToString();
-
-            if (!_labels.CurrentIsDefault)
-            {
-                AddProjectionLine();
-                _mc.AddPointProjection(Plane, _labels.Current.ToString(), gameObject);
-            }
-            else
-            {
-                RemoveProjectionLine();
-            }
+            UpdateText();
         }
 
-        private void AddProjectionLine()
+        public void PrevText()
         {
-            var ls = gameObject.GetComponent<LineSegment>();
-            if (ls == null)
-            {
-                gameObject
-                    .AddComponent<LineSegment>()
-                    .SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
-            }
+            if (_labelComponent == null)
+                return;
+
+            _labelTexts.PreviousWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()));
+
+            UpdateText();
         }
 
-        private void RemoveProjectionLine()
+        private void UpdateText()
         {
-            var ls = gameObject.GetComponent<LineSegment>();
-            if (ls != null)
-            {
-                Destroy(gameObject.GetComponent<LineSegment>());
-            }
+            var oldLabelText = FocusedLabel;
+            var newLabelText = _labelTexts.Current.ToString();
+
+            _mc.RemovePointProjection(Plane, oldLabelText);
+            RemoveProjectionLine(oldLabelText);
+
+            FocusedLabel = newLabelText;
+
+            if (_labelTexts.Current.Equals(DefaultLabelText))
+                return;
+
+            var projectionObj = AddProjectionLine(newLabelText);
+            _mc.AddPointProjection(Plane, newLabelText, projectionObj);
         }
+
     }
 }

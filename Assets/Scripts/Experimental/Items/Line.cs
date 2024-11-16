@@ -17,19 +17,15 @@ namespace Assets.Scripts.Experimental.Items
 
         public float Width { get; set; } = 0.005f;
 
-        private CircularIterator<char> _labels;
-
         private Vector3 _from;
 
         private Vector3 _to;
 
         public bool ColliderEnabled { get; set; } = true;
 
-        public WallInfo Plane { get; private set; }
-
-        public string Label { get; private set; }
-
         private LineRenderer _lineRenderer;
+
+        private IndexedLabel _labelComponent;
 
         private BoxCollider _boxCollider;
         private MeshBuilder _mc;
@@ -56,8 +52,6 @@ namespace Assets.Scripts.Experimental.Items
             _boxCollider.isTrigger = true;
 
             _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
-
-            _labels = new CircularIterator<char>("abcdefghijklmnoprqstuvwxyz".ToList(), ' ');
         }
 
         void Update()
@@ -87,6 +81,59 @@ namespace Assets.Scripts.Experimental.Items
                 RemoveEdgeProjection();
         }
 
+        public void BindPoints(ExPoint startPoint, ExPoint endPoint)
+        {
+            if (_isBoundToPoints)
+                return;
+
+            _startPoint = startPoint;
+            _endPoint = endPoint;
+
+            _startPointLabel = startPoint.FocusedLabel;
+            _endPointLabel = endPoint.FocusedLabel;
+
+            AddEdgeProjection();
+
+            _isBoundToPoints = true;
+        }
+
+        private void RefreshEdgeProjection()
+        {
+            if (_startPoint == null || _endPoint == null)
+            {
+                RemoveEdgeProjection();
+                _isBoundToPoints = false;
+                return;
+            }
+
+            //if (_startPointLabel == _startPoint.Label && _endPointLabel == _endPoint.Label)
+            if (_startPoint.Labels.Contains(_startPointLabel) && _endPoint.Labels.Contains(_endPointLabel))
+                return;
+
+            RemoveEdgeProjection();
+            _isBoundToPoints = false;
+
+            //_startPointLabel = _startPoint.Label;
+            //_endPointLabel = _endPoint.Label;
+
+            //AddEdgeProjection();
+        }
+
+        private void RemoveEdgeProjection()
+        {
+            _mc.RemoveEdgeProjection(_startPointLabel, _endPointLabel);
+        }
+
+        private void AddEdgeProjection()
+        {
+            _mc.AddEdgeProjection(_startPointLabel, _endPointLabel);
+        }
+
+
+        // IDRAWABLE interface
+
+        public WallInfo Plane { get; private set; }
+
         public void Draw(WallInfo plane, params Vector3[] positions)
         {
             if (plane != default(WallInfo))
@@ -98,6 +145,9 @@ namespace Assets.Scripts.Experimental.Items
             _from = (positions.ElementAtOrDefault(0) == default(Vector3)) ? _from : positions[0];
             _to = (positions.ElementAtOrDefault(1) == default(Vector3)) ? _to : positions[1];
         }
+
+
+        // IRAYCASTABLE interface
 
         public void OnHoverEnter()
         {
@@ -114,78 +164,79 @@ namespace Assets.Scripts.Experimental.Items
             action(gameObject);
         }
 
+
+        // ILABELABLE interface
+
+        private const char DefaultLabelText = ' ';
+        private const string LabelTexts = "abcdefghijklmnoprqstuvwxyz";
+        private readonly CircularIterator<char> _labelTexts = new CircularIterator<char>($"{DefaultLabelText}{LabelTexts}".ToList());
+
+        public bool EnabledLabels { get; set; } = false;
+
+        public string FocusedLabel
+        {
+            get
+            {
+                return _labelComponent?.FocusedLabel.Text
+                       ?? string.Empty;
+            }
+            set
+            {
+                if (_labelComponent != null)
+                    _labelComponent.FocusedLabel.Text = value;
+            }
+        }
+
+        public List<string> Labels => _labelComponent?.Labels.Select(l => l.Text).ToList()
+                                      ?? new List<string>();
+
+        public void AddLabel()
+        {
+            if (!EnabledLabels)
+                return;
+
+            if (_labelComponent == null)
+                _labelComponent = gameObject.AddComponent<IndexedLabel>();
+
+            _labelComponent.AddLabel("", new string('\'', Plane.number), "");
+
+            NextText();
+        }
+
+        public void RemoveFocusedLabel()
+        {
+            _labelComponent?.RemoveFocusedLabel();
+        }
+
         public void NextLabel()
         {
-            var labelComponent = gameObject.GetComponent<IndexedLabel>();
-            if (labelComponent == null)
-            {
-                return;
-            }
-
-            _labels.Next();
-
-            labelComponent.Text = _labels.Current.ToString();
-            Label = _labels.Current.ToString();
+            _labelComponent?.NextLabel();
         }
 
         public void PrevLabel()
         {
-            var labelComponent = gameObject.GetComponent<IndexedLabel>();
-            if (labelComponent == null)
-            {
-                return;
-            }
-
-            _labels.Previous();
-
-            labelComponent.Text = _labels.Current.ToString();
-            Label = _labels.Current.ToString();
+            _labelComponent?.PrevLabel();
         }
 
-        public void BindPoints(ExPoint startPoint, ExPoint endPoint)
+        public void NextText()
         {
-            if (_isBoundToPoints)
+            if (_labelComponent == null)
                 return;
 
-            _startPoint = startPoint;
-            _endPoint = endPoint;
+            _labelTexts.Next();
 
-            _startPointLabel = startPoint.Label;
-            _endPointLabel = endPoint.Label;
-
-            AddEdgeProjection();
-
-            _isBoundToPoints = true;
+            FocusedLabel = _labelTexts.Current.ToString();
         }
 
-        private void RefreshEdgeProjection()
+        public void PrevText()
         {
-            if (_startPoint == null || _endPoint == null)
-            {
-                RemoveEdgeProjection();
-                _isBoundToPoints = false;
-                return;
-            }
-
-            if (_startPointLabel == _startPoint.Label && _endPointLabel == _endPoint.Label)
+            if (_labelComponent == null)
                 return;
 
-            RemoveEdgeProjection();
+            _labelTexts.Previous();
 
-            _startPointLabel = _startPoint.Label;
-            _endPointLabel = _endPoint.Label;
-
-            AddEdgeProjection();
+            FocusedLabel = _labelTexts.Current.ToString();
         }
 
-        private void RemoveEdgeProjection()
-        {
-            _mc.RemoveEdgeProjection(_startPointLabel, _endPointLabel);
-        }
-
-        private void AddEdgeProjection()
-        {
-            _mc.AddEdgeProjection(_startPointLabel, _endPointLabel);
-        }
     }
 }
