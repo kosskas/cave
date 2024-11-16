@@ -51,35 +51,37 @@ public class ModeExperimental : IMode
 
     private void _BuildWall()
     {
-        ExPoint point = null;
+        // ExPoint point = null;
+        //
+        // _hitObject?.OnHoverAction(gameObject =>
+        // {
+        //     point = gameObject.GetComponent<ExPoint>();
+        // });
+        //
+        // if (point == null)
+        // {
+        //     if (_wg.points.Count == 0)
+        //         return;
+        //
+        //     // BUILD WALL
+        //     _wg.GenerateWall(_wg.points);
+        //     _wg.points.Clear();
+        //     _wallBuilderView.ClearList();
+        //     return;
+        // }
+        //
+        // if (string.IsNullOrWhiteSpace(point.FocusedLabel))
+        //     return;
+        //
+        // Vector3 position;
+        // if (!_mc.GetPoints3D().TryGetValue(point.FocusedLabel, out position))
+        //     return;
+        //
+        // // ASSIGN TO WALL
+        // _wg.points.Add(new KeyValuePair<string, Vector3>(point.FocusedLabel, position));
+        // _wallBuilderView.AppendToList(point.FocusedLabel);
 
-        _hitObject?.OnHoverAction(gameObject =>
-        {
-            point = gameObject.GetComponent<ExPoint>();
-        });
-
-        if (point == null)
-        {
-            if (_wg.points.Count == 0)
-                return;
-
-            // BUILD WALL
-            _wg.GenerateWall(_wg.points);
-            _wg.points.Clear();
-            _wallBuilderView.ClearList();
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(point.FocusedLabel))
-            return;
-
-        Vector3 position;
-        if (!_mc.GetPoints3D().TryGetValue(point.FocusedLabel, out position))
-            return;
-
-        // ASSIGN TO WALL
-        _wg.points.Add(new KeyValuePair<string, Vector3>(point.FocusedLabel, position));
-        _wallBuilderView.AppendToList(point.FocusedLabel);
+        _wg.GenerateWall(_wg.points);
     }
 
     private void _DeleteHoveredObject()
@@ -95,7 +97,22 @@ public class ModeExperimental : IMode
 
     private void _MakeAction()
     {
-        _context.Current.Value();
+        if (PCref.Hit.collider.tag == "PointButton")
+        {
+            _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
+        }
+        else if (PCref.Hit.collider.gameObject.name == "UpButton")
+        {
+            PointsList.PointListGoUp();
+        }
+        else if (PCref.Hit.collider.gameObject.name == "DownButton")
+        {
+            PointsList.PointListGoDown();
+        }
+        else
+        {
+            _context.Current.Value();
+        }
     }
 
     private void _MoveCursor()
@@ -148,6 +165,8 @@ public class ModeExperimental : IMode
         _controlMenuView = new ExControlMenuView();
 
         _wallBuilderView = new ExWallBuilderView();
+
+        PointsList.ShowListAndLogs();
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
