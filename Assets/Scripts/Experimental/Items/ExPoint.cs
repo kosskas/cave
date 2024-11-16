@@ -170,6 +170,9 @@ namespace Assets.Scripts.Experimental.Items
             _labelComponent.AddLabel(DefaultLabelText.ToString(), new string('\'', Plane.number), "");
             
             NextText();
+
+            if (FocusedLabel.Equals(DefaultLabelText.ToString()))
+                RemoveFocusedLabel();
         }
 
         public void RemoveFocusedLabel()
@@ -197,9 +200,10 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 return;
 
-            _labelTexts.NextWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()));
+            var found = _labelTexts.NextWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
 
-            UpdateText();
+            if (found)
+                UpdateText();
         }
 
         public void PrevText()
@@ -207,9 +211,10 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 return;
 
-            _labelTexts.PreviousWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()));
+            var found = _labelTexts.PreviousWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
 
-            UpdateText();
+            if (found)
+                UpdateText();
         }
 
         private void UpdateText()

@@ -31,22 +31,36 @@ namespace Assets.Scripts.Experimental.Utils
             _index = (_index + 1 == _items.Count) ? 0 : _index + 1;
         }
 
-        public void PreviousWhile(Predicate<TItem> notAccepted)
+        public bool PreviousWhile(Predicate<TItem> notAccepted)
         {
+            var startIndex = _index;
+
             do
             {
                 Previous();
 
+                if (_index == startIndex)
+                    return false;
+
             } while (notAccepted(Current));
+
+            return true;
         }
 
-        public void NextWhile(Predicate<TItem> notAccepted)
+        public bool NextWhile(Predicate<TItem> notAccepted)
         {
+            var startIndex = _index;
+
             do
             {
                 Next();
 
+                if (_index == startIndex)
+                    return false;
+
             } while (notAccepted(Current));
+
+            return true;
         }
 
         public void Push(TItem item)
