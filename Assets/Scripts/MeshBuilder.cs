@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Threading;
-using UnityEditorInternal;
 using System.Xml.Serialization;
 using System.Reflection;
 using System;
 using UnityEngine.Internal.Experimental.UIElements;
 using System.Text.RegularExpressions;
-using UnityEngine.Purchasing;
 
 /// <summary>
 /// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi.
