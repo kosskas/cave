@@ -49,50 +49,12 @@ public class ModeExperimental : IMode
 
     /* * * * CONTEXT ACTIONS end * * * */
 
-    private void _BuildWall()
+    /* * * * INPUT HANDLERS begin * * * */
+
+    private void _ChangeDrawContext()
     {
-        // ExPoint point = null;
-        //
-        // _hitObject?.OnHoverAction(gameObject =>
-        // {
-        //     point = gameObject.GetComponent<ExPoint>();
-        // });
-        //
-        // if (point == null)
-        // {
-        //     if (_wg.points.Count == 0)
-        //         return;
-        //
-        //     // BUILD WALL
-        //     _wg.GenerateWall(_wg.points);
-        //     _wg.points.Clear();
-        //     _wallBuilderView.ClearList();
-        //     return;
-        // }
-        //
-        // if (string.IsNullOrWhiteSpace(point.FocusedLabel))
-        //     return;
-        //
-        // Vector3 position;
-        // if (!_mc.GetPoints3D().TryGetValue(point.FocusedLabel, out position))
-        //     return;
-        //
-        // // ASSIGN TO WALL
-        // _wg.points.Add(new KeyValuePair<string, Vector3>(point.FocusedLabel, position));
-        // _wallBuilderView.AppendToList(point.FocusedLabel);
-
-        _wg.GenerateWall(_wg.points);
-    }
-
-    private void _DeleteHoveredObject()
-    {
-        GameObject hitGameObject = null;
-        _hitObject?.OnHoverAction(gameObject => hitGameObject = gameObject);
-        if (hitGameObject == null) return;
-
-        UnityEngine.Object.Destroy(hitGameObject);
-
-        _hitObject = null;
+        _context.Next();
+        _contextMenuView.SetCurrentContext(_context.Current.Key);
     }
 
     private void _MakeAction()
@@ -113,7 +75,63 @@ public class ModeExperimental : IMode
         {
             _context.Current.Value();
         }
+
+        // !!!! _wg.GenerateWall(_wg.points);
     }
+
+    private void _DeleteHoveredObject()
+    {
+        GameObject hitGameObject = null;
+        _hitObject?.OnHoverAction(gameObject => hitGameObject = gameObject);
+        if (hitGameObject == null) return;
+
+        UnityEngine.Object.Destroy(hitGameObject);
+
+        _hitObject = null;
+    }
+
+    private void _TryGetNextLabelText()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.NextText();
+        });
+    }
+
+    private void _TryGetPrevLabelText()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.PrevText();
+        });
+    }
+
+    private void _TryGetNextLabel()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.NextLabel();
+        });
+    }
+
+    private void _TryRemoveFocusedLabel()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.RemoveFocusedLabel();
+        });
+    }
+
+    private void _TryAddLabel()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.AddLabel();
+        });
+    }
+
+    /* * * * INPUT HANDLERS end * * * */
+
 
     private void _MoveCursor()
     {
@@ -130,6 +148,7 @@ public class ModeExperimental : IMode
 
         _drawAction?.Invoke(hitObject, hitPosition, hitWall, false);
     }
+
 
     public ModeExperimental(PlayerController pc)
     {
@@ -177,8 +196,7 @@ public class ModeExperimental : IMode
 
         if (Input.GetKeyDown("1"))
         {
-            _context.Next();
-            _contextMenuView.SetCurrentContext(_context.Current.Key);
+            _ChangeDrawContext();
         }
 
         if (Input.GetKeyDown("2"))
@@ -191,49 +209,29 @@ public class ModeExperimental : IMode
             _DeleteHoveredObject();
         }
 
-        if (Input.GetKeyDown("4"))
-        {
-            _BuildWall();
-        }
-
         if (Input.GetKeyDown("5"))
         {
-            _hitObject?.OnHoverAction((gameObject) =>
-            {
-                gameObject.GetComponent<ILabelable>()?.AddLabel();
-            });
+            _TryAddLabel();
         }
 
         if (Input.GetKeyDown("6"))
         {
-            _hitObject?.OnHoverAction((gameObject) =>
-            {
-                gameObject.GetComponent<ILabelable>()?.RemoveFocusedLabel();
-            });
+            _TryRemoveFocusedLabel();
         }
 
         if (Input.GetKeyDown("7"))
         {
-            _hitObject?.OnHoverAction((gameObject) =>
-            {
-                gameObject.GetComponent<ILabelable>()?.NextLabel();
-            });
+            _TryGetNextLabel();
         }
 
         if (Input.GetKeyDown("8"))
         {
-            _hitObject?.OnHoverAction((gameObject) =>
-            {
-                gameObject.GetComponent<ILabelable>()?.PrevText();
-            });
+            _TryGetPrevLabelText();
         }
 
         if (Input.GetKeyDown("9"))
         {
-            _hitObject?.OnHoverAction((gameObject) =>
-            {
-                gameObject.GetComponent<ILabelable>()?.NextText();
-            });
+            _TryGetNextLabelText();
         }
     }
 }
