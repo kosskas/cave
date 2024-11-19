@@ -155,6 +155,8 @@ public class ModeExperimental : IMode
         PCref = pc;
         _wc = GameObject.Find("Walls").GetComponent<WallController>();
 
+        SetUpFlystick();
+
         _drawAction = null;
         _hitObject = null;
 
@@ -233,5 +235,10 @@ public class ModeExperimental : IMode
         {
             _TryGetNextLabelText();
         }
+    }
+
+    public void SetUpFlystick()
+    {
+        //throw new NotImplementedException();
     }
 }

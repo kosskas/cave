@@ -60,8 +60,8 @@ public class PlayerController : MonoBehaviour
         _flystickController = GetComponentInChildren<FlystickController>();
         _characterController = GetComponentInChildren<CharacterController>();
 
-        //_ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        _ray = new Ray(_flystickController.RayLineOrigin, _flystickController.RayLineDirection);
+        _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //_ray = new Ray(_flystickController.RayLineOrigin, _flystickController.RayLineDirection);
 
         _SetModeController();
 
@@ -82,9 +82,9 @@ public class PlayerController : MonoBehaviour
 
     private void _UpdateRaycasting()
     {
-        //_ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        _ray.origin = _flystickController.RayLineOrigin;
-        _ray.direction = _flystickController.RayLineDirection;
+        _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //_ray.origin = _flystickController.RayLineOrigin;
+        //_ray.direction = _flystickController.RayLineDirection;
         Physics.Raycast(_ray, out Hit, 100);
     }
 

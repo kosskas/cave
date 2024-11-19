@@ -89,8 +89,14 @@ public class PointsList : MonoBehaviour {
 
 	public static void UpdatePointsList()
     {
+        if (_mb == null)
+            return;
 
         var pointsDictionary = _mb.GetPoints3D();
+
+		if (pointsDictionary == null) 
+            return;
+
         points.RemoveAll(p => !pointsDictionary.ContainsKey(p.Key));
         foreach (var point in pointsDictionary)
         {

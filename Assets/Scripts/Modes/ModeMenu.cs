@@ -55,19 +55,11 @@ public class ModeMenu : IMode
 
     public void SetUpFlystick()
     {
+        return;
+
         FlystickController.ClearActions();
 
-        FlystickController.SetAction(
-            FlystickController.Btn._1, 
-            FlystickController.ActOn.PRESS, 
-            () => _GoToMode3Dto2D()
-        );
-
-        FlystickController.SetAction(
-            FlystickController.Btn._2, 
-            FlystickController.ActOn.PRESS, 
-            () => _GoToMode2Dto3D()
-        );
+        
     }
 
     public void HandleInput()
@@ -75,7 +67,17 @@ public class ModeMenu : IMode
         //if (Input.GetKeyDown("1"))
         //{
         //    PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
-        //}
+        //}// FlystickController.SetAction(
+        //     FlystickController.Btn._1, 
+        //     FlystickController.ActOn.PRESS, 
+        //     () => _GoToMode3Dto2D()
+        // );
+        //
+        // FlystickController.SetAction(
+        //     FlystickController.Btn._2, 
+        //     FlystickController.ActOn.PRESS, 
+        //     () => _GoToMode2Dto3D()
+        // );
 
         //if (Input.GetKeyDown("2"))
         //{

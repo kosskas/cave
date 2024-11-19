@@ -155,6 +155,8 @@ public class Mode2Dto3D : IMode
 
     public void SetUpFlystick()
     {
+        return;
+
         FlystickController.ClearActions();
 
         FlystickController.SetAction(
