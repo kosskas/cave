@@ -10,7 +10,7 @@ namespace Assets.Scripts.Experimental.Utils
 {
     public class RingCollider : MonoBehaviour
     {
-        private const int Segments = 100;
+        private const int Segments = 60;
 
         private List<BoxCollider> colliders = new List<BoxCollider>();
 
