@@ -31,7 +31,12 @@ public class ModeMenu : IMode
                 _HideModesButtons();
                 PCref.ChangeMode(PlayerController.Mode.Mode2Dto3D);
             }
-            
+            else if (PCref.Hit.collider.gameObject.name == "ExpButton")
+            {
+                _HideModesButtons();
+                PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
+            }
+
         }
     }
 
@@ -39,6 +44,7 @@ public class ModeMenu : IMode
     {
         GameObject wizButton = GameObject.Find("WizButton");
         GameObject kreaButton = GameObject.Find("KreaButton");
+        GameObject expButton = GameObject.Find("ExpButton");
 
         if (wizButton != null)
         {
@@ -48,28 +54,19 @@ public class ModeMenu : IMode
         {
             kreaButton.SetActive(false);
         }
+        if (expButton != null)
+        {
+            expButton.SetActive(false);
+        }
     }
 
     public void HandleInput()
     {
-        //if (Input.GetKeyDown("1"))
-        //{
-        //    PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
-        //}
 
-        //if (Input.GetKeyDown("2"))
-        //{
-        //    PCref.ChangeMode(PlayerController.Mode.Mode2Dto3D);
-        //}
         if (Input.GetKeyDown("5"))
         {
             _MakeActionOnWall();
         }
 
-        if (Input.GetKeyDown("3"))
-        {
-            _HideModesButtons();
-            PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
-        }
     }
 }

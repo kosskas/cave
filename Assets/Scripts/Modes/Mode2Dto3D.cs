@@ -64,6 +64,10 @@ public class Mode2Dto3D : IMode
             {
                 PointsList.PointListGoDown();
             }
+            else if (PCref.Hit.collider.gameObject.name == "GenerateButton")
+            {
+                _wg.GenerateWall(_wg.points);
+            }
         }
     }
 
