@@ -53,7 +53,7 @@ public class ConstrDrawer : MonoBehaviour
         const float antiztrackhit = 0.002f;
         Vector3 fixedpos1 = pos1 + antiztrackhit * wall.GetNormal();
         Vector3 fixedpos2 = pos2 + antiztrackhit * wall.GetNormal();
-        const int steps = 100;
+        const int steps = 60;
         float radius = Vector3.Distance(fixedpos1, fixedpos2);
         Vector3 center = fixedpos1; //?
 
@@ -76,16 +76,16 @@ public class ConstrDrawer : MonoBehaviour
         circleRenderer.startWidth = ReconstructionInfo.CIRCLE_2D_WIDTH; 
         circleRenderer.endWidth = ReconstructionInfo.CIRCLE_2D_WIDTH;
 
+        float theta = (2 * Mathf.PI) / steps;
+        float angle = 0;
         for (int step = 0; step <= steps; step++)
         {
-            float progress = (float)step / steps;
-            float radian = 2 * Mathf.PI * progress;
-
-            float x = Mathf.Cos(radian) * radius;
-            float y = Mathf.Sin(radian) * radius;
+            float x = Mathf.Cos(angle) * radius;
+            float y = Mathf.Sin(angle) * radius;
 
             Vector3 currPos = center + right * x + up * y;
             circleRenderer.SetPosition(step, currPos);
+            angle += theta;
         }
     }
 

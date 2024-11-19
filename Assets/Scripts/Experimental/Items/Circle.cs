@@ -16,7 +16,7 @@ namespace Assets.Scripts.Experimental.Items
 
         private static readonly float Width = 0.002f;
 
-        private static readonly int PositionsCount = 100;
+        private static readonly int PositionsCount = 60;
 
         private Vector3 _center;
 
