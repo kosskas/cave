@@ -71,12 +71,14 @@ public class ModeExperimental : IMode
         {
             PointsList.PointListGoDown();
         }
+        else if (PCref.Hit.collider.gameObject.name == "GenerateButton")
+        {
+            _wg.GenerateWall(_wg.points);
+        }
         else
         {
             _context.Current.Value();
         }
-
-        // !!!! _wg.GenerateWall(_wg.points);
     }
 
     private void _DeleteHoveredObject()
