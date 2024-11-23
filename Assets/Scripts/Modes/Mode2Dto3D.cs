@@ -159,8 +159,6 @@ public class Mode2Dto3D : IMode
 
     public void SetUpFlystick()
     {
-        return;
-
         FlystickController.ClearActions();
 
         FlystickController.SetAction(
@@ -176,6 +174,18 @@ public class Mode2Dto3D : IMode
         );
 
         FlystickController.SetAction(
+            FlystickController.Btn._3,
+            FlystickController.ActOn.PRESS,
+            () => _AddEdgeProjection()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._4,
+            FlystickController.ActOn.PRESS,
+            () => _RemoveEdgeProjection()
+        );
+
+        FlystickController.SetAction(
             FlystickController.Btn.JOYSTICK, 
             FlystickController.ActOn.TILT_LEFT, 
             () => _ChoosePreviousLabel()
@@ -186,51 +196,75 @@ public class Mode2Dto3D : IMode
             FlystickController.ActOn.TILT_RIGHT, 
             () => _ChooseNextLabel()
         );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_UP,
+            () => _pp.HandleAddingCircle()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_DOWN,
+            () => _pp.HandleAddingLine()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.PRESS,
+            () => _SaveSolidAndSwitchToMode3Dto2D()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.FIRE,
+            FlystickController.ActOn.PRESS,
+            () => _MakeActionOnWall()
+        );
     }
 
     public void HandleInput()
     {
         _pp.MoveCursor(PCref.Hit);
 
-        if (Input.GetKeyDown("1"))
-        {
-            _AddPointProjection();
-        }
+            if (Input.GetKeyDown("1"))
+            {
+                _AddPointProjection();
+            }
 
-        if (Input.GetKeyDown("2"))
-        {
-            _RemovePointProjection();
-        }
+            if (Input.GetKeyDown("2"))
+            {
+                _RemovePointProjection();
+            }
 
-        if (Input.GetKeyDown("3"))
-        {
-            _AddEdgeProjection();
-        }
+            if (Input.GetKeyDown("3"))
+            {
+                _AddEdgeProjection();
+            }
 
-        if (Input.GetKeyDown("4"))
-        {
-            _RemoveEdgeProjection();
-        }
+            if (Input.GetKeyDown("4"))
+            {
+                _RemoveEdgeProjection();
+            }
 
-        if (Input.GetKeyDown("5"))
-        {
-            _MakeActionOnWall();
-        }
+            if (Input.GetKeyDown("5"))
+            {
+                _MakeActionOnWall();
+            }
 
-        if (Input.GetKeyDown("6"))
-        {
-            _SaveSolidAndSwitchToMode3Dto2D();
-        }
+            if (Input.GetKeyDown("6"))
+            {
+                _SaveSolidAndSwitchToMode3Dto2D();
+            }
 
-        if (Input.GetKeyDown("7"))
-        {
-            _ChoosePreviousLabel();
-        }
+            if (Input.GetKeyDown("7"))
+            {
+                _ChoosePreviousLabel();
+            }
 
-        if (Input.GetKeyDown("8"))
-        {
-            _ChooseNextLabel();
-        }
+            if (Input.GetKeyDown("8"))
+            {
+                _ChooseNextLabel();
+            }
 
         if (Input.GetKeyDown("9"))
         {
@@ -242,10 +276,10 @@ public class Mode2Dto3D : IMode
             _pp.HandleAddingLine();
         }
 
-        if (Input.GetKeyDown("g"))
-        {
-            _wg.GenerateWall(_wg.points);
-        }
+        //if (Input.GetKeyDown("g"))
+        //{
+        //    _wg.GenerateWall(_wg.points);
+        //}
     }
 
 }

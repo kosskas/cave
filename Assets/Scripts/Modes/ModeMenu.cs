@@ -65,11 +65,13 @@ public class ModeMenu : IMode
 
     public void SetUpFlystick()
     {
-        return;
-
         FlystickController.ClearActions();
 
-        
+        FlystickController.SetAction(
+            FlystickController.Btn.FIRE,
+            FlystickController.ActOn.PRESS,
+            () => _MakeActionOnWall()
+        );
     }
 
     public void HandleInput()

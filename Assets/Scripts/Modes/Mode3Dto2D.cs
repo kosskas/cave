@@ -92,8 +92,6 @@ public class Mode3Dto2D : IMode
 
     public void SetUpFlystick()
     {
-        return;
-
         FlystickController.ClearActions();
 
         FlystickController.SetAction(
