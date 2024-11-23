@@ -69,67 +69,58 @@ public class WallGenerator : MonoBehaviour {
 
     public void CreateWall(List<KeyValuePair<string, Vector3>> points)
     {
-        // 1. Tworzymy nowy obiekt dla ściany
+        
         GameObject wallObject = new GameObject("Face");
         wallObject.transform.SetParent(this.transform);
 
-        // Dodaj komponenty MeshFilter i MeshRenderer
         MeshFilter meshFilter = wallObject.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = wallObject.AddComponent<MeshRenderer>();
-
-        // Ustawienie materiału dla ściany (upewnij się, że materiał jest przypisany w Unity)
         meshRenderer.material = new Material(Shader.Find("Standard"));
 
-        // Stwórz nowy mesh
         Mesh mesh = new Mesh();
 
-        // 2. Przekształć punkty do listy Vector3
+        
         List<Vector3> vertices = new List<Vector3>();
         foreach (var point in points)
         {
             vertices.Add(point.Value);
         }
 
-        // 3. Przypisz wierzchołki do mesh
         mesh.vertices = vertices.ToArray();
 
-        // 4. Tworzenie trójkątów dla obu stron
         List<int> triangles = new List<int>();
 
-        // Tworzymy trójkąty w standardowej kolejności
+        
         for (int i = 1; i < vertices.Count - 1; i++)
         {
-            triangles.Add(0);       // pierwszy punkt jako środek
-            triangles.Add(i);       // aktualny punkt
-            triangles.Add(i + 1);   // następny punkt
+            triangles.Add(0);       
+            triangles.Add(i);       
+            triangles.Add(i + 1);   
         }
 
-        // Tworzymy trójkąty w odwrotnej kolejności dla drugiej strony
+       
         for (int i = 1; i < vertices.Count - 1; i++)
         {
-            triangles.Add(0);       // pierwszy punkt jako środek
-            triangles.Add(i + 1);   // następny punkt
-            triangles.Add(i);       // aktualny punkt
+            triangles.Add(0);       
+            triangles.Add(i + 1);   
+            triangles.Add(i);       
         }
 
-        // Przypisz trójkąty do mesh
+        
         mesh.triangles = triangles.ToArray();
 
-        // 5. Oblicz normalne, aby uzyskać prawidłowe oświetlenie
+        
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
 
-        // Set the material for the MeshRenderer (you can create your own material or use an existing one)
+        
         meshRenderer.material = new Material(Shader.Find("Transparent/Diffuse"));
         Color color = Color.white;
         color.a = SOLID_WALL_TRANSPARENCY;
 
-        // Ustawienie koloru na biały
+        
         meshRenderer.material.color = color;
 
-       
-
-        // 6. Przypisz mesh do MeshFilter
         meshFilter.mesh = mesh;
 
         List<KeyValuePair<string, Vector3>> copied_points = points
@@ -207,5 +198,16 @@ public class WallGenerator : MonoBehaviour {
         WallGenerator.faceInfoList.RemoveAll(faceInfo => faceInfos.Contains(faceInfo));
         Debug.Log("faceinfos:" + WallGenerator.faceInfoList.Count);
         /////////----------------------------------------------------
+    }
+
+    public void Clear()
+    {
+        foreach (var faceInfo in faceInfoList)
+        {
+            if (faceInfo.FaceObject != null)
+            {
+                Destroy(faceInfo.FaceObject);
+            }
+        }
     }
 }

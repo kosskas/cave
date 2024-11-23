@@ -80,6 +80,11 @@ public class Mode2Dto3D : IMode
         {
             Debug.LogError("Error - save failed");
         }
+
+        //czyszcenie œcian obiektu
+        _wg.Clear();
+        GameObject.Destroy(_wg);
+
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _gc.Clear();
         GameObject.Destroy(_gc);
