@@ -29,7 +29,11 @@ public class ObjectRotator : MonoBehaviour {
 	}
 
 	void Update(){
-		transform.rotation = tmp.transform.rotation;
+        if (isRotating)
+        {
+            transform.rotation = Lzwp.input.flysticks[0].pose.rotation;
+        }
+
 	}
 	/// <summary>
 	/// Kamera potrzebna do wyliczania obrotu

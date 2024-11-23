@@ -185,9 +185,9 @@ public class ModeExperimental : IMode
         _contextMenuView = new ExContextMenuView();
         _contextMenuView.SetCurrentContext(_context.Current.Key);
 
-        _controlMenuView = new ExControlMenuView();
+        //_controlMenuView = new ExControlMenuView();
 
-        _wallBuilderView = new ExWallBuilderView();
+        //_wallBuilderView = new ExWallBuilderView();
 
         PointsList.ShowListAndLogs();
 
@@ -198,49 +198,99 @@ public class ModeExperimental : IMode
     {
         _MoveCursor();
 
-        if (Input.GetKeyDown("1"))
-        {
-            _ChangeDrawContext();
-        }
+            if (Input.GetKeyDown("1"))
+            {
+                _ChangeDrawContext();
+            }
 
-        if (Input.GetKeyDown("2"))
-        {
-            _MakeAction();
-        }
+            if (Input.GetKeyDown("2"))
+            {
+                _MakeAction();
+            }
 
-        if (Input.GetKeyDown("3"))
-        {
-            _DeleteHoveredObject();
-        }
+            if (Input.GetKeyDown("3"))
+            {
+                _DeleteHoveredObject();
+            }
 
-        if (Input.GetKeyDown("5"))
-        {
-            _TryAddLabel();
-        }
+            if (Input.GetKeyDown("5"))
+            {
+                _TryAddLabel();
+            }
 
-        if (Input.GetKeyDown("6"))
-        {
-            _TryRemoveFocusedLabel();
-        }
+            if (Input.GetKeyDown("6"))
+            {
+                _TryRemoveFocusedLabel();
+            }
 
-        if (Input.GetKeyDown("7"))
-        {
-            _TryGetNextLabel();
-        }
+            if (Input.GetKeyDown("7"))
+            {
+                _TryGetNextLabel();
+            }
 
-        if (Input.GetKeyDown("8"))
-        {
-            _TryGetPrevLabelText();
-        }
+            if (Input.GetKeyDown("8"))
+            {
+                _TryGetPrevLabelText();
+            }
 
-        if (Input.GetKeyDown("9"))
-        {
-            _TryGetNextLabelText();
-        }
+            if (Input.GetKeyDown("9"))
+            {
+                _TryGetNextLabelText();
+            }
     }
 
     public void SetUpFlystick()
     {
-        //throw new NotImplementedException();
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1,
+            FlystickController.ActOn.PRESS,
+            () => _MakeAction()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._2,
+            FlystickController.ActOn.PRESS,
+            () => _DeleteHoveredObject()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._3,
+            FlystickController.ActOn.PRESS,
+            () => _TryAddLabel()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._4,
+            FlystickController.ActOn.PRESS,
+            () => _TryRemoveFocusedLabel()
+        );
+
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            () => _TryGetPrevLabelText()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            () => _TryGetNextLabelText()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_UP,
+            () => _TryGetNextLabel()
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_DOWN,
+            () => _ChangeDrawContext()
+        );
+
     }
 }
