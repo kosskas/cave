@@ -174,23 +174,28 @@ public class ObjectProjecter : MonoBehaviour {
 	/// Rzutuje punkty i krawędzie bryły na płaszczyzny
 	/// </summary>
 	private void ProjectObject(){
-		foreach(WallInfo wall in egdesOnWalls.Keys)
+		foreach(WallInfo wall in verticesOnWalls.Keys)
 		{
-			foreach(int idx in egdesOnWalls[wall].Keys)
+			foreach(var vertice in verticesOnWalls[wall])
 			{
-				CastRay(egdesOnWalls[wall][idx].start, egdesOnWalls[wall][idx].nOfProj,wall.showProjection, globalShowlines && wall.showLines);
-                CastRay(egdesOnWalls[wall][idx].end, egdesOnWalls[wall][idx].nOfProj, wall.showProjection, globalShowlines && wall.showLines);
-                DrawEgdeLine(egdesOnWalls[wall][idx], wall.showProjection);
+				CastRay(vertice.Value, wall.number,wall.showProjection, globalShowlines && wall.showLines);
             }
 		}
-		/*		
+        foreach (WallInfo wall in egdesOnWalls.Keys)
+        {
+            foreach (int idx in egdesOnWalls[wall].Keys)
+            {
+                DrawEgdeLine(egdesOnWalls[wall][idx], wall.showProjection);
+            }
+        }
+        /*		
 		foreach (var edge in edgesprojs)
 		{
 				CastRay(edge.start, edge.nOfProj);
 				CastRay(edge.end, edge.nOfProj);
 				DrawEgdeLine(edge, true);
 		}
-		*/		
+		*/
     }
     /// <summary>
     /// Wyznacza rzut punktu na zadaną płaszczyznę
@@ -259,33 +264,24 @@ public class ObjectProjecter : MonoBehaviour {
 			//słownik krawędzi na danej rzutni
 			Dictionary<int, EdgeProjection> egdeOnThisPlane = new Dictionary<int, EdgeProjection>();
 			int i=0; //numer krawędzi, potrzebny do Dictionary
-			foreach(var edge in edges){
-				VertexProjection p1 = null;
-				VertexProjection p2 = null;
-				if(vertexOnThisPlane.ContainsKey(edge.endPoints.Item1)){
-					p1 = vertexOnThisPlane[edge.endPoints.Item1];
-				}
-				else{
-					p1 = VertexProjection.CreateVertexProjection(VertexProjections, edge.endPoints.Item1, wall.number);
+            foreach (var vertice in rotatedVertices)
+            {
+                VertexProjection p1 = VertexProjection.CreateVertexProjection(VertexProjections, vertice.Key, wall.number);
+                p1.SetDisplay(vertice.Key + new string('\'', wall.number + 1), projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize, projectionInfo.projectionLineColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
+                vertexOnThisPlane[vertice.Key] = p1;
+            }
+            foreach (var edge in edges)
+            {
+                VertexProjection p1 = vertexOnThisPlane[edge.endPoints.Item1];
+                VertexProjection p2 = vertexOnThisPlane[edge.endPoints.Item2];
 
-					p1.SetDisplay(edge.endPoints.Item1 + new string('\'', wall.number+1), projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLineColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
-                    vertexOnThisPlane[edge.endPoints.Item1] = p1;
-				}
-				if(vertexOnThisPlane.ContainsKey(edge.endPoints.Item2)){
-					p2= vertexOnThisPlane[edge.endPoints.Item2];
-				}
-				else{
-					p2 = VertexProjection.CreateVertexProjection(VertexProjections, edge.endPoints.Item2, wall.number);
-					p2.SetDisplay(edge.endPoints.Item2 + new string('\'', wall.number+1), projectionInfo.pointColor, projectionInfo.pointSize, projectionInfo.pointLabelColor, projectionInfo.pointLabelSize,projectionInfo.projectionLineColor, projectionInfo.projectionLineWidth, projectionInfo.projectionLabelColor, projectionInfo.projectionLabelSize);
-                    vertexOnThisPlane[edge.endPoints.Item2] = p2;
-				}
-				EdgeProjection edgeProj = EdgeProjection.CreateEgdeProjection(EdgeProjections, p1, p2,edge.label, wall.number);
-				edgeProj.SetDisplay(projectionInfo.edgeLineColor, projectionInfo.edgeLineWidth, projectionInfo.edgeLabelColor, projectionInfo.edgeLabelSize);
-				edgesprojs.Add(edgeProj);
+                EdgeProjection edgeProj = EdgeProjection.CreateEgdeProjection(EdgeProjections, p1, p2, edge.label, wall.number);
+                edgeProj.SetDisplay(projectionInfo.edgeLineColor, projectionInfo.edgeLineWidth, projectionInfo.edgeLabelColor, projectionInfo.edgeLabelSize);
+                edgesprojs.Add(edgeProj);
 
-				egdeOnThisPlane[i++] = edgeProj;
-			}
-			verticesOnWalls[wall] = vertexOnThisPlane;
+                egdeOnThisPlane[i++] = edgeProj;
+            }
+            verticesOnWalls[wall] = vertexOnThisPlane;
 			egdesOnWalls[wall] = egdeOnThisPlane;
 		}
     }
