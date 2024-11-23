@@ -1,3 +1,5 @@
+//#define IS_LZWP
+
 using UnityEngine;
 
 public class Mode3Dto2D : IMode
@@ -92,6 +94,10 @@ public class Mode3Dto2D : IMode
 
     public void SetUpFlystick()
     {
+#if !IS_LZWP
+        return;
+#endif
+
         FlystickController.ClearActions();
 
         FlystickController.SetAction(

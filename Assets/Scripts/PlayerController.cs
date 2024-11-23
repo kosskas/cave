@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿//#define IS_LZWP
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -57,11 +59,14 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        _flystickController = GetComponentInChildren<FlystickController>();
         _characterController = GetComponentInChildren<CharacterController>();
 
-        //_ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+#if IS_LZWP
+        _flystickController = GetComponentInChildren<FlystickController>();
         _ray = new Ray(_flystickController.RayLineOrigin, _flystickController.RayLineDirection);
+#else
+        _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+#endif
 
         _SetModeController();
 
@@ -82,9 +87,14 @@ public class PlayerController : MonoBehaviour
 
     private void _UpdateRaycasting()
     {
-        //_ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+#if IS_LZWP
         _ray.origin = _flystickController.RayLineOrigin;
         _ray.direction = _flystickController.RayLineDirection;
+#else
+        _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+#endif
+
         Physics.Raycast(_ray, out Hit, 100);
     }
 

@@ -1,3 +1,5 @@
+//#define IS_LZWP
+
 using UnityEngine;
 
 public class ModeMenu : IMode
@@ -65,6 +67,10 @@ public class ModeMenu : IMode
 
     public void SetUpFlystick()
     {
+#if !IS_LZWP
+        return;
+#endif
+
         FlystickController.ClearActions();
 
         FlystickController.SetAction(
@@ -76,20 +82,6 @@ public class ModeMenu : IMode
 
     public void HandleInput()
     {
-        //if (Input.GetKeyDown("1"))
-        //{
-        //    PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
-        //}// FlystickController.SetAction(
-        //     FlystickController.Btn._1, 
-        //     FlystickController.ActOn.PRESS, 
-        //     () => _GoToMode3Dto2D()
-        // );
-        //
-        // FlystickController.SetAction(
-        //     FlystickController.Btn._2, 
-        //     FlystickController.ActOn.PRESS, 
-        //     () => _GoToMode2Dto3D()
-        // );
 
         if (Input.GetKeyDown("5"))
         {

@@ -1,3 +1,4 @@
+//#define IS_LZWP
 
 using UnityEngine;
 
@@ -159,6 +160,10 @@ public class Mode2Dto3D : IMode
 
     public void SetUpFlystick()
     {
+#if !IS_LZWP
+        return;
+#endif
+
         FlystickController.ClearActions();
 
         FlystickController.SetAction(
@@ -226,45 +231,45 @@ public class Mode2Dto3D : IMode
     {
         _pp.MoveCursor(PCref.Hit);
 
-            if (Input.GetKeyDown("1"))
-            {
-                _AddPointProjection();
-            }
+        if (Input.GetKeyDown("1"))
+        {
+            _AddPointProjection();
+        }
 
-            if (Input.GetKeyDown("2"))
-            {
-                _RemovePointProjection();
-            }
+        if (Input.GetKeyDown("2"))
+        {
+            _RemovePointProjection();
+        }
 
-            if (Input.GetKeyDown("3"))
-            {
-                _AddEdgeProjection();
-            }
+        if (Input.GetKeyDown("3"))
+        {
+            _AddEdgeProjection();
+        }
 
-            if (Input.GetKeyDown("4"))
-            {
-                _RemoveEdgeProjection();
-            }
+        if (Input.GetKeyDown("4"))
+        {
+            _RemoveEdgeProjection();
+        }
 
-            if (Input.GetKeyDown("5"))
-            {
-                _MakeActionOnWall();
-            }
+        if (Input.GetKeyDown("5"))
+        {
+            _MakeActionOnWall();
+        }
 
-            if (Input.GetKeyDown("6"))
-            {
-                _SaveSolidAndSwitchToMode3Dto2D();
-            }
+        if (Input.GetKeyDown("6"))
+        {
+            _SaveSolidAndSwitchToMode3Dto2D();
+        }
 
-            if (Input.GetKeyDown("7"))
-            {
-                _ChoosePreviousLabel();
-            }
+        if (Input.GetKeyDown("7"))
+        {
+            _ChoosePreviousLabel();
+        }
 
-            if (Input.GetKeyDown("8"))
-            {
-                _ChooseNextLabel();
-            }
+        if (Input.GetKeyDown("8"))
+        {
+            _ChooseNextLabel();
+        }
 
         if (Input.GetKeyDown("9"))
         {
@@ -276,10 +281,6 @@ public class Mode2Dto3D : IMode
             _pp.HandleAddingLine();
         }
 
-        //if (Input.GetKeyDown("g"))
-        //{
-        //    _wg.GenerateWall(_wg.points);
-        //}
     }
 
 }
