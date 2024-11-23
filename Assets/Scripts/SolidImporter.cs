@@ -376,8 +376,9 @@ public class SolidImporter : MonoBehaviour {
                 if (line.Contains("###")) part++;
                 else if (String.IsNullOrEmpty(line)) continue;
                 else if (part == 1) { ReadVertex(line); }
-                else if (part == 2) { ReadFace(line); ReadEdges(line); }
-                else if (part > 2) break;
+                else if (part == 2) { ReadEdges(line); }
+                else if (part == 3) { ReadFace(line); }
+                else if (part > 3) break;
             }
         }
     }

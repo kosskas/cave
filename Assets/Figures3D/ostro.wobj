@@ -8,6 +8,21 @@ F -0.866025 0.5 -0.5
 G 0 0 1.5
 
 ###
+A,B
+B,C
+C,D
+D,E
+E,F
+F,A
+A,G
+B,G
+C,G
+D,G
+E,G
+F,G
+
+###
+
 A,B,C,D,E,F
 G,B,A
 G,C,B
