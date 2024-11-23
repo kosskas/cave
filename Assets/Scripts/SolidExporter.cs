@@ -42,9 +42,10 @@ public static class SolidExporter{
         }
 
         string points_section = AddPointSection(points);
-        string edgesAndFaces_section = AddEdgesAndFacesSection(edges, faces);
+        string edges_section = AddEdgesSection(edges);
+        string faces_section = AddFacesSection(faces);
 
-        string solid = points_section + edgesAndFaces_section + startSection;
+        string solid = points_section + edges_section + faces_section + startSection;
         string fileName = DateTime.Now.ToString("HHmmss")+solidFileExt;
         string path = Path.Combine(pathToFolderWithSolids, fileName);
         try
@@ -72,22 +73,29 @@ public static class SolidExporter{
         section += newline;
         return section;
     }
-    private static string AddEdgesAndFacesSection(List<Tuple<string, string>> edges, Dictionary<GameObject, List<string>> faces)
+    private static string AddEdgesSection(List<Tuple<string, string>> edges)
     {
         string section = startSection;
         if (edges != null)
         {
             foreach (var pair in edges)
             {
-                section += $"{pair.Item1},{pair.Item2}\n";
+                section += $"{pair.Item1},{pair.Item2}"+newline;
             }
         }
+        section += newline;
+        return section;
+    }
+
+    private static string AddFacesSection(Dictionary<GameObject, List<string>> faces)
+    {
+        string section = startSection;
         if (faces != null)
         {
-			section += newline;
+            section += newline;
             foreach (var edgelist in faces)
             {
-                section += string.Join(",", edgelist.Value)+newline;
+                section += string.Join(",", edgelist.Value) + newline;
             }
         }
         section += newline;
