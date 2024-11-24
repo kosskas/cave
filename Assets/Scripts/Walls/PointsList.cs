@@ -89,16 +89,19 @@ public class PointsList : MonoBehaviour {
 
 	public static void UpdatePointsList()
     {
-
-        var pointsDictionary = _mb.GetPoints3D();
-        points.RemoveAll(p => !pointsDictionary.ContainsKey(p.Key));
-        foreach (var point in pointsDictionary)
+        if (_mb != null)
         {
-            if (!points.Any(p => p.Key == point.Key))
+            var pointsDictionary = _mb.GetPoints3D();
+            points.RemoveAll(p => !pointsDictionary.ContainsKey(p.Key));
+            foreach (var point in pointsDictionary)
             {
-                points.Add(point);
+                if (!points.Any(p => p.Key == point.Key))
+                {
+                    points.Add(point);
+                }
             }
         }
+        
 
         for (int i = 0; i < buttonsList.Count; i++)
 		{
