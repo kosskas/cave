@@ -16,6 +16,8 @@ namespace Assets.Scripts.Experimental.Items
 
         private static readonly float Width = 0.002f;
 
+        private static readonly float ColliderWidth = Width * 4;
+
         private static readonly int PositionsCount = 60;
 
         private Vector3 _center;
@@ -74,7 +76,7 @@ namespace Assets.Scripts.Experimental.Items
         {
             _ringCollider.Center = _center;
             _ringCollider.Radius = _radius;
-            _ringCollider.Width = Width;
+            _ringCollider.Width = ColliderWidth;
             _ringCollider.ColliderEnabled = ColliderEnabled;
         }
 

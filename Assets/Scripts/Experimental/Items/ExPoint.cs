@@ -18,6 +18,8 @@ namespace Assets.Scripts.Experimental.Items
 
         private static readonly float Size = 0.025f;
 
+        private static readonly float ColliderSize = Size * 4;
+
         public Vector3 Position { get; private set; }
 
         private GameObject _pointObject;
@@ -46,7 +48,7 @@ namespace Assets.Scripts.Experimental.Items
             Destroy(_pointObject.GetComponent<SphereCollider>());
 
             _boxCollider = gameObject.AddComponent<BoxCollider>();
-            _boxCollider.size = new Vector3(Size, Size, Size);
+            _boxCollider.size = new Vector3(ColliderSize, ColliderSize, ColliderSize);
             _boxCollider.center = Vector3.zero;
             _boxCollider.isTrigger = true;
 

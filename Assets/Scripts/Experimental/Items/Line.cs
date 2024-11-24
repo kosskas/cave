@@ -17,6 +17,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public float Width { get; set; } = 0.005f;
 
+        private float ColliderWidth => Width * 4;
+
         private Vector3 _from;
 
         private Vector3 _to;
@@ -62,7 +64,7 @@ namespace Assets.Scripts.Experimental.Items
 
             Vector3 newPosition = _from;
             Quaternion newRotation = Quaternion.LookRotation((_to - _from).normalized, gameObject.transform.up) * Quaternion.Euler(0, -90, 0);
-            Vector3 newColliderSize = new Vector3(Vector3.Distance(_from, _to), Width * 3, Width * 3);
+            Vector3 newColliderSize = new Vector3(Vector3.Distance(_from, _to), ColliderWidth, ColliderWidth);
             Vector3 newColliderCenter = new Vector3(Vector3.Distance(_from, _to) * 0.5f, 0, 0);
 
             gameObject.transform.position = newPosition;
