@@ -1,4 +1,5 @@
 using Assets.Scripts.Experimental;
+using Assets.Scripts.Walls;
 using UnityEngine;
 
 public class ModeMenu : IMode
@@ -16,6 +17,7 @@ public class ModeMenu : IMode
         //PointsList.ceilingWall.SetActive(false);
 
         ExContextMenuView.Hide();
+        UIWall.ExportSolidToVisualButton.Hide();
     }
 
 

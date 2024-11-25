@@ -1,4 +1,5 @@
 
+using Assets.Scripts.Walls;
 using UnityEngine;
 
 public class Mode2Dto3D : IMode
@@ -56,24 +57,26 @@ public class Mode2Dto3D : IMode
         {
             _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
         }
-        else if (PCref.Hit.collider.gameObject.name == "UpButton")
+        else switch (PCref.Hit.collider.gameObject.name)
         {
-            PointsList.PointListGoUp();
-        }
-        else if (PCref.Hit.collider.gameObject.name == "DownButton")
-        {
-            PointsList.PointListGoDown();
-        }
-        else if (PCref.Hit.collider.gameObject.name == "GenerateButton")
-        {
-            _wg.GenerateWall(_wg.points);
-        }
-        else if (PCref.Hit.collider.gameObject.name == "SwitchButton")
-        {
-            _SaveSolidAndSwitchToMode3Dto2D();
+            case "UpButton":
+                PointsList.PointListGoUp();
+                break;
+
+            case "DownButton":
+                PointsList.PointListGoDown();
+                break;
+
+            case "GenerateButton":
+                _wg.GenerateWall(_wg.points);
+                break;
+
+            case "ExportSolidToVisualButton":
+                _SaveSolidAndSwitchToMode3Dto2D();
+                break;
         }
     }
-
+    
     private void _SaveSolidAndSwitchToMode3Dto2D()
     {
         GameObject mainObject = GameObject.Find("MainObject");
@@ -110,6 +113,7 @@ public class Mode2Dto3D : IMode
 
         //Hide point list
         PointsList.HideListAndLogs();
+        UIWall.ExportSolidToVisualButton.Hide();
 
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
@@ -161,6 +165,8 @@ public class Mode2Dto3D : IMode
         _pp.MoveCursor(PCref.Hit);
 
         PointsList.ShowListAndLogs();
+
+        UIWall.ExportSolidToVisualButton.Show();
 
         Debug.Log($"<color=blue> MODE inzynierka ON </color>");
     }

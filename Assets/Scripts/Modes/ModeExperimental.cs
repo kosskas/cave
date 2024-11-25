@@ -5,6 +5,7 @@ using System.Linq;
 using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using UnityEngine;
+using Assets.Scripts.Walls;
 
 public class ModeExperimental : IMode
 {
@@ -97,7 +98,11 @@ public class ModeExperimental : IMode
                 _context.Previous();
                 _contextMenuView.SetCurrentContext(_context.Current.Key);
                 break;
-        }
+
+            case "ExportSolidToVisualButton":
+                _SaveSolidAndSwitchToMode3Dto2D();
+                break;
+            }
     }
 
     private void _SaveSolidAndSwitchToMode3Dto2D()
@@ -131,6 +136,7 @@ public class ModeExperimental : IMode
 
         //Hide context view
         ExContextMenuView.Hide();
+        UIWall.ExportSolidToVisualButton.Hide();
 
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
@@ -257,6 +263,8 @@ public class ModeExperimental : IMode
 
         _contextMenuView = new ExContextMenuView();
         _contextMenuView.SetCurrentContext(_context.Current.Key);
+
+        UIWall.ExportSolidToVisualButton.Show();
 
         //_controlMenuView = new ExControlMenuView();
 
