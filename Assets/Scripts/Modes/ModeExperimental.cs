@@ -12,7 +12,7 @@ public class ModeExperimental : IMode
 
     private WallController _wc;
 
-    private MeshBuilder _mc;
+    private MeshBuilder _mb;
 
     private WallGenerator _wg;
 
@@ -57,8 +57,16 @@ public class ModeExperimental : IMode
         _contextMenuView.SetCurrentContext(_context.Current.Key);
     }
 
-    private void _MakeAction()
+    private void _DrawAction()
     {
+        _context.Current.Value();
+    }
+
+    private void _MakeActionOnWall()
+    {
+        if (PCref.Hit.collider == null)
+            return;
+
         if (PCref.Hit.collider.tag == "PointButton")
         {
             _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
@@ -75,10 +83,55 @@ public class ModeExperimental : IMode
         {
             _wg.GenerateWall(_wg.points);
         }
-        else
+        else if (PCref.Hit.collider.gameObject.name == "SwitchButton")
         {
-            _context.Current.Value();
+            _SaveSolidAndSwitchToMode3Dto2D();
         }
+    }
+
+    private void _SaveSolidAndSwitchToMode3Dto2D()
+    {
+        GameObject mainObject = GameObject.Find("MainObject");
+
+        //export solid
+        string solid = SolidExporter.ExportSolid(
+            _mb.GetPoints3D(), 
+            _mb.GetEdges3D(), 
+            WallGenerator.GetFaces());
+
+        if (solid == null)
+        {
+            Debug.LogError("Error - save failed");
+        }
+
+        //czyszcenie œcian obiektu
+        _wg.Clear();
+        GameObject.Destroy(_wg);
+
+        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
+        _items.Clear();
+
+        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
+        _mb.ClearAndDisable();
+        GameObject.Destroy(_mb);
+
+        //Hide point list
+        PointsList.HideListAndLogs();
+
+        ///Zaladuj grupowy
+        PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
+
+        SolidImporter si = mainObject.AddComponent<SolidImporter>();
+        si.Init();
+        if (si == null)
+        {
+            Debug.LogError("Error - cannot find SolidImporter");
+            return;
+        }
+        _wc.SetBasicWalls();
+        _wc.SetDefaultShowRules();
+        si.SetUpDirection();
+        si.ImportSolid(solid);
     }
 
     private void _DeleteHoveredObject()
@@ -113,6 +166,14 @@ public class ModeExperimental : IMode
         _hitObject?.OnHoverAction((gameObject) =>
         {
             gameObject.GetComponent<ILabelable>()?.NextLabel();
+        });
+    }
+
+    private void _TryGetPrevLabel()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.PrevLabel();
         });
     }
 
@@ -163,8 +224,8 @@ public class ModeExperimental : IMode
         _items = new ItemsController();
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
         GameObject mainObject = GameObject.Find("MainObject");
-        _mc = mainObject.AddComponent<MeshBuilder>();
-        _mc.Init(true,false);
+        _mb = mainObject.AddComponent<MeshBuilder>();
+        _mb.Init(true,false);
         _wg = mainObject.AddComponent<WallGenerator>();
 
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
@@ -198,27 +259,32 @@ public class ModeExperimental : IMode
 
         if (Input.GetKeyDown("1"))
         {
-            _ChangeDrawContext();
+            _DrawAction();
         }
 
         if (Input.GetKeyDown("2"))
         {
-            _MakeAction();
+            _DeleteHoveredObject();
         }
 
         if (Input.GetKeyDown("3"))
         {
-            _DeleteHoveredObject();
+            _TryAddLabel();
         }
 
+        if (Input.GetKeyDown("4"))
+        {
+            _TryRemoveFocusedLabel();
+        }
+        
         if (Input.GetKeyDown("5"))
         {
-            _TryAddLabel();
+            _MakeActionOnWall();
         }
 
         if (Input.GetKeyDown("6"))
         {
-            _TryRemoveFocusedLabel();
+            _TryGetPrevLabel();
         }
 
         if (Input.GetKeyDown("7"))
@@ -237,3 +303,16 @@ public class ModeExperimental : IMode
         }
     }
 }
+
+/*
+ *  |           ACTION          |       DEV     |               LZWP                |
+ *  | _DrawAction               |       1       |   Btn._1 ActOn.PRESS              |
+ *  | _DeleteHoveredObject      |       2       |   Btn._2 ActOn.PRESS              |
+ *  | _TryAddLabel              |       3       |   Btn._3 ActOn.PRESS              |
+ *  | _TryRemoveFocusedLabel    |       4       |   Btn._4 ActOn.PRESS              |
+ *  | _MakeActionOnWall         |       5       |   Btn.FIRE ActOn.PRESS            |
+ *  | _TryGetPrevLabel          |       6       |   Btn.JOYSTICK ActOn.TILT_LEFT    |
+ *  | _TryGetNextLabel          |       7       |   Btn.JOYSTICK ActOn.TILT_RIGHT   |
+ *  | _TryGetPrevLabelText      |       8       |   Btn.JOYSTICK ActOn.TILT_DOWN    |
+ *  | _TryGetNextLabelText      |       9       |   Btn.JOYSTICK ActOn.TILT_UP      |
+ */

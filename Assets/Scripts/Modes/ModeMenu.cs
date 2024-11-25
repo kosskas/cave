@@ -70,3 +70,8 @@ public class ModeMenu : IMode
 
     }
 }
+
+/*
+ *  |           ACTION          |       DEV     |               LZWP                |
+ *  | _MakeActionOnWall         |       5       |   Btn.FIRE ActOn.PRESS            |
+ */

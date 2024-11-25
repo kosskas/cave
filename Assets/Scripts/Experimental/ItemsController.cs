@@ -377,6 +377,13 @@ namespace Assets.Scripts.Experimental
                     lineComponent.ColliderEnabled = true;
             };
         }
+
+        public void Clear()
+        {
+            _axisWalls.Clear();
+
+            GameObject.Destroy(_workspace);
+        }
     }
 }
 

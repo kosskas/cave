@@ -47,35 +47,43 @@ public class Mode2Dto3D : IMode
 
     private void _MakeActionOnWall()
     {
-        if (PCref.Hit.collider != null)
+        if (PCref.Hit.collider == null) 
+            return;
+
+        //Debug.Log($"[CLICK] on object named: {PCref.Hit.collider.gameObject.name}");
+
+        if (PCref.Hit.collider.tag == "PointButton")
         {
-            Debug.Log($"[CLICK] on object named: {PCref.Hit.collider.gameObject.name}");
-            if (PCref.Hit.collider.tag == "PointButton")
-            {
-                _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
-                //PointINFO pointInfo = PointsList.RemovePointOnClick(PCref.Hit.collider.gameObject);
-                //_pp.RemovePoint(pointInfo);
-            }
-            else if (PCref.Hit.collider.gameObject.name == "UpButton")
-            {
-                PointsList.PointListGoUp();
-            }
-            else if (PCref.Hit.collider.gameObject.name == "DownButton")
-            {
-                PointsList.PointListGoDown();
-            }
-            else if (PCref.Hit.collider.gameObject.name == "GenerateButton")
-            {
-                _wg.GenerateWall(_wg.points);
-            }
+            _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
+        }
+        else if (PCref.Hit.collider.gameObject.name == "UpButton")
+        {
+            PointsList.PointListGoUp();
+        }
+        else if (PCref.Hit.collider.gameObject.name == "DownButton")
+        {
+            PointsList.PointListGoDown();
+        }
+        else if (PCref.Hit.collider.gameObject.name == "GenerateButton")
+        {
+            _wg.GenerateWall(_wg.points);
+        }
+        else if (PCref.Hit.collider.gameObject.name == "SwitchButton")
+        {
+            _SaveSolidAndSwitchToMode3Dto2D();
         }
     }
 
     private void _SaveSolidAndSwitchToMode3Dto2D()
     {
         GameObject mainObject = GameObject.Find("MainObject");
+
         //export solid
-        string solid = SolidExporter.ExportSolid(_mb.GetPoints3D(), _mb.GetEdges3D(),WallGenerator.GetFaces());
+        string solid = SolidExporter.ExportSolid(
+            _mb.GetPoints3D(), 
+            _mb.GetEdges3D(),
+            WallGenerator.GetFaces());
+
         if(solid == null)
         {
             Debug.LogError("Error - save failed");
@@ -92,14 +100,17 @@ public class Mode2Dto3D : IMode
         //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
         _mb.ClearAndDisable();
         GameObject.Destroy(_mb);
+
         //clear PointPlacer usuwa krawedzie 2d oraz kursor
         _pp.Clear();
         GameObject.Destroy(_pp);
 
         _cd.Clear();
         GameObject.Destroy(_cd);
+
         //Hide point list
         PointsList.HideListAndLogs();
+
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
         
@@ -149,12 +160,6 @@ public class Mode2Dto3D : IMode
         _pp.CreateCursor();
         _pp.MoveCursor(PCref.Hit);
 
-        //if (PointsList.ceilingWall != null) //nie dziala, dalej sie psuje
-        //{
-        //    Debug.Log("ceiling found");
-        //    PointsList.ceilingWall.SetActive(true);
-        //}
-
         PointsList.ShowListAndLogs();
 
         Debug.Log($"<color=blue> MODE inzynierka ON </color>");
@@ -191,33 +196,37 @@ public class Mode2Dto3D : IMode
 
         if (Input.GetKeyDown("6"))
         {
-            _SaveSolidAndSwitchToMode3Dto2D();
+            _ChoosePreviousLabel();
         }
 
         if (Input.GetKeyDown("7"))
         {
-            _ChoosePreviousLabel();
-        }
-
-        if (Input.GetKeyDown("8"))
-        {
             _ChooseNextLabel();
         }
 
-        if (Input.GetKeyDown("9"))
+        if (Input.GetKeyDown("c"))
         {
             _pp.HandleAddingCircle();
         }
 
-        if (Input.GetKeyDown("0"))
+        if (Input.GetKeyDown("l"))
         {
             _pp.HandleAddingLine();
         }
 
-        if (Input.GetKeyDown("g"))
-        {
-            _wg.GenerateWall(_wg.points);
-        }
     }
 
 }
+
+/*
+ *  |           ACTION          |       DEV     |               LZWP                |
+ *  | _AddPointProjection       |       1       |   Btn._1 ActOn.PRESS              |     
+ *  | _RemovePointProjection    |       2       |   Btn._2 ActOn.PRESS              |
+ *  | _AddEdgeProjection        |       3       |   Btn._3 ActOn.PRESS              |
+ *  | _RemoveEdgeProjection     |       4       |   Btn._4 ActOn.PRESS              |
+ *  | _MakeActionOnWall         |       5       |   Btn.FIRE ActOn.PRESS            |
+ *  | _ChoosePreviousLabel      |       6       |   Btn.JOYSTICK ActOn.TILT_LEFT    |
+ *  | _ChooseNextLabel          |       7       |   Btn.JOYSTICK ActOn.TILT_RIGHT   |
+ *  | _pp.HandleAddingCircle    |       c       |   ?                               |
+ *  | _pp.HandleAddingLine      |       l       |   ?                               |
+ */
