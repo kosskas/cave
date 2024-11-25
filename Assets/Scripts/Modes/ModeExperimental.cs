@@ -22,7 +22,6 @@ public class ModeExperimental : IMode
 
     private ExContextMenuView _contextMenuView;
     private ExControlMenuView _controlMenuView;
-    private ExWallBuilderView _wallBuilderView;
 
     private IRaycastable _hitObject;
 
@@ -71,21 +70,33 @@ public class ModeExperimental : IMode
         {
             _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
         }
-        else if (PCref.Hit.collider.gameObject.name == "UpButton")
+        else switch (PCref.Hit.collider.gameObject.name)
         {
-            PointsList.PointListGoUp();
-        }
-        else if (PCref.Hit.collider.gameObject.name == "DownButton")
-        {
-            PointsList.PointListGoDown();
-        }
-        else if (PCref.Hit.collider.gameObject.name == "GenerateButton")
-        {
-            _wg.GenerateWall(_wg.points);
-        }
-        else if (PCref.Hit.collider.gameObject.name == "SwitchButton")
-        {
-            _SaveSolidAndSwitchToMode3Dto2D();
+            case "UpButton":
+                PointsList.PointListGoUp();
+                break;
+
+            case "DownButton":
+                PointsList.PointListGoDown();
+                break;
+
+            case "GenerateButton":
+                _wg.GenerateWall(_wg.points);
+                break;
+
+            case "SwitchButton":
+                _SaveSolidAndSwitchToMode3Dto2D();
+                break;
+
+            case "NextContext":
+                _context.Next();
+                _contextMenuView.SetCurrentContext(_context.Current.Key);
+                break;
+
+            case "PrevContext":
+                _context.Previous();
+                _contextMenuView.SetCurrentContext(_context.Current.Key);
+                break;
         }
     }
 
@@ -117,6 +128,9 @@ public class ModeExperimental : IMode
 
         //Hide point list
         PointsList.HideListAndLogs();
+
+        //Hide context view
+        ExContextMenuView.Hide();
 
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
@@ -244,9 +258,7 @@ public class ModeExperimental : IMode
         _contextMenuView = new ExContextMenuView();
         _contextMenuView.SetCurrentContext(_context.Current.Key);
 
-        _controlMenuView = new ExControlMenuView();
-
-        _wallBuilderView = new ExWallBuilderView();
+        //_controlMenuView = new ExControlMenuView();
 
         PointsList.ShowListAndLogs();
 

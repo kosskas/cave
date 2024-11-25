@@ -1,3 +1,4 @@
+using Assets.Scripts.Experimental;
 using UnityEngine;
 
 public class ModeMenu : IMode
@@ -13,6 +14,8 @@ public class ModeMenu : IMode
 
         PointsList.HideListAndLogs();
         //PointsList.ceilingWall.SetActive(false);
+
+        ExContextMenuView.Hide();
     }
 
 

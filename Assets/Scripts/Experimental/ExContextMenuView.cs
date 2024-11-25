@@ -13,14 +13,18 @@ namespace Assets.Scripts.Experimental
     {
         private readonly TextMeshPro _contextMenu;
 
+        private static GameObject _view;
+
         public ExContextMenuView()
         {
+            Show();
+
             _contextMenu = GameObject.Find("ExperimentalModeContextMenu")?.GetComponent<TextMeshPro>();
 
             if (_contextMenu == null)
                 return;
 
-            _contextMenu.fontMaterial.shader = Shader.Find("TextMeshPro/Distance Field Overlay");
+            //_contextMenu.fontMaterial.shader = Shader.Find("TextMeshPro/Distance Field Overlay");
         }
 
         public void SetCurrentContext(ExContext currentContext)
@@ -38,6 +42,22 @@ namespace Assets.Scripts.Experimental
             }
 
             _contextMenu.text = text.ToString();
+        }
+
+        public static void Show()
+        {
+            if (_view == null)
+                _view = GameObject.Find("ExContext");
+
+            _view.SetActive(true);
+        }
+
+        public static void Hide()
+        {
+            if (_view == null)
+                _view = GameObject.Find("ExContext");
+
+            _view.SetActive(false);
         }
     }
 }
