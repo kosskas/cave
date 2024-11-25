@@ -115,7 +115,7 @@ public class PointsList : MonoBehaviour {
             }
 			else
 			{
-				pointText.text = "EMPTY";
+				pointText.text = "";
 			}
 		}
 	}
