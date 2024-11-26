@@ -15,9 +15,9 @@ public class PointsList : MonoBehaviour {
     //public static List<PointINFO> infoList = new List<PointINFO>();
     public static List<KeyValuePair<string, Vector3>> points = new List<KeyValuePair<string, Vector3>>();
 
-    private int lastInfoListLength = 0;
+    private static int lastInfoListLength = 0;
     private static MeshBuilder _mb;
-    private bool isMbFound = false;
+    private static bool isMbFound = false;
 
 	public static GameObject ceilingWall;
 	public static GameObject pointsList;
@@ -74,31 +74,36 @@ public class PointsList : MonoBehaviour {
 
 			UpdatePointsList();
 		}
-        if (Input.GetKeyDown("9"))
-        {
-			PointListGoUp();
-			//UpdatePointsList();
-        }
-		if (Input.GetKeyDown("0"))
-		{
-			//PointListGoDown();
-			//UpdatePointsList();
-			HideListAndLogs();
-		}
+  //      if (Input.GetKeyDown("9"))
+  //      {
+		//	PointListGoUp();
+		//	//UpdatePointsList();
+  //      }
+		//if (Input.GetKeyDown("0"))
+		//{
+		//	//PointListGoDown();
+		//	//UpdatePointsList();
+		//	HideListAndLogs();
+		//}
 	}
+
+    
 
 	public static void UpdatePointsList()
     {
-
-        var pointsDictionary = _mb.GetPoints3D();
-        points.RemoveAll(p => !pointsDictionary.ContainsKey(p.Key));
-        foreach (var point in pointsDictionary)
+        if (_mb != null)
         {
-            if (!points.Any(p => p.Key == point.Key))
+            var pointsDictionary = _mb.GetPoints3D();
+            points.RemoveAll(p => !pointsDictionary.ContainsKey(p.Key));
+            foreach (var point in pointsDictionary)
             {
-                points.Add(point);
+                if (!points.Any(p => p.Key == point.Key))
+                {
+                    points.Add(point);
+                }
             }
         }
+        
 
         for (int i = 0; i < buttonsList.Count; i++)
 		{
@@ -112,7 +117,7 @@ public class PointsList : MonoBehaviour {
             }
 			else
 			{
-				pointText.text = "EMPTY";
+				pointText.text = "";
 			}
 		}
 	}
@@ -155,6 +160,7 @@ public class PointsList : MonoBehaviour {
         }
 		if (pointsList != null)
 		{
+			
 			pointsList.SetActive(false);
 		}
 	}
@@ -169,7 +175,8 @@ public class PointsList : MonoBehaviour {
 			wallText.SetActive(true);
 		}
 		if (pointsList != null)
-		{
+        {
+            isMbFound = false;
 			pointsList.SetActive(true);
 		}
 	}

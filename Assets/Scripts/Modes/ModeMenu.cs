@@ -1,3 +1,5 @@
+using Assets.Scripts.Experimental;
+using Assets.Scripts.Walls;
 using UnityEngine;
 
 public class ModeMenu : IMode
@@ -13,6 +15,13 @@ public class ModeMenu : IMode
 
         PointsList.HideListAndLogs();
         //PointsList.ceilingWall.SetActive(false);
+
+        ExContextMenuView.Hide();
+        UIWall.ExportSolidToVisualButton.Hide();
+        UIWall.SaveLoadStateButtons.Hide();
+        UIWall.BackToMenuButton.Hide();
+
+        UIWall.MenuButtons.Show();
     }
 
 
@@ -31,45 +40,32 @@ public class ModeMenu : IMode
                 _HideModesButtons();
                 PCref.ChangeMode(PlayerController.Mode.Mode2Dto3D);
             }
-            
+            else if (PCref.Hit.collider.gameObject.name == "ExpButton")
+            {
+                _HideModesButtons();
+                PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
+            }
+
         }
     }
 
     private void _HideModesButtons()
     {
-        GameObject wizButton = GameObject.Find("WizButton");
-        GameObject kreaButton = GameObject.Find("KreaButton");
-
-        if (wizButton != null)
-        {
-            wizButton.SetActive(false);
-        }
-        if (kreaButton != null)
-        {
-            kreaButton.SetActive(false);
-        }
+        UIWall.MenuButtons.Hide();
     }
 
     public void HandleInput()
     {
-        //if (Input.GetKeyDown("1"))
-        //{
-        //    PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
-        //}
 
-        //if (Input.GetKeyDown("2"))
-        //{
-        //    PCref.ChangeMode(PlayerController.Mode.Mode2Dto3D);
-        //}
         if (Input.GetKeyDown("5"))
         {
             _MakeActionOnWall();
         }
 
-        if (Input.GetKeyDown("3"))
-        {
-            _HideModesButtons();
-            PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
-        }
     }
 }
+
+/*
+ *  |           ACTION          |       DEV     |               LZWP                |
+ *  | _MakeActionOnWall         |       5       |   Btn.FIRE ActOn.PRESS            |
+ */

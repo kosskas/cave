@@ -2,9 +2,11 @@ using Assets.Scripts.Experimental;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts;
 using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using UnityEngine;
+using Assets.Scripts.Walls;
 
 public class ModeExperimental : IMode
 {
@@ -12,7 +14,7 @@ public class ModeExperimental : IMode
 
     private WallController _wc;
 
-    private MeshBuilder _mc;
+    private MeshBuilder _mb;
 
     private WallGenerator _wg;
 
@@ -22,7 +24,6 @@ public class ModeExperimental : IMode
 
     private ExContextMenuView _contextMenuView;
     private ExControlMenuView _controlMenuView;
-    private ExWallBuilderView _wallBuilderView;
 
     private IRaycastable _hitObject;
 
@@ -49,39 +50,139 @@ public class ModeExperimental : IMode
 
     /* * * * CONTEXT ACTIONS end * * * */
 
-    private void _BuildWall()
-    {
-        // ExPoint point = null;
-        //
-        // _hitObject?.OnHoverAction(gameObject =>
-        // {
-        //     point = gameObject.GetComponent<ExPoint>();
-        // });
-        //
-        // if (point == null)
-        // {
-        //     if (_wg.points.Count == 0)
-        //         return;
-        //
-        //     // BUILD WALL
-        //     _wg.GenerateWall(_wg.points);
-        //     _wg.points.Clear();
-        //     _wallBuilderView.ClearList();
-        //     return;
-        // }
-        //
-        // if (string.IsNullOrWhiteSpace(point.FocusedLabel))
-        //     return;
-        //
-        // Vector3 position;
-        // if (!_mc.GetPoints3D().TryGetValue(point.FocusedLabel, out position))
-        //     return;
-        //
-        // // ASSIGN TO WALL
-        // _wg.points.Add(new KeyValuePair<string, Vector3>(point.FocusedLabel, position));
-        // _wallBuilderView.AppendToList(point.FocusedLabel);
+    /* * * * INPUT HANDLERS begin * * * */
 
-        _wg.GenerateWall(_wg.points);
+    private void _ChangeDrawContext()
+    {
+        _context.Next();
+        _contextMenuView.SetCurrentContext(_context.Current.Key);
+    }
+
+    private void _DrawAction()
+    {
+        _context.Current.Value();
+    }
+
+    private void _MakeActionOnWall()
+    {
+        if (PCref.Hit.collider == null)
+            return;
+
+        if (PCref.Hit.collider.tag == "PointButton")
+        {
+            _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
+        }
+        else switch (PCref.Hit.collider.gameObject.name)
+        {
+            case "UpButton":
+                PointsList.PointListGoUp();
+                break;
+
+            case "DownButton":
+                PointsList.PointListGoDown();
+                break;
+
+            case "GenerateButton":
+                _wg.GenerateWall(_wg.points);
+                break;
+
+            case "SwitchButton":
+                _SaveSolidAndSwitchToMode3Dto2D();
+                break;
+
+            case "NextContext":
+                _context.Next();
+                _contextMenuView.SetCurrentContext(_context.Current.Key);
+                break;
+
+            case "PrevContext":
+                _context.Previous();
+                _contextMenuView.SetCurrentContext(_context.Current.Key);
+                break;
+
+            case "ExportSolidToVisualButton":
+                _SaveSolidAndSwitchToMode3Dto2D();
+                break;
+
+            case "BackToMenuButton":
+                _BackToMenu();
+                break;
+            }
+    }
+
+    private void _BackToMenu()
+    {
+        //czyszcenie œcian obiektu
+        _wg.Clear();
+        GameObject.Destroy(_wg);
+
+        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
+        _items.Clear();
+
+        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
+        _mb.ClearAndDisable();
+        GameObject.Destroy(_mb);
+
+        //Hide point list
+        PointsList.HideListAndLogs();
+
+        //Hide context view
+        ExContextMenuView.Hide();
+        UIWall.ExportSolidToVisualButton.Hide();
+        UIWall.BackToMenuButton.Hide();
+
+        ///Zaladuj grupowy
+        PCref.ChangeMode(PlayerController.Mode.ModeMenu);
+    }
+
+    private void _SaveSolidAndSwitchToMode3Dto2D()
+    {
+        GameObject mainObject = GameObject.Find("MainObject");
+
+        //export solid
+        string solid = SolidExporter.ExportSolid(
+            _mb.GetPoints3D(), 
+            _mb.GetEdges3D(), 
+            WallGenerator.GetFaces());
+
+        if (solid == null)
+        {
+            Debug.LogError("Error - save failed");
+        }
+
+        //czyszcenie œcian obiektu
+        _wg.Clear();
+        GameObject.Destroy(_wg);
+
+        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
+        _items.Clear();
+
+        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
+        _mb.ClearAndDisable();
+        GameObject.Destroy(_mb);
+
+        //Hide point list
+        PointsList.HideListAndLogs();
+
+        //Hide context view
+        ExContextMenuView.Hide();
+        UIWall.ExportSolidToVisualButton.Hide();
+        UIWall.BackToMenuButton.Hide();
+
+        ///Zaladuj grupowy
+        PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
+
+        SolidImporter si = mainObject.AddComponent<SolidImporter>();
+        si.Init();
+        if (si == null)
+        {
+            Debug.LogError("Error - cannot find SolidImporter");
+            return;
+        }
+        _wc.SetBasicWalls();
+        _wc.SetDefaultShowRules();
+        si.SetUpDirection();
+        si.ImportSolid(solid);
     }
 
     private void _DeleteHoveredObject()
@@ -95,25 +196,56 @@ public class ModeExperimental : IMode
         _hitObject = null;
     }
 
-    private void _MakeAction()
+    private void _TryGetNextLabelText()
     {
-        if (PCref.Hit.collider.tag == "PointButton")
+        _hitObject?.OnHoverAction((gameObject) =>
         {
-            _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
-        }
-        else if (PCref.Hit.collider.gameObject.name == "UpButton")
-        {
-            PointsList.PointListGoUp();
-        }
-        else if (PCref.Hit.collider.gameObject.name == "DownButton")
-        {
-            PointsList.PointListGoDown();
-        }
-        else
-        {
-            _context.Current.Value();
-        }
+            gameObject.GetComponent<ILabelable>()?.NextText();
+        });
     }
+
+    private void _TryGetPrevLabelText()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.PrevText();
+        });
+    }
+
+    private void _TryGetNextLabel()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.NextLabel();
+        });
+    }
+
+    private void _TryGetPrevLabel()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.PrevLabel();
+        });
+    }
+
+    private void _TryRemoveFocusedLabel()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.RemoveFocusedLabel();
+        });
+    }
+
+    private void _TryAddLabel()
+    {
+        _hitObject?.OnHoverAction((gameObject) =>
+        {
+            gameObject.GetComponent<ILabelable>()?.AddLabel();
+        });
+    }
+
+    /* * * * INPUT HANDLERS end * * * */
+
 
     private void _MoveCursor()
     {
@@ -131,6 +263,7 @@ public class ModeExperimental : IMode
         _drawAction?.Invoke(hitObject, hitPosition, hitWall, false);
     }
 
+
     public ModeExperimental(PlayerController pc)
     {
         PCref = pc;
@@ -142,8 +275,8 @@ public class ModeExperimental : IMode
         _items = new ItemsController();
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
         GameObject mainObject = GameObject.Find("MainObject");
-        _mc = mainObject.AddComponent<MeshBuilder>();
-        _mc.Init(true,false);
+        _mb = mainObject.AddComponent<MeshBuilder>();
+        _mb.Init(true,false);
         _wg = mainObject.AddComponent<WallGenerator>();
 
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
@@ -162,9 +295,10 @@ public class ModeExperimental : IMode
         _contextMenuView = new ExContextMenuView();
         _contextMenuView.SetCurrentContext(_context.Current.Key);
 
-        _controlMenuView = new ExControlMenuView();
+        UIWall.ExportSolidToVisualButton.Show();
+        UIWall.BackToMenuButton.Show();
 
-        _wallBuilderView = new ExWallBuilderView();
+        //_controlMenuView = new ExControlMenuView();
 
         PointsList.ShowListAndLogs();
 
@@ -177,63 +311,60 @@ public class ModeExperimental : IMode
 
         if (Input.GetKeyDown("1"))
         {
-            _context.Next();
-            _contextMenuView.SetCurrentContext(_context.Current.Key);
+            _DrawAction();
         }
 
         if (Input.GetKeyDown("2"))
         {
-            _MakeAction();
+            _DeleteHoveredObject();
         }
 
         if (Input.GetKeyDown("3"))
         {
-            _DeleteHoveredObject();
+            _TryAddLabel();
         }
 
         if (Input.GetKeyDown("4"))
         {
-            _BuildWall();
+            _TryRemoveFocusedLabel();
         }
-
+        
         if (Input.GetKeyDown("5"))
         {
-            _hitObject?.OnHoverAction((gameObject) =>
-            {
-                gameObject.GetComponent<ILabelable>()?.AddLabel();
-            });
+            _MakeActionOnWall();
         }
 
         if (Input.GetKeyDown("6"))
         {
-            _hitObject?.OnHoverAction((gameObject) =>
-            {
-                gameObject.GetComponent<ILabelable>()?.RemoveFocusedLabel();
-            });
+            _TryGetPrevLabel();
         }
 
         if (Input.GetKeyDown("7"))
         {
-            _hitObject?.OnHoverAction((gameObject) =>
-            {
-                gameObject.GetComponent<ILabelable>()?.NextLabel();
-            });
+            _TryGetNextLabel();
         }
 
         if (Input.GetKeyDown("8"))
         {
-            _hitObject?.OnHoverAction((gameObject) =>
-            {
-                gameObject.GetComponent<ILabelable>()?.PrevText();
-            });
+            _TryGetPrevLabelText();
         }
 
         if (Input.GetKeyDown("9"))
         {
-            _hitObject?.OnHoverAction((gameObject) =>
-            {
-                gameObject.GetComponent<ILabelable>()?.NextText();
-            });
+            _TryGetNextLabelText();
         }
     }
 }
+
+/*
+ *  |           ACTION          |       DEV     |               LZWP                |
+ *  | _DrawAction               |       1       |   Btn._1 ActOn.PRESS              |
+ *  | _DeleteHoveredObject      |       2       |   Btn._2 ActOn.PRESS              |
+ *  | _TryAddLabel              |       3       |   Btn._3 ActOn.PRESS              |
+ *  | _TryRemoveFocusedLabel    |       4       |   Btn._4 ActOn.PRESS              |
+ *  | _MakeActionOnWall         |       5       |   Btn.FIRE ActOn.PRESS            |
+ *  | _TryGetPrevLabel          |       6       |   Btn.JOYSTICK ActOn.TILT_LEFT    |
+ *  | _TryGetNextLabel          |       7       |   Btn.JOYSTICK ActOn.TILT_RIGHT   |
+ *  | _TryGetPrevLabelText      |       8       |   Btn.JOYSTICK ActOn.TILT_DOWN    |
+ *  | _TryGetNextLabelText      |       9       |   Btn.JOYSTICK ActOn.TILT_UP      |
+ */

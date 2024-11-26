@@ -22,6 +22,7 @@ namespace Assets.Scripts.Experimental
         private readonly GameObject _axisRepo;
         private readonly GameObject _lineRepo;
         private readonly GameObject _pointRepo;
+        private readonly GameObject _circleRepo;
 
         private readonly Dictionary<Axis, Tuple<WallInfo, WallInfo>> _axisWalls;
 
@@ -104,6 +105,9 @@ namespace Assets.Scripts.Experimental
 
             _pointRepo = new GameObject("PointRepo");
             _pointRepo.transform.SetParent(_workspace.transform);
+            
+            _circleRepo = new GameObject("CircleRepo");
+            _circleRepo.transform.SetParent(_workspace.transform);
 
             _axisWalls = new Dictionary<Axis, Tuple<WallInfo, WallInfo>>();
         }
@@ -226,7 +230,7 @@ namespace Assets.Scripts.Experimental
         public DrawAction DrawCircle(WallInfo plane, Vector3 startPosition, float lineWidth = _HELP_LINE_WIDTH)
         {
             var circle = new GameObject("CIRCLE");
-            circle.transform.SetParent(_lineRepo.transform);
+            circle.transform.SetParent(_circleRepo.transform);
 
             var circleComponent = circle.AddComponent<Circle>();
             circleComponent.ColliderEnabled = false;
@@ -376,6 +380,13 @@ namespace Assets.Scripts.Experimental
                 if (isEnd)
                     lineComponent.ColliderEnabled = true;
             };
+        }
+
+        public void Clear()
+        {
+            _axisWalls.Clear();
+
+            GameObject.Destroy(_workspace);
         }
     }
 }
