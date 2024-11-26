@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
 using System;
+using Assets.Scripts;
 using UnityEngine;
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
@@ -245,7 +246,9 @@ public class PointPlacer : MonoBehaviour {
 
         _LocateLabels(pointClicked, wall);
 
-        return new PointINFO(pointClicked, wall, labelText, fullLabelText);
+        var pointInfo = new PointINFO(pointClicked, wall, labelText, fullLabelText);
+        StateManager.Grid.Points.Add(pointInfo);
+        return pointInfo;
     }
 
     private Label _FindPickedLabel(List<Label> labels)
@@ -271,7 +274,9 @@ public class PointPlacer : MonoBehaviour {
 
         _LocateLabels(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall);
 
-        return new PointINFO(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall, labelText, fullLabelText);
+        var pointInfo = new PointINFO(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall, labelText, fullLabelText);
+        StateManager.Grid.Points.Remove(pointInfo);
+        return pointInfo;
     }
 
     private EdgeINFO _AddEdge()
@@ -300,7 +305,9 @@ public class PointPlacer : MonoBehaviour {
         );
 
         _mc.AddEdgeProjection(labelText_1, labelText_2);
-        return new EdgeINFO(edgeObj, edge, point_1, point_2);
+        var edgeInfo = new EdgeINFO(edgeObj, edge, point_1, point_2);
+        StateManager.Grid.Edges.Add(edgeInfo);
+        return edgeInfo;
     }
 
     private EdgeINFO _AddCircle()
@@ -346,8 +353,10 @@ public class PointPlacer : MonoBehaviour {
 
         _mc.RemoveEdgeProjection(labelText_1, labelText_2);
         Destroy(edgeObj);
-        
-        return new EdgeINFO(edgeObj, edge, point_1, point_2);
+
+        var edgeInfo = new EdgeINFO(edgeObj, edge, point_1, point_2);
+        StateManager.Grid.Edges.Remove(edgeInfo);
+        return edgeInfo;
     }
 
     private EdgeINFO _RemoveEdge(GameObject edgeObj)
@@ -360,7 +369,9 @@ public class PointPlacer : MonoBehaviour {
         _mc.RemoveEdgeProjection(labelText_1, labelText_2);
         Destroy(edgeObj);
 
-        return EdgeINFO.Empty;
+        var edgeInfo = StateManager.Grid.Edges.First(e => e.P1.FullLabel.Equals(fullLabelTexts[0]) && e.P2.FullLabel.Equals(fullLabelTexts[1]));
+        StateManager.Grid.Edges.Remove(edgeInfo);
+        return edgeInfo;
     }
 
     private List<EdgeINFO> _RemoveEdgesWithPointCascade(string pointLabel)
@@ -707,5 +718,47 @@ public class PointPlacer : MonoBehaviour {
     public EdgeINFO HandleAddingLine()
     {
         return _HandleActingOnEdge(_AddLine, Context.AddLine);
+    }
+
+    public void AddPoint(PointINFO pointInfo)
+    {
+        var labelObj = new GameObject(pointInfo.Label);
+        labelObj.transform.parent = pointInfo.GridPoint.transform;
+
+        var point = labelObj.AddComponent<Point>();
+        point.SetCoordinates(pointInfo.GridPoint.transform.position);
+        point.SetStyle(ReconstructionInfo.POINT_COLOR, ReconstructionInfo.POINT_SIZE);
+        point.SetEnable(true);
+        point.SetLabel(pointInfo.FullLabel, ReconstructionInfo.LABEL_SIZE_PLACED, ReconstructionInfo.LABEL_COLOR_PLACED);
+
+        ///linia rzutująca
+        var lineseg = labelObj.AddComponent<LineSegment>();
+        lineseg.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+
+        _mc.AddPointProjection(pointInfo.WallInfo, pointInfo.Label, labelObj);
+
+        _LocateLabels(pointInfo.GridPoint, pointInfo.WallInfo);
+
+        if (!StateManager.Grid.Points.Contains(pointInfo))
+            StateManager.Grid.Points.Add(pointInfo);
+    }
+
+    public void AddEdge(PointINFO point1, PointINFO point2)
+    {
+        var edgeObj = new GameObject($"{point1.FullLabel}-{point2.FullLabel}");
+        edgeObj.transform.SetParent(_edgeRepo.transform);
+
+        var edge = edgeObj.AddComponent<LineSegment>();
+        edge.SetStyle(ReconstructionInfo.EDGE_COLOR, ReconstructionInfo.EDGE_LINE_WIDTH);
+        edge.SetCoordinates(
+            point1.GridPoint.transform.position,
+            point2.GridPoint.transform.position
+        );
+
+        _mc.AddEdgeProjection(point1.Label, point2.Label);
+
+        var edgeInfo = new EdgeINFO(edgeObj, edge, point1, point2);
+        if (!StateManager.Grid.Edges.Contains(edgeInfo))
+            StateManager.Grid.Edges.Add(edgeInfo);
     }
 }

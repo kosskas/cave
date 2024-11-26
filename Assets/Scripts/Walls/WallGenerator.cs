@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using Assets.Scripts;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -131,28 +132,24 @@ public class WallGenerator : MonoBehaviour {
         faceInfoList.Add(new FaceInfo(copied_points,wallObject));
     }
 
-    public void GenerateWall(List<KeyValuePair<string, Vector3>> points)
+    public void GenerateWall(List<KeyValuePair<string, Vector3>> _points)
     {
-        if (points.Count() < 3)
+        if (_points.Count() < 3)
         {
             Debug.Log("Conajmniej 3 punkty muszą zostać wybrane, by ściana mogła powstać.");
             
         }
-        else if (points.Count() == 3)
+        else if (_points.Count() == 3 || CheckIfPointsAreOnTheSamePlane(_points))
         {
             //Debug.Log(CheckIfPointsAreOnTheSamePlane(points));
-            CreateWall(points);
-        }
-        else
-        {
-            if (CheckIfPointsAreOnTheSamePlane(points))
-            {
-                //Debug.Log(CheckIfPointsAreOnTheSamePlane(points));
-                CreateWall(points);
-            }
+
+            if (!StateManager.Grid.Walls.Contains(_points))
+                StateManager.Grid.Walls.Add(_points);
+
+            CreateWall(_points);
         }
 
-        points.Clear();
+        points = new List<KeyValuePair<string, Vector3>>();
         PointsList.listTextComponent.text = "";
     }
 

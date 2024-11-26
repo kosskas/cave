@@ -2,6 +2,7 @@ using Assets.Scripts.Experimental;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts;
 using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using UnityEngine;
@@ -102,7 +103,36 @@ public class ModeExperimental : IMode
             case "ExportSolidToVisualButton":
                 _SaveSolidAndSwitchToMode3Dto2D();
                 break;
+
+            case "BackToMenuButton":
+                _BackToMenu();
+                break;
             }
+    }
+
+    private void _BackToMenu()
+    {
+        //czyszcenie œcian obiektu
+        _wg.Clear();
+        GameObject.Destroy(_wg);
+
+        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
+        _items.Clear();
+
+        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
+        _mb.ClearAndDisable();
+        GameObject.Destroy(_mb);
+
+        //Hide point list
+        PointsList.HideListAndLogs();
+
+        //Hide context view
+        ExContextMenuView.Hide();
+        UIWall.ExportSolidToVisualButton.Hide();
+        UIWall.BackToMenuButton.Hide();
+
+        ///Zaladuj grupowy
+        PCref.ChangeMode(PlayerController.Mode.ModeMenu);
     }
 
     private void _SaveSolidAndSwitchToMode3Dto2D()
@@ -137,6 +167,7 @@ public class ModeExperimental : IMode
         //Hide context view
         ExContextMenuView.Hide();
         UIWall.ExportSolidToVisualButton.Hide();
+        UIWall.BackToMenuButton.Hide();
 
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
@@ -265,6 +296,7 @@ public class ModeExperimental : IMode
         _contextMenuView.SetCurrentContext(_context.Current.Key);
 
         UIWall.ExportSolidToVisualButton.Show();
+        UIWall.BackToMenuButton.Show();
 
         //_controlMenuView = new ExControlMenuView();
 
