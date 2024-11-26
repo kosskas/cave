@@ -15,9 +15,9 @@ public class PointsList : MonoBehaviour {
     //public static List<PointINFO> infoList = new List<PointINFO>();
     public static List<KeyValuePair<string, Vector3>> points = new List<KeyValuePair<string, Vector3>>();
 
-    private int lastInfoListLength = 0;
+    private static int lastInfoListLength = 0;
     private static MeshBuilder _mb;
-    private bool isMbFound = false;
+    private static bool isMbFound = false;
 
 	public static GameObject ceilingWall;
 	public static GameObject pointsList;
@@ -74,18 +74,20 @@ public class PointsList : MonoBehaviour {
 
 			UpdatePointsList();
 		}
-        if (Input.GetKeyDown("9"))
-        {
-			PointListGoUp();
-			//UpdatePointsList();
-        }
-		if (Input.GetKeyDown("0"))
-		{
-			//PointListGoDown();
-			//UpdatePointsList();
-			HideListAndLogs();
-		}
+  //      if (Input.GetKeyDown("9"))
+  //      {
+		//	PointListGoUp();
+		//	//UpdatePointsList();
+  //      }
+		//if (Input.GetKeyDown("0"))
+		//{
+		//	//PointListGoDown();
+		//	//UpdatePointsList();
+		//	HideListAndLogs();
+		//}
 	}
+
+    
 
 	public static void UpdatePointsList()
     {
@@ -158,6 +160,7 @@ public class PointsList : MonoBehaviour {
         }
 		if (pointsList != null)
 		{
+			
 			pointsList.SetActive(false);
 		}
 	}
@@ -172,7 +175,8 @@ public class PointsList : MonoBehaviour {
 			wallText.SetActive(true);
 		}
 		if (pointsList != null)
-		{
+        {
+            isMbFound = false;
 			pointsList.SetActive(true);
 		}
 	}

@@ -78,7 +78,7 @@ namespace Assets.Scripts
                         var wallNumber = point["WallNumber"]?.ToObject<int>();
                         var label = point["Label"]?.ToString();
                         var fullLabel = point["FullLabel"]?.ToString();
-                        
+
                         if (gridPoint == null || wallNumber == null || label == null || fullLabel == null)
                             continue;
 
@@ -95,7 +95,7 @@ namespace Assets.Scripts
                     {
                         var edgeName = edge["EdgeName"]?.ToString();
 
-                        if (edgeName == null) 
+                        if (edgeName == null)
                             continue;
 
                         var fullLabelText1 = edgeName.Split('-')[0];
@@ -121,7 +121,7 @@ namespace Assets.Scripts
                             var key = wallPointJson["Key"]?.ToString();
                             var value = wallPointJson["Value"];
 
-                            if (key == null || value == null) 
+                            if (key == null || value == null)
                                 continue;
 
                             var x = value["x"]?.ToObject<float>();
