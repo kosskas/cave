@@ -83,7 +83,42 @@ public class Mode2Dto3D : IMode
             case "LoadStateButton":
                 StateManager.Grid.Load(_pp, _wg);
                 break;
+
+            case "BackToMenuButton":
+                _BackToMenu();
+                break;
             }
+    }
+
+    private void _BackToMenu()
+    {
+        //czyszcenie œcian obiektu
+        _wg.Clear();
+        GameObject.Destroy(_wg);
+
+        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
+        _gc.Clear();
+        GameObject.Destroy(_gc);
+
+        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
+        _mb.ClearAndDisable();
+        GameObject.Destroy(_mb);
+
+        //clear PointPlacer usuwa krawedzie 2d oraz kursor
+        _pp.Clear();
+        GameObject.Destroy(_pp);
+
+        _cd.Clear();
+        GameObject.Destroy(_cd);
+
+        //Hide point list
+        PointsList.HideListAndLogs();
+        UIWall.ExportSolidToVisualButton.Hide();
+        UIWall.SaveLoadStateButtons.Hide();
+        UIWall.BackToMenuButton.Hide();
+
+        ///Zaladuj grupowy
+        PCref.ChangeMode(PlayerController.Mode.ModeMenu);
     }
     
     private void _SaveSolidAndSwitchToMode3Dto2D()
@@ -124,6 +159,7 @@ public class Mode2Dto3D : IMode
         PointsList.HideListAndLogs();
         UIWall.ExportSolidToVisualButton.Hide();
         UIWall.SaveLoadStateButtons.Hide();
+        UIWall.BackToMenuButton.Hide();
 
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
@@ -178,6 +214,7 @@ public class Mode2Dto3D : IMode
 
         UIWall.ExportSolidToVisualButton.Show();
         UIWall.SaveLoadStateButtons.Show();
+        UIWall.BackToMenuButton.Show();
 
         Debug.Log($"<color=blue> MODE inzynierka ON </color>");
     }

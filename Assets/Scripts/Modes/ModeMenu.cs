@@ -19,6 +19,9 @@ public class ModeMenu : IMode
         ExContextMenuView.Hide();
         UIWall.ExportSolidToVisualButton.Hide();
         UIWall.SaveLoadStateButtons.Hide();
+        UIWall.BackToMenuButton.Hide();
+
+        UIWall.MenuButtons.Show();
     }
 
 
@@ -48,22 +51,7 @@ public class ModeMenu : IMode
 
     private void _HideModesButtons()
     {
-        GameObject wizButton = GameObject.Find("WizButton");
-        GameObject kreaButton = GameObject.Find("KreaButton");
-        GameObject expButton = GameObject.Find("ExpButton");
-
-        if (wizButton != null)
-        {
-            wizButton.SetActive(false);
-        }
-        if (kreaButton != null)
-        {
-            kreaButton.SetActive(false);
-        }
-        if (expButton != null)
-        {
-            expButton.SetActive(false);
-        }
+        UIWall.MenuButtons.Hide();
     }
 
     public void HandleInput()

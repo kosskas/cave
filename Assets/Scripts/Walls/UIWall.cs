@@ -64,5 +64,64 @@ namespace Assets.Scripts.Walls
             }
         }
 
+        public class BackToMenuButton
+        {
+            private static GameObject _backToMenuButton;
+
+            private static GameObject GetHandler()
+            {
+                if (_backToMenuButton == null)
+                    _backToMenuButton = GameObject.Find("BackToMenuButton");
+
+
+                return _backToMenuButton;
+            }
+
+            public static void Show()
+            {
+                GetHandler()?.SetActive(true);
+            }
+
+            public static void Hide()
+            {
+                GetHandler()?.SetActive(false);
+            }
+        }
+
+        public class MenuButtons
+        {
+            private static GameObject _visualizationButton;
+            private static GameObject _reconstructionWithGridButton;
+            private static GameObject _reconstructionButton;
+
+            private static List<GameObject> GetHandler()
+            {
+                if (_visualizationButton == null)
+                    _visualizationButton = GameObject.Find("WizButton");
+
+                if (_reconstructionWithGridButton == null)
+                    _reconstructionWithGridButton = GameObject.Find("KreaButton");
+
+                if (_reconstructionButton == null)
+                    _reconstructionButton = GameObject.Find("ExpButton");
+
+                return new List<GameObject>()
+                {
+                    _visualizationButton,
+                    _reconstructionWithGridButton,
+                    _reconstructionButton
+                };
+            }
+
+            public static void Show()
+            {
+                GetHandler().ForEach(btn => btn?.SetActive(true));
+            }
+
+            public static void Hide()
+            {
+                GetHandler().ForEach(btn => btn?.SetActive(false));
+            }
+        }
     }
 }
