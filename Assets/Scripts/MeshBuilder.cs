@@ -294,9 +294,9 @@ public class MeshBuilder : MonoBehaviour {
     /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
     /// <param name="label">Etykieta</param>
     public void RemovePointProjection(WallInfo wall, string label)
-	{
-        //Debug.Log($"usuwanie");
-        //rozszerzyć o label
+    {
+        if (verticesOnWalls == null)
+            return;
         if (!verticesOnWalls.ContainsKey(wall))
             return;
         if (!verticesOnWalls[wall].ContainsKey(label))
