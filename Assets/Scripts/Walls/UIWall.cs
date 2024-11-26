@@ -14,22 +14,53 @@ namespace Assets.Scripts.Walls
         {
             private static GameObject _exportSolidToVisualButton;
 
-            private static void GetHandler()
+            private static GameObject GetHandler()
             {
                 if (_exportSolidToVisualButton == null)
                     _exportSolidToVisualButton = GameObject.Find("ExportSolidToVisualButton");
+
+                return _exportSolidToVisualButton;
             }
 
             public static void Show()
             {
-                GetHandler();
-                _exportSolidToVisualButton.SetActive(true);
+                GetHandler()?.SetActive(true);
             }
 
             public static void Hide()
             {
-                GetHandler();
-                _exportSolidToVisualButton.SetActive(false);
+                GetHandler()?.SetActive(false);
+            }
+        }
+
+        public class SaveLoadStateButtons
+        {
+            private static GameObject _saveStateButton;
+            private static GameObject _loadStateButton;
+
+            private static List<GameObject> GetHandler()
+            {
+                if (_saveStateButton == null)
+                    _saveStateButton = GameObject.Find("SaveStateButton");
+
+                if (_loadStateButton == null)
+                    _loadStateButton = GameObject.Find("LoadStateButton");
+
+                return new List<GameObject>()
+                {
+                    _saveStateButton,
+                    _loadStateButton
+                };
+            }
+
+            public static void Show()
+            {
+                GetHandler().ForEach(btn => btn?.SetActive(true));
+            }
+
+            public static void Hide()
+            {
+                GetHandler().ForEach(btn => btn?.SetActive(false));
             }
         }
 

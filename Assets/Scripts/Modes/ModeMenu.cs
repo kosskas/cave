@@ -18,6 +18,7 @@ public class ModeMenu : IMode
 
         ExContextMenuView.Hide();
         UIWall.ExportSolidToVisualButton.Hide();
+        UIWall.SaveLoadStateButtons.Hide();
     }
 
 

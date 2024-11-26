@@ -143,6 +143,9 @@ public class WallGenerator : MonoBehaviour {
         {
             //Debug.Log(CheckIfPointsAreOnTheSamePlane(points));
 
+            if (!StateManager.Grid.Walls.Contains(_points))
+                StateManager.Grid.Walls.Add(_points);
+
             CreateWall(_points);
         }
 
