@@ -86,7 +86,7 @@ namespace Assets.Scripts.Experimental.Items
             _boxCollider.enabled = ColliderEnabled;
 
             if (_isBoundToPoints)
-                RefreshEdgeProjection();
+                WatchBinding();
         }
 
         void OnDestroy()
@@ -134,26 +134,18 @@ namespace Assets.Scripts.Experimental.Items
                 : new List<string>();
         }
 
-        private void RefreshEdgeProjection()
+        private void WatchBinding()
         {
-            if (_startPoint == null || _endPoint == null)
-            {
-                RemoveEdgeProjection();
-                _isBoundToPoints = false;
-                return;
-            }
-
-            //if (_startPointLabel == _startPoint.Label && _endPointLabel == _endPoint.Label)
-            if (_startPoint.Labels.Contains(_startPointLabel) && _endPoint.Labels.Contains(_endPointLabel))
+            if (
+                _startPoint != null &&
+                _endPoint != null &&
+                _startPoint.Labels.Contains(_startPointLabel) &&
+                _endPoint.Labels.Contains(_endPointLabel)
+                )
                 return;
 
             RemoveEdgeProjection();
-            _isBoundToPoints = false;
-
-            //_startPointLabel = _startPoint.Label;
-            //_endPointLabel = _endPoint.Label;
-
-            //AddEdgeProjection();
+            Destroy(gameObject);
         }
 
         private void RemoveEdgeProjection()
