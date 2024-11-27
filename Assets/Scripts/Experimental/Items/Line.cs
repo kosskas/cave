@@ -19,9 +19,9 @@ namespace Assets.Scripts.Experimental.Items
 
         private float ColliderWidth => Width * 4;
 
-        private Vector3 _from;
+        public Vector3 StartPosition { get; private set; }
 
-        private Vector3 _to;
+        public Vector3 EndPosition { get; private set; }
 
         public bool ColliderEnabled { get; set; } = true;
 
@@ -30,7 +30,19 @@ namespace Assets.Scripts.Experimental.Items
         private IndexedLabel _labelComponent;
 
         private BoxCollider _boxCollider;
+
         private MeshBuilder _mc;
+
+        private MeshBuilder Mc
+        {
+            get
+            {
+                if (_mc == null)
+                    _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
+
+                return _mc;
+            }
+        }
 
         private ExPoint _startPoint;
         private ExPoint _endPoint;
@@ -60,12 +72,12 @@ namespace Assets.Scripts.Experimental.Items
         {
             _lineRenderer.startWidth = Width;
             _lineRenderer.endWidth = Width;
-            _lineRenderer.SetPositions(new[] { _from, _to });
+            _lineRenderer.SetPositions(new[] { StartPosition, EndPosition });
 
-            Vector3 newPosition = _from;
-            Quaternion newRotation = Quaternion.LookRotation((_to - _from).normalized, gameObject.transform.up) * Quaternion.Euler(0, -90, 0);
-            Vector3 newColliderSize = new Vector3(Vector3.Distance(_from, _to), ColliderWidth, ColliderWidth);
-            Vector3 newColliderCenter = new Vector3(Vector3.Distance(_from, _to) * 0.5f, 0, 0);
+            Vector3 newPosition = StartPosition;
+            Quaternion newRotation = Quaternion.LookRotation((EndPosition - StartPosition).normalized, gameObject.transform.up) * Quaternion.Euler(0, -90, 0);
+            Vector3 newColliderSize = new Vector3(Vector3.Distance(StartPosition, EndPosition), ColliderWidth, ColliderWidth);
+            Vector3 newColliderCenter = new Vector3(Vector3.Distance(StartPosition, EndPosition) * 0.5f, 0, 0);
 
             gameObject.transform.position = newPosition;
             gameObject.transform.rotation = newRotation;
@@ -99,6 +111,29 @@ namespace Assets.Scripts.Experimental.Items
             _isBoundToPoints = true;
         }
 
+        public void BindPoints(ExPoint startPoint, string startPointLabel, ExPoint endPoint, string endPointLabel)
+        {
+            if (_isBoundToPoints)
+                return;
+
+            _startPoint = startPoint;
+            _endPoint = endPoint;
+
+            _startPointLabel = startPointLabel;
+            _endPointLabel = endPointLabel;
+
+            AddEdgeProjection();
+
+            _isBoundToPoints = true;
+        }
+
+        public List<string> GetLabelsOfBoundPoints()
+        {
+            return (_isBoundToPoints)
+                ? new List<string> { _startPointLabel, _endPointLabel }
+                : new List<string>();
+        }
+
         private void RefreshEdgeProjection()
         {
             if (_startPoint == null || _endPoint == null)
@@ -123,12 +158,12 @@ namespace Assets.Scripts.Experimental.Items
 
         private void RemoveEdgeProjection()
         {
-            _mc.RemoveEdgeProjection(_startPointLabel, _endPointLabel);
+            Mc?.RemoveEdgeProjection(_startPointLabel, _endPointLabel);
         }
 
         private void AddEdgeProjection()
         {
-            _mc.AddEdgeProjection(_startPointLabel, _endPointLabel);
+            Mc.AddEdgeProjection(_startPointLabel, _endPointLabel);
         }
 
 
@@ -144,8 +179,8 @@ namespace Assets.Scripts.Experimental.Items
                 gameObject.transform.rotation = plane.gameObject.transform.rotation;
             }
 
-            _from = (positions.ElementAtOrDefault(0) == default(Vector3)) ? _from : positions[0];
-            _to = (positions.ElementAtOrDefault(1) == default(Vector3)) ? _to : positions[1];
+            StartPosition = (positions.ElementAtOrDefault(0) == default(Vector3)) ? StartPosition : positions[0];
+            EndPosition = (positions.ElementAtOrDefault(1) == default(Vector3)) ? EndPosition : positions[1];
         }
 
 
@@ -205,6 +240,12 @@ namespace Assets.Scripts.Experimental.Items
             NextText();
         }
 
+        public void AddLabel(string labelText)
+        {
+            AddLabel();
+            SetToText(labelText);
+        }
+
         public void RemoveFocusedLabel()
         {
             _labelComponent?.RemoveFocusedLabel();
@@ -238,6 +279,14 @@ namespace Assets.Scripts.Experimental.Items
             _labelTexts.Previous();
 
             FocusedLabel = _labelTexts.Current.ToString();
+        }
+
+        private void SetToText(string text)
+        {
+            if (_labelComponent == null)
+                return;
+
+            _labelTexts.NextWhile(current => current.ToString() != text);
         }
 
     }

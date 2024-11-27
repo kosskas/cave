@@ -146,6 +146,8 @@ public class WallGenerator : MonoBehaviour {
             if (!StateManager.Grid.Walls.Contains(_points))
                 StateManager.Grid.Walls.Add(_points);
 
+            StateManager.Exp.StoreWall(_points);
+
             CreateWall(_points);
         }
 

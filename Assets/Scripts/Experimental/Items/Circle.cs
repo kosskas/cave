@@ -14,17 +14,21 @@ namespace Assets.Scripts.Experimental.Items
         private static readonly Color ColorNormal = Color.black;
         private static readonly Color ColorFocused = Color.red;
 
-        private static readonly float Width = 0.002f;
+        public float Width = 0.002f;
 
-        private static readonly float ColliderWidth = Width * 4;
+        private float ColliderWidth => Width * 4;
 
         private static readonly int PositionsCount = 60;
 
         private Vector3 _center;
 
+        public Vector3 StartPosition => _center;
+
         private float _radius;
 
         private Vector3 _radiusEnd;
+
+        public Vector3 EndPosition => _radiusEnd;
 
         public bool ColliderEnabled { get; set; } = true;
 
