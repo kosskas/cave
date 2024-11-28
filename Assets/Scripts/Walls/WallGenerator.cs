@@ -53,7 +53,7 @@ public class WallGenerator : MonoBehaviour {
                 float det = posPart - negPart;
                 Debug.Log("Wyznacznik macierzy: "+ det + '\n');
 
-                const float eps = 0.001f;
+                const float eps = 0.01f;
                 if (!(Mathf.Abs(det - 0f) < eps))
                 {
                     areOnSamePlane = false;
