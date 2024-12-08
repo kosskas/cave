@@ -107,7 +107,17 @@ public class ModeExperimental : IMode
             case "BackToMenuButton":
                 _BackToMenu();
                 break;
-            }
+            
+            case "SaveStateButton":
+                _items.Save();
+                break;
+
+            case "LoadStateButton":
+                _items.Restore();
+                StateManager.Exp.RestoreWalls(_wg);
+                break;
+
+        }
     }
 
     private void _BackToMenu()
@@ -168,6 +178,7 @@ public class ModeExperimental : IMode
         ExContextMenuView.Hide();
         UIWall.ExportSolidToVisualButton.Hide();
         UIWall.BackToMenuButton.Hide();
+        UIWall.SaveLoadStateButtons.Hide();
 
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
@@ -297,6 +308,7 @@ public class ModeExperimental : IMode
 
         UIWall.ExportSolidToVisualButton.Show();
         UIWall.BackToMenuButton.Show();
+        UIWall.SaveLoadStateButtons.Show();
 
         //_controlMenuView = new ExControlMenuView();
 

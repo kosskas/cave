@@ -53,7 +53,7 @@ public class WallGenerator : MonoBehaviour {
                 float det = posPart - negPart;
                 Debug.Log("Wyznacznik macierzy: "+ det + '\n');
 
-                const float eps = 0.001f;
+                const float eps = 0.01f;
                 if (!(Mathf.Abs(det - 0f) < eps))
                 {
                     areOnSamePlane = false;
@@ -145,6 +145,8 @@ public class WallGenerator : MonoBehaviour {
 
             if (!StateManager.Grid.Walls.Contains(_points))
                 StateManager.Grid.Walls.Add(_points);
+
+            StateManager.Exp.StoreWall(_points);
 
             CreateWall(_points);
         }

@@ -20,8 +20,9 @@ public class Vector3Converter : JsonConverter
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
-        // Implement deserialization logic if needed
-        throw new NotImplementedException("Deserialization for Vector3 is not implemented.");
+        var t = serializer.Deserialize(reader);
+        var iv = JsonConvert.DeserializeObject<Vector3>(t.ToString());
+        return iv;
     }
 
     public override bool CanConvert(Type objectType)

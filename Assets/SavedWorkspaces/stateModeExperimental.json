@@ -1,0 +1,1017 @@
+{
+  "POINTS": [
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 0.222376347,
+        "z": -0.221335366
+      },
+      "Labels": [
+        "E"
+      ]
+    },
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 0.222441435,
+        "z": 0.09193596
+      },
+      "Labels": [
+        "F"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 1.5145092,
+        "y": 0.0600000173,
+        "z": 0.09193599
+      },
+      "Labels": [
+        "F"
+      ]
+    },
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 1.38961,
+        "z": -0.3308918
+      },
+      "Labels": [
+        "B"
+      ]
+    },
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 1.39065719,
+        "z": 0.4307075
+      },
+      "Labels": [
+        "C"
+      ]
+    },
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 0.874766946,
+        "z": -0.5982951
+      },
+      "Labels": [
+        "A"
+      ]
+    },
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 0.8953769,
+        "z": 0.675257266
+      },
+      "Labels": [
+        "D"
+      ]
+    },
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 1.55337656,
+        "z": 0.4810388
+      },
+      "Labels": [
+        "1"
+      ]
+    },
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 1.5523541,
+        "z": -0.389953971
+      },
+      "Labels": [
+        "2"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 0.122410119,
+        "y": 0.0600000173,
+        "z": -0.389953941
+      },
+      "Labels": [
+        "2"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": -0.03205151,
+        "y": 0.0600000173,
+        "z": 0.4810388
+      },
+      "Labels": [
+        "1"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 0.290277,
+        "y": 0.0600000173,
+        "z": -0.3308918
+      },
+      "Labels": [
+        "B"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 0.170655847,
+        "y": 0.0600000173,
+        "z": 0.4307075
+      },
+      "Labels": [
+        "C"
+      ]
+    },
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 0.8833428,
+        "z": -0.147575721
+      },
+      "Labels": [
+        "4"
+      ]
+    },
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 0.889659166,
+        "z": 0.285557359
+      },
+      "Labels": [
+        "3"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 0.7469913,
+        "y": 0.0600000173,
+        "z": 0.285557419
+      },
+      "Labels": [
+        "3"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 0.82335633,
+        "y": 0.0600000173,
+        "z": -0.147575736
+      },
+      "Labels": [
+        "4"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 0.6780381,
+        "y": 0.0600000173,
+        "z": 0.675257266
+      },
+      "Labels": [
+        "D"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 0.9039699,
+        "y": 0.0600000173,
+        "z": -0.5982951
+      },
+      "Labels": [
+        "A"
+      ]
+    },
+    {
+      "PlaneName": "Wall4",
+      "Position": {
+        "x": 1.64000022,
+        "y": 0.523142636,
+        "z": 0.179514155
+      },
+      "Labels": [
+        "5"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 1.16479445,
+        "y": 0.0600000173,
+        "z": 0.17951417
+      },
+      "Labels": [
+        "5"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 1.55275488,
+        "y": 0.0600000173,
+        "z": -0.221335351
+      },
+      "Labels": [
+        "E"
+      ]
+    }
+  ],
+  "LINES": [
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.222376347,
+        "z": -0.221335366
+      },
+      "EndPosition": {
+        "x": 1.64000022,
+        "y": 0.222376347,
+        "z": 0.0936097354
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.222441435,
+        "z": 0.09193596
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.09193599
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 1.5145092,
+        "y": 0.0600000173,
+        "z": 0.09193599
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.09193599
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 1.55482018,
+        "z": 0.79009974
+      },
+      "EndPosition": {
+        "x": 1.64000022,
+        "y": 1.55482018,
+        "z": -0.634422064
+      },
+      "Labels": [
+        "a"
+      ],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.874766946,
+        "z": -0.5982951
+      },
+      "EndPosition": {
+        "x": 1.64000022,
+        "y": 1.38961,
+        "z": -0.3308918
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [
+        "A",
+        "B"
+      ],
+      "LineWidth": 0.005
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 1.38961,
+        "z": -0.3308918
+      },
+      "EndPosition": {
+        "x": 1.64000022,
+        "y": 1.39065719,
+        "z": 0.4307075
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [
+        "B",
+        "C"
+      ],
+      "LineWidth": 0.005
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 1.39065719,
+        "z": 0.4307075
+      },
+      "EndPosition": {
+        "x": 1.64000022,
+        "y": 0.8953769,
+        "z": 0.675257266
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [
+        "C",
+        "D"
+      ],
+      "LineWidth": 0.005
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.8953769,
+        "z": 0.675257266
+      },
+      "EndPosition": {
+        "x": 1.64000022,
+        "y": 0.222376347,
+        "z": -0.221335366
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [
+        "D",
+        "E"
+      ],
+      "LineWidth": 0.005
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.222376347,
+        "z": -0.221335366
+      },
+      "EndPosition": {
+        "x": 1.64000022,
+        "y": 0.874766946,
+        "z": -0.5982951
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [
+        "E",
+        "A"
+      ],
+      "LineWidth": 0.005
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": -0.0616386533,
+        "y": 0.0600000173,
+        "z": 0.6645653
+      },
+      "EndPosition": {
+        "x": 0.156355262,
+        "y": 0.0600000173,
+        "z": -0.568758667
+      },
+      "Labels": [
+        "a"
+      ],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.222441435,
+        "z": 0.09193596
+      },
+      "EndPosition": {
+        "x": 1.64000022,
+        "y": 1.55331612,
+        "z": -0.390918255
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.222441435,
+        "z": 0.09193596
+      },
+      "EndPosition": {
+        "x": 1.64000022,
+        "y": 1.55366933,
+        "z": 0.480346233
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 1.5523541,
+        "z": -0.389953971
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": -0.389953971
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.122410119,
+        "y": 0.0600000173,
+        "z": -0.389953941
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": -0.389953971
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 1.55337656,
+        "z": 0.4810388
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.4810388
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": -0.03205151,
+        "y": 0.0600000173,
+        "z": 0.4810388
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.4810388
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 1.5145092,
+        "y": 0.0600000173,
+        "z": 0.09193599
+      },
+      "EndPosition": {
+        "x": 0.122410119,
+        "y": 0.0600000173,
+        "z": -0.389953941
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 1.5145092,
+        "y": 0.0600000173,
+        "z": 0.09193599
+      },
+      "EndPosition": {
+        "x": -0.03205151,
+        "y": 0.0600000173,
+        "z": 0.4810388
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 1.38961,
+        "z": -0.3308918
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": -0.330891848
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.290277,
+        "y": 0.0600000173,
+        "z": -0.3308918
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": -0.330891848
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 1.39065719,
+        "z": 0.4307075
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.4307075
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.170655847,
+        "y": 0.0600000173,
+        "z": 0.4307075
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.4307075
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.170655847,
+        "y": 0.0600000173,
+        "z": 0.4307075
+      },
+      "EndPosition": {
+        "x": 0.290277,
+        "y": 0.0600000173,
+        "z": -0.3308918
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [
+        "C",
+        "B"
+      ],
+      "LineWidth": 0.005
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.8953769,
+        "z": 0.675257266
+      },
+      "EndPosition": {
+        "x": 1.64000022,
+        "y": 0.874766946,
+        "z": -0.5982951
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.889659166,
+        "z": 0.285557359
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.2855574
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.7469913,
+        "y": 0.0600000173,
+        "z": 0.285557419
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.2855574
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.8833428,
+        "z": -0.147575721
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": -0.147575736
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.82335633,
+        "y": 0.0600000173,
+        "z": -0.147575736
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": -0.147575736
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.7469913,
+        "y": 0.0600000173,
+        "z": 0.285557419
+      },
+      "EndPosition": {
+        "x": 0.9191842,
+        "y": 0.0600000173,
+        "z": -0.6856371
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.82335633,
+        "y": 0.0600000173,
+        "z": -0.147575736
+      },
+      "EndPosition": {
+        "x": 0.6259577,
+        "y": 0.0600000173,
+        "z": 0.967123568
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.8953769,
+        "z": 0.675257266
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.675257266
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.6780381,
+        "y": 0.0600000173,
+        "z": 0.675257266
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.675257266
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.874766946,
+        "z": -0.5982951
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": -0.5982951
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.9039699,
+        "y": 0.0600000173,
+        "z": -0.5982951
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": -0.5982951
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.290277,
+        "y": 0.0600000173,
+        "z": -0.3308918
+      },
+      "EndPosition": {
+        "x": 0.9039699,
+        "y": 0.0600000173,
+        "z": -0.5982951
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [
+        "B",
+        "A"
+      ],
+      "LineWidth": 0.005
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.170655847,
+        "y": 0.0600000173,
+        "z": 0.4307075
+      },
+      "EndPosition": {
+        "x": 0.6780381,
+        "y": 0.0600000173,
+        "z": 0.675257266
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [
+        "C",
+        "D"
+      ],
+      "LineWidth": 0.005
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.523142636,
+        "z": 0.179514155
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.17951417
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 1.16479445,
+        "y": 0.0600000173,
+        "z": 0.17951417
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": 0.17951417
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.6780381,
+        "y": 0.0600000173,
+        "z": 0.675257266
+      },
+      "EndPosition": {
+        "x": 1.629262,
+        "y": 0.0600000173,
+        "z": -0.297440946
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall4",
+      "StartPosition": {
+        "x": 1.64000022,
+        "y": 0.222376347,
+        "z": -0.221335366
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": -0.221335411
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 1.55275488,
+        "y": 0.0600000173,
+        "z": -0.221335351
+      },
+      "EndPosition": {
+        "x": 1.64000058,
+        "y": 0.05999966,
+        "z": -0.221335411
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [],
+      "LineWidth": 0.002
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 0.6780381,
+        "y": 0.0600000173,
+        "z": 0.675257266
+      },
+      "EndPosition": {
+        "x": 1.55275488,
+        "y": 0.0600000173,
+        "z": -0.221335351
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [
+        "D",
+        "E"
+      ],
+      "LineWidth": 0.005
+    },
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": 1.55275488,
+        "y": 0.0600000173,
+        "z": -0.221335351
+      },
+      "EndPosition": {
+        "x": 0.9039699,
+        "y": 0.0600000173,
+        "z": -0.5982951
+      },
+      "Labels": [],
+      "BoundPointsByLabel": [
+        "E",
+        "A"
+      ],
+      "LineWidth": 0.005
+    }
+  ],
+  "CIRCLES": [],
+  "WALLS": [
+    {
+      "Vertices": [
+        {
+          "Key": "B",
+          "Value": {
+            "x": 0.29,
+            "y": 1.389,
+            "z": -0.331
+          }
+        },
+        {
+          "Key": "C",
+          "Value": {
+            "x": 0.17,
+            "y": 1.39,
+            "z": 0.43
+          }
+        },
+        {
+          "Key": "D",
+          "Value": {
+            "x": 0.678,
+            "y": 0.895,
+            "z": 0.675
+          }
+        },
+        {
+          "Key": "E",
+          "Value": {
+            "x": 1.552,
+            "y": 0.222,
+            "z": -0.222
+          }
+        },
+        {
+          "Key": "A",
+          "Value": {
+            "x": 0.903,
+            "y": 0.8740001,
+            "z": -0.599
+          }
+        }
+      ]
+    }
+  ]
+}

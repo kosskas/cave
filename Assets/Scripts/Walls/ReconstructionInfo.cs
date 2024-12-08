@@ -16,7 +16,7 @@ public static class ReconstructionInfo
     public static Color POINT_COLOR = Color.black;
     // -- EDGE ON WALL
     public static float EDGE_LINE_WIDTH = 0.01f;
-    public static Color EDGE_COLOR = Color.white;
+    public static Color EDGE_COLOR = Color.black;
     // -- LABEL ON WALL
     public static float LABEL_SIZE_PLACED = 0.04f;
     public static float LABEL_SIZE_PICKED = 0.06f;

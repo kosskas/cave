@@ -19,10 +19,10 @@ namespace Assets.Scripts.Experimental
         private const float _BOLD_LINE_WIDTH = 0.005f;
 
         private readonly GameObject _workspace;
-        private readonly GameObject _axisRepo;
-        private readonly GameObject _lineRepo;
-        private readonly GameObject _pointRepo;
-        private readonly GameObject _circleRepo;
+        private GameObject _axisRepo;
+        private GameObject _lineRepo;
+        private GameObject _pointRepo;
+        private GameObject _circleRepo;
 
         private readonly Dictionary<Axis, Tuple<WallInfo, WallInfo>> _axisWalls;
 
@@ -95,7 +95,7 @@ namespace Assets.Scripts.Experimental
 
         public ItemsController()
         {
-            _workspace = GameObject.Find("Workspace") ?? new GameObject("Workspace");
+            _workspace = GameObject.Find("WorkspaceExp") ?? new GameObject("WorkspaceExp");
 
             _axisRepo = new GameObject("AxisRepo");
             _axisRepo.transform.SetParent(_workspace.transform);
@@ -234,6 +234,7 @@ namespace Assets.Scripts.Experimental
 
             var circleComponent = circle.AddComponent<Circle>();
             circleComponent.ColliderEnabled = false;
+            circleComponent.Width = lineWidth;
             circleComponent.Draw(plane, startPosition, startPosition);
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
@@ -382,12 +383,177 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public void Clear()
-        {
-            _axisWalls.Clear();
+        //---
 
-            GameObject.Destroy(_workspace);
+        public void Save()
+        {
+            StorePoints();
+            StoreLines();
+            StoreCircles();
+
+            StateManager.Exp.Save();
+        }
+
+        private void StorePoints()
+        {
+            foreach (Transform pointTrans in _pointRepo.transform)
+            {
+                var point = pointTrans.gameObject.GetComponent<ExPoint>();
+                if (point == null)
+                    continue;
+
+                var planeName = point.Plane.name;
+                var position = point.Position;
+                var labels = point.Labels;
+
+                StateManager.Exp.StorePoint(planeName, position, labels);
+            }
+        }
+
+        private void StoreLines()
+        {
+            foreach (Transform lineTrans in _lineRepo.transform)
+            {
+                var line = lineTrans.gameObject.GetComponent<Line>();
+                if (line == null)
+                    continue;
+
+                var planeName = line.Plane.name;
+                var startPosition = line.StartPosition;
+                var endPosition = line.EndPosition;
+                var boundPoints = line.GetLabelsOfBoundPoints();
+                var labels = line.Labels;
+                var lineWidth = line.Width;
+
+                StateManager.Exp.StoreLine(planeName, startPosition, endPosition, boundPoints, labels, lineWidth);
+            }
+        }
+
+        private void StoreCircles()
+        {
+            foreach (Transform circleTrans in _circleRepo.transform)
+            {
+                var circle = circleTrans.gameObject.GetComponent<Circle>();
+                if (circle == null)
+                    continue;
+
+                var planeName = circle.Plane.name;
+                var startPosition = circle.StartPosition;
+                var endPosition = circle.EndPosition;
+                var lineWidth = circle.Width;
+
+                StateManager.Exp.StoreCircle(planeName, startPosition, endPosition, lineWidth);
+            }
+        }
+
+        //---
+
+        public void Clear(bool withAxis = true)
+        {
+            if (withAxis)
+            {
+                _axisWalls.Clear();
+
+                UnityEngine.Object.DestroyImmediate(_axisRepo);
+                _axisRepo = new GameObject("AxisRepo");
+                _axisRepo.transform.SetParent(_workspace.transform);
+            }
+
+            UnityEngine.Object.DestroyImmediate(_circleRepo);
+            _circleRepo = new GameObject("CircleRepo");
+            _circleRepo.transform.SetParent(_workspace.transform);
+
+            UnityEngine.Object.DestroyImmediate(_lineRepo);
+            _lineRepo = new GameObject("LineRepo");
+            _lineRepo.transform.SetParent(_workspace.transform);
+
+            UnityEngine.Object.DestroyImmediate(_pointRepo);
+            _pointRepo = new GameObject("PointRepo");
+            _pointRepo.transform.SetParent(_workspace.transform);
+        }
+
+        //---
+
+        public void Restore()
+        {
+            Clear(withAxis: false);
+            
+            StateManager.Exp.Load();
+
+            RestorePoints();
+            RestoreLines();
+            RestoreCircles();
+        }
+
+        private void RestorePoints()
+        {
+            StateManager.Exp.RestorePoints((plane, position, labels) =>
+            {
+                var point = new GameObject("POINT");
+                point.transform.SetParent(_pointRepo.transform);
+
+                var pointComponent = point.AddComponent<ExPoint>();
+                pointComponent.Draw(plane, position);
+                pointComponent.EnabledLabels = true;
+
+                labels.ForEach(label => pointComponent.AddLabel(label));
+            });
+        }
+
+        private void RestoreLines()
+        {
+            StateManager.Exp.RestoreLines((plane, startPosition, endPosition, boundPointsByLabel, labels, lineWidth) =>
+            {
+                var line = new GameObject("LINE");
+                line.transform.SetParent(_lineRepo.transform);
+            
+                var lineComponent = line.AddComponent<Line>();
+                lineComponent.Width = lineWidth;
+                lineComponent.Draw(plane, startPosition, endPosition);
+                lineComponent.EnabledLabels = true;
+                lineComponent.ColliderEnabled = true;
+            
+                labels.ForEach(label => lineComponent.AddLabel(label));
+
+                var startPointLabel = boundPointsByLabel.ElementAtOrDefault(0);
+                var endPointLabel = boundPointsByLabel.ElementAtOrDefault(1);
+
+                if (startPointLabel == default(string) || endPointLabel == default(string))
+                    return;
+
+                var startPoint = default(ExPoint);
+                var endPoint = default(ExPoint);
+                foreach (Transform pointTrans in _pointRepo.transform)
+                {
+                    var point = pointTrans.gameObject.GetComponent<ExPoint>();
+                    if (point == null)
+                        continue;
+
+                    if (point.Plane.Equals(plane) && point.Labels.Contains(startPointLabel))
+                        startPoint = point;
+
+                    if (point.Plane.Equals(plane) && point.Labels.Contains(endPointLabel))
+                        endPoint = point;
+                }
+
+                if (startPoint == default(ExPoint) || endPoint == default(ExPoint))
+                    return;
+
+                lineComponent.BindPoints(startPoint, startPointLabel, endPoint, endPointLabel);
+            });
+        }
+
+        private void RestoreCircles()
+        {
+            StateManager.Exp.RestoreCircles((plane, startPosition, endPosition, lineWidth) =>
+            {
+                var circle = new GameObject("CIRCLE");
+                circle.transform.SetParent(_circleRepo.transform);
+
+                var circleComponent = circle.AddComponent<Circle>();
+                circleComponent.Draw(plane, startPosition, endPosition);
+                circleComponent.ColliderEnabled = true;
+            });
         }
     }
 }
-

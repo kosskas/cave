@@ -32,6 +32,17 @@ namespace Assets.Scripts.Experimental.Items
 
         private MeshBuilder _mc;
 
+        private MeshBuilder Mc
+        {
+            get
+            {
+                if (_mc == null)
+                    _mc = (MeshBuilder)FindObjectOfType(typeof(MeshBuilder));
+
+                return _mc;
+            }
+        }
+
         void Start()
         {
             _pointObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -58,13 +69,14 @@ namespace Assets.Scripts.Experimental.Items
         void Update()
         {
             gameObject.transform.position = Position;
+            _pointObject.transform.position = Position;
         }
 
         void OnDestroy()
         {
             Labels?.ForEach(label =>
             {
-                _mc.RemovePointProjection(Plane, label);
+                Mc?.RemovePointProjection(Plane, label);
             });
         }
 
@@ -109,6 +121,7 @@ namespace Assets.Scripts.Experimental.Items
             }
 
             Position = (positions.ElementAtOrDefault(0) == default(Vector3)) ? Position : positions[0];
+            gameObject.transform.position = Position;
         }
 
 
@@ -177,12 +190,18 @@ namespace Assets.Scripts.Experimental.Items
                 RemoveFocusedLabel();
         }
 
+        public void AddLabel(string labelText)
+        {
+            AddLabel();
+            SetToText(labelText);
+        }
+
         public void RemoveFocusedLabel()
         {
             if (_labelComponent == null)
                 return;
 
-            _mc.RemovePointProjection(Plane, FocusedLabel);
+            Mc.RemovePointProjection(Plane, FocusedLabel);
             RemoveProjectionLine(FocusedLabel);
             _labelComponent.RemoveFocusedLabel();
         }
@@ -202,7 +221,7 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 return;
 
-            var found = _labelTexts.NextWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
+            var found = _labelTexts.NextWhile(current => Mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
 
             if (found)
                 UpdateText();
@@ -213,7 +232,18 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 return;
 
-            var found = _labelTexts.PreviousWhile(current => _mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
+            var found = _labelTexts.PreviousWhile(current => Mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
+
+            if (found)
+                UpdateText();
+        }
+
+        private void SetToText(string text)
+        {
+            if (_labelComponent == null)
+                return;
+
+            var found = _labelTexts.NextWhile(current => Mc.CheckIfAlreadyExist(Plane, current.ToString()) || current.ToString() != text);
 
             if (found)
                 UpdateText();
@@ -224,7 +254,7 @@ namespace Assets.Scripts.Experimental.Items
             var oldLabelText = FocusedLabel;
             var newLabelText = _labelTexts.Current.ToString();
 
-            _mc.RemovePointProjection(Plane, oldLabelText);
+            Mc.RemovePointProjection(Plane, oldLabelText);
             RemoveProjectionLine(oldLabelText);
 
             FocusedLabel = newLabelText;
@@ -233,7 +263,7 @@ namespace Assets.Scripts.Experimental.Items
                 return;
 
             var projectionObj = AddProjectionLine(newLabelText);
-            _mc.AddPointProjection(Plane, newLabelText, projectionObj);
+            Mc.AddPointProjection(Plane, newLabelText, projectionObj);
         }
 
     }

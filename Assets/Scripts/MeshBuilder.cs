@@ -192,7 +192,7 @@ public class MeshBuilder : MonoBehaviour {
     {
         if (currPts.Count == 1)
         {
-            Debug.Log("Pierwszy");
+            Debug.Log($"Pierwszy {label}");
             //nie bylo zadnych rzutow tego pktu
             //bedzie 1
             MarkOK(currPts[0]);
@@ -200,7 +200,7 @@ public class MeshBuilder : MonoBehaviour {
         }
         else if (currPts.Count == 2)
         {
-            Debug.Log("Drugi");
+            Debug.Log($"Drugi {label}");
             //jest juz 1 bedzie 2
             //podejmij rekonstrukcje
             //sprawdz plawszczyzny
