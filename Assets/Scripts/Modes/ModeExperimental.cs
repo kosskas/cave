@@ -340,40 +340,7 @@ public class ModeExperimental : IMode
 
         PointsList.ShowListAndLogs();
 
-
-        GameObject canvas = GameObject.Find("FlystickPlaceholder/Canvas");
-        if (canvas != null)
-        {
-            Transform radialMenuRoot = canvas.transform.Find("RadialMenuRoot");
-            if (radialMenuRoot != null)
-            {
-                GameObject itemPrefab = Resources.Load<GameObject>("RadialMenuItem");
-                if (itemPrefab != null)
-                {
-                    List<string> descriptions = Enum.GetValues(typeof(ExContext)).Cast<ExContext>().Select(e => e.GetDescription()).ToList();
-                    this.radialMenu = RadialMenu.Create(
-                        radialMenuRoot,
-                        descriptions.Count, // liczba elementów
-                        20f, // promieñ
-                        descriptions, // etykiety
-                        itemPrefab,
-                        this
-                    );
-                }
-                else
-                {
-                    Debug.LogError("Nie mo¿na za³adowaæ prefabrykatu MenuItem z Resources/RadialMenuItem");
-                }
-            }
-            else
-            {
-                Debug.LogError("Nie znaleziono RadialMenuRoot w Canvas");
-            }
-        }
-        else
-        {
-            Debug.LogError("Nie znaleziono Canvas w scenie");
-        }
+        SetUpFlystick();
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
@@ -436,6 +403,100 @@ public class ModeExperimental : IMode
         {
             _wc.PopBackWall();
         }
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+        /*
+        FlystickController.SetAction(
+            FlystickController.Btn._1,
+            FlystickController.ActOn.PRESS,
+            _DrawAction
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._2,
+            FlystickController.ActOn.PRESS,
+            _DeleteHoveredObject
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._3,
+            FlystickController.ActOn.PRESS,
+            _TryAddLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._4,
+            FlystickController.ActOn.PRESS,
+            _TryRemoveFocusedLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.FIRE,
+            FlystickController.ActOn.PRESS,
+            _MakeActionOnWall
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            _TryGetPrevLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            _TryGetNextLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_DOWN,
+            _TryGetPrevLabelText
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_UP,
+            _TryGetNextLabelText
+        );
+        */
+        GameObject canvas = GameObject.Find("FlystickPlaceholder/Canvas");
+        if (canvas != null)
+        {
+            Transform radialMenuRoot = canvas.transform.Find("RadialMenuRoot");
+            if (radialMenuRoot != null)
+            {
+                GameObject itemPrefab = Resources.Load<GameObject>("RadialMenuItem");
+                if (itemPrefab != null)
+                {
+                    List<string> descriptions = Enum.GetValues(typeof(ExContext)).Cast<ExContext>().Select(e => e.GetDescription()).ToList();
+                    this.radialMenu = RadialMenu.Create(
+                        radialMenuRoot,
+                        descriptions.Count, // liczba elementów
+                        20f, // promieñ
+                        descriptions, // etykiety
+                        itemPrefab,
+                        this
+                    );
+                }
+                else
+                {
+                    Debug.LogError("Nie mo¿na za³adowaæ prefabrykatu MenuItem z Resources/RadialMenuItem");
+                }
+            }
+            else
+            {
+                Debug.LogError("Nie znaleziono RadialMenuRoot w Canvas");
+            }
+        }
+        else
+        {
+            Debug.LogError("Nie znaleziono Canvas w scenie");
+        }
+
     }
 }
 

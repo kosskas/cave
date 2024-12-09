@@ -216,6 +216,8 @@ public class Mode2Dto3D : IMode
         UIWall.SaveLoadStateButtons.Show();
         UIWall.BackToMenuButton.Show();
 
+        SetUpFlystick();
+
         Debug.Log($"<color=blue> MODE inzynierka ON </color>");
     }
 
@@ -270,6 +272,52 @@ public class Mode2Dto3D : IMode
 
     }
 
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1,
+            FlystickController.ActOn.PRESS,
+            _AddPointProjection
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._2,
+            FlystickController.ActOn.PRESS,
+            _RemovePointProjection
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._3,
+            FlystickController.ActOn.PRESS,
+            _AddEdgeProjection
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._4,
+            FlystickController.ActOn.PRESS,
+            _RemoveEdgeProjection
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.FIRE,
+            FlystickController.ActOn.PRESS,
+            _MakeActionOnWall
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            _ChoosePreviousLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            _ChooseNextLabel
+        );
+    }
 }
 
 /*
