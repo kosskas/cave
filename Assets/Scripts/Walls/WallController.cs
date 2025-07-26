@@ -218,7 +218,7 @@ public class WallController : MonoBehaviour {
 		ret = (A, e, f)
 		*/
         Vector3 ret = Vector3.zero;
-        const float eps = 0.01f;
+        const float eps = 0.0001f;
         for (int i = 0; i < 3; i++)
         {
             bool cmp_v12 = Mathf.Abs(vec1[i] - vec2[i]) < eps;
@@ -323,11 +323,7 @@ public class WallController : MonoBehaviour {
         }
     }
 
-    /// <summary>
-    /// Wyznacza indeks w zależności od nazwy ściany
-    /// </summary>
-    /// <param name="wall">Metadane o ścianie</param>
-    /// <returns>Numer indeksu</returns>
+
     public int GetWallIndex(WallInfo wall)
     {
         if(wall.name == "Wall3")
@@ -338,21 +334,7 @@ public class WallController : MonoBehaviour {
             return 3;
         return 0;
     }
-    /// <summary>
-    /// Znajduje ściane położoną na podłodze.
-    /// </summary>
-    /// <returns>Podłoga jeśli jest, Null jeśli nie ma</returns>
-    public WallInfo GetGroundWall()
-    {
-        foreach (WallInfo wall in walls)
-        {
-            if (wall.GetNormal() == Vector3.up)
-            {
-                return wall;
-            }
-        }
-        return null;
-    }
+
     /// <summary>
     /// Znajduje ściane na podstawie nazwy
     /// </summary>
@@ -368,35 +350,5 @@ public class WallController : MonoBehaviour {
             }
         }
         return null;
-    }
-    /// <summary>
-    /// Znajduje dwie pozostałe ściany z trybu rekonstrukcji
-    /// </summary>
-    /// <param name="wall">Sciana</param>
-    /// <returns></returns>
-    public WallInfo[] RecGetRemainingWalls(WallInfo wall)
-    {
-        WallInfo wall3 = GetWallByName("Wall3");
-        WallInfo wall4 = GetWallByName("Wall4");
-        WallInfo wall6 = GetWallByName("Wall6");
-        WallInfo[] remainingWalls = new WallInfo[2];
-
-        if(wall.name == "Wall3")
-        {
-            remainingWalls[0] = wall4;
-            remainingWalls[1] = wall6;
-        }
-        else if(wall.name == "Wall4")
-        {
-            remainingWalls[0] = wall3;
-            remainingWalls[1] = wall6;
-        }
-        else//Wall6
-        {
-            remainingWalls[0] = wall3;
-            remainingWalls[1] = wall4;
-        }
-
-        return remainingWalls;
     }
 }
