@@ -372,7 +372,11 @@ public class ModeExperimental : IMode
 
         if (Input.GetKeyDown("p"))
         {
-            _wcrt.CreatePoint(PCref.Hit);
+            _wcrt.AddAnchorPoint(PCref.Hit);
+        }
+        if (Input.GetKeyDown("l"))
+        {
+            _wc.PopBackWall();
         }
     }
 }

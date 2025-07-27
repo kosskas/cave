@@ -43,7 +43,7 @@ public class Mode3Dto2D : IMode
 
     private void _AddPointToCreateWall()
     {
-        _wcrt.CreatePoint(PCref.Hit);
+        _wcrt.AddAnchorPoint(PCref.Hit);
     }
 
     private void _SetShowingProjection()
