@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -115,8 +116,6 @@ public class MeshBuilder : MonoBehaviour {
     WallController wc = null;
     bool blocked = false;
     bool showProjectionLines = true;
-    bool showReferenceLines=true;
-    bool generateReferenceLines = true;
 
 	// Update is called once per frame
 	void Update()
@@ -129,7 +128,7 @@ public class MeshBuilder : MonoBehaviour {
     /// <summary>
     /// Inicjalizuje klasę, tworzy katalogi do przechowywania punktów i krawędzi 3D
     /// </summary>
-    public void Init(bool showProjectionLines, bool generateReferenceLines)
+    public void Init(bool showProjectionLines)
     {
         reconstrVertDir = new GameObject("Reconstr. Verticies");
         reconstrVertDir.transform.SetParent(gameObject.transform);
@@ -143,8 +142,6 @@ public class MeshBuilder : MonoBehaviour {
         wc = (WallController)FindObjectOfType(typeof(WallController));
         blocked = false;
         this.showProjectionLines = showProjectionLines;
-        this.generateReferenceLines = generateReferenceLines;
-        this.showReferenceLines = generateReferenceLines;
 
     }
     /// <summary>
@@ -441,23 +438,6 @@ public class MeshBuilder : MonoBehaviour {
     public void SetShowRulesProjectionLine(bool rule)
     {
         showProjectionLines = rule;
-    }
-    /// <summary>
-    /// Ustawia widoczność linii odnoszących
-    /// </summary>
-    /// <param name="rule">Zadada wyświetlania. True - wyświetlanie, False - brak</param>
-    public void SetShowRulesReferencenLine(bool rule)
-    {
-        showReferenceLines = rule;
-    }
-
-    /// <summary>
-    /// Ustawia tworzenie linii odnoszących
-    /// </summary>
-    /// <param name="rule">Zadada wyświetlania. True - wyświetlanie, False - brak</param>
-    public void SetGenerateRulesReferenceLine(bool rule)
-    {
-        generateReferenceLines = rule;
     }
 
     /// <summary>

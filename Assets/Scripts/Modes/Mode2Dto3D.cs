@@ -195,7 +195,7 @@ public class Mode2Dto3D : IMode
 
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
-        _mb.Init(true, true);
+        _mb.Init(true);
 
         _gc = wallsObject.AddComponent<GridCreator>();
         _gc.Init();

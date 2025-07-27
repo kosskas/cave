@@ -18,6 +18,8 @@ public class ModeExperimental : IMode
 
     private WallGenerator _wg;
 
+    private WallCreator _wcrt;
+
     private ItemsController _items;
 
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
@@ -283,11 +285,13 @@ public class ModeExperimental : IMode
         _drawAction = null;
         _hitObject = null;
 
+        _wcrt = PCref.gameObject.GetComponent<WallCreator>();
+
         _items = new ItemsController();
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
-        _mb.Init(true,false);
+        _mb.Init(true);
         _wg = mainObject.AddComponent<WallGenerator>();
 
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
@@ -364,6 +368,11 @@ public class ModeExperimental : IMode
         if (Input.GetKeyDown("9"))
         {
             _TryGetNextLabelText();
+        }
+
+        if (Input.GetKeyDown("p"))
+        {
+            _wcrt.CreatePoint(PCref.Hit);
         }
     }
 }
