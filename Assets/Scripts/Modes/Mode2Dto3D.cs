@@ -10,7 +10,7 @@ public class Mode2Dto3D : IMode
     private GridCreator _gc;
     private ConstrDrawer _cd;
     private MeshBuilder _mb;
-    private WallGenerator _wg;
+    private FacesGenerator _fc;
     public PlayerController PCref { get; private set; }
 
     private void _AddPointProjection()
@@ -56,7 +56,7 @@ public class Mode2Dto3D : IMode
 
         if (PCref.Hit.collider.tag == "PointButton")
         {
-            _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
+            _fc.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
         }
         else switch (PCref.Hit.collider.gameObject.name)
         {
@@ -69,7 +69,7 @@ public class Mode2Dto3D : IMode
                 break;
 
             case "GenerateButton":
-                _wg.GenerateWall(_wg.points);
+                _fc.GenerateFace(_fc.points);
                 break;
 
             case "ExportSolidToVisualButton":
@@ -81,7 +81,7 @@ public class Mode2Dto3D : IMode
                 break;
 
             case "LoadStateButton":
-                StateManager.Grid.Load(_pp, _wg);
+                StateManager.Grid.Load(_pp, _fc);
                 break;
 
             case "BackToMenuButton":
@@ -93,8 +93,8 @@ public class Mode2Dto3D : IMode
     private void _BackToMenu()
     {
         //czyszcenie œcian obiektu
-        _wg.Clear();
-        GameObject.Destroy(_wg);
+        _fc.Clear();
+        GameObject.Destroy(_fc);
 
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _gc.Clear();
@@ -129,7 +129,7 @@ public class Mode2Dto3D : IMode
         string solid = SolidExporter.ExportSolid(
             _mb.GetPoints3D(), 
             _mb.GetEdges3D(),
-            WallGenerator.GetFaces());
+            FacesGenerator.GetFaces());
 
         if(solid == null)
         {
@@ -137,8 +137,8 @@ public class Mode2Dto3D : IMode
         }
 
         //czyszcenie œcian obiektu
-        _wg.Clear();
-        GameObject.Destroy(_wg);
+        _fc.Clear();
+        GameObject.Destroy(_fc);
 
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _gc.Clear();
@@ -203,7 +203,7 @@ public class Mode2Dto3D : IMode
         _cd = wallsObject.AddComponent<ConstrDrawer>();
         _cd.Init();
 
-        _wg = mainObject.AddComponent<WallGenerator>();
+        _fc = mainObject.AddComponent<FacesGenerator>();
 
         _pp = PCref.gameObject.AddComponent<PointPlacer>();
         _pp.Init(_mb, _cd);

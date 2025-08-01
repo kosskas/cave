@@ -41,7 +41,7 @@ public class Mode3Dto2D : IMode
         _wc.PopBackWall();
     }
 
-    private void _AddPointToCreateWall()
+    private void _AddPointToCreateFace()
     {
         _wcrt.CreatePoint(PCref.Hit);
     }
@@ -127,7 +127,7 @@ public class Mode3Dto2D : IMode
 
         if (Input.GetKeyDown("c"))
         {
-            _AddPointToCreateWall();
+            _AddPointToCreateFace();
         }
     }
 }

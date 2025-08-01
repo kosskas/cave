@@ -310,7 +310,7 @@ public class MeshBuilder : MonoBehaviour {
                 //vertices3D.Remove(label);
                 //Destroy(todel3D);
                 vertices3D[label].deleted = true;
-                WallGenerator.RemoveFacesFromPoint(label);
+                FacesGenerator.RemoveFacesFromPoint(label);
                 //TUTAJ USUŃ Z LISTY!!!!!!
                 PointsList.UpdatePointsList();
             }
@@ -344,7 +344,7 @@ public class MeshBuilder : MonoBehaviour {
             if (vertices3D[label].deleted)
             {
                 PointsList.UpdatePointsList();
-                WallGenerator.RemoveFacesFromPoint(label);
+                FacesGenerator.RemoveFacesFromPoint(label);
             }
         }   
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
@@ -745,7 +745,7 @@ public class MeshBuilder : MonoBehaviour {
         Point et = pointProj.pointObject.GetComponent<Point>();
         if (et == null)
         {
-            Debug.LogError("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
+            Debug.LogWarning("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
             //return;
         }
         else
@@ -764,7 +764,7 @@ public class MeshBuilder : MonoBehaviour {
         Point et = pointProj.pointObject.GetComponent<Point>();
         if (et == null)
         {
-            Debug.LogError("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
+            Debug.LogWarning("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
             //return;
         }
         else

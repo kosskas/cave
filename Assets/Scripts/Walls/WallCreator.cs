@@ -74,7 +74,7 @@ public class WallCreator : MonoBehaviour
 				return;
 			}
 
-			CreateWall(points[0].transform.position, points[1].transform.position, hitWallInfo);
+			CreateFace(points[0].transform.position, points[1].transform.position, hitWallInfo);
 			ClearPoints();
             wallController.AddWall(newWall, true, true, true);
         }
@@ -99,7 +99,7 @@ public class WallCreator : MonoBehaviour
 		points.Clear();
 	}
 
-	void CreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo)
+	void CreateFace(Vector3 point1, Vector3 point2, WallInfo parentWallInfo)
 	{
 		Vector3 direction = point2 - point1;
 		Vector3 parentNormal = parentWallInfo.GetNormal();
