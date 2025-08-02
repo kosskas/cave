@@ -37,8 +37,9 @@ public class ModeMenu : IMode
             }
             else if (PCref.Hit.collider.gameObject.name == "KreaButton")
             {
-                _HideModesButtons();
-                PCref.ChangeMode(PlayerController.Mode.Mode2Dto3D);
+                //_HideModesButtons();
+                //PCref.ChangeMode(PlayerController.Mode.Mode2Dto3D);
+                Debug.Log("Wycofany");
             }
             else if (PCref.Hit.collider.gameObject.name == "ExpButton")
             {

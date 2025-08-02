@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Serialization;
 using System.Reflection;
+using Assets.Scripts.Experimental.Items;
 
 /// <summary>
 /// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi.
@@ -722,7 +723,7 @@ public class MeshBuilder : MonoBehaviour {
 
     private void MarkError(PointProjection pointProj)
     {
-        Point et = pointProj.pointObject.GetComponent<Point>();
+        ExPoint et = pointProj.pointObject.GetComponent<ExPoint>();
         if (et == null)
         {
             Debug.LogWarning("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
@@ -730,7 +731,7 @@ public class MeshBuilder : MonoBehaviour {
         }
         else
         {
-            et.SetLabel(ReconstructionInfo.LABEL_3D_ERR_COLOR);
+            et.SetLabelColor(ReconstructionInfo.LABEL_3D_ERR_COLOR);
         }
         if (pointProj.projLine != null)
         {
@@ -741,7 +742,7 @@ public class MeshBuilder : MonoBehaviour {
 
     private void MarkOK(PointProjection pointProj)
     {
-        Point et = pointProj.pointObject.GetComponent<Point>();
+        ExPoint et = pointProj.pointObject.GetComponent<ExPoint>();
         if (et == null)
         {
             Debug.LogWarning("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
@@ -749,7 +750,7 @@ public class MeshBuilder : MonoBehaviour {
         }
         else
         {
-            et.SetLabel(ReconstructionInfo.LABEL_3D_COLOR);
+            et.SetLabelColor(ReconstructionInfo.LABEL_3D_COLOR);
         }
 
         if (pointProj.projLine != null){
