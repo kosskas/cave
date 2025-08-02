@@ -693,16 +693,22 @@ public class MeshBuilder : MonoBehaviour
         ExPoint et = pointProj.pointObject.GetComponent<ExPoint>();
         if (et == null)
         {
-            Debug.LogWarning("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
+            Debug.LogWarning("GameObj nie ma komponentu ExPoint, nie mozna oznaczyc etykiety");
             //return;
         }
         else
         {
             et.SetLabelColor(ReconstructionInfo.LABEL_3D_ERR_COLOR);
         }
-        if (pointProj.projLine != null)
+
+        if (pointProj.projLine == null)
         {
-            pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_ERROR_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+            Debug.LogWarning("GameObj nie ma komponentu pointProj, nie mozna oznaczyc linii");
+            //return;
+        }
+        else
+        {
+            pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
         }
         pointProj.is_ok_placed = false;
     }
@@ -712,7 +718,7 @@ public class MeshBuilder : MonoBehaviour
         ExPoint et = pointProj.pointObject.GetComponent<ExPoint>();
         if (et == null)
         {
-            Debug.LogWarning("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
+            Debug.LogWarning("GameObj nie ma komponentu ExPoint, nie mozna oznaczyc etykiety");
             //return;
         }
         else
@@ -720,7 +726,13 @@ public class MeshBuilder : MonoBehaviour
             et.SetLabelColor(ReconstructionInfo.LABEL_3D_COLOR);
         }
 
-        if (pointProj.projLine != null){
+        if (pointProj.projLine == null)
+        {
+            Debug.LogWarning("GameObj nie ma komponentu pointProj, nie mozna oznaczyc linii");
+            //return;
+        }
+        else
+        {
             pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
         }
         pointProj.is_ok_placed = true;
