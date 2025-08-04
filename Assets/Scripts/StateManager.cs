@@ -56,7 +56,7 @@ namespace Assets.Scripts
                 Debug.Log("State saved to JSON file.");
             }
 
-            public static void Load(PointPlacer pp, WallGenerator wg)
+            public static void Load(PointPlacer pp, FacesGenerator fg)
             {
                 var path = pathToFolderWithSavedStates + "/stateMode2Dto3D.json";
                 if (!File.Exists(path))
@@ -137,7 +137,7 @@ namespace Assets.Scripts
                             wallPoints.Add(new KeyValuePair<string, Vector3>(key, new Vector3((float)x, (float)y, (float)z)));
                         }
 
-                        wg.GenerateWall(wallPoints);
+                        fg.GenerateFace(wallPoints);
                     }
                 }
 
@@ -332,7 +332,7 @@ namespace Assets.Scripts
                 _circles.Clear();
             }
 
-            public static void RestoreWalls(WallGenerator wg)
+            public static void RestoreWalls(FacesGenerator fg)
             {
                 var restoredWalls = new List<WallJson>();
                 restoredWalls.AddRange(_walls);
@@ -341,7 +341,7 @@ namespace Assets.Scripts
 
                 restoredWalls.ForEach(wall =>
                 {
-                    wg.GenerateWall(wall.Vertices);
+                    fg.GenerateFace(wall.Vertices);
                 });
             }
 

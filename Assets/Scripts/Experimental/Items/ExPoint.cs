@@ -263,8 +263,15 @@ namespace Assets.Scripts.Experimental.Items
                 return;
 
             var projectionObj = AddProjectionLine(newLabelText);
-            Mc.AddPointProjection(Plane, newLabelText, projectionObj);
+            Mc.AddPointProjection(Plane, newLabelText, this.gameObject);
         }
 
+        public void SetLabelColor(Color textColor)
+        {
+            _pointRenderer.material.color = textColor;
+
+            if (_labelComponent != null)
+                _labelComponent.FocusedLabelColor = textColor;
+        }
     }
 }

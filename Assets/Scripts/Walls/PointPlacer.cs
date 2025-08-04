@@ -221,7 +221,7 @@ public class PointPlacer : MonoBehaviour {
         }
 
         string labelText = $"{_addPoint_Labels[_addPoint_LabelIdx]}";
-        int index = _wc.GetWallIndex(wall);
+        int index = wall.number;
         string fullLabelText = $"{labelText + new string('\'', index)}";
 
         if(_mc.CheckIfAlreadyExist(wall, labelText)) {

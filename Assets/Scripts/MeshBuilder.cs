@@ -6,25 +6,13 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Serialization;
 using System.Reflection;
+using Assets.Scripts.Experimental.Items;
 
 /// <summary>
 /// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi.
 /// </summary>
-public class MeshBuilder : MonoBehaviour {
-    /*TODO
-     [?] Przypadki przy dodawaniu
-     [x] Sprawdz numeryczne porownianie
-     [ ] Aktualizuj info jakie krawędzie między wierzchołkami	 
-     [x] Jak się określi krawędzie to zrób to samo w 3D
-     [ ] Zrób grafowo-matematyczny dziki algorytm żeby wypełnić ściany
-	 [x] Kiedy jest juz to ten ray tylko do wierch ale nie w INF
-	 [x] podswietl dodawany na czerwono jesli zla plaszcz, umiejscowienie trzeciego
-	 [X] usun takze 3D kiedy są tylko 2
-     [x] jezeli sa 3, usuwasz 1, sprawdz nowa pozycje 3d, usun czerwonosci jezeli byly  TO TEST xxx
-     [-] dynamicznie zmieniaj kszatl byly jezeli zmienia sie wirzcholki
-     [ ] Refaktor kodu
-     [x] Przypadek, wszystko zle, potem usuwasz i robi sie ok
-	*/
+public class MeshBuilder : MonoBehaviour
+{
     private class PointProjection
 	{
 		public GameObject pointObject;
@@ -39,7 +27,8 @@ public class MeshBuilder : MonoBehaviour {
         }
 
     }
-    private enum Status {
+    private enum Status
+    {
         OK,
         PLANE_ERR,
         OTHER_ERR
@@ -98,8 +87,6 @@ public class MeshBuilder : MonoBehaviour {
     /// </summary>
     Dictionary<string, Edge3D> edges3D = null;
 
-    Dictionary<string, List<string>> adjList = null;
-
     /// <summary>
     /// Folder z wierch. rysowanymi w 3D
     /// </summary>
@@ -138,7 +125,6 @@ public class MeshBuilder : MonoBehaviour {
         verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
         vertices3D = new Dictionary<string, Vertice3D>();
         edges3D = new Dictionary<string, Edge3D>();
-        adjList = new Dictionary<string, List<string>>();
         wc = (WallController)FindObjectOfType(typeof(WallController));
         blocked = false;
         this.showProjectionLines = showProjectionLines;
@@ -156,7 +142,6 @@ public class MeshBuilder : MonoBehaviour {
         verticesOnWalls = null;
         vertices3D = null;
         edges3D = null;
-        adjList = null;
     }
 
     /// <summary>
@@ -167,7 +152,8 @@ public class MeshBuilder : MonoBehaviour {
     /// <param name="pointObj">Metadana o rzucie: etykieta, połozenie(position) jest takie jakie ma rodzic</param>
 	public void AddPointProjection(WallInfo wall, string label, GameObject pointObj)
 	{
-        if (!verticesOnWalls.ContainsKey(wall)) {
+        if (!verticesOnWalls.ContainsKey(wall))
+        {
 			verticesOnWalls[wall] = new Dictionary<string, PointProjection>();
         }
         PointProjection toAddProj = new PointProjection(pointObj, pointObj.GetComponent<LineSegment>(), false);
@@ -185,7 +171,6 @@ public class MeshBuilder : MonoBehaviour {
             //nie bylo zadnych rzutow tego pktu
             //bedzie 1
             MarkOK(currPts[0]);
-            //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
         }
         else if (currPts.Count == 2)
         {
@@ -206,9 +191,7 @@ public class MeshBuilder : MonoBehaviour {
             {
                 MarkOK(currPts[0]);
                 MarkOK(currPts[1]);
-                //TUTAJ DODAJ DO LISTY
                 PointsList.UpdatePointsList();
-                //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
             }
         }
         else
@@ -225,7 +208,6 @@ public class MeshBuilder : MonoBehaviour {
                     MarkOK(currPts[0]);
                     MarkOK(currPts[1]);
                     MarkOK(currPts[2]);
-                    //Debug.Log($"Point added: wall[{wall.number}] label[{label}] N={wall.GetNormal()} ---- {pointObj.transform.position.x} {pointObj.transform.position.y} {pointObj.transform.position.z}");
                 }
                 else
                 {
@@ -239,7 +221,6 @@ public class MeshBuilder : MonoBehaviour {
                 Debug.Log("nie ma pktu 3d");
                 bool p1 = false, p2 = false, p3 = false;
                 Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-                //TUTAJ TEŻ DODAJ DO LISTY!!!!!!!!!!!!!!!!!!!!!!! GetAll3d points?
                 PointsList.UpdatePointsList();
                 if (result == Status.OK)
                 {
@@ -290,25 +271,21 @@ public class MeshBuilder : MonoBehaviour {
             return;
         if (!verticesOnWalls[wall].ContainsKey(label))
             return;
+
         PointProjection pointToRemove = verticesOnWalls[wall][label];
 
         if (pointToRemove == null)
             return;
-
         
         int count = GetCurrentPointProjections(label).Count;
-        //Debug.Log($"liczba={count}");
+
         verticesOnWalls[wall].Remove(label);
         if (count == 2) //sa dwa, usun 3d
         {
             if (vertices3D.ContainsKey(label))
             {
-                //GameObject todel3D = vertices3D[label];
-                //vertices3D.Remove(label);
-                //Destroy(todel3D);
                 vertices3D[label].deleted = true;
-                WallGenerator.RemoveFacesFromPoint(label);
-                //TUTAJ USUŃ Z LISTY!!!!!!
+                FacesGenerator.RemoveFacesFromPoint(label);
                 PointsList.UpdatePointsList();
             }
         }
@@ -317,7 +294,6 @@ public class MeshBuilder : MonoBehaviour {
             if (vertices3D.ContainsKey(label)) //sa 3 i jest obiekt 3d
             {
                 vertices3D[label].deleted = true;
-                //TUTAJ USUŃ Z LISTY!!!!!!
                 PointsList.UpdatePointsList();
             }
             //moga byc 3 i zle polozone
@@ -325,23 +301,19 @@ public class MeshBuilder : MonoBehaviour {
             List<PointProjection> currPts = GetCurrentPointProjections(label);
             bool p1 = false, p2 = false, p3 = false;
             Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-            //TUTAJ DODAJ DO LSITY!
             PointsList.UpdatePointsList();
-            if (result == Status.PLANE_ERR)
+
+            if (result != Status.OK)
             {
                 MarkError(currPts[0]);
                 MarkError(currPts[1]);
             }
-            else if (result == Status.OK)
+            else
             {
                 MarkOK(currPts[0]);
                 MarkOK(currPts[1]);
-            }
-
-            if (vertices3D[label].deleted)
-            {
                 PointsList.UpdatePointsList();
-                WallGenerator.RemoveFacesFromPoint(label);
+                FacesGenerator.RemoveFacesFromPoint(label);
             }
         }   
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
@@ -493,13 +465,9 @@ public class MeshBuilder : MonoBehaviour {
     private Status Create3DPoint(string label,ref bool p1, ref bool p2, ref bool p3)
 	{
 		int licz = 0;
-
         List<PointProjection> pointsInfo = GetCurrentPointProjections(label);
-        //pointsInfo.Add(pointNode); //dodaj do listy ten jeszcze nie dodany
-
         //sprawdz ile jest juz rzutow jednego pktu
         licz = pointsInfo.Count;
-		///ja nie wiem w jakiej kolejności to wypluwa rzuty. dopoki sa 2 to ok
 		if(licz == 2)
 		{
 			Vector3 rzut1 = pointsInfo[0].pointObject.transform.position;
@@ -722,37 +690,49 @@ public class MeshBuilder : MonoBehaviour {
 
     private void MarkError(PointProjection pointProj)
     {
-        Point et = pointProj.pointObject.GetComponent<Point>();
+        ExPoint et = pointProj.pointObject.GetComponent<ExPoint>();
         if (et == null)
         {
-            Debug.LogError("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
+            Debug.LogWarning("GameObj nie ma komponentu ExPoint, nie mozna oznaczyc etykiety");
             //return;
         }
         else
         {
-            et.SetLabel(ReconstructionInfo.LABEL_3D_ERR_COLOR);
+            et.SetLabelColor(ReconstructionInfo.LABEL_3D_ERR_COLOR);
         }
-        if (pointProj.projLine != null)
+
+        if (pointProj.projLine == null)
         {
-            pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_ERROR_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+            Debug.LogWarning("GameObj nie ma komponentu pointProj, nie mozna oznaczyc linii");
+            //return;
+        }
+        else
+        {
+            pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
         }
         pointProj.is_ok_placed = false;
     }
 
     private void MarkOK(PointProjection pointProj)
     {
-        Point et = pointProj.pointObject.GetComponent<Point>();
+        ExPoint et = pointProj.pointObject.GetComponent<ExPoint>();
         if (et == null)
         {
-            Debug.LogError("GameObj nie ma komponentu Point, nie mozna oznaczyc etykiety");
+            Debug.LogWarning("GameObj nie ma komponentu ExPoint, nie mozna oznaczyc etykiety");
             //return;
         }
         else
         {
-            et.SetLabel(ReconstructionInfo.LABEL_3D_COLOR);
+            et.SetLabelColor(ReconstructionInfo.LABEL_3D_COLOR);
         }
 
-        if (pointProj.projLine != null){
+        if (pointProj.projLine == null)
+        {
+            Debug.LogWarning("GameObj nie ma komponentu pointProj, nie mozna oznaczyc linii");
+            //return;
+        }
+        else
+        {
             pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
         }
         pointProj.is_ok_placed = true;

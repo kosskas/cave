@@ -6,7 +6,7 @@ using Assets.Scripts;
 using JetBrains.Annotations;
 using UnityEngine;
 
-public class WallGenerator : MonoBehaviour {
+public class FacesGenerator : MonoBehaviour {
 
     private const float SOLID_WALL_TRANSPARENCY = 0.3f;
     // Use this for initialization
@@ -68,7 +68,7 @@ public class WallGenerator : MonoBehaviour {
 
 
 
-    public void CreateWall(List<KeyValuePair<string, Vector3>> points)
+    public void CreateFace(List<KeyValuePair<string, Vector3>> points)
     {
         
         GameObject wallObject = new GameObject("Face");
@@ -132,7 +132,7 @@ public class WallGenerator : MonoBehaviour {
         faceInfoList.Add(new FaceInfo(copied_points,wallObject));
     }
 
-    public void GenerateWall(List<KeyValuePair<string, Vector3>> _points)
+    public void GenerateFace(List<KeyValuePair<string, Vector3>> _points)
     {
         if (_points.Count() < 3)
         {
@@ -148,7 +148,7 @@ public class WallGenerator : MonoBehaviour {
 
             StateManager.Exp.StoreWall(_points);
 
-            CreateWall(_points);
+            CreateFace(_points);
         }
 
         points = new List<KeyValuePair<string, Vector3>>();
@@ -188,14 +188,14 @@ public class WallGenerator : MonoBehaviour {
     public static void RemoveFacesFromPoint(string pointLabel)
     {
         ///////UWAGA NIE WIADOMO CZY DZIAŁA------------------------
-        List<FaceInfo> faceInfos = WallGenerator.GetFaceInfosFromPointLabel(pointLabel);
-        Debug.Log("faceinfos:" + WallGenerator.faceInfoList.Count);
+        List<FaceInfo> faceInfos = FacesGenerator.GetFaceInfosFromPointLabel(pointLabel);
+        Debug.Log("faceinfos:" + FacesGenerator.faceInfoList.Count);
         foreach (var faceInfo in faceInfos)
         {
             Destroy(faceInfo.FaceObject.gameObject);
         }
-        WallGenerator.faceInfoList.RemoveAll(faceInfo => faceInfos.Contains(faceInfo));
-        Debug.Log("faceinfos:" + WallGenerator.faceInfoList.Count);
+        FacesGenerator.faceInfoList.RemoveAll(faceInfo => faceInfos.Contains(faceInfo));
+        Debug.Log("faceinfos:" + FacesGenerator.faceInfoList.Count);
         /////////----------------------------------------------------
     }
 

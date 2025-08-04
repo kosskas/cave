@@ -16,7 +16,7 @@ public class ModeExperimental : IMode
 
     private MeshBuilder _mb;
 
-    private WallGenerator _wg;
+    private FacesGenerator _fc;
 
     private WallCreator _wcrt;
 
@@ -72,7 +72,7 @@ public class ModeExperimental : IMode
 
         if (PCref.Hit.collider.tag == "PointButton")
         {
-            _wg.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
+            _fc.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
         }
         else switch (PCref.Hit.collider.gameObject.name)
         {
@@ -85,7 +85,7 @@ public class ModeExperimental : IMode
                 break;
 
             case "GenerateButton":
-                _wg.GenerateWall(_wg.points);
+                _fc.GenerateFace(_fc.points);
                 break;
 
             case "SwitchButton":
@@ -116,7 +116,7 @@ public class ModeExperimental : IMode
 
             case "LoadStateButton":
                 _items.Restore();
-                StateManager.Exp.RestoreWalls(_wg);
+                StateManager.Exp.RestoreWalls(_fc);
                 break;
 
         }
@@ -125,8 +125,8 @@ public class ModeExperimental : IMode
     private void _BackToMenu()
     {
         //czyszcenie œcian obiektu
-        _wg.Clear();
-        GameObject.Destroy(_wg);
+        _fc.Clear();
+        GameObject.Destroy(_fc);
 
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
@@ -155,7 +155,7 @@ public class ModeExperimental : IMode
         string solid = SolidExporter.ExportSolid(
             _mb.GetPoints3D(), 
             _mb.GetEdges3D(), 
-            WallGenerator.GetFaces());
+            FacesGenerator.GetFaces());
 
         if (solid == null)
         {
@@ -163,8 +163,8 @@ public class ModeExperimental : IMode
         }
 
         //czyszcenie œcian obiektu
-        _wg.Clear();
-        GameObject.Destroy(_wg);
+        _fc.Clear();
+        GameObject.Destroy(_fc);
 
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
@@ -292,7 +292,7 @@ public class ModeExperimental : IMode
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
         _mb.Init(true);
-        _wg = mainObject.AddComponent<WallGenerator>();
+        _fc = mainObject.AddComponent<FacesGenerator>();
 
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
