@@ -34,7 +34,10 @@ public class WallInfo
     /// Flaga dot. wyświetlania linii odnoszących
     /// </summary>
     public bool showReferenceLines = true;
-
+    /// <summary>
+    /// Flaga dot. możliwości usuwania ściany
+    /// </summary>
+    public bool canDelete = true;
 
     /// <summary>
     /// Konstruktor inicjujący parametry klasy WallInfo z domyślnie ustawionymi flagami.
@@ -57,7 +60,8 @@ public class WallInfo
     /// <param name="showProjection">Flaga dotycząca wyświetlania na ścianie rzutów.</param>
     /// <param name="showLines">Flaga dotycząca wyświetlania linii rzutujących.</param>
     /// <param name="showReferenceLines">Flaga dotycząca wyświetlania linii odnoszących.</param>
-    public WallInfo(GameObject gameObject, int number, string name, bool showProjection, bool showLines, bool showReferenceLines)
+    /// <param name="canDelete">Flaga dot. możliwości usuwania ściany.</param>
+    public WallInfo(GameObject gameObject, int number, string name, bool showProjection, bool showLines, bool showReferenceLines, bool canDelete)
     {
         this.gameObject = gameObject;
         this.number = number;
@@ -65,6 +69,7 @@ public class WallInfo
         this.showProjection = showProjection;
         this.showLines = showLines;
         this.showReferenceLines = showReferenceLines;
+        this.canDelete = canDelete;
     }
 
     /// <summary>

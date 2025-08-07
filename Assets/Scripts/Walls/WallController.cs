@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Assets.Scripts.Walls;
 
 /// <summary>
 /// Klasa WallController zarządza właściwościami ścian
@@ -23,6 +24,7 @@ public class WallController : MonoBehaviour {
     private List<WallInfo> walls;
     private List<WallInfo> basicwalls;
     private List<WallInfo> playerAddedWalls;
+    private Dictionary<WallInfo, List<GameObject>> wallRelatedObjects;
 
     int wallcounter;
     // Use this for initialization
@@ -31,6 +33,7 @@ public class WallController : MonoBehaviour {
         basicwalls = InitWalls();
         walls = new List<WallInfo>(basicwalls);
         playerAddedWalls = new List<WallInfo>();
+        wallRelatedObjects = new Dictionary<WallInfo, List<GameObject>>();
     }
     private List<WallInfo> InitWalls()
     {
@@ -43,7 +46,8 @@ public class WallController : MonoBehaviour {
             ret.Add(new WallInfo(wall, idx, wall.name,
                 true,   //show projection
                 true,  //showLines
-                true  //showReferenceLines
+                true,  //showReferenceLines
+                false   //canDelete
             ));
             idx++;
         }
@@ -69,6 +73,7 @@ public class WallController : MonoBehaviour {
         Debug.DrawRay(point1, newWallNormal, Color.blue, 60.0f);
 
         GameObject newWall = Instantiate(wallPrefab);
+        newWall.name = newWall.name + newWall.GetHashCode();
         newWall.transform.parent = GameObject.Find("Walls").transform;
         newWall.tag = "Wall";
 
@@ -96,7 +101,7 @@ public class WallController : MonoBehaviour {
         BoxCollider boxCollider = newWall.GetComponent<BoxCollider>();
         boxCollider.isTrigger = false;
 
-        WallInfo wall = new WallInfo(newWall, wallcounter++, newWall.name, true, true, true);
+        WallInfo wall = new WallInfo(newWall, wallcounter++, newWall.name, true, true, true, true);
         walls.Add(wall);
         playerAddedWalls.Add(wall);
         ResetProjection();
@@ -183,6 +188,32 @@ public class WallController : MonoBehaviour {
         playerAddedWalls = new List<WallInfo>();
         ResetProjection();
     }
+
+    public void LinkConstructionToWall(WallInfo wall, GameObject constructionObject)
+    {
+        if (!wallRelatedObjects.ContainsKey(wall))
+        {
+            wallRelatedObjects[wall] = new List<GameObject>();
+        }
+        wallRelatedObjects[wall].Add(constructionObject);
+    }
+
+    public void RemoveWall(WallInfo wall)
+    {
+        if(!wall.canDelete)
+            return;
+
+        if (wallRelatedObjects.ContainsKey(wall))
+        {
+            foreach (var constructionObject in wallRelatedObjects[wall])
+            {
+                Debug.Log("Destroying"+constructionObject.name);
+                Destroy(constructionObject);
+            }
+        }
+        Destroy(wall.gameObject);
+    }
+
     /// <summary>
     /// Usuwa ściany z odwróconą chronologią ich dodania
     /// </summary>
@@ -195,7 +226,7 @@ public class WallController : MonoBehaviour {
             lastWall.showProjection = false;
             playerAddedWalls.RemoveAt(playerAddedWalls.Count - 1);
             walls.RemoveAt(walls.Count - 1);
-            Destroy(lastWall.gameObject);
+            RemoveWall(lastWall);
             lastWall.gameObject = null;
             wallcounter--;
             ResetProjection();

@@ -11,6 +11,8 @@ namespace Assets.Scripts.Experimental
 {
     public class ItemsController
     {
+        private WallController _wc;
+        
         private const float _WALL_HALF_WIDTH = 0.05f;
         private const float _WALL_HALF_LENGTH = 1.7f;
         private const float _OFFSET_FROM_WALL = 0.01f;
@@ -93,7 +95,7 @@ namespace Assets.Scripts.Experimental
 
         /* PUBLIC METHODS */
 
-        public ItemsController()
+        public ItemsController(WallController wc)
         {
             _workspace = GameObject.Find("WorkspaceExp") ?? new GameObject("WorkspaceExp");
 
@@ -110,6 +112,8 @@ namespace Assets.Scripts.Experimental
             _circleRepo.transform.SetParent(_workspace.transform);
 
             _axisWalls = new Dictionary<Axis, Tuple<WallInfo, WallInfo>>();
+
+            _wc = wc;
         }
 
         public void AddAxisBetweenPlanes(WallInfo planeA, WallInfo planeB)
@@ -187,11 +191,12 @@ namespace Assets.Scripts.Experimental
         {
             var point = new GameObject("POINT");
             point.transform.SetParent(_pointRepo.transform);
+            _wc.LinkConstructionToWall(plane, point);
 
             var pointComponent = point.AddComponent<ExPoint>();
             pointComponent.Draw(plane, position);
             pointComponent.EnabledLabels = true;
-
+            
             return null;
         }
 
@@ -199,6 +204,7 @@ namespace Assets.Scripts.Experimental
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
+            _wc.LinkConstructionToWall(plane, line);
 
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
@@ -231,6 +237,7 @@ namespace Assets.Scripts.Experimental
         {
             var circle = new GameObject("CIRCLE");
             circle.transform.SetParent(_circleRepo.transform);
+            _wc.LinkConstructionToWall(plane, circle);
 
             var circleComponent = circle.AddComponent<Circle>();
             circleComponent.ColliderEnabled = false;
@@ -260,6 +267,7 @@ namespace Assets.Scripts.Experimental
             // FIRST PART
             var projection1 = new GameObject("PROJECTION");
             projection1.transform.SetParent(_lineRepo.transform);
+
 
             var projectionComponent1 = projection1.AddComponent<Line>();
             projectionComponent1.ColliderEnabled = false;
@@ -315,6 +323,11 @@ namespace Assets.Scripts.Experimental
 
                         projectionComponent1.ColliderEnabled = true;
                         projectionComponent2.ColliderEnabled = true;
+
+                        _wc.LinkConstructionToWall(startPlane, projection1);
+                        _wc.LinkConstructionToWall(startPlane, projection2);
+                        _wc.LinkConstructionToWall(endPlane, projection1);
+                        _wc.LinkConstructionToWall(endPlane, projection2);
                     }
                 }
             };
@@ -324,7 +337,8 @@ namespace Assets.Scripts.Experimental
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
-        
+            _wc.LinkConstructionToWall(plane, line);
+
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
             lineComponent.Width = 0.002f;
@@ -357,7 +371,8 @@ namespace Assets.Scripts.Experimental
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
-        
+            _wc.LinkConstructionToWall(plane, line);
+
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
             lineComponent.Width = 0.002f;

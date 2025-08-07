@@ -287,7 +287,7 @@ public class ModeExperimental : IMode
 
         _wcrt = PCref.gameObject.GetComponent<WallCreator>();
 
-        _items = new ItemsController();
+        _items = new ItemsController(_wc);
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
@@ -376,7 +376,7 @@ public class ModeExperimental : IMode
         }
         if (Input.GetKeyDown("l"))
         {
-            _wc.PopBackWall();
+            _wc.RemoveWall(_wc.FindWallInfoByGameObject(PCref.Hit.collider.gameObject));
         }
     }
 }
