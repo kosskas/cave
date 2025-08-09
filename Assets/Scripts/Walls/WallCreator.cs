@@ -84,7 +84,12 @@ public class WallCreator : MonoBehaviour
 		}
 	}
 
-	void ClearPoints()
+    public void WCrCreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo)
+    {
+        wallController.CreateWall(point1, point2, parentWallInfo, wallPrefab);
+    }
+
+    void ClearPoints()
 	{
 		foreach (GameObject obj in points)
 		{

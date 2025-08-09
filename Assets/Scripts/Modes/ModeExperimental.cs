@@ -287,7 +287,7 @@ public class ModeExperimental : IMode
 
         _wcrt = PCref.gameObject.GetComponent<WallCreator>();
 
-        _items = new ItemsController(_wc);
+        _items = new ItemsController(_wc, _wcrt);
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
@@ -304,7 +304,8 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.Projection, Act)
+                new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.Wall, Act)
             });
 
         _contextMenuView = new ExContextMenuView();
@@ -370,10 +371,6 @@ public class ModeExperimental : IMode
             _TryGetNextLabelText();
         }
 
-        if (Input.GetKeyDown("p"))
-        {
-            _wcrt.AddAnchorPoint(PCref.Hit);
-        }
         if (Input.GetKeyDown("l"))
         {
             _wc.RemoveWall(_wc.FindWallInfoByGameObject(PCref.Hit.collider.gameObject));

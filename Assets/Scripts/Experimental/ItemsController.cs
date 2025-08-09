@@ -12,6 +12,7 @@ namespace Assets.Scripts.Experimental
     public class ItemsController
     {
         private WallController _wc;
+        private WallCreator _wcrt;
         
         private const float _WALL_HALF_WIDTH = 0.05f;
         private const float _WALL_HALF_LENGTH = 1.7f;
@@ -95,7 +96,7 @@ namespace Assets.Scripts.Experimental
 
         /* PUBLIC METHODS */
 
-        public ItemsController(WallController wc)
+        public ItemsController(WallController wc, WallCreator wcrt)
         {
             _workspace = GameObject.Find("WorkspaceExp") ?? new GameObject("WorkspaceExp");
 
@@ -114,6 +115,7 @@ namespace Assets.Scripts.Experimental
             _axisWalls = new Dictionary<Axis, Tuple<WallInfo, WallInfo>>();
 
             _wc = wc;
+            _wcrt = wcrt;
         }
 
         public void AddAxisBetweenPlanes(WallInfo planeA, WallInfo planeB)
@@ -183,6 +185,8 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity);
 
+                case ExContext.Wall: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, _BOLD_LINE_WIDTH, true);
+
                 default: return null;
             }
         }
@@ -200,7 +204,7 @@ namespace Assets.Scripts.Experimental
             return null;
         }
 
-        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH)
+        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH, bool isWallOrigin = false)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -228,7 +232,15 @@ namespace Assets.Scripts.Experimental
                     var endPoint = hitObject as ExPoint;
 
                     if (startPoint != null && endPoint != null)
+                    {
                         lineComponent.BindPoints(startPoint, endPoint);
+
+                        if (isWallOrigin)
+                        {
+                            _wcrt.WCrCreateWall(startPoint.Position, endPoint.Position, plane);
+                        }
+
+                    }
                 }
             };
         }

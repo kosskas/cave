@@ -26,7 +26,10 @@ namespace Assets.Scripts.Experimental
         Circle,
 
         [Description("Rzut")]
-        Projection
+        Projection,
+
+        [Description("\u015bciana")]
+        Wall
     }
 
 }
