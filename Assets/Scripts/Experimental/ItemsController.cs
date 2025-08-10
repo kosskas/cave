@@ -142,10 +142,12 @@ namespace Assets.Scripts.Experimental
             axisComponent.Draw(default(WallInfo), from, to);
 
             var labelComponent = axis.AddComponent<IndexedLabel>();
-            labelComponent.AddLabel("X", "", $"{planeA.number}{planeB.number}");
+            labelComponent.AddLabel("X", "", $"{planeA.number}/{planeB.number}");
             labelComponent.FontSize = 1;
 
             _axisWalls.Add(axisComponent, new Tuple<WallInfo, WallInfo>(planeA, planeB));
+            _wc.LinkConstructionToWall(planeA, axis);
+            _wc.LinkConstructionToWall(planeB, axis);
         }
 
         public DrawAction Add(
@@ -238,7 +240,7 @@ namespace Assets.Scripts.Experimental
                         if (isWallOrigin)
                         {
                             WallInfo addedWall = _wcrt.WCrCreateWall(startPoint.Position, endPoint.Position, plane);
-                            AddAxisBetweenPlanes(plane, addedWall);
+                            AddAxisBetweenPlanes(addedWall, plane);
                         }
 
                     }
@@ -338,8 +340,6 @@ namespace Assets.Scripts.Experimental
                         projectionComponent2.ColliderEnabled = true;
 
                         _wc.LinkConstructionToWall(startPlane, projection1);
-                        _wc.LinkConstructionToWall(startPlane, projection2);
-                        _wc.LinkConstructionToWall(endPlane, projection1);
                         _wc.LinkConstructionToWall(endPlane, projection2);
                     }
                 }

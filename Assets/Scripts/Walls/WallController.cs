@@ -209,8 +209,11 @@ public class WallController : MonoBehaviour {
         {
             foreach (var constructionObject in wallRelatedObjects[wall])
             {
-                Debug.Log("Destroying"+constructionObject.name);
-                Destroy(constructionObject);
+                if (constructionObject != null)
+                {
+                    Debug.Log("Destroying" + constructionObject.name);
+                    Destroy(constructionObject);
+                }
             }
         }
         Destroy(wall.gameObject);

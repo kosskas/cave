@@ -375,6 +375,11 @@ public class ModeExperimental : IMode
         {
             _wc.RemoveWall(_wc.FindWallInfoByGameObject(PCref.Hit.collider.gameObject));
         }
+
+        if (Input.GetKeyDown("p"))
+        {
+            _wc.PopBackWall();
+        }
     }
 }
 
