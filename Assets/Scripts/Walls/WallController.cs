@@ -61,7 +61,7 @@ public class WallController : MonoBehaviour {
     /// <param name="point2">Koordynaty 2</param>
     /// <param name="parentWallInfo">Ściana, od której powstała nowa ściana</param>
     /// <param name="wallPrefab">Szablon ściany</param>
-    public void CreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo, GameObject wallPrefab)
+    public WallInfo CreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo, GameObject wallPrefab)
     {
         Vector3 direction = point2 - point1;
         Vector3 parentNormal = parentWallInfo.GetNormal();
@@ -105,6 +105,8 @@ public class WallController : MonoBehaviour {
         walls.Add(wall);
         playerAddedWalls.Add(wall);
         ResetProjection();
+
+        return wall;
     }
     private Vector3 FindVectorFromPlaneTowardsSolid(Vector3 point1, Vector3 point2)
     {

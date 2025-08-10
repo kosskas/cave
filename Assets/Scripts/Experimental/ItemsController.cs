@@ -237,7 +237,8 @@ namespace Assets.Scripts.Experimental
 
                         if (isWallOrigin)
                         {
-                            _wcrt.WCrCreateWall(startPoint.Position, endPoint.Position, plane);
+                            WallInfo addedWall = _wcrt.WCrCreateWall(startPoint.Position, endPoint.Position, plane);
+                            AddAxisBetweenPlanes(plane, addedWall);
                         }
 
                     }
