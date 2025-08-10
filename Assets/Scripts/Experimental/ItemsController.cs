@@ -519,7 +519,7 @@ namespace Assets.Scripts.Experimental
             {
                 var point = new GameObject("POINT");
                 point.transform.SetParent(_pointRepo.transform);
-
+                _wc.LinkConstructionToWall(plane, point);
                 var pointComponent = point.AddComponent<ExPoint>();
                 pointComponent.Draw(plane, position);
                 pointComponent.EnabledLabels = true;
@@ -534,7 +534,7 @@ namespace Assets.Scripts.Experimental
             {
                 var line = new GameObject("LINE");
                 line.transform.SetParent(_lineRepo.transform);
-            
+                _wc.LinkConstructionToWall(plane, line);
                 var lineComponent = line.AddComponent<Line>();
                 lineComponent.Width = lineWidth;
                 lineComponent.Draw(plane, startPosition, endPosition);
@@ -568,6 +568,7 @@ namespace Assets.Scripts.Experimental
                     return;
 
                 lineComponent.BindPoints(startPoint, startPointLabel, endPoint, endPointLabel);
+                //
             });
         }
 
@@ -577,7 +578,7 @@ namespace Assets.Scripts.Experimental
             {
                 var circle = new GameObject("CIRCLE");
                 circle.transform.SetParent(_circleRepo.transform);
-
+                _wc.LinkConstructionToWall(plane, circle);
                 var circleComponent = circle.AddComponent<Circle>();
                 circleComponent.Draw(plane, startPosition, endPosition);
                 circleComponent.ColliderEnabled = true;
