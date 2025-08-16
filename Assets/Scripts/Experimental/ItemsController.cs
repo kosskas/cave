@@ -149,7 +149,45 @@ namespace Assets.Scripts.Experimental
             _wc.LinkConstructionToWall(planeA, axis);
             _wc.LinkConstructionToWall(planeB, axis);
         }
+        public void AddAxisBetweenPlanes2(WallInfo planeA, WallInfo planeB)
+        {
+            Vector3 normalA = planeA.GetNormal();
+            Vector3 normalB = planeB.GetNormal();
 
+            Vector3 positionA = planeA.gameObject.transform.position;
+            Vector3 positionB = planeB.gameObject.transform.position;
+
+            // Calculate the intersection point of the two planes
+            Vector3 direction = Vector3.Cross(normalA, normalB);
+            Vector3 offsetVector = (normalA + normalB) * (_WALL_HALF_WIDTH + _OFFSET_FROM_WALL);
+
+            // Solve for the intersection point using plane equations
+            float determinant = Vector3.Dot(direction, direction);
+            if (Mathf.Approximately(determinant, 0))
+            {
+                Debug.LogError("Planes are parallel and do not intersect.");
+                return;
+            }
+
+            Vector3 intersectionMiddlePoint = positionA + Vector3.Project(positionB - positionA, direction);
+
+            Vector3 from = (intersectionMiddlePoint - direction.normalized * _WALL_HALF_LENGTH) + offsetVector;
+            Vector3 to = (intersectionMiddlePoint + direction.normalized * _WALL_HALF_LENGTH) + offsetVector;
+
+            var axis = new GameObject("AXIS");
+            axis.transform.SetParent(_axisRepo.transform);
+
+            var axisComponent = axis.AddComponent<Axis>();
+            axisComponent.Draw(default(WallInfo), from, to);
+
+            var labelComponent = axis.AddComponent<IndexedLabel>();
+            labelComponent.AddLabel("X", "", $"{planeA.number}/{planeB.number}");
+            labelComponent.FontSize = 1;
+
+            _axisWalls.Add(axisComponent, new Tuple<WallInfo, WallInfo>(planeA, planeB));
+            _wc.LinkConstructionToWall(planeA, axis);
+            _wc.LinkConstructionToWall(planeB, axis);
+        }
         public DrawAction Add(
             ExContext context, 
             IRaycastable hitObject,
@@ -240,7 +278,7 @@ namespace Assets.Scripts.Experimental
                         if (isWallOrigin)
                         {
                             WallInfo addedWall = _wcrt.WCrCreateWall(startPoint.Position, endPoint.Position, plane);
-                            AddAxisBetweenPlanes(addedWall, plane);
+                            AddAxisBetweenPlanes2(addedWall, plane);
                         }
 
                     }

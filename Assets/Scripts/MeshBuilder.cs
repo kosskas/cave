@@ -14,16 +14,18 @@ using Assets.Scripts.Experimental.Items;
 public class MeshBuilder : MonoBehaviour
 {
     private class PointProjection
-	{
-		public GameObject pointObject;
+    {
+        public GameObject pointObject;
 		public LineSegment projLine;
 		public bool is_ok_placed;
+        public Vector3 wallNormal;
 
-		public PointProjection(GameObject pointObject, LineSegment projLine, bool is_ok_placed)
+		public PointProjection(GameObject pointObject, LineSegment projLine, Vector3 wallNormal, bool is_ok_placed)
 		{
 			this.pointObject = pointObject;
             this.projLine = projLine;
             this.is_ok_placed = is_ok_placed;
+            this.wallNormal = wallNormal;
         }
 
     }
@@ -156,7 +158,7 @@ public class MeshBuilder : MonoBehaviour
         {
 			verticesOnWalls[wall] = new Dictionary<string, PointProjection>();
         }
-        PointProjection toAddProj = new PointProjection(pointObj, pointObj.GetComponent<LineSegment>(), false);
+        PointProjection toAddProj = new PointProjection(pointObj, pointObj.GetComponent<LineSegment>(),wall.GetNormal(), false);
         verticesOnWalls[wall][label] = toAddProj;
         //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
@@ -202,7 +204,7 @@ public class MeshBuilder : MonoBehaviour
             {
                 //sa juz 2
                 //sprawdz czy dobrze postawiony trzeci
-                if (Check3Pos(currPts[0].pointObject.transform.position, currPts[1].pointObject.transform.position, currPts[2].pointObject.transform.position))
+                if (Check3Pos(currPts[0], currPts[1], currPts[2]))
                 {
                     Debug.Log("3 polozony OK");
                     MarkOK(currPts[0]);
@@ -251,11 +253,11 @@ public class MeshBuilder : MonoBehaviour
             }
         }
     }
-    private bool Check3Pos(Vector3 proj1, Vector3 proj2, Vector3 proj3)
+    private bool Check3Pos(PointProjection proj1, PointProjection proj2, PointProjection proj3)
     {
-        Vector3 test1 = CalcPosIn3D(proj1, proj2);
-        Vector3 test2 = CalcPosIn3D(proj2, proj3);
-        Vector3 test3 = CalcPosIn3D(proj1, proj3);
+        Vector3 test1 = CalcPosIn3D(proj1.pointObject.transform.position, proj2.pointObject.transform.position, proj1.wallNormal, proj2.wallNormal);
+        Vector3 test2 = CalcPosIn3D(proj2.pointObject.transform.position, proj3.pointObject.transform.position, proj2.wallNormal, proj3.wallNormal);
+        Vector3 test3 = CalcPosIn3D(proj1.pointObject.transform.position, proj3.pointObject.transform.position, proj1.wallNormal, proj3.wallNormal);
         return (!(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3));
     }
     /// <summary>
@@ -473,8 +475,8 @@ public class MeshBuilder : MonoBehaviour
 			Vector3 rzut1 = pointsInfo[0].pointObject.transform.position;
 			Vector3 rzut2 = pointsInfo[1].pointObject.transform.position;
 
-			Vector3 pkt3D = CalcPosIn3D(rzut1, rzut2);
-			if (pkt3D != Vector3.zero)
+			Vector3 pkt3D = CalcPosIn3D(rzut1, rzut2, pointsInfo[0].wallNormal, pointsInfo[1].wallNormal);
+            if (pkt3D != Vector3.zero)
 			{
                 if (vertices3D.ContainsKey(label))
                 {
@@ -505,9 +507,9 @@ public class MeshBuilder : MonoBehaviour
             Vector3 proj2 = pointsInfo[1].pointObject.transform.position;
             Vector3 proj3 = pointsInfo[2].pointObject.transform.position;
 
-            Vector3 test1 = CalcPosIn3D(proj1, proj2);
-            Vector3 test2 = CalcPosIn3D(proj2, proj3);
-            Vector3 test3 = CalcPosIn3D(proj1, proj3);
+            Vector3 test1 = CalcPosIn3D(proj1, proj2, pointsInfo[0].wallNormal, pointsInfo[1].wallNormal);
+            Vector3 test2 = CalcPosIn3D(proj2, proj3, pointsInfo[1].wallNormal, pointsInfo[2].wallNormal);
+            Vector3 test3 = CalcPosIn3D(proj1, proj3, pointsInfo[0].wallNormal, pointsInfo[2].wallNormal);
             //Sprawdz czy 3 jest dobrze polozony
             p1 = (test1 != Vector3.zero);
             p2 = (test2 != Vector3.zero);
@@ -588,44 +590,45 @@ public class MeshBuilder : MonoBehaviour
 
         vertices3D[label] = new Vertice3D(obj);
     }
-    private Vector3 CalcPosIn3D(Vector3 vec1, Vector3 vec2)
+    private Vector3 CalcPosIn3D(Vector3 vec1, Vector3 vec2, Vector3 d1, Vector3 d2)
     {
-        Vector3 ret = Vector3.zero;
-        const float eps = 0.0001f;
-		const float C = 1000;
-		
+        const float eps = 1e-6f;
+        // --- sprawdzenie prostopadłości ---
+        //if (Mathf.Abs(Vector3.Dot(d1.normalized, d2.normalized)) > eps)
+        //{
+        //    Debug.LogError("Normalne nie są prostopadłe! Dane rzutów są niepoprawne.");
+        //    return Vector3.zero;
+        //}
+        // proste: L1(s) = vec1 + s*n1,   L2(t) = vec2 + t*n2
+        Vector3 p1 = vec1;
 
-		bool cmp_x = Mathf.Abs(vec1.x - vec2.x) < eps;
-        bool cmp_y = Mathf.Abs(vec1.y - vec2.y) < eps;
-        bool cmp_z = Mathf.Abs(vec1.z - vec2.z) < eps;
+        Vector3 p2 = vec2;
 
-		Debug.Log($"{cmp_x}{cmp_y}{cmp_z}");
-		if(!(cmp_x || cmp_y || cmp_z))
-		{
-			return ret;
-		}
+        Vector3 r = p1 - p2;
 
-		if (cmp_x)
-		{
-			ret.x = Mathf.Floor(vec1.x * C) / C;
-			ret.y = Mathf.Floor(Mathf.Max(vec1.y, vec2.y) * C) / C;
-            ret.z = Mathf.Floor(Mathf.Max(vec1.z, vec2.z) * C) / C;
-        }
-        if (cmp_y)
+        float a = Vector3.Dot(d1, d1); // =1
+        float b = Vector3.Dot(d1, d2);
+        float c = Vector3.Dot(d2, d2); // =1
+        float d = Vector3.Dot(d1, r);
+        float e = Vector3.Dot(d2, r);
+
+        float denom = a * c - b * b;
+        if (Mathf.Abs(denom) < eps)
         {
-            ret.x = Mathf.Floor(Mathf.Min(vec1.x, vec2.x) * C) / C;
-            ret.y = Mathf.Floor(vec1.y * C) / C;
-            ret.z = Mathf.Floor(Mathf.Max(vec1.z, vec2.z) * C) / C;
+            Debug.LogError("Płaszczyzny są równoległe lub prawie równoległe – brak przecięcia.");
+            return Vector3.zero;
         }
-        if (cmp_z)
-        {
-            ret.x = Mathf.Floor(Mathf.Min(vec1.x, vec2.x) * C) / C;
-            ret.y = Mathf.Floor(Mathf.Max(vec1.y, vec2.y) * C) / C;
-            ret.z = Mathf.Floor(vec2.z * C) / C;
-        }
-        ///Jeżeli rzuty nie znajdują sie na jednej płasz. to DO STH
-        return ret;
+
+        float s = (b * e - c * d) / denom;
+        float t = (a * e - b * d) / denom;
+
+        Vector3 point1 = p1 + s * d1;
+        Vector3 point2 = p2 + t * d2;
+
+        // bierzemy środek (dla stabilności numerycznej)
+        return (point1 + point2) * 0.5f;
     }
+
     private void ShowProjectionLines()
     {
         foreach (WallInfo wall in verticesOnWalls.Keys)

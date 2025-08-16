@@ -202,6 +202,7 @@ public class ModeExperimental : IMode
     {
         GameObject hitGameObject = null;
         _hitObject?.OnHoverAction(gameObject => hitGameObject = gameObject);
+        //Debug.Log("Objekt " + hitGameObject.name);
         if (hitGameObject == null) return;
 
         UnityEngine.Object.Destroy(hitGameObject);
@@ -289,6 +290,8 @@ public class ModeExperimental : IMode
 
         _items = new ItemsController(_wc, _wcrt);
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
+        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall6"), _wc.GetWallByName("Wall3"));
+        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall6"));
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
         _mb.Init(true);
