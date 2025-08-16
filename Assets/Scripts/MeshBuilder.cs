@@ -255,9 +255,9 @@ public class MeshBuilder : MonoBehaviour
     }
     private bool Check3Pos(PointProjection proj1, PointProjection proj2, PointProjection proj3)
     {
-        Vector3 test1 = CalcPosIn3D(proj1.pointObject.transform.position, proj2.pointObject.transform.position, proj1.wallNormal, proj2.wallNormal);
-        Vector3 test2 = CalcPosIn3D(proj2.pointObject.transform.position, proj3.pointObject.transform.position, proj2.wallNormal, proj3.wallNormal);
-        Vector3 test3 = CalcPosIn3D(proj1.pointObject.transform.position, proj3.pointObject.transform.position, proj1.wallNormal, proj3.wallNormal);
+        Vector3 test1 = CalcPosIn3D(proj1, proj2);
+        Vector3 test2 = CalcPosIn3D(proj2, proj3);
+        Vector3 test3 = CalcPosIn3D(proj1, proj3);
         return (!(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3));
     }
     /// <summary>
@@ -472,10 +472,7 @@ public class MeshBuilder : MonoBehaviour
         licz = pointsInfo.Count;
 		if(licz == 2)
 		{
-			Vector3 rzut1 = pointsInfo[0].pointObject.transform.position;
-			Vector3 rzut2 = pointsInfo[1].pointObject.transform.position;
-
-			Vector3 pkt3D = CalcPosIn3D(rzut1, rzut2, pointsInfo[0].wallNormal, pointsInfo[1].wallNormal);
+			Vector3 pkt3D = CalcPosIn3D(pointsInfo[0], pointsInfo[1]);
             if (pkt3D != Vector3.zero)
 			{
                 if (vertices3D.ContainsKey(label))
@@ -503,13 +500,9 @@ public class MeshBuilder : MonoBehaviour
         }
 		if (licz > 2) //sa 3 rzuty, zadne moga nie byc wspolne
 		{
-            Vector3 proj1 = pointsInfo[0].pointObject.transform.position;
-            Vector3 proj2 = pointsInfo[1].pointObject.transform.position;
-            Vector3 proj3 = pointsInfo[2].pointObject.transform.position;
-
-            Vector3 test1 = CalcPosIn3D(proj1, proj2, pointsInfo[0].wallNormal, pointsInfo[1].wallNormal);
-            Vector3 test2 = CalcPosIn3D(proj2, proj3, pointsInfo[1].wallNormal, pointsInfo[2].wallNormal);
-            Vector3 test3 = CalcPosIn3D(proj1, proj3, pointsInfo[0].wallNormal, pointsInfo[2].wallNormal);
+            Vector3 test1 = CalcPosIn3D(pointsInfo[0], pointsInfo[1]);
+            Vector3 test2 = CalcPosIn3D(pointsInfo[1], pointsInfo[2]);
+            Vector3 test3 = CalcPosIn3D(pointsInfo[0], pointsInfo[2]);
             //Sprawdz czy 3 jest dobrze polozony
             p1 = (test1 != Vector3.zero);
             p2 = (test2 != Vector3.zero);
@@ -590,9 +583,18 @@ public class MeshBuilder : MonoBehaviour
 
         vertices3D[label] = new Vertice3D(obj);
     }
-    private Vector3 CalcPosIn3D(Vector3 vec1, Vector3 vec2, Vector3 d1, Vector3 d2)
+    private Vector3 CalcPosIn3D(PointProjection proj1, PointProjection proj2)//Vector3 vec1, Vector3 vec2, Vector3 d1, Vector3 d2)
     {
         const float eps = 1e-6f;
+        Vector3 v1 = proj1.pointObject.transform.position;
+        Vector3 v2 = proj2.pointObject.transform.position;
+        Vector3 d1 = proj1.wallNormal;
+        Vector3 d2 = proj2.wallNormal;
+
+        Debug.LogError($"test1 Np1{proj1.pointObject.transform.right.normalized} N1{d1.normalized}");
+        Debug.LogError($"test2 Np2{proj2.pointObject.transform.right.normalized} N2{d2.normalized}");
+
+        //Debug.LogError($"test2 {Mathf.Abs(Vector3.Dot(d1.normalized, d2.normalized))}");
         // --- sprawdzenie prostopadłości ---
         //if (Mathf.Abs(Vector3.Dot(d1.normalized, d2.normalized)) > eps)
         //{
@@ -600,11 +602,8 @@ public class MeshBuilder : MonoBehaviour
         //    return Vector3.zero;
         //}
         // proste: L1(s) = vec1 + s*n1,   L2(t) = vec2 + t*n2
-        Vector3 p1 = vec1;
 
-        Vector3 p2 = vec2;
-
-        Vector3 r = p1 - p2;
+        Vector3 r = v1 - v2;
 
         float a = Vector3.Dot(d1, d1); // =1
         float b = Vector3.Dot(d1, d2);
@@ -622,8 +621,8 @@ public class MeshBuilder : MonoBehaviour
         float s = (b * e - c * d) / denom;
         float t = (a * e - b * d) / denom;
 
-        Vector3 point1 = p1 + s * d1;
-        Vector3 point2 = p2 + t * d2;
+        Vector3 point1 = v1 + s * d1;
+        Vector3 point2 = v2 + t * d2;
 
         // bierzemy środek (dla stabilności numerycznej)
         return (point1 + point2) * 0.5f;
