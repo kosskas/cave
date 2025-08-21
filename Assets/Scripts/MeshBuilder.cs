@@ -583,7 +583,7 @@ public class MeshBuilder : MonoBehaviour
 
         vertices3D[label] = new Vertice3D(obj);
     }
-    private Vector3 CalcPosIn3D(PointProjection proj1, PointProjection proj2)//Vector3 vec1, Vector3 vec2, Vector3 d1, Vector3 d2)
+    private Vector3 CalcPosIn3D(PointProjection proj1, PointProjection proj2)
     {
         const float eps = 1e-6f;
         Vector3 v1 = proj1.pointObject.transform.position;
@@ -591,16 +591,6 @@ public class MeshBuilder : MonoBehaviour
         Vector3 d1 = proj1.wallNormal;
         Vector3 d2 = proj2.wallNormal;
 
-        Debug.LogError($"test1 Np1{proj1.pointObject.transform.right.normalized} N1{d1.normalized}");
-        Debug.LogError($"test2 Np2{proj2.pointObject.transform.right.normalized} N2{d2.normalized}");
-
-        //Debug.LogError($"test2 {Mathf.Abs(Vector3.Dot(d1.normalized, d2.normalized))}");
-        // --- sprawdzenie prostopadłości ---
-        //if (Mathf.Abs(Vector3.Dot(d1.normalized, d2.normalized)) > eps)
-        //{
-        //    Debug.LogError("Normalne nie są prostopadłe! Dane rzutów są niepoprawne.");
-        //    return Vector3.zero;
-        //}
         // proste: L1(s) = vec1 + s*n1,   L2(t) = vec2 + t*n2
 
         Vector3 r = v1 - v2;
@@ -624,8 +614,13 @@ public class MeshBuilder : MonoBehaviour
         Vector3 point1 = v1 + s * d1;
         Vector3 point2 = v2 + t * d2;
 
-        // bierzemy środek (dla stabilności numerycznej)
-        return (point1 + point2) * 0.5f;
+        if (point1 != point2)
+        {
+            Debug.LogError("Nierzut");
+            return Vector3.zero;
+        }
+
+        return point1;
     }
 
     private void ShowProjectionLines()
