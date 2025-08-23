@@ -585,34 +585,74 @@ public class MeshBuilder : MonoBehaviour
     }
     private Vector3 CalcPosIn3D(PointProjection proj1, PointProjection proj2)
     {
+        /* Komentarz
+         * ( '*' to możenie skalarne, czyli powstaje liczba)
+         * Proste:
+         * l1(t) = p1 + t * n1
+         * l2(s) = p2 + s * n2
+         *
+         * Szukamy najkrótszego odcinka (t, s) między prostymi l1 i l2 takiego że 't' in l1, 's' in l2
+         *
+         * Funkcja odl. d(s, t) = |l1(t) - l2(s)|^2
+         * Szukamy takich 's' i 't', że 'd' jest MIN
+         * MIN jest wtedy kiedy d'(t) = d'(s) = 0
+         *
+         * d'(t) = 2n1 (p1 - p2 - s*n2 + t*n1) = 0
+         * d'(s) = -2u2 (p1 - p2 - s*n2 + t*n1) = 0
+         *
+         * dla uproszczenia r = p1 - p2
+         *
+         * Układ równań (to wektory więc nie można dzielić)
+         * 1. n1 (r - s*n2 + t*n1) = 0
+         * 2. n2 (r - s*n2 + t*n1) = 0
+         * 
+         * 1. n1*n1 * t - n1*n2 * s = -n1 * r
+         * 2. n1*n2 * t - n2*n2 * s = -n2 * r
+         *
+         * Niech:
+         * a = n1 * n1 
+         * b = n1 * n2
+         * c = n2 * n2
+         * d = -n1 * r
+         * e = -n2 * r
+         *
+         * Czyli mamy po uproszczeniu
+         *
+         * 1. at - bs = d
+         * 2. bt - cs = e
+         *
+         * s = (bd - ae) / (b^2 + ac)
+         * t = (cd - be) / (b^2 + ac)
+         *
+         *
+         * Rzut jest wtedy kiedy s = t, czyli najkrótszy odcinek jest punktem
+         */
         const float eps = 1e-6f;
-        Vector3 v1 = proj1.pointObject.transform.position;
-        Vector3 v2 = proj2.pointObject.transform.position;
-        Vector3 d1 = proj1.wallNormal;
-        Vector3 d2 = proj2.wallNormal;
+        Vector3 p1 = proj1.pointObject.transform.position;
+        Vector3 p2 = proj2.pointObject.transform.position;
+        Vector3 n1 = proj1.wallNormal;
+        Vector3 n2 = proj2.wallNormal;
 
-        // proste: L1(s) = vec1 + s*n1,   L2(t) = vec2 + t*n2
+        Vector3 r = p1 - p2;
 
-        Vector3 r = v1 - v2;
+        float a = Vector3.Dot(n1, n1);
+        float b = Vector3.Dot(n1, n2);
+        float c = Vector3.Dot(n2, n2);
+        float d = - Vector3.Dot(n1, r);
+        float e = - Vector3.Dot(n2, r);
 
-        float a = Vector3.Dot(d1, d1); // =1
-        float b = Vector3.Dot(d1, d2);
-        float c = Vector3.Dot(d2, d2); // =1
-        float d = Vector3.Dot(d1, r);
-        float e = Vector3.Dot(d2, r);
-
-        float denom = a * c - b * b;
-        if (Mathf.Abs(denom) < eps)
+        float mian = b * b + a * c;
+        if (Mathf.Abs(mian) < eps)
         {
             Debug.LogError("Płaszczyzny są równoległe lub prawie równoległe – brak przecięcia.");
             return Vector3.zero;
         }
 
-        float s = (b * e - c * d) / denom;
-        float t = (a * e - b * d) / denom;
+        float t = (c * d + b * e) / mian;
+        float s = (b * d - a * e) / mian;
 
-        Vector3 point1 = v1 + s * d1;
-        Vector3 point2 = v2 + t * d2;
+        Vector3 point1 = p1 + t * n1;
+        Vector3 point2 = p2 + s * n2;
 
         if (point1 != point2)
         {
