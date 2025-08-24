@@ -30,6 +30,8 @@ public class ModeExperimental : IMode
     private IRaycastable _hitObject;
 
     private DrawAction _drawAction;
+
+    private RadialMenu radialMenu;
     
     /* * * * CONTEXT ACTIONS begin * * * */
 
@@ -54,9 +56,15 @@ public class ModeExperimental : IMode
 
     /* * * * INPUT HANDLERS begin * * * */
 
-    private void _ChangeDrawContext()
+    public void _ChangeDrawContextNext()
     {
         _context.Next();
+        _contextMenuView.SetCurrentContext(_context.Current.Key);
+    }
+
+    public void _ChangeDrawContextPrev()
+    {
+        _context.Previous();
         _contextMenuView.SetCurrentContext(_context.Current.Key);
     }
 
@@ -138,6 +146,10 @@ public class ModeExperimental : IMode
         //Hide point list
         PointsList.HideListAndLogs();
 
+        //delete menu
+        GameObject.Destroy(radialMenu.gameObject); 
+        radialMenu = null;
+
         //Hide context view
         ExContextMenuView.Hide();
         UIWall.ExportSolidToVisualButton.Hide();
@@ -181,6 +193,11 @@ public class ModeExperimental : IMode
         UIWall.ExportSolidToVisualButton.Hide();
         UIWall.BackToMenuButton.Hide();
         UIWall.SaveLoadStateButtons.Hide();
+
+
+        //delete menu
+        GameObject.Destroy(radialMenu.gameObject);
+        radialMenu = null;
 
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
@@ -321,6 +338,40 @@ public class ModeExperimental : IMode
         //_controlMenuView = new ExControlMenuView();
 
         PointsList.ShowListAndLogs();
+
+
+        GameObject canvas = GameObject.Find("FlystickPlaceholder/Canvas");
+        if (canvas != null)
+        {
+            Transform radialMenuRoot = canvas.transform.Find("RadialMenuRoot");
+            if (radialMenuRoot != null)
+            {
+                GameObject itemPrefab = Resources.Load<GameObject>("RadialMenuItem");
+                if (itemPrefab != null)
+                {
+                    this.radialMenu = RadialMenu.Create(
+                        radialMenuRoot,
+                        6, // liczba elementów
+                        20f, // promieñ
+                        new List<string> { "Dodaj punkt", "Usuñ punkt", "Dodaj krawêdŸ", "Usuñ krawêdŸ", "Akcja na œcianie", "Wróæ" }, // etykiety
+                        itemPrefab,
+                        this
+                    );
+                }
+                else
+                {
+                    Debug.LogError("Nie mo¿na za³adowaæ prefabrykatu MenuItem z Resources/RadialMenuItem");
+                }
+            }
+            else
+            {
+                Debug.LogError("Nie znaleziono RadialMenuRoot w Canvas");
+            }
+        }
+        else
+        {
+            Debug.LogError("Nie znaleziono Canvas w scenie");
+        }
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
