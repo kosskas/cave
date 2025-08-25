@@ -627,7 +627,15 @@ public class MeshBuilder : MonoBehaviour
          *
          * Rzut jest wtedy kiedy s = t, czyli najkrótszy odcinek jest punktem
          */
-        const float eps = 1e-6f;
+        const float eps = 1e-7f;
+
+        if (Math.Abs(Vector3.Dot(proj1.wallNormal, proj2.wallNormal)) < eps)
+        {
+            Debug.LogError("Płaszczyzny nie są prostopadłe");
+            return Vector3.zero;
+        }
+
+
         Vector3 p1 = proj1.pointObject.transform.position;
         Vector3 p2 = proj2.pointObject.transform.position;
         Vector3 n1 = proj1.wallNormal;
