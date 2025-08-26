@@ -88,6 +88,16 @@ public class WallCreator : MonoBehaviour
     {
         return wallController.CreateWall(point1, point2, parentWallInfo, wallPrefab);
     }
+    public void RestoreWall(string wallName, Vector3 point1, Vector3 point2, string parentWallName)
+    {
+        WallInfo parentWallInfo = wallController.GetWallByName(parentWallName);
+        if (parentWallInfo == null)
+        {
+            Debug.LogError("Nie znaleziono rodzica potrzebnego do stworzenia sciany");
+			return;
+        }
+        wallController.CreateWall(point1, point2, parentWallInfo, wallPrefab, wallName);
+    }
 
     void ClearPoints()
 	{

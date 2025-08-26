@@ -23,6 +23,10 @@ public class WallInfo
     /// </summary>
     public string name;
     /// <summary>
+    /// Nazwa ściany rodzica
+    /// </summary>
+    public string parentName;
+    /// <summary>
     /// Flaga dot. wyświetlania na ścianie rzutów
     /// </summary>
     public bool showProjection = true;
@@ -61,7 +65,7 @@ public class WallInfo
     /// <param name="showLines">Flaga dotycząca wyświetlania linii rzutujących.</param>
     /// <param name="showReferenceLines">Flaga dotycząca wyświetlania linii odnoszących.</param>
     /// <param name="canDelete">Flaga dot. możliwości usuwania ściany.</param>
-    public WallInfo(GameObject gameObject, int number, string name, bool showProjection, bool showLines, bool showReferenceLines, bool canDelete)
+    public WallInfo(GameObject gameObject, int number, string name, string parentName, bool showProjection, bool showLines, bool showReferenceLines, bool canDelete)
     {
         this.gameObject = gameObject;
         this.number = number;
@@ -70,6 +74,7 @@ public class WallInfo
         this.showLines = showLines;
         this.showReferenceLines = showReferenceLines;
         this.canDelete = canDelete;
+        this.parentName = parentName;
     }
 
     /// <summary>

@@ -9,6 +9,7 @@ using System;
 using Assets.Scripts.Experimental;
 using Assets.Scripts.Experimental.Items;
 using System.Reflection;
+using System.Dynamic;
 
 namespace Assets.Scripts
 {
@@ -29,7 +30,7 @@ namespace Assets.Scripts
 
             public static List<EdgeINFO> Edges = new List<EdgeINFO>();
 
-            public static List<List<KeyValuePair<string, Vector3>>> Walls = new List<List<KeyValuePair<string, Vector3>>>();
+            public static List<List<KeyValuePair<string, Vector3>>> Faces = new List<List<KeyValuePair<string, Vector3>>>();
 
             public static void Save()
             {
@@ -47,7 +48,7 @@ namespace Assets.Scripts
                     //GRIDS = Grids,
                     POINTS = Points,
                     EDGES = Edges,
-                    WALLS = Walls
+                    FACES = Faces
                 };
 
                 var json = JsonConvert.SerializeObject(data, Formatting.Indented, settings);
@@ -111,15 +112,15 @@ namespace Assets.Scripts
                     }
                 }
 
-                JArray walls;
-                if (data.TryGetValue("WALLS", out walls))
+                JArray faces;
+                if (data.TryGetValue("FACES", out faces))
                 {
-                    foreach (var wall in walls)
+                    foreach (var face in faces)
                     {
-                        var wallPointsJson = wall.ToArray();
-                        var wallPoints = new List<KeyValuePair<string, Vector3>>();
+                        var facePointsJson = face.ToArray();
+                        var facePoints = new List<KeyValuePair<string, Vector3>>();
 
-                        foreach (var wallPointJson in wallPointsJson)
+                        foreach (var wallPointJson in facePointsJson)
                         {
                             var key = wallPointJson["Key"]?.ToString();
                             var value = wallPointJson["Value"];
@@ -134,10 +135,10 @@ namespace Assets.Scripts
                             if (x == null || y == null || z == null)
                                 continue;
 
-                            wallPoints.Add(new KeyValuePair<string, Vector3>(key, new Vector3((float)x, (float)y, (float)z)));
+                            facePoints.Add(new KeyValuePair<string, Vector3>(key, new Vector3((float)x, (float)y, (float)z)));
                         }
 
-                        fg.GenerateFace(wallPoints);
+                        fg.GenerateFace(facePoints);
                     }
                 }
 
@@ -174,6 +175,13 @@ namespace Assets.Scripts
 
             private class WallJson
             {
+                public string WallName { get; set; }
+                public Vector3 ConstPoint1 { get; set; }
+                public Vector3 ConstPoint2 { get; set; }
+                public string ParentWallName { get; set; }
+            }
+            private class FaceJson
+            {
                 public List<KeyValuePair<string, Vector3>> Vertices { get; set; }
             }
 
@@ -181,6 +189,7 @@ namespace Assets.Scripts
             private static List<PointJson> _points = new List<PointJson>();
             private static List<CircleJson> _circles = new List<CircleJson>();
             private static List<WallJson> _walls = new List<WallJson>();
+            private static List<FaceJson> _faces = new List<FaceJson>();
 
 
             public static void Save()
@@ -198,6 +207,7 @@ namespace Assets.Scripts
                     LINES = _lines,
                     CIRCLES = _circles,
                     WALLS = _walls,
+                    FACES = _faces,
                 };
 
                 var json = JsonConvert.SerializeObject(data, Formatting.Indented, settings);
@@ -207,6 +217,7 @@ namespace Assets.Scripts
                 _lines.Clear();
                 _circles.Clear();
                 _walls.Clear();
+                _faces.Clear();
 
                 Debug.Log("State saved to JSON file.");
             }
@@ -245,9 +256,20 @@ namespace Assets.Scripts
                 });
             }
 
-            public static void StoreWall(List<KeyValuePair<string, Vector3>> vertices)
+            public static void StoreWall(string wallName, Vector3 point1, Vector3 point2, string parentWallName)
             {
                 _walls.Add(new WallJson()
+                {
+                     WallName = wallName,
+                     ConstPoint1 = point1,
+                     ConstPoint2 = point2,
+                     ParentWallName = parentWallName
+                });
+            }
+
+            public static void StoreFace(List<KeyValuePair<string, Vector3>> vertices)
+            {
+                _faces.Add(new FaceJson()
                 {
                     Vertices = vertices
                 });
@@ -277,7 +299,8 @@ namespace Assets.Scripts
                     POINTS = new List<PointJson>(),
                     LINES = new List<LineJson>(),
                     CIRCLES = new List<CircleJson>(),
-                    WALLS = new List<WallJson>()
+                    WALLS = new List<WallJson>(),
+                    FACES = new List<FaceJson>()
                 };
 
                 var result = JsonConvert.DeserializeAnonymousType(json, template, settings);
@@ -286,6 +309,7 @@ namespace Assets.Scripts
                 _lines = result?.LINES ?? new List<LineJson>();
                 _circles = result?.CIRCLES ?? new List<CircleJson>();
                 _walls = result?.WALLS ?? new List<WallJson>();
+                _faces = result?.FACES ?? new List<FaceJson>();
 
                 Debug.Log("State load from JSON file.");
             }
@@ -332,7 +356,20 @@ namespace Assets.Scripts
                 _circles.Clear();
             }
 
-            public static void RestoreWalls(FacesGenerator fg)
+            public static void RestoreFaces(FacesGenerator fg)
+            {
+                var restoredFaces = new List<FaceJson>();
+                restoredFaces.AddRange(_faces);
+
+                _faces.Clear();
+
+                restoredFaces.ForEach(face =>
+                {
+                    fg.GenerateFace(face.Vertices);
+                });
+            }
+
+            public static void RestoreWalls(WallCreator wctr)
             {
                 var restoredWalls = new List<WallJson>();
                 restoredWalls.AddRange(_walls);
@@ -341,10 +378,9 @@ namespace Assets.Scripts
 
                 restoredWalls.ForEach(wall =>
                 {
-                    fg.GenerateFace(wall.Vertices);
+                    wctr.RestoreWall(wall.WallName, wall.ConstPoint1, wall.ConstPoint2, wall.ParentWallName);
                 });
             }
-
         }
 
     }

@@ -13,6 +13,7 @@ namespace Assets.Scripts.Experimental
     {
         private WallController _wc;
         private WallCreator _wcrt;
+        private FacesGenerator _fc;
         
         private const float _WALL_HALF_WIDTH = 0.05f;
         private const float _WALL_HALF_LENGTH = 1.7f;
@@ -96,7 +97,7 @@ namespace Assets.Scripts.Experimental
 
         /* PUBLIC METHODS */
 
-        public ItemsController(WallController wc, WallCreator wcrt)
+        public ItemsController(WallController wc, WallCreator wcrt, FacesGenerator fc)
         {
             _workspace = GameObject.Find("WorkspaceExp") ?? new GameObject("WorkspaceExp");
 
@@ -116,6 +117,7 @@ namespace Assets.Scripts.Experimental
 
             _wc = wc;
             _wcrt = wcrt;
+            _fc = fc;
         }
 
         public void AddAxisBetweenPlanes(WallInfo planeA, WallInfo planeB)
@@ -453,13 +455,28 @@ namespace Assets.Scripts.Experimental
 
         public void Save()
         {
+            //walls i faces sa juz zapisane
             StorePoints();
             StoreLines();
             StoreCircles();
 
             StateManager.Exp.Save();
         }
+        private void StoreWalls()
+        {
+            foreach (Transform pointTrans in _pointRepo.transform)
+            {
+                var point = pointTrans.gameObject.GetComponent<ExPoint>();
+                if (point == null)
+                    continue;
 
+                var planeName = point.Plane.name;
+                var position = point.Position;
+                var labels = point.Labels;
+
+                StateManager.Exp.StorePoint(planeName, position, labels);
+            }
+        }
         private void StorePoints()
         {
             foreach (Transform pointTrans in _pointRepo.transform)
@@ -543,12 +560,12 @@ namespace Assets.Scripts.Experimental
         public void Restore()
         {
             Clear(withAxis: false);
-            
             StateManager.Exp.Load();
-
+            StateManager.Exp.RestoreWalls(_wcrt);
             RestorePoints();
             RestoreLines();
             RestoreCircles();
+            StateManager.Exp.RestoreFaces(_fc);
         }
 
         private void RestorePoints()

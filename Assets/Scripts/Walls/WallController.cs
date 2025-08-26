@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Assets.Scripts.Walls;
+using Assets.Scripts;
 
 /// <summary>
 /// Klasa WallController zarządza właściwościami ścian
@@ -43,7 +44,7 @@ public class WallController : MonoBehaviour {
         int idx = 0;
         foreach (GameObject wall in wallsobject)
         {
-            ret.Add(new WallInfo(wall, idx, wall.name,
+            ret.Add(new WallInfo(wall, idx, wall.name, null,
                 true,   //show projection
                 true,  //showLines
                 true,  //showReferenceLines
@@ -61,7 +62,7 @@ public class WallController : MonoBehaviour {
     /// <param name="point2">Koordynaty 2</param>
     /// <param name="parentWallInfo">Ściana, od której powstała nowa ściana</param>
     /// <param name="wallPrefab">Szablon ściany</param>
-    public WallInfo CreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo, GameObject wallPrefab)
+    public WallInfo CreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo, GameObject wallPrefab, string fixedName = null)
     {
         Vector3 direction = point2 - point1;
         Vector3 parentNormal = parentWallInfo.GetNormal();
@@ -73,7 +74,16 @@ public class WallController : MonoBehaviour {
         Debug.DrawRay(point1, newWallNormal, Color.blue, 60.0f);
 
         GameObject newWall = Instantiate(wallPrefab);
-        newWall.name = newWall.name + newWall.GetHashCode();
+
+        if (fixedName == null)
+        {
+            newWall.name = newWall.name + newWall.GetHashCode();
+        }
+        else
+        {
+            newWall.name = fixedName;
+        }
+
         newWall.transform.parent = GameObject.Find("Walls").transform;
         newWall.tag = "Wall";
 
@@ -101,11 +111,12 @@ public class WallController : MonoBehaviour {
         BoxCollider boxCollider = newWall.GetComponent<BoxCollider>();
         boxCollider.isTrigger = false;
 
-        WallInfo wall = new WallInfo(newWall, wallcounter++, newWall.name, true, true, true, true);
+        WallInfo wall = new WallInfo(newWall, wallcounter++, newWall.name, parentWallInfo.name , true, true, true, true);
         walls.Add(wall);
         playerAddedWalls.Add(wall);
         ResetProjection();
 
+        StateManager.Exp.StoreWall(newWall.name, point1, point2, parentWallInfo.name);
         return wall;
     }
     private Vector3 FindVectorFromPlaneTowardsSolid(Vector3 point1, Vector3 point2)

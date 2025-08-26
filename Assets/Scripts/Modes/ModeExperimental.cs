@@ -116,7 +116,6 @@ public class ModeExperimental : IMode
 
             case "LoadStateButton":
                 _items.Restore();
-                StateManager.Exp.RestoreWalls(_fc);
                 break;
 
         }
@@ -137,6 +136,8 @@ public class ModeExperimental : IMode
 
         //Hide point list
         PointsList.HideListAndLogs();
+
+        _wc.SetBasicWalls();
 
         //Hide context view
         ExContextMenuView.Hide();
@@ -288,14 +289,15 @@ public class ModeExperimental : IMode
 
         _wcrt = PCref.gameObject.GetComponent<WallCreator>();
 
-        _items = new ItemsController(_wc, _wcrt);
-        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
-        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall6"), _wc.GetWallByName("Wall3"));
-        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall6"));
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
         _mb.Init(true);
         _fc = mainObject.AddComponent<FacesGenerator>();
+
+        _items = new ItemsController(_wc, _wcrt, _fc);
+        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall3"));
+        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall6"), _wc.GetWallByName("Wall3"));
+        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall6"));
 
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
