@@ -350,11 +350,12 @@ public class ModeExperimental : IMode
                 GameObject itemPrefab = Resources.Load<GameObject>("RadialMenuItem");
                 if (itemPrefab != null)
                 {
+                    List<string> descriptions = Enum.GetValues(typeof(ExContext)).Cast<ExContext>().Select(e => e.GetDescription()).ToList();
                     this.radialMenu = RadialMenu.Create(
                         radialMenuRoot,
-                        6, // liczba elementów
+                        descriptions.Count, // liczba elementów
                         20f, // promieñ
-                        new List<string> { "Dodaj punkt", "Usuñ punkt", "Dodaj krawêdŸ", "Usuñ krawêdŸ", "Akcja na œcianie", "Wróæ" }, // etykiety
+                        descriptions, // etykiety
                         itemPrefab,
                         this
                     );

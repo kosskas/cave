@@ -28,7 +28,7 @@ namespace Assets.Scripts.Experimental
         [Description("Rzut")]
         Projection,
 
-        [Description("\u015bciana")]
+        [Description("\u015aciana")]
         Wall
     }
 
