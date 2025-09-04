@@ -158,7 +158,7 @@ public class Mode3Dto2D : IMode
         FlystickController.SetAction(
             FlystickController.Btn._4,
             FlystickController.ActOn.PRESS,
-            _AddPointToCreateWall
+            _AddPointToCreateFace
         );
 
         FlystickController.SetAction(

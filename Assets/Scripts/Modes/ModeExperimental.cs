@@ -408,7 +408,7 @@ public class ModeExperimental : IMode
     public void SetUpFlystick()
     {
         FlystickController.ClearActions();
-        /*
+        
         FlystickController.SetAction(
             FlystickController.Btn._1,
             FlystickController.ActOn.PRESS,
@@ -432,13 +432,13 @@ public class ModeExperimental : IMode
             FlystickController.ActOn.PRESS,
             _TryRemoveFocusedLabel
         );
-
+        
         FlystickController.SetAction(
             FlystickController.Btn.FIRE,
             FlystickController.ActOn.PRESS,
             _MakeActionOnWall
         );
-
+        /*
         FlystickController.SetAction(
             FlystickController.Btn.JOYSTICK,
             FlystickController.ActOn.TILT_LEFT,
