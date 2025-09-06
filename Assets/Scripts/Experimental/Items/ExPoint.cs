@@ -12,9 +12,9 @@ namespace Assets.Scripts.Experimental.Items
 {
     public class ExPoint : MonoBehaviour, IDrawable, IRaycastable, ILabelable
     {
-        private static readonly Color ColorNormal = Color.black;
+        private Color ColorNormal = ReconstructionInfo.NORMAL;
 
-        private static readonly Color ColorFocused = Color.red;
+        private Color ColorFocused = ReconstructionInfo.FOCUSED;
 
         private static readonly float Size = 0.025f;
 
@@ -268,6 +268,7 @@ namespace Assets.Scripts.Experimental.Items
 
         public void SetLabelColor(Color textColor)
         {
+            ColorNormal = textColor;
             _pointRenderer.material.color = textColor;
 
             if (_labelComponent != null)

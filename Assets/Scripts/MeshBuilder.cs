@@ -280,7 +280,7 @@ public class MeshBuilder : MonoBehaviour
             return;
         
         int count = GetCurrentPointProjections(label).Count;
-
+        List<PointProjection> currPts = GetCurrentPointProjections(label);
         verticesOnWalls[wall].Remove(label);
         if (count == 2) //sa dwa, usun 3d
         {
@@ -290,6 +290,8 @@ public class MeshBuilder : MonoBehaviour
                 FacesGenerator.RemoveFacesFromPoint(label);
                 PointsList.UpdatePointsList();
             }
+            MarkOK(currPts[0]);
+            MarkOK(currPts[1]);
         }
         else if (count > 2) //sa trzy
         {
@@ -300,7 +302,6 @@ public class MeshBuilder : MonoBehaviour
             }
             //moga byc 3 i zle polozone
             //Rekonstruuj
-            List<PointProjection> currPts = GetCurrentPointProjections(label);
             bool p1 = false, p2 = false, p3 = false;
             Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
             PointsList.UpdatePointsList();
@@ -765,7 +766,7 @@ public class MeshBuilder : MonoBehaviour
         }
         else
         {
-            et.SetLabelColor(ReconstructionInfo.LABEL_3D_COLOR);
+            et.SetLabelColor(ReconstructionInfo.NORMAL);
         }
 
         if (pointProj.projLine == null)
