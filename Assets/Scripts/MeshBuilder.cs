@@ -627,19 +627,16 @@ public class MeshBuilder : MonoBehaviour
          *
          * Rzut jest wtedy kiedy s = t, czyli najkrótszy odcinek jest punktem
          */
-        const float eps = 1e-7f;
-
-        if (Math.Abs(Vector3.Dot(proj1.wallNormal, proj2.wallNormal)) < eps)
-        {
-            Debug.LogError("Płaszczyzny nie są prostopadłe");
-            return Vector3.zero;
-        }
-
-
+        const float eps = 1e-5f;
         Vector3 p1 = proj1.pointObject.transform.position;
         Vector3 p2 = proj2.pointObject.transform.position;
         Vector3 n1 = proj1.wallNormal;
         Vector3 n2 = proj2.wallNormal;
+        if (Math.Abs(Vector3.Dot(n1, n2)) > eps)
+        {
+            Debug.LogError($"Płaszczyzny nie są prostopadłe: n1={n1}, n2={n2}, dot={Vector3.Dot(n1, n2)}");
+            return Vector3.zero;
+        }
 
         Vector3 r = p1 - p2;
 
@@ -652,7 +649,7 @@ public class MeshBuilder : MonoBehaviour
         float mian = b * b + a * c;
         if (Mathf.Abs(mian) < eps)
         {
-            Debug.LogError("Płaszczyzny są równoległe lub prawie równoległe – brak przecięcia.");
+            Debug.LogError($"Płaszczyzny są równoległe lub prawie równoległe – brak przecięcia. n1={n1}, n2={n2}");
             return Vector3.zero;
         }
 
@@ -664,7 +661,7 @@ public class MeshBuilder : MonoBehaviour
 
         if (point1 != point2)
         {
-            Debug.LogError("Nierzut");
+            Debug.LogError($"Nierzut: point1={point1}, point2={point2}");
             return Vector3.zero;
         }
 

@@ -35,6 +35,11 @@ namespace Assets.Scripts.Experimental
 
         private Vector3 CalcProjectionOnAxis(Axis axis, Vector3 point)
         {
+            if (axis == null)
+            {
+                Debug.LogError("Brak osi odniesienia");
+                return Vector3.zero;
+            }
             return CalcProjectionOnAxis(axis.From, axis.To, point);
         }
 
