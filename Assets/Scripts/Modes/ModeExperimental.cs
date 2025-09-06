@@ -10,6 +10,8 @@ using Assets.Scripts.Walls;
 
 public class ModeExperimental : IMode
 {
+    private static float Z_RADIAL_MENU_OFFSET = 0.15f;
+    private static float RADIAL_MENU_RADIUS = 20f;
     public PlayerController PCref { get; private set; }
 
     private WallController _wc;
@@ -342,11 +344,33 @@ public class ModeExperimental : IMode
         //_controlMenuView = new ExControlMenuView();
 
         PointsList.ShowListAndLogs();
+        
+        AddRadialMenu();
 
+        Debug.Log($"<color=blue> MODE experimental ON </color>");
+    }
 
-        GameObject canvas = GameObject.Find("FlystickPlaceholder/Canvas");
-        if (canvas != null)
+    public void AddRadialMenu()
+    {
+        GameObject flystick = GameObject.Find("TrackedObject");
+        if (flystick == null)
         {
+            flystick = GameObject.Find("FlystickPlaceholder");
+            if (flystick == null)
+            {
+                flystick = new GameObject("FlystickPlaceholder");
+            }
+        }
+
+        GameObject canvasPrefab = Resources.Load<GameObject>("Canvas");
+        if (canvasPrefab != null)
+        {
+            GameObject canvas = GameObject.Instantiate(canvasPrefab, flystick.transform);
+
+            Vector3 localPos = canvas.transform.localPosition;
+            localPos.z = Z_RADIAL_MENU_OFFSET;
+            canvas.transform.localPosition = localPos;
+
             Transform radialMenuRoot = canvas.transform.Find("RadialMenuRoot");
             if (radialMenuRoot != null)
             {
@@ -357,7 +381,7 @@ public class ModeExperimental : IMode
                     this.radialMenu = RadialMenu.Create(
                         radialMenuRoot,
                         descriptions.Count, // liczba elementów
-                        20f, // promieñ
+                        RADIAL_MENU_RADIUS, // promieñ
                         descriptions, // etykiety
                         itemPrefab,
                         this
@@ -375,12 +399,9 @@ public class ModeExperimental : IMode
         }
         else
         {
-            Debug.LogError("Nie znaleziono Canvas w scenie");
+            Debug.LogError("Nie znaleziono fabrykatu z Resources/Canvas");
         }
-
-        Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
-
     public void HandleInput()
     {
         _MoveCursor();
