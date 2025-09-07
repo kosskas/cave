@@ -11,8 +11,8 @@ namespace Assets.Scripts.Experimental.Items
 {
     public class Circle : MonoBehaviour, IDrawable, IRaycastable
     {
-        private static readonly Color ColorNormal = Color.black;
-        private static readonly Color ColorFocused = Color.red;
+        private Color ColorNormal = ReconstructionInfo.NORMAL;
+        private Color ColorFocused = ReconstructionInfo.FOCUSED;
 
         public float Width = 0.002f;
 

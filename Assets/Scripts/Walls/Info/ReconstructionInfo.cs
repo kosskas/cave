@@ -7,6 +7,9 @@ using UnityEngine;
 
 public static class ReconstructionInfo
 {
+    // -- COLOR
+    public static Color NORMAL = Color.black;
+    public static Color FOCUSED = new Color(0.3f, 0, 0.3f);
     // -- CURSOR
     public static float _CURSOR_SIZE = 0.05f;
     public static Color _CURSOR_COLOR = new Color(1, 1, 1, 0.3f);

@@ -11,9 +11,9 @@ namespace Assets.Scripts.Experimental.Items
 {
     public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable
     {
-        private static readonly Color ColorNormal = Color.black;
+        private Color ColorNormal = Color.black;
 
-        private static readonly Color ColorFocused = Color.red;
+        private Color ColorFocused = ReconstructionInfo.FOCUSED;
 
         public float Width { get; set; } = 0.005f;
 
