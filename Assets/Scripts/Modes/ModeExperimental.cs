@@ -348,6 +348,8 @@ public class ModeExperimental : IMode
         
         AddRadialMenu();
 
+        SetUpFlystick();
+
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
 
@@ -477,6 +479,65 @@ public class ModeExperimental : IMode
         {
             _wc.PopBackWall();
         }
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1,
+            FlystickController.ActOn.PRESS,
+            _DrawAction
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._2,
+            FlystickController.ActOn.PRESS,
+            _DeleteHoveredObject
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._3,
+            FlystickController.ActOn.PRESS,
+            _TryAddLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._4,
+            FlystickController.ActOn.PRESS,
+            _TryRemoveFocusedLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.FIRE,
+            FlystickController.ActOn.PRESS,
+            _MakeActionOnWall
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            _TryGetPrevLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            _TryGetNextLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_DOWN,
+            _TryGetPrevLabelText
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_UP,
+            _TryGetNextLabelText
+        );
     }
 }
 
