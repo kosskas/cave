@@ -514,7 +514,7 @@ public class ModeExperimental : IMode
             FlystickController.ActOn.PRESS,
             _MakeActionOnWall
         );
-
+/*
         FlystickController.SetAction(
             FlystickController.Btn.JOYSTICK,
             FlystickController.ActOn.TILT_LEFT,
@@ -538,6 +538,7 @@ public class ModeExperimental : IMode
             FlystickController.ActOn.TILT_UP,
             _TryGetNextLabelText
         );
+*/
     }
 }
 
