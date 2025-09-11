@@ -34,7 +34,8 @@ public class ModeExperimental : IMode
     private DrawAction _drawAction;
 
     private RadialMenu radialMenu;
-    
+
+    private GameObject canvas;
     /* * * * CONTEXT ACTIONS begin * * * */
 
     private void Act()
@@ -365,7 +366,7 @@ public class ModeExperimental : IMode
         GameObject canvasPrefab = Resources.Load<GameObject>("Canvas");
         if (canvasPrefab != null)
         {
-            GameObject canvas = GameObject.Instantiate(canvasPrefab, flystick.transform);
+            canvas = GameObject.Instantiate(canvasPrefab, flystick.transform);
 
             Vector3 localPos = canvas.transform.localPosition;
             localPos.z = Z_RADIAL_MENU_OFFSET;
@@ -405,6 +406,22 @@ public class ModeExperimental : IMode
     public void HandleInput()
     {
         _MoveCursor();
+
+        if (Input.GetKeyDown("h"))
+        {
+            Vector3 localPos = canvas.transform.localPosition;
+            localPos.z += 0.01f;
+            canvas.transform.localPosition = localPos;
+            Debug.LogError($"Z = {localPos.z}");
+        }
+
+        if (Input.GetKeyDown("j"))
+        {
+            Vector3 localPos = canvas.transform.localPosition;
+            localPos.z -= 0.01f;
+            canvas.transform.localPosition = localPos;
+            Debug.LogError($"Z = {localPos.z}");
+        }
 
         if (Input.GetKeyDown("1"))
         {
