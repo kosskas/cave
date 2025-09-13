@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngineInternal.Input.NativeTrackingEvent;
 
 namespace Assets.Scripts.Experimental.Items
 {
@@ -181,11 +182,13 @@ namespace Assets.Scripts.Experimental.Items
         public void OnHoverEnter()
         {
             _lineRenderer.material.color = ColorFocused;
+           // _labelComponent?.SetVisible(true);
         }
 
         public void OnHoverExit()
         {
             _lineRenderer.material.color = ColorNormal;
+            //_labelComponent?.SetVisible(false);
         }
 
         public void OnHoverAction(Action<GameObject> action)
@@ -230,6 +233,24 @@ namespace Assets.Scripts.Experimental.Items
             _labelComponent.AddLabel("", new string('\'', Plane.number), "");
 
             NextText();
+        }
+        public void SetLabel(float value)
+        {
+            if (!EnabledLabels)
+                return;
+
+            if (_labelComponent == null)
+            {
+                _labelComponent = gameObject.AddComponent<IndexedLabel>();
+                _labelComponent.AddLabel("", "", "");
+            }
+
+            _labelComponent.Labels[0].Text = value.ToString("F2");
+        }
+
+        public void SetLabelVisible(bool flag)
+        {
+            _labelComponent?.SetVisible(flag);
         }
 
         public void AddLabel(string labelText)

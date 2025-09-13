@@ -262,6 +262,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = lineWidth;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
+            lineComponent.SetLabelVisible(true);
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
@@ -272,10 +273,12 @@ namespace Assets.Scripts.Experimental
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
 
+                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
-
+                    lineComponent.SetLabelVisible(false);
                     var endPoint = hitObject as ExPoint;
 
                     if (startPoint != null && endPoint != null)
@@ -331,8 +334,10 @@ namespace Assets.Scripts.Experimental
 
             var projectionComponent1 = projection1.AddComponent<Line>();
             projectionComponent1.ColliderEnabled = false;
+            projectionComponent1.EnabledLabels = true;
             projectionComponent1.Width = 0.002f;
             projectionComponent1.Draw(startPlane, startPosition, startPosition);
+            projectionComponent1.SetLabelVisible(true);
 
             // SECOND PART
             var projection2 = new GameObject("PROJECTION");
@@ -340,8 +345,10 @@ namespace Assets.Scripts.Experimental
 
             var projectionComponent2 = projection2.AddComponent<Line>();
             projectionComponent2.ColliderEnabled = false;
+            projectionComponent1.EnabledLabels = true;
             projectionComponent2.Width = 0.002f;
             projectionComponent2.Draw(startPlane, startPosition, startPosition);
+            projectionComponent2.SetLabelVisible(true);
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
@@ -358,6 +365,8 @@ namespace Assets.Scripts.Experimental
                     projectionComponent1.Draw(default(WallInfo), default(Vector3), endPosition);
                     projectionComponent2.Draw(default(WallInfo), startPosition, endPosition);
 
+                    projectionComponent1.SetLabel(Vector3.Distance(startPosition, hitPosition));//
+
                     if (isEnd)
                     {
                         projectionComponent1.Draw(default(WallInfo), default(Vector3), startPositionProjection);
@@ -373,6 +382,8 @@ namespace Assets.Scripts.Experimental
                     var endPosition = cursorPosition + alignment;
                     
                     projectionComponent2.Draw(endPlane, endPosition, default(Vector3));
+
+                    projectionComponent2.SetLabel(Vector3.Distance(endPosition, hitPosition));
 
                     if (isEnd)
                     {
@@ -402,6 +413,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = 0.002f;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
+            lineComponent.SetLabelVisible(true);
 
             var axis = GetAxis(plane);
             var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
@@ -419,9 +431,13 @@ namespace Assets.Scripts.Experimental
                 var endPosition = cursorPositionProjection + startPositionOffsetFromAxis;
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-        
+                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+
                 if (isEnd)
+                {
                     lineComponent.ColliderEnabled = true;
+                    lineComponent.SetLabelVisible(false);
+                }
             };
         }
 
@@ -436,6 +452,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = 0.002f;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
+            lineComponent.SetLabelVisible(true);
 
             var axis = GetAxis(plane);
             var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
@@ -450,9 +467,13 @@ namespace Assets.Scripts.Experimental
                 var endPosition = CalcProjectionOnAxis(startPosition, startPositionProjection, cursorPosition);
         
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-        
+                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+
                 if (isEnd)
+                {
                     lineComponent.ColliderEnabled = true;
+                    lineComponent.SetLabelVisible(false);
+                }
             };
         }
 
