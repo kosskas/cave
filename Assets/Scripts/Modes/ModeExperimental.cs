@@ -10,7 +10,7 @@ using Assets.Scripts.Walls;
 
 public class ModeExperimental : IMode
 {
-    private static float Z_RADIAL_MENU_OFFSET = 0.05f;
+    private static float Z_RADIAL_MENU_OFFSET = 0.0f;
     private static float RADIAL_MENU_RADIUS = 20f;
     public PlayerController PCref { get; private set; }
 

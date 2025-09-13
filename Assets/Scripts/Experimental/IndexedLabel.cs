@@ -17,7 +17,7 @@ namespace Assets.Scripts.Experimental
 
         private const float LabelFontSize = 0.6f;
 
-        private static readonly Color ColorNormal = Color.black;
+        private static readonly Color ColorNormal = ReconstructionInfo.NORMAL;
 
         private TextMeshPro _textMeshPro;
 
@@ -56,7 +56,7 @@ namespace Assets.Scripts.Experimental
 
         // ---
 
-        public Color FocusedLabelColor { get; set; } = ColorNormal;
+        public Color FocusedLabelColor { get; set; } = ReconstructionInfo.FOCUSED;
 
         public List<AtomicLabel> Labels => _labels.All().ToList();
 
