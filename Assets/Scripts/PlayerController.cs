@@ -63,6 +63,7 @@ public class PlayerController : MonoBehaviour
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        GameObject.Find("KreaButton").SetActive(false);
 
         Debug.Log($"<color=blue> [MODE MENU]  1 -> grp  ,  2 -> inz  [MODE MENU] </color>");
     }
