@@ -89,12 +89,23 @@ public class Mode3Dto2D : IMode
         Debug.Log($"<color=blue> MODE grupowy ON </color>");
     }
 
+    private void _BackToMenu()
+    {
+        _wc.SetBasicWalls();
+        GameObject.Destroy(_si);
+        PCref.ChangeMode(PlayerController.Mode.ModeMenu);
+    }
     ////
     /// NOTE: jedyny Input nie będący tutaj jest w pliku ObjectRotator!
     ///
     //from solidimporter
     public void HandleInput()
     {
+        if (Input.GetKeyDown("m"))
+        {
+            _BackToMenu();
+        }
+
         if (Input.GetKeyDown("p"))
         {
             _DisplayNextSolid();
