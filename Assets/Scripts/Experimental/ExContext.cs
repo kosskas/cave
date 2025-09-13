@@ -10,10 +10,10 @@ namespace Assets.Scripts.Experimental
         [Description("Punkt")]
         Point,
 
-        [Description("Gruba linia")]
+        [Description("Kraw\u0119d\u017a")]
         BoldLine,
 
-        [Description("Linia")]
+        [Description("Linia pomocznicza")]
         Line,
 
         [Description("Linia prostopad\u0142a")]
@@ -25,7 +25,7 @@ namespace Assets.Scripts.Experimental
         [Description("Okr\u0105g")]
         Circle,
 
-        [Description("Rzut")]
+        [Description("Linia odnosz\u0105ca")]
         Projection,
 
         [Description("\u015aciana")]
