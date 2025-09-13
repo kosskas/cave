@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
     {
         ModeMenu,
         Mode3Dto2D,
-        Mode2Dto3D,
+        //Mode2Dto3D,
         ModeExperimental
     }
 
@@ -120,10 +120,6 @@ public class PlayerController : MonoBehaviour
         {
             case Mode.ModeMenu:
                 _modeController = new ModeMenu(this);
-                break;
-
-            case Mode.Mode2Dto3D:
-                _modeController = new Mode2Dto3D(this);
                 break;
 
             case Mode.Mode3Dto2D:

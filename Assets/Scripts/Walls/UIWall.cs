@@ -91,7 +91,6 @@ namespace Assets.Scripts.Walls
         public class MenuButtons
         {
             private static GameObject _visualizationButton;
-            private static GameObject _reconstructionWithGridButton;
             private static GameObject _reconstructionButton;
 
             private static List<GameObject> GetHandler()
@@ -99,16 +98,12 @@ namespace Assets.Scripts.Walls
                 if (_visualizationButton == null)
                     _visualizationButton = GameObject.Find("WizButton");
 
-                if (_reconstructionWithGridButton == null)
-                    _reconstructionWithGridButton = GameObject.Find("KreaButton");
-
                 if (_reconstructionButton == null)
                     _reconstructionButton = GameObject.Find("ExpButton");
 
                 return new List<GameObject>()
                 {
                     _visualizationButton,
-                    _reconstructionWithGridButton,
                     _reconstructionButton
                 };
             }
