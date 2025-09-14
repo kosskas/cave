@@ -87,7 +87,7 @@ namespace Assets.Scripts.Experimental
 
         public void SetVisible(bool flag)
         {
-            _textMeshPro.gameObject.SetActive(flag);
+            _textMeshPro?.gameObject.SetActive(flag);
         }
         // -------
 

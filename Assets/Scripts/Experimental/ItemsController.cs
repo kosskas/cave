@@ -345,10 +345,9 @@ namespace Assets.Scripts.Experimental
 
             var projectionComponent2 = projection2.AddComponent<Line>();
             projectionComponent2.ColliderEnabled = false;
-            projectionComponent1.EnabledLabels = true;
+            projectionComponent2.EnabledLabels = true;
             projectionComponent2.Width = 0.002f;
             projectionComponent2.Draw(startPlane, startPosition, startPosition);
-            projectionComponent2.SetLabelVisible(true);
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
@@ -365,13 +364,16 @@ namespace Assets.Scripts.Experimental
                     projectionComponent1.Draw(default(WallInfo), default(Vector3), endPosition);
                     projectionComponent2.Draw(default(WallInfo), startPosition, endPosition);
 
-                    projectionComponent1.SetLabel(Vector3.Distance(startPosition, hitPosition));//
+                    projectionComponent1.SetLabel(Vector3.Distance(startPosition, hitPosition));
+                    projectionComponent1.SetLabelVisible(true);
+                    projectionComponent2.SetLabelVisible(false);
 
                     if (isEnd)
                     {
                         projectionComponent1.Draw(default(WallInfo), default(Vector3), startPositionProjection);
                         projectionComponent1.ColliderEnabled = true;
-
+                        projectionComponent1.SetLabelVisible(false);
+                        projectionComponent2.SetLabelVisible(false);
                         UnityEngine.Object.Destroy(projection2);
                     }
                 }
@@ -383,8 +385,9 @@ namespace Assets.Scripts.Experimental
                     
                     projectionComponent2.Draw(endPlane, endPosition, default(Vector3));
 
-                    projectionComponent2.SetLabel(Vector3.Distance(endPosition, hitPosition));
-
+                    projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, hitPosition));
+                    projectionComponent1.SetLabelVisible(false);
+                    projectionComponent2.SetLabelVisible(true);
                     if (isEnd)
                     {
                         projectionComponent1.Draw(default(WallInfo), default(Vector3), startPositionProjection);
@@ -394,7 +397,8 @@ namespace Assets.Scripts.Experimental
 
                         projectionComponent1.ColliderEnabled = true;
                         projectionComponent2.ColliderEnabled = true;
-
+                        projectionComponent1.SetLabelVisible(false);
+                        projectionComponent2.SetLabelVisible(false);
                         _wc.LinkConstructionToWall(startPlane, projection1);
                         _wc.LinkConstructionToWall(endPlane, projection2);
                     }
