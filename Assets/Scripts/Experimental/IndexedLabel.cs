@@ -85,6 +85,10 @@ namespace Assets.Scripts.Experimental
             _labels.Previous();
         }
 
+        public void SetVisible(bool flag)
+        {
+            _textMeshPro?.gameObject.SetActive(flag);
+        }
         // -------
 
         public float FontSize { get; set; } = LabelFontSize;
