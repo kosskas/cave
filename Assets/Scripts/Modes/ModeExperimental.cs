@@ -353,6 +353,9 @@ public class ModeExperimental : IMode
     public void AddRadialMenu()
     {
         GameObject flystick = GameObject.Find("TrackedObject");
+        GameObject.Find("NextContext")?.SetActive(false);
+        GameObject.Find("PrevContext")?.SetActive(false);
+
         if (flystick == null)
         {
             flystick = GameObject.Find("FlystickPlaceholder");
@@ -459,6 +462,16 @@ public class ModeExperimental : IMode
         if (Input.GetKeyDown("p"))
         {
             _wc.PopBackWall();
+        }
+
+        if (Input.GetKeyDown("v"))
+        {
+            radialMenu.disableRadialMenu();
+        }
+
+        if (Input.GetKeyDown("b"))
+        {
+            radialMenu.enableRadialMenu();
         }
     }
 }
