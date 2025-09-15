@@ -206,6 +206,7 @@ namespace Assets.Scripts.Experimental
             _wc.LinkConstructionToWall(planeA, axis);
             _wc.LinkConstructionToWall(planeB, axis);
         }
+
         public void AddAxisBetweenPlanes2(WallInfo planeA, WallInfo planeB)
         {
             Vector3 normalA = planeA.GetNormal();
@@ -216,7 +217,6 @@ namespace Assets.Scripts.Experimental
 
             // Calculate the intersection point of the two planes
             Vector3 direction = Vector3.Cross(normalA, normalB);
-            Vector3 offsetVector = (normalA + normalB) * (_WALL_HALF_WIDTH + _OFFSET_FROM_WALL);
 
             // Solve for the intersection point using plane equations
             float determinant = Vector3.Dot(direction, direction);
@@ -228,8 +228,8 @@ namespace Assets.Scripts.Experimental
 
             Vector3 intersectionMiddlePoint = positionA + Vector3.Project(positionB - positionA, direction);
 
-            Vector3 from = (intersectionMiddlePoint - direction.normalized * _WALL_HALF_LENGTH) + offsetVector;
-            Vector3 to = (intersectionMiddlePoint + direction.normalized * _WALL_HALF_LENGTH) + offsetVector;
+            Vector3 from = (intersectionMiddlePoint - direction.normalized * _WALL_HALF_LENGTH);
+            Vector3 to = (intersectionMiddlePoint + direction.normalized * _WALL_HALF_LENGTH);
 
             var axis = new GameObject("AXIS");
             axis.transform.SetParent(_axisRepo.transform);
@@ -245,6 +245,7 @@ namespace Assets.Scripts.Experimental
             _wc.LinkConstructionToWall(planeA, axis);
             _wc.LinkConstructionToWall(planeB, axis);
         }
+
         public DrawAction Add(
             ExContext context, 
             IRaycastable hitObject,
@@ -282,7 +283,7 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity);
 
-                case ExContext.Wall: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, _BOLD_LINE_WIDTH, true);
+                case ExContext.Wall: return DrawWall(plane, positionWithPointSensitivity);
 
                 default: return null;
             }
@@ -301,7 +302,7 @@ namespace Assets.Scripts.Experimental
             return null;
         }
 
-        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH, bool isWallOrigin = false)
+        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -334,14 +335,40 @@ namespace Assets.Scripts.Experimental
                     if (startPoint != null && endPoint != null)
                     {
                         lineComponent.BindPoints(startPoint, endPoint);
-
-                        if (isWallOrigin)
-                        {
-                            WallInfo addedWall = _wcrt.WCrCreateWall(startPoint.Position, endPoint.Position, plane);
-                            AddAxisBetweenPlanes2(addedWall, plane);
-                        }
-
                     }
+                }
+            };
+        }
+
+        public DrawAction DrawWall(WallInfo plane, Vector3 startPosition)
+        {
+            var line = new GameObject("LINE");
+            line.transform.SetParent(_lineRepo.transform);
+            _wc.LinkConstructionToWall(plane, line);
+
+            var lineComponent = line.AddComponent<Line>();
+            lineComponent.ColliderEnabled = false;
+            lineComponent.Width = _HELP_LINE_WIDTH;
+            lineComponent.Draw(plane, startPosition, startPosition);
+            lineComponent.EnabledLabels = true;
+            lineComponent.SetLabelVisible(true);
+
+            return (hitObject, hitPosition, hitPlane, isEnd) =>
+            {
+                if (plane != FindPlane(hitPlane, hitObject))
+                    return;
+
+                var endPositionWithPointSensitivity = CalcPosition(plane, hitPosition, hitObject as ExPoint);
+
+                lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
+                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+
+                if (isEnd)
+                {
+                    UnityEngine.Object.Destroy(line);
+
+                    var addedWall = _wcrt.WCrCreateWall(startPosition, endPositionWithPointSensitivity, plane);
+                    AddAxisBetweenPlanes2(addedWall, plane);
                 }
             };
         }
