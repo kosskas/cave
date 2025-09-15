@@ -509,12 +509,12 @@ public class ModeExperimental : IMode
 
         if (Input.GetKeyDown("v"))
         {
-            radialMenu.disableRadialMenu();
+            radialMenu.SetRadialMenuActive(false);
         }
 
         if (Input.GetKeyDown("b"))
         {
-            radialMenu.enableRadialMenu();
+            radialMenu.SetRadialMenuActive(true);
         }
         if (Input.GetKeyDown("f"))
         {
