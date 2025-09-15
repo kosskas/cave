@@ -219,6 +219,12 @@ public class ModeExperimental : IMode
 
     private void _DeleteHoveredObject()
     {
+        if (_context.Current.Key == ExContext.Wall)
+        {
+            _wc.PopBackWall();
+            return;
+        }
+
         GameObject hitGameObject = null;
         _hitObject?.OnHoverAction(gameObject => hitGameObject = gameObject);
         //Debug.Log("Objekt " + hitGameObject.name);
