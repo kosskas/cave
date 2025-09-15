@@ -221,21 +221,12 @@ public class RadialMenu : MonoBehaviour
         Select((index % itemCount + itemCount) % itemCount);
     }
 
-    public void disableRadialMenu()
+    public void SetRadialMenuActive(bool flag)
     {
+        isMenuActive = flag;
         foreach (GameObject item in spawnedItems)
         {
-            item.SetActive(false);
-            isMenuActive = false;
-        }
-    }
-
-    public void enableRadialMenu()
-    {
-        foreach (GameObject item in spawnedItems)
-        {
-            item.SetActive(true);
-            isMenuActive = true;
+            item.SetActive(isMenuActive);
         }
     }
 }
