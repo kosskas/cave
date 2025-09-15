@@ -32,7 +32,7 @@ public class RadialMenu : MonoBehaviour
     private float rotationOffset = 0f; 
     private Coroutine rotateCoroutine;
 
-    public bool isMenuActive = false;
+    public bool isMenuActive = true;
 
  
     public static RadialMenu Create(Transform parent, int count, float rad, List<string> lbls, GameObject prefab, ModeExperimental modeExperimental)

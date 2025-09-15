@@ -250,6 +250,9 @@ public class ModeExperimental : IMode
 
     private void _TryGetNextLabelText()
     {
+        if(!_isRaycastLocked)
+            return;
+
         _hitObject?.OnHoverAction((gameObject) =>
         {
             gameObject.GetComponent<ILabelable>()?.NextText();
@@ -258,6 +261,9 @@ public class ModeExperimental : IMode
 
     private void _TryGetPrevLabelText()
     {
+        if (!_isRaycastLocked)
+            return;
+
         _hitObject?.OnHoverAction((gameObject) =>
         {
             gameObject.GetComponent<ILabelable>()?.PrevText();
@@ -266,6 +272,9 @@ public class ModeExperimental : IMode
 
     private void _TryGetNextLabel()
     {
+        if (!_isRaycastLocked)
+            return;
+
         _hitObject?.OnHoverAction((gameObject) =>
         {
             gameObject.GetComponent<ILabelable>()?.NextLabel();
@@ -274,6 +283,9 @@ public class ModeExperimental : IMode
 
     private void _TryGetPrevLabel()
     {
+        if (!_isRaycastLocked)
+            return;
+
         _hitObject?.OnHoverAction((gameObject) =>
         {
             gameObject.GetComponent<ILabelable>()?.PrevLabel();
@@ -431,7 +443,7 @@ public class ModeExperimental : IMode
             Debug.LogError("Nie znaleziono fabrykatu z Resources/Canvas");
         }
     }
-    private void ToggleRaycastLock()
+    private void _ToggleRaycastLock()
     {
         if (_isRaycastLocked)
         {
@@ -447,6 +459,11 @@ public class ModeExperimental : IMode
             _isRaycastLocked = true;
         }
         _MakeActionOnWall();
+    }
+
+    private void _ToggleRadialMenu()
+    {
+        radialMenu.SetRadialMenuActive(!radialMenu.isMenuActive);
     }
     public void HandleInput()
     {
@@ -518,7 +535,7 @@ public class ModeExperimental : IMode
         }
         if (Input.GetKeyDown("f"))
         {
-            ToggleRaycastLock();
+            _ToggleRaycastLock();
         }
     }
 
@@ -578,6 +595,12 @@ public class ModeExperimental : IMode
             FlystickController.Btn.JOYSTICK,
             FlystickController.ActOn.TILT_UP,
             _TryGetNextLabelText
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.PRESS,
+            _ToggleRadialMenu
         );
     }
 }
