@@ -31,6 +31,8 @@ public class FlystickController : MonoBehaviour
         TILT_DOWN
     }
 
+    private PlayerController _PCref;
+
     private static Action _OnJoystickTiltedLeft = () => { };
     private static Action _OnJoystickTiltedRight = () => { };
     private static Action _OnJoystickTiltedUp = () => { };
@@ -44,8 +46,9 @@ public class FlystickController : MonoBehaviour
     private bool _isTiltedX = false;
     private bool _isTiltedY = false;
 
-    void Start()
+    public void Init(PlayerController PCref)
     {
+        _PCref = PCref;
         flystick = GameObject.Find("TrackedObject");
         rayline = flystick.AddComponent<LineSegment>();
         rayline.SetStyle(_RAY_COLOR, _RAY_WEIGHT);
@@ -63,7 +66,16 @@ public class FlystickController : MonoBehaviour
     {
         RayLineOrigin = flystick.transform.position;
         RayLineDirection = flystick.transform.forward * _RAY_RANGE;
-        rayline.SetCoordinates(RayLineOrigin, RayLineDirection);
+        if (_PCref.LockedRaycastObject != null)
+        {
+            // Kiedy mamy locka – linia zawsze idzie do zapamiętanego punktu
+            rayline.SetCoordinates(RayLineOrigin, _PCref.LockedRayPoint);
+        }
+        else
+        {
+            // Normalny tryb – idziemy do aktualnego miejsca raycastu
+            rayline.SetCoordinates(RayLineOrigin, RayLineDirection);
+        }
     }
 
     private void _HandleJoystickTiltActions()

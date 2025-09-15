@@ -6,7 +6,7 @@ using UnityEngine;
 /// <summary>
 /// Klasa PlayerController jest klasą strerującą graczem w aplikacji. Obsługuje ruch gracza po mapie oraz wszelkie dodatkowe czynności inicjowane przyciskiem z klawiatury.
 /// </summary>
-[RequireComponent(typeof(CharacterController), typeof(FlystickController))]
+[RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     /// <summary>
@@ -53,14 +53,14 @@ public class PlayerController : MonoBehaviour
     private IMode _modeController;
     private Mode _mode = Mode.ModeMenu;
     private bool _isModeChanged = false;
-
-
+    public Vector3 LockedRayPoint { get; set; } = Vector3.zero;
+    public GameObject LockedRaycastObject { get; set; } = null;
     void Start()
     {
         //_ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         _characterController = GetComponentInChildren<CharacterController>();
         _flystickController = gameObject.AddComponent<FlystickController>();
-
+        _flystickController.Init(this);
         _ray = new Ray(_flystickController.RayLineOrigin, _flystickController.RayLineDirection);
 
         _SetModeController();
@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviour
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
+        GameObject.Find("KreaButton").SetActive(false);
         Debug.Log($"<color=blue> [MODE MENU]  1 -> grp  ,  2 -> inz  [MODE MENU] </color>");
     }
 
@@ -79,13 +79,30 @@ public class PlayerController : MonoBehaviour
         _UpdateMode();
     }
 
-
     private void _UpdateRaycasting()
     {
         //_ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (LockedRaycastObject != null)
+        {
+            Collider lockedCollider = LockedRaycastObject.GetComponent<Collider>();
+            if (lockedCollider != null)
+            {
+                if (lockedCollider.Raycast(_ray, out Hit, 100))
+                {
+                    // Trafiamy w zafokusowany obiekt – aktualizuj punkt
+                    LockedRayPoint = Hit.point;
+                }
+                // Jeśli nie trafiamy – nie zmieniamy Hit ani _lockedRayPoint
+            }
+            return; // w locku nie sprawdzamy innych obiektów
+        }
+
+        // Tryb bez locka – normalny raycast
         _ray.origin = _flystickController.RayLineOrigin;
         _ray.direction = _flystickController.RayLineDirection;
         Physics.Raycast(_ray, out Hit, 100);
+        LockedRayPoint = Hit.point;
     }
 
     private void _UpdateMovement()
@@ -127,10 +144,6 @@ public class PlayerController : MonoBehaviour
         {
             case Mode.ModeMenu:
                 _modeController = new ModeMenu(this);
-                break;
-
-            case Mode.Mode2Dto3D:
-                _modeController = new Mode2Dto3D(this);
                 break;
 
             case Mode.Mode3Dto2D:

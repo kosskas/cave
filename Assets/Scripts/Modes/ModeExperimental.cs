@@ -35,12 +35,22 @@ public class ModeExperimental : IMode
 
     private RadialMenu radialMenu;
     
+    private bool _isRaycastLocked = false;
+
     /* * * * CONTEXT ACTIONS begin * * * */
 
     private void Act()
     {
+        //Unclock focus when action
+        _isRaycastLocked = false;
+        PCref.LockedRaycastObject = null;
+
         var hitObject = _hitObject;
         var hitPosition = PCref.Hit.point;
+        
+        if(PCref.Hit.collider == null)
+            return;
+
         var hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
 
         if (_drawAction == null)
@@ -126,6 +136,9 @@ public class ModeExperimental : IMode
 
             case "LoadStateButton":
                 _items.Restore();
+                break;
+
+            default:
                 break;
 
         }
@@ -282,6 +295,11 @@ public class ModeExperimental : IMode
 
     private void _MoveCursor()
     {
+        if (_isRaycastLocked)
+        {
+            return;
+        }
+
         var hitObject = PCref.Hit.collider.gameObject.GetComponent<IRaycastable>();
         var hitPosition = PCref.Hit.point;
         var hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
@@ -404,6 +422,23 @@ public class ModeExperimental : IMode
             Debug.LogError("Nie znaleziono fabrykatu z Resources/Canvas");
         }
     }
+    private void ToggleRaycastLock()
+    {
+        if (_isRaycastLocked)
+        {
+            // Always unlock, regardless of what is currently hit
+            _isRaycastLocked = false;
+            PCref.LockedRaycastObject = null;
+            return;
+        }
+        if (PCref.Hit.collider != null && PCref.Hit.collider.gameObject.GetComponent<IRaycastable>() != null)
+        {
+            // Lock only if hitting a raycastable object
+            PCref.LockedRaycastObject = PCref.Hit.collider.gameObject;
+            _isRaycastLocked = true;
+        }
+        _MakeActionOnWall();
+    }
     public void HandleInput()
     {
         _MoveCursor();
@@ -461,6 +496,11 @@ public class ModeExperimental : IMode
         if (Input.GetKeyDown("p"))
         {
             _wc.PopBackWall();
+        }
+
+        if (Input.GetKeyDown("f"))
+        {
+            ToggleRaycastLock();
         }
     }
 
