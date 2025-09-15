@@ -47,6 +47,24 @@ public class RadialMenu : MonoBehaviour
         menu.itemPrefab = prefab;
         menu.modeExperimental = modeExperimental;
         menu.initialMenuItemScale = prefab.GetComponent<RectTransform>().localScale;
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            () =>
+            {
+                menu.Select((menu.selectedIndex - 1 + menu.itemCount) % menu.itemCount);
+                modeExperimental._ChangeDrawContextPrev();
+            }
+        );
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            () =>
+            {
+                menu.Select((menu.selectedIndex + 1 + menu.itemCount) % menu.itemCount);
+                modeExperimental._ChangeDrawContextNext();
+            }
+        );
         menu.Generate();
         return menu;
     }
