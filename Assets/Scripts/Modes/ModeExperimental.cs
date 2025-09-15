@@ -426,14 +426,13 @@ public class ModeExperimental : IMode
             PCref.LockedRaycastObject = null;
             return;
         }
-        if (PCref.Hit.collider != null)
+        if (PCref.Hit.collider != null && PCref.Hit.collider.gameObject.GetComponent<IRaycastable>() != null)
         {
             // Lock only if hitting a raycastable object
-            if (PCref.Hit.collider.gameObject.GetComponent<IRaycastable>() == null)
-                return;
             PCref.LockedRaycastObject = PCref.Hit.collider.gameObject;
             _isRaycastLocked = true;
         }
+        _MakeActionOnWall();
     }
     public void HandleInput()
     {
