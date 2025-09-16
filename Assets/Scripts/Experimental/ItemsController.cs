@@ -325,7 +325,7 @@ namespace Assets.Scripts.Experimental
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
 
-                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+                lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
 
                 if (isEnd)
                 {
@@ -362,7 +362,7 @@ namespace Assets.Scripts.Experimental
                 var endPositionWithPointSensitivity = CalcPosition(plane, hitPosition, hitObject as ExPoint);
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
-                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+                lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
 
                 if (isEnd)
                 {
@@ -446,7 +446,7 @@ namespace Assets.Scripts.Experimental
                     projectionComponent1.Draw(default(WallInfo), default(Vector3), endPosition);
                     projectionComponent2.Draw(default(WallInfo), startPosition, endPosition);
 
-                    projectionComponent1.SetLabel(Vector3.Distance(startPosition, startPositionProjection));
+                    projectionComponent1.SetLabel(Vector3.Distance(startPosition, endPosition));
                     projectionComponent1.SetLabelVisible(true);
                     projectionComponent2.SetLabelVisible(false);
 
@@ -464,7 +464,7 @@ namespace Assets.Scripts.Experimental
                     
                     projectionComponent2.Draw(endPlane, endPosition, default(Vector3));
 
-                    projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, hitPosition));
+                    projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
                     projectionComponent1.SetLabelVisible(false);
                     projectionComponent2.SetLabelVisible(true);
 
@@ -517,7 +517,7 @@ namespace Assets.Scripts.Experimental
                 var endPosition = cursorPositionProjection + startPositionOffsetFromAxis;
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+                lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
 
                 if (isEnd)
                 {
@@ -572,7 +572,7 @@ namespace Assets.Scripts.Experimental
                 var endPosition = startPosition + vDrawnLinePerpendicular;
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+                lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
 
                 if (isEnd)
                 {
