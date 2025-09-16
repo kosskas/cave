@@ -727,7 +727,14 @@ namespace Assets.Scripts.Experimental
                 lineComponent.EnabledLabels = true;
                 lineComponent.ColliderEnabled = true;
             
-                labels.ForEach(label => lineComponent.AddLabel(label));
+                labels.ForEach(label =>
+                {
+                    float tmp;
+                    if (float.TryParse(label, out tmp))
+                        return;
+
+                    lineComponent.AddLabel(label);
+                });
 
                 var startPointLabel = boundPointsByLabel.ElementAtOrDefault(0);
                 var endPointLabel = boundPointsByLabel.ElementAtOrDefault(1);
@@ -754,7 +761,6 @@ namespace Assets.Scripts.Experimental
                     return;
 
                 lineComponent.BindPoints(startPoint, startPointLabel, endPoint, endPointLabel);
-                //
             });
         }
 

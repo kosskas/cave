@@ -43,7 +43,7 @@ namespace Assets.Scripts.Experimental.Items
             }
         }
 
-        void Start()
+        void Awake()
         {
             _pointObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             _pointObject.transform.SetParent(gameObject.transform);
