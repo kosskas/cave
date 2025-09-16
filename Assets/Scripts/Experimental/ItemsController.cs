@@ -250,7 +250,8 @@ namespace Assets.Scripts.Experimental
             ExContext context, 
             IRaycastable hitObject,
             Vector3 hitPosition, 
-            WallInfo hitPlane)
+            WallInfo hitPlane,
+            Line relativeLine = null)
         {
             // FIND PLANE
 
@@ -275,9 +276,9 @@ namespace Assets.Scripts.Experimental
                 
                 case ExContext.Line: return DrawLine(plane, positionWithPointSensitivity);
 
-                case ExContext.PerpendicularLine: return DrawLinePerpendicularToAxis(plane, positionWithPointSensitivity);
+                case ExContext.PerpendicularLine: return DrawLinePerpendicularToLine(plane, positionWithPointSensitivity, relativeLine);
 
-                case ExContext.ParallelLine: return DrawLineParallelToAxis(plane, positionWithPointSensitivity);
+                case ExContext.ParallelLine: return DrawLineParallelToLine(plane, positionWithPointSensitivity, relativeLine);
 
                 case ExContext.Circle: return DrawCircle(plane, positionWithPointSensitivity);
 
@@ -324,7 +325,7 @@ namespace Assets.Scripts.Experimental
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
 
-                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+                lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
 
                 if (isEnd)
                 {
@@ -361,7 +362,7 @@ namespace Assets.Scripts.Experimental
                 var endPositionWithPointSensitivity = CalcPosition(plane, hitPosition, hitObject as ExPoint);
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
-                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+                lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
 
                 if (isEnd)
                 {
@@ -445,7 +446,7 @@ namespace Assets.Scripts.Experimental
                     projectionComponent1.Draw(default(WallInfo), default(Vector3), endPosition);
                     projectionComponent2.Draw(default(WallInfo), startPosition, endPosition);
 
-                    projectionComponent1.SetLabel(Vector3.Distance(startPosition, startPositionProjection));
+                    projectionComponent1.SetLabel(Vector3.Distance(startPosition, endPosition));
                     projectionComponent1.SetLabelVisible(true);
                     projectionComponent2.SetLabelVisible(false);
 
@@ -463,7 +464,7 @@ namespace Assets.Scripts.Experimental
                     
                     projectionComponent2.Draw(endPlane, endPosition, default(Vector3));
 
-                    projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, hitPosition));
+                    projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
                     projectionComponent1.SetLabelVisible(false);
                     projectionComponent2.SetLabelVisible(true);
 
@@ -485,7 +486,7 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public DrawAction DrawLineParallelToAxis(WallInfo plane, Vector3 startPosition, float lineWidth = _HELP_LINE_WIDTH)
+        public DrawAction DrawLineParallelToLine(WallInfo plane, Vector3 startPosition, Line relativeLine = null)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -493,28 +494,30 @@ namespace Assets.Scripts.Experimental
 
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
-            lineComponent.Width = 0.002f;
+            lineComponent.Width = _HELP_LINE_WIDTH;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
             lineComponent.SetLabelVisible(true);
 
-            var axis = GetAxis(plane);
-            var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
-            var startPositionOffsetFromAxis = startPosition - startPositionProjection;
-        
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
                 if (plane != FindPlane(hitPlane, hitObject))
                     return;
 
+                if (relativeLine == null)
+                    return;
+
+                var startPositionProjection = CalcProjectionOnAxis(relativeLine.StartPosition, relativeLine.EndPosition, startPosition);
+                var startPositionOffsetFromAxis = startPosition - startPositionProjection;
+
                 var cursorPosition = CalcPosition(plane, hitPosition);
 
-                var cursorPositionProjection = CalcProjectionOnAxis(axis, cursorPosition);
+                var cursorPositionProjection = CalcProjectionOnAxis(relativeLine.StartPosition, relativeLine.EndPosition, cursorPosition);
 
                 var endPosition = cursorPositionProjection + startPositionOffsetFromAxis;
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+                lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
 
                 if (isEnd)
                 {
@@ -524,7 +527,7 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public DrawAction DrawLinePerpendicularToAxis(WallInfo plane, Vector3 startPosition, float lineWidth = _HELP_LINE_WIDTH)
+        public DrawAction DrawLinePerpendicularToLine(WallInfo plane, Vector3 startPosition, Line relativeLine = null)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -532,25 +535,44 @@ namespace Assets.Scripts.Experimental
 
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
-            lineComponent.Width = 0.002f;
+            lineComponent.Width = _HELP_LINE_WIDTH;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
             lineComponent.SetLabelVisible(true);
-
-            var axis = GetAxis(plane);
-            var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
                 if (plane != FindPlane(hitPlane, hitObject))
                     return;
 
+                if (relativeLine == null)
+                    return;
+
                 var cursorPosition = CalcPosition(plane, hitPosition);
 
-                var endPosition = CalcProjectionOnAxis(startPosition, startPositionProjection, cursorPosition);
-        
+                var vRelativeLine = relativeLine.EndPosition - relativeLine.StartPosition;
+                var vDrawnLine = cursorPosition - startPosition;
+
+                if (vDrawnLine.magnitude < 1e-8f)
+                    return; // vDrawnLine zdegenerowany
+
+                if (vRelativeLine.sqrMagnitude < 1e-12f) 
+                    return; // vRelativeLine zdegenerowany
+
+                var dirRelativeLine = vRelativeLine.normalized;
+
+                // Usuñ sk³adow¹ vDrawnLine wzd³u¿ vRelativeLine (rzut na p³aszczyznê prostopad³¹ do vRelativeLine)
+                var vDrawnLinePerpendicular = vDrawnLine - Vector3.Dot(vDrawnLine, dirRelativeLine) * dirRelativeLine;
+
+                if (vDrawnLinePerpendicular.sqrMagnitude < 1e-12f)
+                    return; // gdy vDrawnLine by³ równoleg³y do vRelativeLine
+
+                vDrawnLinePerpendicular = vDrawnLinePerpendicular.normalized * vDrawnLine.magnitude;
+
+                var endPosition = startPosition + vDrawnLinePerpendicular;
+
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-                lineComponent.SetLabel(Vector3.Distance(startPosition, hitPosition));
+                lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
 
                 if (isEnd)
                 {
