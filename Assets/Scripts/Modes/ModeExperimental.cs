@@ -34,6 +34,8 @@ public class ModeExperimental : IMode
     private DrawAction _drawAction;
 
     private RadialMenu radialMenu;
+
+    private Line _relativeLine;
     
     /* * * * CONTEXT ACTIONS begin * * * */
 
@@ -45,13 +47,27 @@ public class ModeExperimental : IMode
 
         if (_drawAction == null)
         {
-            _drawAction = _items.Add(_context.Current.Key, hitObject, hitPosition, hitWall);
+            _drawAction = _items.Add(_context.Current.Key, hitObject, hitPosition, hitWall, _relativeLine);
         }
         else
         {
             _drawAction(hitObject, hitPosition, hitWall, true);
             _drawAction = null;
+            _relativeLine = null;
         }
+    }
+
+    private void ActRelativeToLine()
+    {
+        var relativeLine = _hitObject as Line;
+
+        if (_relativeLine == null)
+        {
+            _relativeLine = relativeLine;
+            return;
+        }
+
+        Act();
     }
 
     /* * * * CONTEXT ACTIONS end * * * */
@@ -333,8 +349,8 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Line, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToLine),
+                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToLine),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Wall, Act)
