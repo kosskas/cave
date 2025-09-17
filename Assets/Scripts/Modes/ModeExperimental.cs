@@ -37,7 +37,7 @@ public class ModeExperimental : IMode
 
     private Line _relativeLine;
     
-    private bool _isRaycastLocked = false;
+    public bool _isRaycastLocked = false;
 
     /* * * * CONTEXT ACTIONS begin * * * */
 
@@ -396,10 +396,9 @@ public class ModeExperimental : IMode
         //_controlMenuView = new ExControlMenuView();
 
         PointsList.ShowListAndLogs();
-        
-        AddRadialMenu();
 
         SetUpFlystick();
+        AddRadialMenu();
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
@@ -586,7 +585,7 @@ public class ModeExperimental : IMode
         FlystickController.SetAction(
             FlystickController.Btn.FIRE,
             FlystickController.ActOn.PRESS,
-            _MakeActionOnWall
+            _ToggleRaycastLock
         );
 
         FlystickController.SetAction(

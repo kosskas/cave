@@ -232,16 +232,16 @@ public class FlystickController : MonoBehaviour
                             Lzwp.input.flysticks[0].GetButton(LzwpInput.Flystick.ButtonID.Joystick).OnRelease += action;
                             break;
                         case ActOn.TILT_LEFT:
-                            _OnJoystickTiltedLeft = action;
+                            _OnJoystickTiltedLeft += action;
                             break;
                         case ActOn.TILT_RIGHT:
-                            _OnJoystickTiltedRight = action;
+                            _OnJoystickTiltedRight += action;
                             break;
                         case ActOn.TILT_UP:
-                            _OnJoystickTiltedUp = action;
+                            _OnJoystickTiltedUp += action;
                             break;
                         case ActOn.TILT_DOWN:
-                            _OnJoystickTiltedDown = action;
+                            _OnJoystickTiltedDown += action;
                             break;
                         default:
                             break;

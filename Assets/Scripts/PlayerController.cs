@@ -81,6 +81,8 @@ public class PlayerController : MonoBehaviour
 
     private void _UpdateRaycasting()
     {
+        _ray.origin = _flystickController.RayLineOrigin;
+        _ray.direction = _flystickController.RayLineDirection;
         //_ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         if (LockedRaycastObject != null)
@@ -99,8 +101,6 @@ public class PlayerController : MonoBehaviour
         }
 
         // Tryb bez locka – normalny raycast
-        _ray.origin = _flystickController.RayLineOrigin;
-        _ray.direction = _flystickController.RayLineDirection;
         Physics.Raycast(_ray, out Hit, 100);
         LockedRayPoint = Hit.point;
     }

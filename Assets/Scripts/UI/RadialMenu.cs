@@ -52,6 +52,7 @@ public class RadialMenu : MonoBehaviour
             FlystickController.ActOn.TILT_LEFT,
             () =>
             {
+                if (modeExperimental._isRaycastLocked || !menu.isMenuActive) return;
                 menu.Select((menu.selectedIndex - 1 + menu.itemCount) % menu.itemCount);
                 modeExperimental._ChangeDrawContextPrev();
             }
@@ -61,6 +62,7 @@ public class RadialMenu : MonoBehaviour
             FlystickController.ActOn.TILT_RIGHT,
             () =>
             {
+                if (modeExperimental._isRaycastLocked || !menu.isMenuActive) return;
                 menu.Select((menu.selectedIndex + 1 + menu.itemCount) % menu.itemCount);
                 modeExperimental._ChangeDrawContextNext();
             }

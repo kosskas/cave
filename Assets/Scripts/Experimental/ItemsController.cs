@@ -20,8 +20,8 @@ namespace Assets.Scripts.Experimental
         private const float _WALL_HALF_LENGTH = 1.7f;
         private const float _OFFSET_FROM_WALL = 0.01f;
             
-        private const float _HELP_LINE_WIDTH = 0.002f;
-        private const float _BOLD_LINE_WIDTH = 0.005f;
+        private const float _HELP_LINE_WIDTH = 0.0035f;
+        private const float _BOLD_LINE_WIDTH = 0.008f;
 
         private readonly GameObject _workspace;
         private GameObject _axisRepo;
@@ -408,7 +408,7 @@ namespace Assets.Scripts.Experimental
             var projectionComponent1 = projection1.AddComponent<Line>();
             projectionComponent1.ColliderEnabled = false;
             projectionComponent1.EnabledLabels = true;
-            projectionComponent1.Width = 0.002f;
+            projectionComponent1.Width = lineWidth;
             projectionComponent1.Draw(startPlane, startPosition, startPosition);
             projectionComponent1.SetLabelVisible(true);
 
@@ -419,7 +419,7 @@ namespace Assets.Scripts.Experimental
             var projectionComponent2 = projection2.AddComponent<Line>();
             projectionComponent2.ColliderEnabled = false;
             projectionComponent2.EnabledLabels = true;
-            projectionComponent2.Width = 0.002f;
+            projectionComponent2.Width = lineWidth;
             projectionComponent2.Draw(startPlane, startPosition, startPosition);
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
