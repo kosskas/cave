@@ -335,10 +335,10 @@ public class ModeExperimental : IMode
         _fc = mainObject.AddComponent<FacesGenerator>();
 
         _items = new ItemsController(_wc, _wcrt, _fc);
-        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall1"));
-        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall2"));
+        // _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall1"));
+        // _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall2"));
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall4"));
-        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall6"));
+        // _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall6"));
 
         // to i inne boczne nie dziala
         // _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall6"));

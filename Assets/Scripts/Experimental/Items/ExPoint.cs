@@ -151,9 +151,13 @@ namespace Assets.Scripts.Experimental.Items
 
         // ILABELABLE interface
 
-        private const char DefaultLabelText = ' ';
-        private const string LabelTexts = "ABCDEFGHIJKLMNOPRQSTUVWXYZ123456789";
-        private readonly CircularIterator<char> _labelTexts = new CircularIterator<char>($"{DefaultLabelText}{LabelTexts}".ToList());
+        private const string DefaultLabelText = " ";
+
+        private static readonly List<string> LabelTexts = " ABCDEFGHIJKLMNOPRQSTUVWXYZ123456789".Select(c => c.ToString())
+            .Concat(new[] { "I","II","III","IV","V","VI","VII","VIII","IX","X" })
+            .ToList();
+
+        private readonly CircularIterator<string> _labelTexts = new CircularIterator<string>(LabelTexts);
 
         public bool EnabledLabels { get; set; } = false;
 
@@ -182,7 +186,7 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 _labelComponent = gameObject.AddComponent<IndexedLabel>();
             
-            _labelComponent.AddLabel(DefaultLabelText.ToString(), new string('\'', Plane.number), "");
+            _labelComponent.AddLabel(DefaultLabelText.ToString(), new string('\'', Plane.numberExp), "");
             
             NextText();
 
