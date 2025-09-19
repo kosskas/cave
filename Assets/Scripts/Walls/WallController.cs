@@ -248,6 +248,16 @@ public class WallController : MonoBehaviour {
             ResetProjection();
         } 
     }
+
+    public WallInfo GetLastAddedWall()
+    {
+        if (playerAddedWalls != null && playerAddedWalls.Count > 0)
+        {
+            return playerAddedWalls[playerAddedWalls.Count - 1];
+        }
+
+        return null;
+    }
     /// <summary>
     /// Pobiera listę ścian i ją zwraca
     /// </summary>

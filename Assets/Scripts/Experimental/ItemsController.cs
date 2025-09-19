@@ -29,7 +29,7 @@ namespace Assets.Scripts.Experimental
         private GameObject _pointRepo;
         private GameObject _circleRepo;
 
-        private readonly Dictionary<Axis, Tuple<WallInfo, WallInfo>> _axisWalls;
+        private Dictionary<Axis, Tuple<WallInfo, WallInfo>> _axisWalls;
 
 
         /* PRIVATE METHODS */
@@ -245,7 +245,24 @@ namespace Assets.Scripts.Experimental
             _wc.LinkConstructionToWall(planeA, axis);
             _wc.LinkConstructionToWall(planeB, axis);
         }
-
+        public void RemoveLastAxis()
+        {
+            if (_axisWalls != null && _axisWalls.Count > 0 && _wc != null)
+            {
+                var deletingWall = _wc.GetLastAddedWall();
+                if (deletingWall != null)
+                {
+                    var keysToRemove = _axisWalls
+                        .Where(pair => pair.Value.Item1 == deletingWall || pair.Value.Item2 == deletingWall)
+                        .Select(pair => pair.Key)
+                        .ToList();
+                    foreach (var key in keysToRemove)
+                    {
+                        _axisWalls.Remove(key);
+                    }
+                }
+            }
+        }
         public DrawAction Add(
             ExContext context, 
             IRaycastable hitObject,
