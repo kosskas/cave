@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Purchasing;
 using UnityEngine.UI;
 
 /// <summary>
@@ -18,6 +19,8 @@ public class WallInfo
     /// Numer ściany
     /// </summary>
     public int number;
+
+    public int numberExp;
     /// <summary>
     /// Nazwa ściany
     /// </summary>
@@ -75,6 +78,19 @@ public class WallInfo
         this.showReferenceLines = showReferenceLines;
         this.canDelete = canDelete;
         this.parentName = parentName;
+
+        switch (number)
+        {
+            case 1:
+                this.numberExp = 3;
+                break;
+            case 3:
+                this.numberExp = 1;
+                break;
+            default:
+                this.numberExp = number;
+                break;
+        }
     }
 
     /// <summary>

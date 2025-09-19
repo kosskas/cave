@@ -199,7 +199,7 @@ namespace Assets.Scripts.Experimental
             axisComponent.Draw(default(WallInfo), from, to);
 
             var labelComponent = axis.AddComponent<IndexedLabel>();
-            labelComponent.AddLabel("X", "", $"{planeA.number}/{planeB.number}");
+            labelComponent.AddLabel("X", "", $"{planeA.numberExp}/{planeB.numberExp}");
             labelComponent.FontSize = 1;
 
             _axisWalls.Add(axisComponent, new Tuple<WallInfo, WallInfo>(planeA, planeB));
@@ -238,7 +238,7 @@ namespace Assets.Scripts.Experimental
             axisComponent.Draw(default(WallInfo), from, to);
 
             var labelComponent = axis.AddComponent<IndexedLabel>();
-            labelComponent.AddLabel("X", "", $"{planeA.number}/{planeB.number}");
+            labelComponent.AddLabel("X", "", $"{planeA.numberExp}/{planeB.numberExp}");
             labelComponent.FontSize = 1;
 
             _axisWalls.Add(axisComponent, new Tuple<WallInfo, WallInfo>(planeA, planeB));
@@ -727,7 +727,14 @@ namespace Assets.Scripts.Experimental
                 lineComponent.EnabledLabels = true;
                 lineComponent.ColliderEnabled = true;
             
-                labels.ForEach(label => lineComponent.AddLabel(label));
+                labels.ForEach(label =>
+                {
+                    float tmp;
+                    if (float.TryParse(label, out tmp))
+                        return;
+
+                    lineComponent.AddLabel(label);
+                });
 
                 var startPointLabel = boundPointsByLabel.ElementAtOrDefault(0);
                 var endPointLabel = boundPointsByLabel.ElementAtOrDefault(1);
@@ -754,7 +761,6 @@ namespace Assets.Scripts.Experimental
                     return;
 
                 lineComponent.BindPoints(startPoint, startPointLabel, endPoint, endPointLabel);
-                //
             });
         }
 
