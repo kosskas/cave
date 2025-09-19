@@ -333,6 +333,8 @@ namespace Assets.Scripts.Experimental
             lineComponent.EnabledLabels = true;
             lineComponent.SetLabelVisible(true);
 
+            var collidedLines = new HashSet<IAnalyzable>();
+
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
                 if (plane != FindPlane(hitPlane, hitObject))
@@ -344,6 +346,12 @@ namespace Assets.Scripts.Experimental
 
                 lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
 
+                // Check for collision with other lines or circles
+                if (hitObject is IAnalyzable)
+                {
+                    collidedLines.Add((IAnalyzable)hitObject);
+                }
+                
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
@@ -353,6 +361,15 @@ namespace Assets.Scripts.Experimental
                     if (startPoint != null && endPoint != null)
                     {
                         lineComponent.BindPoints(startPoint, endPoint);
+                    }
+
+                    foreach (var vaAnalyzable in collidedLines)
+                    {
+                        List<Vector3> found = vaAnalyzable.FindCrossingPoints(lineComponent);
+                        if (found != null)
+                        {
+                            DrawPoint(plane, found[0]);
+                        }
                     }
                 }
             };

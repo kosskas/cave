@@ -9,7 +9,7 @@ using UnityEngine.Analytics;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Circle : MonoBehaviour, IDrawable, IRaycastable
+    public class Circle : MonoBehaviour, IDrawable, IRaycastable, IAnalyzable
     {
         private Color ColorNormal = ReconstructionInfo.NORMAL;
         private Color ColorFocused = ReconstructionInfo.FOCUSED;
@@ -110,6 +110,16 @@ namespace Assets.Scripts.Experimental.Items
         public void OnHoverExit()
         {
             _circleRenderer.material.color = ColorNormal;
+        }
+
+        // IAnalyzable interface
+        public List<Vector3> FindCrossingPoints(IAnalyzable obj)
+        {
+            return null;
+        }
+        public string GetName()
+        {
+            return gameObject.name;
         }
     }
 }

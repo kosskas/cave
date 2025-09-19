@@ -10,7 +10,7 @@ using static UnityEngineInternal.Input.NativeTrackingEvent;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable
+    public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable, IAnalyzable
     {
         private Color ColorNormal = Color.black;
 
@@ -302,5 +302,51 @@ namespace Assets.Scripts.Experimental.Items
             _labelTexts.NextWhile(current => current.ToString() != text);
         }
 
+        // IAnalyzable interface
+        public List<Vector3> FindCrossingPoints(IAnalyzable obj)
+        {
+            const float eps = 1e-5f;
+            if (obj is Line)
+            {
+                var crossObj = obj as Line;
+                Vector3 p1 = this.StartPosition;
+                Vector3 n1 = (this.EndPosition - this.StartPosition);
+                Vector3 p2 = crossObj.StartPosition;
+                Vector3 n2 = (crossObj.EndPosition - crossObj.StartPosition);
+
+                Vector3 r = p1 - p2;
+                float a = Vector3.Dot(n1, n1);
+                float b = Vector3.Dot(n1, n2);
+                float c = Vector3.Dot(n2, n2);
+                float d = Vector3.Dot(n1, r);
+                float e = Vector3.Dot(n2, r);
+
+                float mian = a * c - b * b;
+                if (Mathf.Abs(mian) < eps)
+                {
+                    //Debug.LogError("Proste są równoległe lub prawie równoległe.");
+                    return null;
+                }
+
+                float t = (b * e - c * d) / mian;
+                float s = (a * e - b * d) / mian;
+
+                Vector3 point1 = p1 + t * n1;
+                Vector3 point2 = p2 + s * n2;
+
+                Vector3 intersection = (point1 + point2) * 0.5f;
+
+                return new List<Vector3> { intersection };
+
+            }
+
+            return null;
+
+        }
+
+        public string GetName()
+        {
+            return gameObject.GetHashCode().ToString();
+        }
     }
 }

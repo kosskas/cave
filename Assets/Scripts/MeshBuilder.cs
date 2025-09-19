@@ -622,8 +622,8 @@ public class MeshBuilder : MonoBehaviour
          * 1. at - bs = d
          * 2. bt - cs = e
          *
-         * s = (bd - ae) / (b^2 + ac)
-         * t = (cd - be) / (b^2 + ac)
+         * s = (ae - bd) / (b^2 - ac)
+         * t = (be - cd) / (b^2 - ac)
          *
          *
          * Rzut jest wtedy kiedy s = t, czyli najkrótszy odcinek jest punktem
@@ -647,15 +647,15 @@ public class MeshBuilder : MonoBehaviour
         float d = - Vector3.Dot(n1, r);
         float e = - Vector3.Dot(n2, r);
 
-        float mian = b * b + a * c;
+        float mian = b * b - a * c;
         if (Mathf.Abs(mian) < eps)
         {
             Debug.LogError($"Płaszczyzny są równoległe lub prawie równoległe – brak przecięcia. n1={n1}, n2={n2}");
             return Vector3.zero;
         }
 
-        float t = (c * d + b * e) / mian;
-        float s = (b * d - a * e) / mian;
+        float t = (b * e - c * d) / mian;
+        float s = (a * e - b * d) / mian;
 
         Vector3 point1 = p1 + t * n1;
         Vector3 point2 = p2 + s * n2;
