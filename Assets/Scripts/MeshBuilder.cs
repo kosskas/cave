@@ -7,6 +7,7 @@ using System.Threading;
 using System.Xml.Serialization;
 using System.Reflection;
 using Assets.Scripts.Experimental.Items;
+using Assets.Scripts.Experimental.Utils;
 
 /// <summary>
 /// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi.
@@ -587,45 +588,8 @@ public class MeshBuilder : MonoBehaviour
     private Vector3 CalcPosIn3D(PointProjection proj1, PointProjection proj2)
     {
         /* Komentarz
-         * ( '*' to możenie skalarne, czyli powstaje liczba)
-         * Proste:
-         * l1(t) = p1 + t * n1
-         * l2(s) = p2 + s * n2
-         *
-         * Szukamy najkrótszego odcinka (t, s) między prostymi l1 i l2 takiego że 't' in l1, 's' in l2
-         *
-         * Funkcja odl. d(s, t) = |l1(t) - l2(s)|^2
-         * Szukamy takich 's' i 't', że 'd' jest MIN
-         * MIN jest wtedy kiedy d'(t) = d'(s) = 0
-         *
-         * d'(t) = 2n1 (p1 - p2 - s*n2 + t*n1) = 0
-         * d'(s) = -2u2 (p1 - p2 - s*n2 + t*n1) = 0
-         *
-         * dla uproszczenia r = p1 - p2
-         *
-         * Układ równań (to wektory więc nie można dzielić)
-         * 1. n1 (r - s*n2 + t*n1) = 0
-         * 2. n2 (r - s*n2 + t*n1) = 0
-         * 
-         * 1. n1*n1 * t - n1*n2 * s = -n1 * r
-         * 2. n1*n2 * t - n2*n2 * s = -n2 * r
-         *
-         * Niech:
-         * a = n1 * n1 
-         * b = n1 * n2
-         * c = n2 * n2
-         * d = -n1 * r
-         * e = -n2 * r
-         *
-         * Czyli mamy po uproszczeniu
-         *
-         * 1. at - bs = d
-         * 2. bt - cs = e
-         *
-         * s = (ae - bd) / (b^2 - ac)
-         * t = (be - cd) / (b^2 - ac)
-         *
-         *
+         * Zobacz FindLLIntersections
+         * Dodatkowo trzeba sprawdzić czy płaszczyzny nie są prostopadłe
          * Rzut jest wtedy kiedy s = t, czyli najkrótszy odcinek jest punktem
          */
         const float eps = 1e-5f;
@@ -639,27 +603,15 @@ public class MeshBuilder : MonoBehaviour
             return Vector3.zero;
         }
 
-        Vector3 r = p1 - p2;
-
-        float a = Vector3.Dot(n1, n1);
-        float b = Vector3.Dot(n1, n2);
-        float c = Vector3.Dot(n2, n2);
-        float d = - Vector3.Dot(n1, r);
-        float e = - Vector3.Dot(n2, r);
-
-        float mian = b * b - a * c;
-        if (Mathf.Abs(mian) < eps)
+        Tuple<Vector3, Vector3> result = DescriptiveMathLib.FindLLIntersections(p1, n1, p2, n2);
+        if (result == null)
         {
-            Debug.LogError($"Płaszczyzny są równoległe lub prawie równoległe – brak przecięcia. n1={n1}, n2={n2}");
             return Vector3.zero;
         }
 
-        float t = (b * e - c * d) / mian;
-        float s = (a * e - b * d) / mian;
-
-        Vector3 point1 = p1 + t * n1;
-        Vector3 point2 = p2 + s * n2;
-
+        Vector3 point1 = result.Item1;
+        Vector3 point2 = result.Item2;
+        if(Vector3.SqrMagnitude(point1 - point2) > eps)
         if (point1 != point2)
         {
             Debug.LogError($"Nierzut: point1={point1}, point2={point2}");

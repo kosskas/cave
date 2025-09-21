@@ -9,8 +9,9 @@ namespace Assets.Scripts.Experimental
 {
     public interface IAnalyzable
     {
-        string GetName();
         List<Vector3> FindCrossingPoints(IAnalyzable obj);
+
+        IAnalyzable GetElement();
     }
 }
 

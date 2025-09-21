@@ -115,11 +115,34 @@ namespace Assets.Scripts.Experimental.Items
         // IAnalyzable interface
         public List<Vector3> FindCrossingPoints(IAnalyzable obj)
         {
+            Line crossLineObj = null;
+            Circle crossCircleObj = null;
+            if (obj is Line)
+            {
+                crossLineObj = (Line)obj;
+                Vector3 A = crossLineObj.StartPosition;
+                Vector3 B = crossLineObj.EndPosition;
+                Vector3 S = this.StartPosition;
+                float r = this._radius;
+
+                return DescriptiveMathLib.FindLCIntersections(A, B, S, r);
+
+            }
+            if (obj is Circle)
+            {
+                crossCircleObj = (Circle)obj;
+                Vector3 S1 = this.StartPosition;
+                Vector3 A1 = this.EndPosition;
+                Vector3 S2 = crossCircleObj.StartPosition;
+                Vector3 B2 = crossCircleObj.EndPosition;
+
+                return DescriptiveMathLib.FindCCIntersections(S1, A1, S2, B2);
+            }
             return null;
         }
-        public string GetName()
+        public IAnalyzable GetElement()
         {
-            return gameObject.name;
+            return this;
         }
     }
 }

@@ -305,48 +305,45 @@ namespace Assets.Scripts.Experimental.Items
         // IAnalyzable interface
         public List<Vector3> FindCrossingPoints(IAnalyzable obj)
         {
-            const float eps = 1e-5f;
+            Line crossLineObj = null;
+            Circle crossCircleObj = null;
             if (obj is Line)
             {
-                var crossObj = obj as Line;
+                crossLineObj = (Line)obj;
                 Vector3 p1 = this.StartPosition;
                 Vector3 n1 = (this.EndPosition - this.StartPosition);
-                Vector3 p2 = crossObj.StartPosition;
-                Vector3 n2 = (crossObj.EndPosition - crossObj.StartPosition);
+                Vector3 p2 = crossLineObj.StartPosition;
+                Vector3 n2 = (crossLineObj.EndPosition - crossLineObj.StartPosition);
 
-                Vector3 r = p1 - p2;
-                float a = Vector3.Dot(n1, n1);
-                float b = Vector3.Dot(n1, n2);
-                float c = Vector3.Dot(n2, n2);
-                float d = Vector3.Dot(n1, r);
-                float e = Vector3.Dot(n2, r);
-
-                float mian = a * c - b * b;
-                if (Mathf.Abs(mian) < eps)
+                Tuple<Vector3, Vector3> result = DescriptiveMathLib.FindLLIntersections(p1, n1, p2, n2);
+                if (result == null)
                 {
-                    //Debug.LogError("Proste są równoległe lub prawie równoległe.");
                     return null;
                 }
 
-                float t = (b * e - c * d) / mian;
-                float s = (a * e - b * d) / mian;
-
-                Vector3 point1 = p1 + t * n1;
-                Vector3 point2 = p2 + s * n2;
+                Vector3 point1 = result.Item1;
+                Vector3 point2 = result.Item2;
 
                 Vector3 intersection = (point1 + point2) * 0.5f;
 
                 return new List<Vector3> { intersection };
 
             }
+            if (obj is Circle)
+            {
+                crossCircleObj = (Circle)obj;
+                Vector3 A = this.StartPosition;
+                Vector3 B = this.EndPosition;
+                Vector3 S = crossCircleObj.StartPosition;
+                float r = Vector3.Distance(crossCircleObj.EndPosition, crossCircleObj.StartPosition);
 
+                return DescriptiveMathLib.FindLCIntersections(A, B, S, r);
+            }
             return null;
-
         }
-
-        public string GetName()
+        public IAnalyzable GetElement()
         {
-            return gameObject.GetHashCode().ToString();
+            return this;
         }
     }
 }
