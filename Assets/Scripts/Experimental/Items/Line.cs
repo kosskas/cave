@@ -10,7 +10,7 @@ using static UnityEngineInternal.Input.NativeTrackingEvent;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable
+    public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable, IAnalyzable
     {
         private Color ColorNormal = Color.black;
 
@@ -302,5 +302,48 @@ namespace Assets.Scripts.Experimental.Items
             _labelTexts.NextWhile(current => current.ToString() != text);
         }
 
+        // IAnalyzable interface
+        public List<Vector3> FindCrossingPoints(IAnalyzable obj)
+        {
+            Line crossLineObj = null;
+            Circle crossCircleObj = null;
+            if (obj is Line)
+            {
+                crossLineObj = (Line)obj;
+                Vector3 p1 = this.StartPosition;
+                Vector3 n1 = (this.EndPosition - this.StartPosition);
+                Vector3 p2 = crossLineObj.StartPosition;
+                Vector3 n2 = (crossLineObj.EndPosition - crossLineObj.StartPosition);
+
+                Tuple<Vector3, Vector3> result = DescriptiveMathLib.FindLLIntersections(p1, n1, p2, n2);
+                if (result == null)
+                {
+                    return null;
+                }
+
+                Vector3 point1 = result.Item1;
+                Vector3 point2 = result.Item2;
+
+                Vector3 intersection = (point1 + point2) * 0.5f;
+
+                return new List<Vector3> { intersection };
+
+            }
+            if (obj is Circle)
+            {
+                crossCircleObj = (Circle)obj;
+                Vector3 A = this.StartPosition;
+                Vector3 B = this.EndPosition;
+                Vector3 S = crossCircleObj.StartPosition;
+                float r = Vector3.Distance(crossCircleObj.EndPosition, crossCircleObj.StartPosition);
+
+                return DescriptiveMathLib.FindLCIntersections(A, B, S, r);
+            }
+            return null;
+        }
+        public IAnalyzable GetElement()
+        {
+            return this;
+        }
     }
 }

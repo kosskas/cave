@@ -299,6 +299,11 @@ public class ModeExperimental : IMode
         });
     }
 
+    private void _RemoveLastWall()
+    {
+        _items.RemoveLastAxis();
+        _wc.PopBackWall();
+    }
     /* * * * INPUT HANDLERS end * * * */
 
 
@@ -483,7 +488,7 @@ public class ModeExperimental : IMode
 
         if (Input.GetKeyDown("p"))
         {
-            _wc.PopBackWall();
+            _RemoveLastWall();
         }
 
         if (Input.GetKeyDown("v"))

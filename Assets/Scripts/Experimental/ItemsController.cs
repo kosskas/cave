@@ -29,7 +29,7 @@ namespace Assets.Scripts.Experimental
         private GameObject _pointRepo;
         private GameObject _circleRepo;
 
-        private readonly Dictionary<Axis, Tuple<WallInfo, WallInfo>> _axisWalls;
+        private Dictionary<Axis, Tuple<WallInfo, WallInfo>> _axisWalls;
 
 
         /* PRIVATE METHODS */
@@ -245,7 +245,24 @@ namespace Assets.Scripts.Experimental
             _wc.LinkConstructionToWall(planeA, axis);
             _wc.LinkConstructionToWall(planeB, axis);
         }
-
+        public void RemoveLastAxis()
+        {
+            if (_axisWalls != null && _axisWalls.Count > 0 && _wc != null)
+            {
+                var deletingWall = _wc.GetLastAddedWall();
+                if (deletingWall != null)
+                {
+                    var keysToRemove = _axisWalls
+                        .Where(pair => pair.Value.Item1 == deletingWall || pair.Value.Item2 == deletingWall)
+                        .Select(pair => pair.Key)
+                        .ToList();
+                    foreach (var key in keysToRemove)
+                    {
+                        _axisWalls.Remove(key);
+                    }
+                }
+            }
+        }
         public DrawAction Add(
             ExContext context, 
             IRaycastable hitObject,
@@ -316,6 +333,8 @@ namespace Assets.Scripts.Experimental
             lineComponent.EnabledLabels = true;
             lineComponent.SetLabelVisible(true);
 
+            var intersectedObjs = new HashSet<IAnalyzable>();
+
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
                 if (plane != FindPlane(hitPlane, hitObject))
@@ -327,6 +346,12 @@ namespace Assets.Scripts.Experimental
 
                 lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
 
+                if (hitObject is IAnalyzable)
+                {
+                    IAnalyzable aHitObject = (IAnalyzable)hitObject;
+                    intersectedObjs.Add(aHitObject.GetElement());
+                }
+                
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
@@ -337,10 +362,23 @@ namespace Assets.Scripts.Experimental
                     {
                         lineComponent.BindPoints(startPoint, endPoint);
                     }
+
+                    foreach (var intersected in intersectedObjs)
+                    {
+                        List<Vector3> crossings = intersected.FindCrossingPoints(lineComponent);
+                        if (crossings != null)
+                        {
+                            foreach (var point in crossings)
+                            {
+                                if(Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
+                                DrawPoint(plane, point);
+                            }
+                        }
+                    }
                 }
             };
         }
-
+        /// TODO Przeciecia sa niedostepne dla scian
         public DrawAction DrawWall(WallInfo plane, Vector3 startPosition)
         {
             var line = new GameObject("LINE");
@@ -363,7 +401,7 @@ namespace Assets.Scripts.Experimental
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
                 lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
-
+                
                 if (isEnd)
                 {
                     UnityEngine.Object.Destroy(line);
@@ -384,6 +422,8 @@ namespace Assets.Scripts.Experimental
             circleComponent.ColliderEnabled = false;
             circleComponent.Width = lineWidth;
             circleComponent.Draw(plane, startPosition, startPosition);
+            
+            var intersectedObjs = new HashSet<IAnalyzable>();
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
@@ -394,8 +434,28 @@ namespace Assets.Scripts.Experimental
 
                 circleComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
 
+                if (hitObject is IAnalyzable)
+                {
+                    IAnalyzable aHitObject = (IAnalyzable)hitObject;
+                    intersectedObjs.Add(aHitObject.GetElement());
+                }
+
                 if (isEnd)
+                {
                     circleComponent.ColliderEnabled = true;
+                    foreach (var intersected in intersectedObjs)
+                    {
+                        List<Vector3> crossings = intersected.FindCrossingPoints(circleComponent);
+                        if (crossings != null)
+                        {
+                            foreach (var point in crossings)
+                            {
+                                if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
+                                DrawPoint(plane, point);
+                            }
+                        }
+                    }
+                }
             };
         }
 
@@ -422,6 +482,9 @@ namespace Assets.Scripts.Experimental
             projectionComponent2.Width = lineWidth;
             projectionComponent2.Draw(startPlane, startPosition, startPosition);
 
+            var intersectedObjsPl1 = new HashSet<IAnalyzable>();
+            var intersectedObjsPl2 = new HashSet<IAnalyzable>();
+
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
                 if (startPlane == default(WallInfo))
@@ -439,6 +502,7 @@ namespace Assets.Scripts.Experimental
                 var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
                 var cursorPosition = CalcPosition(endPlane, hitPosition);
 
+
                 if (startPlane == currPlane)
                 {
                     var endPosition = CalcProjectionOnAxis(startPosition, startPositionProjection, cursorPosition);
@@ -449,6 +513,12 @@ namespace Assets.Scripts.Experimental
                     projectionComponent1.SetLabel(Vector3.Distance(startPosition, endPosition));
                     projectionComponent1.SetLabelVisible(true);
                     projectionComponent2.SetLabelVisible(false);
+                    
+                    if (hitObject is IAnalyzable)
+                    {
+                        IAnalyzable aHitObject = (IAnalyzable)hitObject;
+                        intersectedObjsPl1.Add(aHitObject.GetElement());
+                    }
 
                     if (isEnd)
                     {
@@ -468,6 +538,12 @@ namespace Assets.Scripts.Experimental
                     projectionComponent1.SetLabelVisible(false);
                     projectionComponent2.SetLabelVisible(true);
 
+                    if (hitObject is IAnalyzable)
+                    {
+                        IAnalyzable aHitObject = (IAnalyzable)hitObject;
+                        intersectedObjsPl2.Add(aHitObject.GetElement());
+                    }
+
                     if (isEnd)
                     {
                         projectionComponent1.Draw(default(WallInfo), default(Vector3), startPositionProjection);
@@ -481,6 +557,29 @@ namespace Assets.Scripts.Experimental
                         projectionComponent2.SetLabelVisible(false);
                         _wc.LinkConstructionToWall(startPlane, projection1);
                         _wc.LinkConstructionToWall(endPlane, projection2);
+
+                        foreach (var intersected in intersectedObjsPl1)
+                        {
+                            List<Vector3> crossings = intersected.FindCrossingPoints(projectionComponent1);
+                            if (crossings != null)
+                            {
+                                foreach (var point in crossings)
+                                {
+                                    DrawPoint(startPlane, point);
+                                }
+                            }
+                        }
+                        foreach (var intersected in intersectedObjsPl2)
+                        {
+                            List<Vector3> crossings = intersected.FindCrossingPoints(projectionComponent2);
+                            if (crossings != null)
+                            {
+                                foreach (var point in crossings)
+                                {
+                                    DrawPoint(endPlane, point);
+                                }
+                            }
+                        }
                     }
                 }
             };
@@ -498,6 +597,8 @@ namespace Assets.Scripts.Experimental
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
             lineComponent.SetLabelVisible(true);
+
+            var intersectedObjs = new HashSet<IAnalyzable>();
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
@@ -518,11 +619,30 @@ namespace Assets.Scripts.Experimental
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
                 lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
+                
+                if (hitObject is IAnalyzable)
+                {
+                    IAnalyzable aHitObject = (IAnalyzable)hitObject;
+                    intersectedObjs.Add(aHitObject.GetElement());
+                }
 
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
                     lineComponent.SetLabelVisible(false);
+
+                    foreach (var intersected in intersectedObjs)
+                    {
+                        List<Vector3> crossings = intersected.FindCrossingPoints(lineComponent);
+                        if (crossings != null)
+                        {
+                            foreach (var point in crossings)
+                            {
+                                //if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
+                                DrawPoint(plane, point);
+                            }
+                        }
+                    }
                 }
             };
         }
@@ -539,6 +659,8 @@ namespace Assets.Scripts.Experimental
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
             lineComponent.SetLabelVisible(true);
+
+            var intersectedObjs = new HashSet<IAnalyzable>();
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
@@ -574,10 +696,29 @@ namespace Assets.Scripts.Experimental
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
                 lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
 
+                if (hitObject is IAnalyzable)
+                {
+                    IAnalyzable aHitObject = (IAnalyzable)hitObject;
+                    intersectedObjs.Add(aHitObject.GetElement());
+                }
+
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
                     lineComponent.SetLabelVisible(false);
+
+                    foreach (var intersected in intersectedObjs)
+                    {
+                        List<Vector3> crossings = intersected.FindCrossingPoints(lineComponent);
+                        if (crossings != null)
+                        {
+                            foreach (var point in crossings)
+                            {
+                                //if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
+                                DrawPoint(plane, point);
+                            }
+                        }
+                    }
                 }
             };
         }

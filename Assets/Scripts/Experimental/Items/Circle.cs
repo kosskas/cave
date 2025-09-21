@@ -9,7 +9,7 @@ using UnityEngine.Analytics;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Circle : MonoBehaviour, IDrawable, IRaycastable
+    public class Circle : MonoBehaviour, IDrawable, IRaycastable, IAnalyzable
     {
         private Color ColorNormal = ReconstructionInfo.NORMAL;
         private Color ColorFocused = ReconstructionInfo.FOCUSED;
@@ -110,6 +110,39 @@ namespace Assets.Scripts.Experimental.Items
         public void OnHoverExit()
         {
             _circleRenderer.material.color = ColorNormal;
+        }
+
+        // IAnalyzable interface
+        public List<Vector3> FindCrossingPoints(IAnalyzable obj)
+        {
+            Line crossLineObj = null;
+            Circle crossCircleObj = null;
+            if (obj is Line)
+            {
+                crossLineObj = (Line)obj;
+                Vector3 A = crossLineObj.StartPosition;
+                Vector3 B = crossLineObj.EndPosition;
+                Vector3 S = this.StartPosition;
+                float r = this._radius;
+
+                return DescriptiveMathLib.FindLCIntersections(A, B, S, r);
+
+            }
+            if (obj is Circle)
+            {
+                crossCircleObj = (Circle)obj;
+                Vector3 S1 = this.StartPosition;
+                Vector3 A1 = this.EndPosition;
+                Vector3 S2 = crossCircleObj.StartPosition;
+                Vector3 B2 = crossCircleObj.EndPosition;
+
+                return DescriptiveMathLib.FindCCIntersections(S1, A1, S2, B2);
+            }
+            return null;
+        }
+        public IAnalyzable GetElement()
+        {
+            return this;
         }
     }
 }

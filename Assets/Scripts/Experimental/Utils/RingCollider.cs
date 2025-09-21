@@ -79,7 +79,7 @@ namespace Assets.Scripts.Experimental.Utils
         }
 
 
-        private class RaycastableDrawableComponent : MonoBehaviour, IRaycastable, IDrawable
+        private class RaycastableDrawableComponent : MonoBehaviour, IRaycastable, IDrawable, IAnalyzable
         {
 
             void Start()
@@ -110,6 +110,15 @@ namespace Assets.Scripts.Experimental.Utils
 
             public void Draw(WallInfo plane, params Vector3[] positions)
             {}
+            // IAnalyzable interface
+            public List<Vector3> FindCrossingPoints(IAnalyzable obj)
+            {
+                return gameObject.transform.parent?.parent?.GetComponent<IAnalyzable>()?.FindCrossingPoints(obj);
+            }
+            public IAnalyzable GetElement()
+            {
+                return gameObject.transform.parent?.parent?.GetComponent<IAnalyzable>()?.GetElement();
+            }
         }
     }
 }
