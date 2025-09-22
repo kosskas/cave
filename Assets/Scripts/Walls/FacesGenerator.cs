@@ -143,9 +143,6 @@ public class FacesGenerator : MonoBehaviour {
         {
             //Debug.Log(CheckIfPointsAreOnTheSamePlane(points));
 
-            if (!StateManager.Grid.Faces.Contains(_points))
-                StateManager.Grid.Faces.Add(_points);
-
             StateManager.Exp.StoreFace(_points);
 
             CreateFace(_points);
