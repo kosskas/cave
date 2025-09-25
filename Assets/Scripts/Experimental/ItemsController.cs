@@ -15,12 +15,12 @@ namespace Assets.Scripts.Experimental
         private WallController _wc;
         private WallCreator _wcrt;
         private FacesGenerator _fc;
-        
-        private const float _WALL_HALF_WIDTH = 0.05f;
+
         private const float _WALL_HALF_LENGTH = 1.7f;
-        private const float _OFFSET_FROM_WALL = 0.01f;
-            
-        private const float _HELP_LINE_WIDTH = 0.0035f;
+        private const float _WALL_OFFSET = 0.005f;
+
+        private const float _AXIS_LINE_WIDTH = 0.02f;
+        private const float _HELP_LINE_WIDTH = 0.004f;
         private const float _BOLD_LINE_WIDTH = 0.008f;
 
         private readonly GameObject _workspace;
@@ -125,17 +125,17 @@ namespace Assets.Scripts.Experimental
             var position = Vector3.zero;
 
             if (Mathf.Approximately(Mathf.Abs(planeNormal.x), 1))
-                position.x = planePosition.x + planeNormal.x * (_WALL_HALF_WIDTH + _OFFSET_FROM_WALL);
+                position.x = planePosition.x + Mathf.Sign(planeNormal.x) * _WALL_OFFSET;
             else
                 position.x = hitPosition.x;
 
             if (Mathf.Approximately(Mathf.Abs(planeNormal.y), 1))
-                position.y = planePosition.y + planeNormal.y * (_WALL_HALF_WIDTH + _OFFSET_FROM_WALL);
+                position.y = planePosition.y + Mathf.Sign(planeNormal.y) * _WALL_OFFSET;
             else
                 position.y = hitPosition.y;
 
             if (Mathf.Approximately(Mathf.Abs(planeNormal.z), 1))
-                position.z = planePosition.z + planeNormal.z * (_WALL_HALF_WIDTH + _OFFSET_FROM_WALL);
+                position.z = planePosition.z + Mathf.Sign(planeNormal.z) * _WALL_OFFSET;
             else
                 position.z = hitPosition.z;
 
@@ -179,23 +179,25 @@ namespace Assets.Scripts.Experimental
         {
             Vector3 normalA = planeA.GetNormal();
             Vector3 normalB = planeB.GetNormal();
+            Vector3 direction = Vector3.Cross(normalA, normalB).normalized;
 
-            Vector3 positionA = planeA.gameObject.transform.position;
-            Vector3 positionB = planeB.gameObject.transform.position;
+            Vector3 posA = planeA.gameObject.transform.position;
+            Vector3 posB = planeB.gameObject.transform.position;
 
-            Vector3 offsetVector = (normalA + normalB) * (_WALL_HALF_WIDTH + _OFFSET_FROM_WALL);
+            Vector3 v1 = posB - posA;
+            Vector3 v2 = Vector3.ProjectOnPlane(v1, normalA);
 
-            Vector3 direction = Vector3.Cross(normalA, normalB);
+            Vector3 contactPoint = posA + v2 + _WALL_OFFSET * (normalA + normalB);
 
-            Vector3 intersectionMiddlePoint = positionA - _WALL_HALF_LENGTH * normalB;
+            Vector3 from = contactPoint - direction * _WALL_HALF_LENGTH;
+            Vector3 to = contactPoint + direction * _WALL_HALF_LENGTH;
 
-            Vector3 from = (intersectionMiddlePoint - direction) + offsetVector;
-            Vector3 to = (intersectionMiddlePoint + direction) + offsetVector;
 
             var axis = new GameObject("AXIS");
             axis.transform.SetParent(_axisRepo.transform);
 
             var axisComponent = axis.AddComponent<Axis>();
+            axisComponent.Width = _AXIS_LINE_WIDTH;
             axisComponent.Draw(default(WallInfo), from, to);
 
             var labelComponent = axis.AddComponent<IndexedLabel>();
@@ -207,44 +209,6 @@ namespace Assets.Scripts.Experimental
             _wc.LinkConstructionToWall(planeB, axis);
         }
 
-        public void AddAxisBetweenPlanes2(WallInfo planeA, WallInfo planeB)
-        {
-            Vector3 normalA = planeA.GetNormal();
-            Vector3 normalB = planeB.GetNormal();
-
-            Vector3 positionA = planeA.gameObject.transform.position;
-            Vector3 positionB = planeB.gameObject.transform.position;
-
-            // Calculate the intersection point of the two planes
-            Vector3 direction = Vector3.Cross(normalA, normalB);
-
-            // Solve for the intersection point using plane equations
-            float determinant = Vector3.Dot(direction, direction);
-            if (Mathf.Approximately(determinant, 0))
-            {
-                Debug.LogError("Planes are parallel and do not intersect.");
-                return;
-            }
-
-            Vector3 intersectionMiddlePoint = positionA + Vector3.Project(positionB - positionA, direction);
-
-            Vector3 from = (intersectionMiddlePoint - direction.normalized * _WALL_HALF_LENGTH);
-            Vector3 to = (intersectionMiddlePoint + direction.normalized * _WALL_HALF_LENGTH);
-
-            var axis = new GameObject("AXIS");
-            axis.transform.SetParent(_axisRepo.transform);
-
-            var axisComponent = axis.AddComponent<Axis>();
-            axisComponent.Draw(default(WallInfo), from, to);
-
-            var labelComponent = axis.AddComponent<IndexedLabel>();
-            labelComponent.AddLabel("X", "", $"{planeA.numberExp}/{planeB.numberExp}");
-            labelComponent.FontSize = 1;
-
-            _axisWalls.Add(axisComponent, new Tuple<WallInfo, WallInfo>(planeA, planeB));
-            _wc.LinkConstructionToWall(planeA, axis);
-            _wc.LinkConstructionToWall(planeB, axis);
-        }
         public void RemoveLastAxis()
         {
             if (_axisWalls != null && _axisWalls.Count > 0 && _wc != null)
@@ -407,7 +371,7 @@ namespace Assets.Scripts.Experimental
                     UnityEngine.Object.Destroy(line);
 
                     var addedWall = _wcrt.WCrCreateWall(startPosition, endPositionWithPointSensitivity, plane);
-                    AddAxisBetweenPlanes2(addedWall, plane);
+                    AddAxisBetweenPlanes(addedWall, plane);
                 }
             };
         }
