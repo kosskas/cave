@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
-using UnityEngine;
-using UnityEngine.Experimental.GlobalIllumination;
+﻿using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Assets.Scripts.Experimental.Items
 {
@@ -13,7 +7,7 @@ namespace Assets.Scripts.Experimental.Items
     {
         private readonly Color _COLOR = Color.black;
 
-        private const float _WIDTH = 0.01f;
+        public float Width { get; set; } = 0.005f;
 
         public WallInfo Plane { get; private set; }
 
@@ -21,31 +15,48 @@ namespace Assets.Scripts.Experimental.Items
 
         public Vector3 To { get; private set; }
 
-        private LineRenderer _lineRenderer;
-        
+        private GameObject _cylinder;
 
-        void Start()
+        private MeshRenderer _meshRenderer;
+
+
+        void Awake()
         {
-            _lineRenderer = gameObject.AddComponent<LineRenderer>();
-            _lineRenderer.material = new Material(Shader.Find("Unlit/Color"))
-            {
-                color = _COLOR
-            };
-            _lineRenderer.positionCount = 2;
+            _cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            _cylinder.transform.SetParent(transform, worldPositionStays: false);
 
-            _lineRenderer.startWidth = _WIDTH;
-            _lineRenderer.endWidth = _WIDTH;
+            _meshRenderer = _cylinder.GetComponent<MeshRenderer>();
+            if (_meshRenderer != null)
+            {
+                var mat = new Material(Shader.Find("Unlit/Color"))
+                {
+                    color = _COLOR
+                };
+                _meshRenderer.material = mat;
+                _meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            }
         }
 
         void Update()
         {
-            _lineRenderer.SetPositions(new[] { From, To });
+            // Jeśli From/To nieustawione, nic nie rób
+            Vector3 dir = To - From;
+            float len = dir.magnitude;
+            if (len < 1e-6f) return;
 
-            Vector3 newPosition = From;
-            Quaternion newRotation = Quaternion.LookRotation((To - From).normalized, Vector3.up) * Quaternion.Euler(0, -90, 0);
+            // Pozycja = środek odcinka
+            Vector3 mid = (From + To) * 0.5f;
+            transform.position = mid;
 
-            gameObject.transform.position = newPosition;
-            gameObject.transform.rotation = newRotation;
+            // Obrót: z osi Y na kierunek odcinka
+            transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+
+            // Skalowanie cylindra (lokalne):
+            // Cylinder ma wysokość 2 → skala.y = L/2
+            // Grubość = Width (średnica)
+            _cylinder.transform.localPosition = Vector3.zero;
+            _cylinder.transform.localRotation = Quaternion.identity;
+            _cylinder.transform.localScale = new Vector3(Width, len * 0.5f, Width);
         }
 
 
