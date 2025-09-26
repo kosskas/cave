@@ -44,16 +44,21 @@ public class PlayerController : MonoBehaviour
     private Vector3 _moveDirection = Vector3.zero;
     private float _rotationX = 0;
     private CharacterController _characterController;
+    private FlystickController _flystickController;
     private Ray _ray;
     private IMode _modeController;
     private Mode _mode = Mode.ModeExperimental;
     private bool _isModeChanged = false;
-
-
+    public Vector3 LockedRayPoint { get; set; } = Vector3.zero;
+    public GameObject LockedRaycastObject { get; set; } = null;
     void Start()
     {
-        _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //_ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         _characterController = GetComponentInChildren<CharacterController>();
+        _flystickController = gameObject.AddComponent<FlystickController>();
+        _flystickController.Init(this);
+        _ray = new Ray(_flystickController.RayLineOrigin, _flystickController.RayLineDirection);
+
         _SetModeController();
 
         // Lock cursor
@@ -70,11 +75,30 @@ public class PlayerController : MonoBehaviour
         _UpdateMode();
     }
 
-
     private void _UpdateRaycasting()
     {
-        _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        _ray.origin = _flystickController.RayLineOrigin;
+        _ray.direction = _flystickController.RayLineDirection;
+        //_ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (LockedRaycastObject != null)
+        {
+            Collider lockedCollider = LockedRaycastObject.GetComponent<Collider>();
+            if (lockedCollider != null)
+            {
+                if (lockedCollider.Raycast(_ray, out Hit, 100))
+                {
+                    // Trafiamy w zafokusowany obiekt – aktualizuj punkt
+                    LockedRayPoint = Hit.point;
+                }
+                // Jeśli nie trafiamy – nie zmieniamy Hit ani _lockedRayPoint
+            }
+            return; // w locku nie sprawdzamy innych obiektów
+        }
+
+        // Tryb bez locka – normalny raycast
         Physics.Raycast(_ray, out Hit, 100);
+        LockedRayPoint = Hit.point;
     }
 
     private void _UpdateMovement()
