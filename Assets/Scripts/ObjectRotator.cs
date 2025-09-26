@@ -13,12 +13,29 @@ public class ObjectRotator : MonoBehaviour {
 	private bool isRotating = false;
 
 	void Start(){
-		tmp = GameObject.Find("FlystickPlaceholder");
+		//tmp = GameObject.Find("FlystickPlaceholder");
+
+		FlystickController.SetAction(
+            FlystickController.Btn.FIRE,
+            FlystickController.ActOn.PRESS,
+            () => { isRotating = true;}
+        );
+
+		FlystickController.SetAction(
+            FlystickController.Btn.FIRE,
+            FlystickController.ActOn.RELEASE,
+            () => { isRotating = false;}
+        );
 	}
 
 	void Update(){
-		transform.rotation = tmp.transform.rotation;
+		//transform.rotation = tmp.transform.rotation;
+        if (isRotating)
+        {
+            transform.rotation = Lzwp.input.flysticks[0].pose.rotation;
+        }
 	}
+
 	/// <summary>
 	/// Kamera potrzebna do wyliczania obrotu
 	/// </summary>

@@ -8,6 +8,8 @@ public class ModeMenu : IMode
     {
         PCref = pc;
         Debug.Log($"<color=blue> MODE menu ON </color>");
+
+        SetUpFlystick();
     }
 
     public void HandleInput()
@@ -33,6 +35,23 @@ public class ModeMenu : IMode
     private void _LoadReconstruction()
     {
         PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1,
+            FlystickController.ActOn.PRESS,
+            _LoadVisualization
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._2,
+            FlystickController.ActOn.PRESS,
+            _LoadReconstruction
+        );
     }
 }
 

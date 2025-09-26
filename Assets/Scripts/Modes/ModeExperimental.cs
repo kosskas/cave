@@ -39,6 +39,10 @@ public class ModeExperimental : IMode
     private Line _relativeLine;
 
     private bool _showProjLines = true;
+
+    public bool _isRaycastLocked = false;
+
+
     /* * * * CONTEXT ACTIONS begin * * * */
 
     private void TryColorObject(IRaycastable obj, Color color)
@@ -61,8 +65,16 @@ public class ModeExperimental : IMode
 
     private void Act()
     {
+        //Unclock focus when action
+        _isRaycastLocked = false;
+        PCref.LockedRaycastObject = null;
+
         var hitObject = _hitObject;
         var hitPosition = PCref.Hit.point;
+        
+        if(PCref.Hit.collider == null)
+            return;
+
         var hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
 
         if (_drawAction == null)
@@ -218,6 +230,9 @@ public class ModeExperimental : IMode
 
     private void _TryGetNextLabelText()
     {
+        if(!_isRaycastLocked)
+            return;
+
         _hitObject?.OnHoverAction((gameObject) =>
         {
             gameObject.GetComponent<ILabelable>()?.NextText();
@@ -226,6 +241,9 @@ public class ModeExperimental : IMode
 
     private void _TryGetPrevLabelText()
     {
+        if (!_isRaycastLocked)
+            return;
+
         _hitObject?.OnHoverAction((gameObject) =>
         {
             gameObject.GetComponent<ILabelable>()?.PrevText();
@@ -234,6 +252,9 @@ public class ModeExperimental : IMode
 
     private void _TryGetNextLabel()
     {
+        if (!_isRaycastLocked)
+            return;
+
         _hitObject?.OnHoverAction((gameObject) =>
         {
             gameObject.GetComponent<ILabelable>()?.NextLabel();
@@ -242,6 +263,9 @@ public class ModeExperimental : IMode
 
     private void _TryGetPrevLabel()
     {
+        if (!_isRaycastLocked)
+            return;
+
         _hitObject?.OnHoverAction((gameObject) =>
         {
             gameObject.GetComponent<ILabelable>()?.PrevLabel();
@@ -275,6 +299,12 @@ public class ModeExperimental : IMode
     private void _MoveCursor()
     {
         Debug.Log($"_MoveCursor: {PCref.Hit.collider.gameObject.transform.parent.gameObject} --> {PCref.Hit.collider.gameObject}");
+
+        if (_isRaycastLocked)
+        {
+            return;
+        }
+
         var hitObject = PCref.Hit.collider.gameObject.GetComponent<IRaycastable>();
         var hitPosition = PCref.Hit.point;
         var hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
@@ -362,6 +392,8 @@ public class ModeExperimental : IMode
         
         AddRadialMenu();
 
+        SetUpFlystick();
+
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
 
@@ -437,6 +469,27 @@ public class ModeExperimental : IMode
             Debug.LogError("Nie znaleziono fabrykatu z Resources/Canvas");
         }
     }
+    private void _ToggleRaycastLock()
+    {
+        if (_isRaycastLocked)
+        {
+            // Always unlock, regardless of what is currently hit
+            _isRaycastLocked = false;
+            PCref.LockedRaycastObject = null;
+            return;
+        }
+        if (PCref.Hit.collider != null && PCref.Hit.collider.gameObject.GetComponent<IRaycastable>() != null)
+        {
+            // Lock only if hitting a raycastable object
+            PCref.LockedRaycastObject = PCref.Hit.collider.gameObject;
+            _isRaycastLocked = true;
+        }
+    }
+
+    private void _ToggleRadialMenu()
+    {
+        radialMenu.ToggleRadialMenuActive();
+    }
     public void HandleInput()
     {
         _MoveCursor();
@@ -495,6 +548,96 @@ public class ModeExperimental : IMode
         {
             radialMenu.ToggleRadialMenuActive();
         }
+
+        if (Input.GetKeyDown("f"))
+        {
+            _ToggleRaycastLock();
+        }
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1,
+            FlystickController.ActOn.PRESS,
+            _DrawAction
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._2,
+            FlystickController.ActOn.PRESS,
+            _DeleteHoveredObject
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._3,
+            FlystickController.ActOn.PRESS,
+            _TryAddLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._4,
+            FlystickController.ActOn.PRESS,
+            _TryRemoveFocusedLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.FIRE,
+            FlystickController.ActOn.PRESS,
+            _ToggleRaycastLock
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            _TryGetPrevLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            _TryGetNextLabel
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_DOWN,
+            _TryGetPrevLabelText
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_UP,
+            _TryGetNextLabelText
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.PRESS,
+            _ToggleRadialMenu
+        );
+
+        //When lock
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            () =>
+            {
+                if (_isRaycastLocked || !radialMenu.isMenuActive) return;
+                radialMenu.PreviousOption();
+            }
+        );
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            () =>
+            {
+                if (_isRaycastLocked || !radialMenu.isMenuActive) return;
+                radialMenu.NextOption();
+            }
+        );
     }
 }
 
