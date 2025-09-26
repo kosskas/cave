@@ -22,6 +22,8 @@ public class ModeMenu : IMode
         UIWall.BackToMenuButton.Hide();
 
         UIWall.MenuButtons.Show();
+
+        SetUpFlystick();
     }
 
 
@@ -63,6 +65,17 @@ public class ModeMenu : IMode
             _MakeActionOnWall();
         }
 
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn.FIRE,
+            FlystickController.ActOn.PRESS,
+            _MakeActionOnWall
+        );
     }
 }
 

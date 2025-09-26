@@ -32,7 +32,7 @@ public class RadialMenu : MonoBehaviour
     private float rotationOffset = 0f; 
     private Coroutine rotateCoroutine;
 
-    public bool isMenuActive = false;
+    public bool isMenuActive = true;
 
  
     public static RadialMenu Create(Transform parent, int count, float rad, List<string> lbls, GameObject prefab, ModeExperimental modeExperimental)
@@ -47,6 +47,26 @@ public class RadialMenu : MonoBehaviour
         menu.itemPrefab = prefab;
         menu.modeExperimental = modeExperimental;
         menu.initialMenuItemScale = prefab.GetComponent<RectTransform>().localScale;
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            () =>
+            {
+                if (modeExperimental._isRaycastLocked || !menu.isMenuActive) return;
+                menu.Select((menu.selectedIndex - 1 + menu.itemCount) % menu.itemCount);
+                modeExperimental._ChangeDrawContextPrev();
+            }
+        );
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            () =>
+            {
+                if (modeExperimental._isRaycastLocked || !menu.isMenuActive) return;
+                menu.Select((menu.selectedIndex + 1 + menu.itemCount) % menu.itemCount);
+                modeExperimental._ChangeDrawContextNext();
+            }
+        );
         menu.Generate();
         return menu;
     }
