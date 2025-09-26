@@ -143,8 +143,6 @@ public class FacesGenerator : MonoBehaviour {
         {
             //Debug.Log(CheckIfPointsAreOnTheSamePlane(points));
 
-            StateManager.Exp.StoreFace(_points);
-
             CreateFace(_points);
         }
 

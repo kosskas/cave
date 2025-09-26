@@ -137,14 +137,39 @@ public class ModeExperimental : IMode
                 break;
             
             case "SaveStateButton":
-                _items.Save();
+                _SaveState();
                 break;
 
             case "LoadStateButton":
-                _items.Restore();
+                _LoadState();
                 break;
 
         }
+    }
+
+    private void _SaveState()
+    {
+        StateManager.Exp.Save();
+    }
+
+    private void _LoadState()
+    {
+        //czyszcenie œcian obiektu
+        _fc.Clear();
+        GameObject.Destroy(_fc);
+
+        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
+        _items.Clear();
+
+        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
+        _mb.ClearAndDisable();
+        _mb.Init(true);
+
+        //dodanie bazowej osi rzutuj¹cej
+        _AddBaseAxis();
+
+        //wczytanie pliku
+        StateManager.Exp.Load();
     }
 
     private void _BackToMenu()
@@ -323,6 +348,11 @@ public class ModeExperimental : IMode
         _drawAction?.Invoke(hitObject, hitPosition, hitWall, false);
     }
 
+    private void _AddBaseAxis()
+    {
+        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall4"));
+    }
+
 
     public ModeExperimental(PlayerController pc)
     {
@@ -340,13 +370,10 @@ public class ModeExperimental : IMode
         _fc = mainObject.AddComponent<FacesGenerator>();
 
         _items = new ItemsController(_wc, _wcrt, _fc);
-        // _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall1"));
-        // _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall2"));
-        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall4"));
-        // _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall6"));
 
-        // to i inne boczne nie dziala
-        // _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall4"), _wc.GetWallByName("Wall6"));
+        //dodanie bazowej osi rzutuj¹cej
+        _AddBaseAxis();
+
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
             {

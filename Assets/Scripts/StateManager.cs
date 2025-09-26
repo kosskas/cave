@@ -1,9 +1,10 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json.Linq;
 using UnityEngine;
 using System;
+using System.Linq;
+using Assets.Scripts.Experimental;
 using Assets.Scripts.JsonConverters;
 
 namespace Assets.Scripts
@@ -12,13 +13,15 @@ namespace Assets.Scripts
     {
 
 #if UNITY_EDITOR
-        private static readonly string pathToFolderWithSavedStates = "./Assets/SavedWorkspaces";
+        private const string PathToFolderWithSavedStates = "./Assets/SavedWorkspaces";
 #else
-    private static readonly string pathToFolderWithSavedStates = "./SavedWorkspaces";
+    private const string PathToFolderWithSavedStates = "./SavedWorkspaces";
 #endif
 
         public class Exp
         {
+            /*   J S O N   */
+
             private class LineJson
             {
                 public string PlaneName { get; set; }
@@ -47,8 +50,8 @@ namespace Assets.Scripts
             private class WallJson
             {
                 public string WallName { get; set; }
-                public Vector3 ConstPoint1 { get; set; }
-                public Vector3 ConstPoint2 { get; set; }
+                [JsonConverter(typeof(Vector3Converter))] public Vector3? ConstPoint1 { get; set; }
+                [JsonConverter(typeof(Vector3Converter))] public Vector3? ConstPoint2 { get; set; }
                 public string ParentWallName { get; set; }
             }
             private class FaceJson
@@ -56,14 +59,97 @@ namespace Assets.Scripts
                 public List<KeyValuePair<string, Vector3>> Vertices { get; set; }
             }
 
-            private static List<LineJson> _lines = new List<LineJson>();
-            private static List<PointJson> _points = new List<PointJson>();
-            private static List<CircleJson> _circles = new List<CircleJson>();
-            private static List<WallJson> _walls = new List<WallJson>();
-            private static List<FaceJson> _faces = new List<FaceJson>();
+            private class SceneState
+            {
+                public List<PointJson> POINTS { get; set; }
+                public List<LineJson> LINES { get; set; }
+                public List<CircleJson> CIRCLES { get; set; }
+                public List<WallJson> WALLS { get; set; }
+                public List<FaceJson> FACES { get; set; }
+            }
 
 
-            public static void Save()
+            /*   P R I V A T E   M E T H O D S   */
+
+            private static void SaveJson(string json, string fileName, bool withTimestamp)
+            {
+                const string extension = "json";
+
+                var folderPath = PathToFolderWithSavedStates;
+                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+                var fullFileName = withTimestamp ? $"{fileName}_{timestamp}.{extension}" : $"{fileName}.{extension}";
+                var fullPath = Path.Combine(folderPath, fullFileName);
+
+                try
+                {
+                    // Upewnij siê, ¿e katalog istnieje
+                    Directory.CreateDirectory(folderPath);
+
+                    File.WriteAllText(fullPath, json);
+
+                    // Weryfikacja zapisu
+                    if (File.Exists(fullPath))
+                    {
+                        Debug.Log($"State saved to JSON file: {fullPath}");
+                    }
+                    else
+                    {
+                        throw new Exception($"SaveFile: WriteAllText completed but file not found: {fullPath}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Failed to save file '{fullPath}'. Exception: {ex}");
+                }
+            }
+
+            private static string GetLexicographicallyLastJson()
+            {
+                var folderPath = PathToFolderWithSavedStates;
+
+                if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
+                    return null;
+
+                return Directory.EnumerateFiles(folderPath, "*.json", SearchOption.TopDirectoryOnly)
+                    .OrderBy(Path.GetFileName, StringComparer.Ordinal)
+                    .LastOrDefault();
+            }
+
+            private static T LoadJson<T>(string fullPath, JsonSerializerSettings settings)
+            {
+                if (string.IsNullOrEmpty(fullPath) || !File.Exists(fullPath))
+                {
+                    Debug.LogError($"LoadJson: File not found: '{fullPath}'.");
+                    return default(T);
+                }
+
+                try
+                {
+                    var json = File.ReadAllText(fullPath);
+                    var obj = settings == null
+                        ? JsonConvert.DeserializeObject<T>(json)
+                        : JsonConvert.DeserializeObject<T>(json, settings);
+
+                    Debug.Log($"LoadJson: Successfully loaded from file {fullPath}");
+                    return obj;
+                }
+                catch (JsonException jex)
+                {
+                    Debug.LogError($"LoadJson: JSON parse/deserialize error for '{fullPath}'. Exception: {jex}");
+                    return default(T);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"LoadJson: Failed to load '{fullPath}'. Exception: {ex}");
+                    return default(T);
+                }
+            }
+
+
+            /*   P U B L I C   M E T H O D S   */
+
+            public static void Save(string fileName = "sceneState", bool withTimestamp = true)
             {
                 var settings = new JsonSerializerSettings
                 {
@@ -72,100 +158,13 @@ namespace Assets.Scripts
 
                 settings.Converters.Add(new Vector3Converter());
 
-                var data = new
-                {
-                    POINTS = _points,
-                    LINES = _lines,
-                    CIRCLES = _circles,
-                    WALLS = _walls,
-                    FACES = _faces,
-                };
+                var points = ItemsController.GetPoints();
+                var lines = ItemsController.GetLines();
+                var circles = ItemsController.GetCircles();
+                var walls = ItemsController.GetWalls();
+                var faces = ItemsController.GetFaces();
 
-                var json = JsonConvert.SerializeObject(data, Formatting.Indented, settings);
-                File.WriteAllText(pathToFolderWithSavedStates + "/stateModeExperimental.json", json);
-
-                _points.Clear();
-                _lines.Clear();
-                _circles.Clear();
-                _walls.Clear();
-                _faces.Clear();
-
-                Debug.Log("State saved to JSON file.");
-            }
-
-            public static void StoreLine(string planeName, Vector3 startPosition, Vector3 endPosition, List<string> boundPointsByLabel, List<string> labels, float lineWidth)
-            {
-                _lines.Add(new LineJson()
-                {
-                    PlaneName = planeName,
-                    StartPosition = startPosition,
-                    EndPosition = endPosition,
-                    BoundPointsByLabel = boundPointsByLabel,
-                    Labels = labels,
-                    LineWidth = lineWidth
-                });
-            }
-
-            public static void StorePoint(string planeName, Vector3 position, List<string> labels)
-            {
-                _points.Add(new PointJson()
-                {
-                    PlaneName = planeName,
-                    Position = position,
-                    Labels = labels
-                });
-            }
-
-            public static void StoreCircle(string planeName, Vector3 startPosition, Vector3 endPosition, float lineWidth)
-            {
-                _circles.Add(new CircleJson()
-                {
-                    PlaneName = planeName,
-                    StartPosition = startPosition,
-                    EndPosition = endPosition,
-                    LineWidth = lineWidth
-                });
-            }
-
-            public static void StoreWall(string wallName, Vector3 point1, Vector3 point2, string parentWallName)
-            {
-                _walls.Add(new WallJson()
-                {
-                     WallName = wallName,
-                     ConstPoint1 = point1,
-                     ConstPoint2 = point2,
-                     ParentWallName = parentWallName
-                });
-            }
-
-            public static void StoreFace(List<KeyValuePair<string, Vector3>> vertices)
-            {
-                _faces.Add(new FaceJson()
-                {
-                    Vertices = vertices
-                });
-            }
-
-            // - - -
-
-            public static void Load()
-            {
-                var path = pathToFolderWithSavedStates + "/stateModeExperimental.json";
-                if (!File.Exists(path))
-                    return;
-
-                var json = File.ReadAllText(path);
-                var data = JsonConvert.DeserializeObject<Dictionary<string, JArray>>(json);
-                if (data == null)
-                    return;
-
-                var settings = new JsonSerializerSettings
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                };
-                settings.Converters.Add(new Vector3Converter());
-
-                var template = new
+                var ss = new SceneState()
                 {
                     POINTS = new List<PointJson>(),
                     LINES = new List<LineJson>(),
@@ -174,85 +173,132 @@ namespace Assets.Scripts
                     FACES = new List<FaceJson>()
                 };
 
-                var result = JsonConvert.DeserializeAnonymousType(json, template, settings);
+                points.ForEach(point =>
+                {
+                    ss.POINTS.Add(new PointJson()
+                    {
+                        Labels = point.Labels,
+                        PlaneName = point.Plane.name,
+                        Position = point.Position,
+                    });
+                });
 
-                _points = result?.POINTS ?? new List<PointJson>();
-                _lines = result?.LINES ?? new List<LineJson>();
-                _circles = result?.CIRCLES ?? new List<CircleJson>();
-                _walls = result?.WALLS ?? new List<WallJson>();
-                _faces = result?.FACES ?? new List<FaceJson>();
+                lines.ForEach(line =>
+                {
+                    ss.LINES.Add(new LineJson()
+                    {
+                        BoundPointsByLabel = line.GetLabelsOfBoundPoints(),
+                        EndPosition = line.EndPosition,
+                        Labels = line.Labels,
+                        LineWidth = line.Width,
+                        PlaneName = line.Plane.name,
+                        StartPosition = line.StartPosition
+                    });
+                });
 
-                Debug.Log("State load from JSON file.");
+                circles.ForEach(circle =>
+                {
+                    ss.CIRCLES.Add(new CircleJson()
+                    {
+                        EndPosition = circle.EndPosition,
+                        LineWidth = circle.Width,
+                        PlaneName = circle.Plane.name,
+                        StartPosition = circle.StartPosition
+                    });
+                });
+
+                walls.ForEach(wall =>
+                {
+                    ss.WALLS.Add(new WallJson()
+                    {
+                        ConstPoint1 = wall.constrPoint1,
+                        ConstPoint2 = wall.constrPoint2,
+                        WallName = wall.name,
+                        ParentWallName = wall.parentName
+                    });
+                });
+
+                faces.ForEach(face =>
+                {
+                    ss.FACES.Add(new FaceJson()
+                    {
+                        Vertices = face.Points
+                    });
+                });
+
+                var json = JsonConvert.SerializeObject(ss, Formatting.Indented, settings);
+
+                SaveJson(json, fileName, withTimestamp);
             }
 
-            public static void RestorePoints(Action<WallInfo, Vector3, List<string>> restorePoint)
+            public static void Load()
             {
-                var planes = GameObject.Find("Walls")?.GetComponent<WallController>();
-                if (planes == null)
+                var path = GetLexicographicallyLastJson();
+
+                if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                {
+                    Debug.LogError("Load: No JSON file to load.");
                     return;
+                }
 
-                _points.ForEach(point =>
+                var settings = new JsonSerializerSettings
                 {
-                    restorePoint(planes.GetWallByName(point.PlaneName), point.Position, point.Labels);
-                });
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                };
+                settings.Converters.Add(new Vector3Converter());
 
-                _points.Clear();
-            }
-
-            public static void RestoreLines(Action<WallInfo, Vector3, Vector3, List<string>, List<string>, float> restoreLine)
-            {
-                var planes = GameObject.Find("Walls")?.GetComponent<WallController>();
-                if (planes == null)
+                var ss = LoadJson<SceneState>(path, settings);
+                if (ss == null)
+                {
+                    Debug.LogError($"Load: Deserialization returned null for '{path}'.");
                     return;
+                }
 
-                _lines.ForEach(line =>
+                ss.WALLS.ForEach(wall =>
                 {
-                    restoreLine(planes.GetWallByName(line.PlaneName), line.StartPosition, line.EndPosition, line.BoundPointsByLabel, line.Labels, line.LineWidth);
+                    ItemsController.AddWall(
+                        wall.ConstPoint1,
+                        wall.ConstPoint2,
+                        wall.ParentWallName,
+                        wall.WallName);
                 });
 
-                _lines.Clear();
-            }
-
-            public static void RestoreCircles(Action<WallInfo, Vector3, Vector3, float> restoreCircle)
-            {
-                var planes = GameObject.Find("Walls")?.GetComponent<WallController>();
-                if (planes == null)
-                    return;
-
-                _circles.ForEach(circle =>
+                ss.POINTS.ForEach(point =>
                 {
-                    restoreCircle(planes.GetWallByName(circle.PlaneName), circle.StartPosition, circle.EndPosition, circle.LineWidth);
+                    ItemsController.AddPoint(
+                        point.Labels, 
+                        point.PlaneName,
+                        point.Position);
                 });
 
-                _circles.Clear();
-            }
-
-            public static void RestoreFaces(FacesGenerator fg)
-            {
-                var restoredFaces = new List<FaceJson>();
-                restoredFaces.AddRange(_faces);
-
-                _faces.Clear();
-
-                restoredFaces.ForEach(face =>
+                ss.LINES.ForEach(line =>
                 {
-                    fg.GenerateFace(face.Vertices);
+                    ItemsController.AddLine(
+                        line.BoundPointsByLabel,
+                        line.EndPosition, 
+                        line.Labels, 
+                        line.LineWidth,
+                        line.PlaneName,
+                        line.StartPosition);
                 });
-            }
 
-            public static void RestoreWalls(WallCreator wctr)
-            {
-                var restoredWalls = new List<WallJson>();
-                restoredWalls.AddRange(_walls);
-
-                _walls.Clear();
-
-                restoredWalls.ForEach(wall =>
+                ss.CIRCLES.ForEach(circle =>
                 {
-                    wctr.RestoreWall(wall.WallName, wall.ConstPoint1, wall.ConstPoint2, wall.ParentWallName);
+                    ItemsController.AddCircle(
+                        circle.EndPosition,
+                        circle.LineWidth,
+                        circle.PlaneName,
+                        circle.StartPosition);
                 });
+
+                ss.FACES.ForEach(face =>
+                {
+                    ItemsController.AddFace(
+                        face.Vertices);
+                });
+
+                Debug.Log($"State from file '{path}' restored successfully.");
             }
         }
-
     }
 }
