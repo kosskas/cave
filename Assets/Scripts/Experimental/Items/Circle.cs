@@ -39,7 +39,7 @@ namespace Assets.Scripts.Experimental.Items
         private RingCollider _ringCollider;
 
 
-        void Start()
+        void Awake()
         {
             _circleRenderer = gameObject.AddComponent<LineRenderer>();
             _circleRenderer.material = new Material(Shader.Find("Unlit/Color"))

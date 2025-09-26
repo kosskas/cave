@@ -51,7 +51,7 @@ namespace Assets.Scripts.Experimental.Items
         private string _endPointLabel;
         private bool _isBoundToPoints = false;
 
-        void Start()
+        void Awake()
         {
             _lineRenderer = gameObject.AddComponent<LineRenderer>();
             _lineRenderer.material = new Material(Shader.Find("Unlit/Color"))

@@ -94,7 +94,7 @@ namespace Assets.Scripts.Experimental
         public float FontSize { get; set; } = LabelFontSize;
 
 
-        void Start()
+        void Awake()
         {
             _player = GameObject.Find("FPSPlayer");
 
