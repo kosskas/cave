@@ -53,7 +53,12 @@ public class ModeExperimental : IMode
         {
             _drawAction(hitObject, hitPosition, hitWall, true);
             _drawAction = null;
-            _relativeLine = null;
+
+            if (_relativeLine != null)
+            {
+                _relativeLine.Color = ReconstructionInfo.NORMAL;
+                _relativeLine = null;
+            }
         }
     }
 
@@ -64,9 +69,13 @@ public class ModeExperimental : IMode
         if (_relativeLine == null)
         {
             _relativeLine = relativeLine;
+
+            if (_relativeLine != null)
+                _relativeLine.Color = ReconstructionInfo.MENTIONED;
+
             return;
         }
-
+        
         Act();
     }
 

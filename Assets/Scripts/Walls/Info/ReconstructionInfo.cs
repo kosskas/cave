@@ -9,8 +9,9 @@ public static class ReconstructionInfo
 {
     // -- COLOR
     public static Color NORMAL = Color.black;
-
+    public static Color MENTIONED = new Color(0.5f, 0.5f, 0.5f, 1f);
     public static Color FOCUSED = Color.white;
+
     // -- CURSOR
     public static float _CURSOR_SIZE = 0.05f;
     public static Color _CURSOR_COLOR = new Color(1, 1, 1, 0.3f);

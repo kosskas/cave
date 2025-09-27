@@ -12,9 +12,20 @@ namespace Assets.Scripts.Experimental.Items
 {
     public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable, IAnalyzable
     {
-        private Color ColorNormal = Color.black;
+        private Color _color = ReconstructionInfo.NORMAL;
 
-        private Color ColorFocused = ReconstructionInfo.FOCUSED;
+        public Color Color
+        {
+            get
+            {
+                return _color;
+            }
+            set
+            {
+                _color = value;
+                _lineRenderer.material.color = value;
+            }
+        } 
 
         public float Width { get; set; } = 0.005f;
 
@@ -56,7 +67,7 @@ namespace Assets.Scripts.Experimental.Items
             _lineRenderer = gameObject.AddComponent<LineRenderer>();
             _lineRenderer.material = new Material(Shader.Find("Unlit/Color"))
             {
-                color = ColorNormal
+                color = _color
             };
             _lineRenderer.positionCount = 2;
 
@@ -181,13 +192,13 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverEnter()
         {
-            _lineRenderer.material.color = ColorFocused;
+            _lineRenderer.material.color = ReconstructionInfo.FOCUSED;
            // _labelComponent?.SetVisible(true);
         }
 
         public void OnHoverExit()
         {
-            _lineRenderer.material.color = ColorNormal;
+            _lineRenderer.material.color = _color;
             //_labelComponent?.SetVisible(false);
         }
 
