@@ -459,6 +459,8 @@ namespace Assets.Scripts.Experimental
             projectionComponent1.Draw(startPlane, startPosition, startPosition);
             projectionComponent1.SetLabelVisible(true);
 
+            var intersectedObjsPl1 = new HashSet<IAnalyzable>();
+
             // SECOND PART
             var projection2 = new GameObject("PROJECTION");
             projection2.transform.SetParent(_lineRepo.transform);
@@ -468,8 +470,8 @@ namespace Assets.Scripts.Experimental
             projectionComponent2.EnabledLabels = true;
             projectionComponent2.Width = lineWidth;
             projectionComponent2.Draw(startPlane, startPosition, startPosition);
+            projectionComponent1.SetLabelVisible(false);
 
-            var intersectedObjsPl1 = new HashSet<IAnalyzable>();
             var intersectedObjsPl2 = new HashSet<IAnalyzable>();
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
@@ -483,22 +485,36 @@ namespace Assets.Scripts.Experimental
                 if (axis == default(Axis))
                     return;
 
-                var currPlane = FindPlane(hitPlane, hitObject);
+                // END PLANE
                 var endPlane = FindEndPlane(axis, startPlane);
 
-                var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
-                var cursorPosition = CalcPosition(endPlane, hitPosition);
+                // CURRENT PLANE
+                var currPlane = FindPlane(hitPlane, hitObject);
+                if (currPlane == default(WallInfo))
+                    return;
 
+                // PROJECTION OF START POSITION ON AXIS
+                var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
+
+                // CURRENT POSITION
+                var cursorPosition = CalcPosition(currPlane, hitPosition);
+
+                // PROJECTION OF CURRENT POSITION ON AXIS
+                var cursorPositionProjection = CalcProjectionOnAxis(axis, cursorPosition);
+
+                // DISPLACEMENT VECTOR
+                var vDisplacement = startPositionProjection - cursorPositionProjection;
+
+                // ACTUAL END POSITION
+                var endPosition = cursorPosition + vDisplacement;
 
                 if (startPlane == currPlane)
                 {
-                    var endPosition = CalcProjectionOnAxis(startPosition, startPositionProjection, cursorPosition);
-
-                    projectionComponent1.Draw(default(WallInfo), default(Vector3), endPosition);
-                    projectionComponent2.Draw(default(WallInfo), startPosition, endPosition);
-
+                    projectionComponent1.Draw(startPlane, startPosition, endPosition);
                     projectionComponent1.SetLabel(Vector3.Distance(startPosition, endPosition));
                     projectionComponent1.SetLabelVisible(true);
+
+                    projectionComponent2.Draw(startPlane, startPosition, endPosition);
                     projectionComponent2.SetLabelVisible(false);
                     
                     if (hitObject is IAnalyzable)
@@ -515,14 +531,11 @@ namespace Assets.Scripts.Experimental
                 }
                 else
                 {
-                    var cursorPositionProjection = CalcProjectionOnAxis(axis, cursorPosition);
-                    var alignment = startPositionProjection - cursorPositionProjection;
-                    var endPosition = cursorPosition + alignment;
-                    
-                    projectionComponent2.Draw(endPlane, endPosition, default(Vector3));
-
-                    projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
+                    projectionComponent1.Draw(startPlane, startPosition, startPositionProjection);
                     projectionComponent1.SetLabelVisible(false);
+
+                    projectionComponent2.Draw(endPlane, startPositionProjection, endPosition);
+                    projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
                     projectionComponent2.SetLabelVisible(true);
 
                     if (hitObject is IAnalyzable)
@@ -533,16 +546,14 @@ namespace Assets.Scripts.Experimental
 
                     if (isEnd)
                     {
-                        projectionComponent1.Draw(default(WallInfo), default(Vector3), startPositionProjection);
-                        projectionComponent2.Draw(default(WallInfo), default(Vector3), startPositionProjection);
-
                         DrawPoint(endPlane, endPosition);
 
                         projectionComponent1.ColliderEnabled = true;
-                        projectionComponent2.ColliderEnabled = true;
                         projectionComponent1.SetLabelVisible(false);
-                        projectionComponent2.SetLabelVisible(false);
                         _wCtrl.LinkConstructionToWall(startPlane, projection1);
+
+                        projectionComponent2.ColliderEnabled = true;
+                        projectionComponent2.SetLabelVisible(false);
                         _wCtrl.LinkConstructionToWall(endPlane, projection2);
 
                         foreach (var intersected in intersectedObjsPl1)
@@ -556,6 +567,7 @@ namespace Assets.Scripts.Experimental
                                 }
                             }
                         }
+
                         foreach (var intersected in intersectedObjsPl2)
                         {
                             List<Vector3> crossings = intersected.FindCrossingPoints(projectionComponent2);
