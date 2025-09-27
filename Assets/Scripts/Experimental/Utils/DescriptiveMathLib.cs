@@ -162,7 +162,15 @@ namespace Assets.Scripts.Experimental.Utils
 
             return intersections;
         }
+        public static bool IsPointOnSegment(Vector3 p, Vector3 a, Vector3 b)
+        {
+            const float epsilon = 1e-5f;
+            float segmentLength = Vector3.Distance(a, b);
+            float d1 = Vector3.Distance(a, p);
+            float d2 = Vector3.Distance(b, p);
 
+            return (d1 + d2 <= segmentLength + epsilon);
+        }
 
 
     }

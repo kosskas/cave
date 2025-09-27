@@ -12,9 +12,23 @@ namespace Assets.Scripts.Experimental.Items
 {
     public class ExPoint : MonoBehaviour, IDrawable, IRaycastable, ILabelable
     {
-        private Color ColorNormal = ReconstructionInfo.NORMAL;
+        private Color _color = ReconstructionInfo.NORMAL;
 
-        private Color ColorFocused = ReconstructionInfo.FOCUSED;
+        public Color Color
+        {
+            get
+            {
+                return _color;
+            }
+            set
+            {
+                _color = value;
+                _pointRenderer.material.color = value;
+
+                if (_labelComponent != null)
+                    _labelComponent.FocusedLabelColor = value;
+            }
+        }
 
         private static readonly float Size = 0.025f;
 
@@ -52,7 +66,7 @@ namespace Assets.Scripts.Experimental.Items
             _pointRenderer = _pointObject.GetComponent<Renderer>();
             _pointRenderer.material = new Material(Shader.Find("Unlit/Color"))
             {
-                color = ColorNormal
+                color = _color
             };
             _pointRenderer.shadowCastingMode = ShadowCastingMode.Off;
 
@@ -134,18 +148,18 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverEnter()
         {
-            _pointRenderer.material.color = ColorFocused;
+            _pointRenderer.material.color = ReconstructionInfo.FOCUSED; ;
 
             if (_labelComponent != null)
-                _labelComponent.FocusedLabelColor = ColorFocused;
+                _labelComponent.FocusedLabelColor = ReconstructionInfo.FOCUSED; ;
         }
 
         public void OnHoverExit()
         {
-            _pointRenderer.material.color = ColorNormal;
+            _pointRenderer.material.color = _color;
 
             if (_labelComponent != null)
-                _labelComponent.FocusedLabelColor = ColorNormal;
+                _labelComponent.FocusedLabelColor = _color;
         }
 
 
@@ -165,7 +179,7 @@ namespace Assets.Scripts.Experimental.Items
         {
             get
             {
-                return _labelComponent?.FocusedLabel.Text
+                return _labelComponent?.FocusedLabel?.Text
                        ?? string.Empty;
             }
             set
@@ -270,13 +284,5 @@ namespace Assets.Scripts.Experimental.Items
             Mc.AddPointProjection(Plane, newLabelText, this.gameObject);
         }
 
-        public void SetLabelColor(Color textColor)
-        {
-            ColorNormal = textColor;
-            _pointRenderer.material.color = textColor;
-
-            if (_labelComponent != null)
-                _labelComponent.FocusedLabelColor = textColor;
-        }
     }
 }

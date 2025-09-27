@@ -114,6 +114,7 @@ public class MeshBuilder : MonoBehaviour
             return;
         ShowPoints3D();
         ShowEdges3D();
+        ShowProjectionLines();
     }
     /// <summary>
     /// Inicjalizuje klasę, tworzy katalogi do przechowywania punktów i krawędzi 3D
@@ -159,7 +160,7 @@ public class MeshBuilder : MonoBehaviour
         {
 			verticesOnWalls[wall] = new Dictionary<string, PointProjection>();
         }
-        PointProjection toAddProj = new PointProjection(pointObj, pointObj.GetComponent<LineSegment>(),wall.GetNormal(), false);
+        PointProjection toAddProj = new PointProjection(pointObj, pointObj.AddComponent<LineSegment>(),wall.GetNormal(), false);
         verticesOnWalls[wall][label] = toAddProj;
         //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
@@ -691,10 +692,6 @@ public class MeshBuilder : MonoBehaviour
             Debug.LogWarning("GameObj nie ma komponentu ExPoint, nie mozna oznaczyc etykiety");
             //return;
         }
-        else
-        {
-            et.SetLabelColor(ReconstructionInfo.LABEL_3D_ERR_COLOR);
-        }
 
         if (pointProj.projLine == null)
         {
@@ -703,7 +700,7 @@ public class MeshBuilder : MonoBehaviour
         }
         else
         {
-            pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
+            pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_ERROR_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
         }
         pointProj.is_ok_placed = false;
     }
@@ -715,10 +712,6 @@ public class MeshBuilder : MonoBehaviour
         {
             Debug.LogWarning("GameObj nie ma komponentu ExPoint, nie mozna oznaczyc etykiety");
             //return;
-        }
-        else
-        {
-            et.SetLabelColor(ReconstructionInfo.NORMAL);
         }
 
         if (pointProj.projLine == null)

@@ -18,6 +18,7 @@ namespace Assets.Scripts.Experimental
         private readonly WallController _wCtrl;
         private readonly WallCreator _wCrt;
         private readonly FacesGenerator _fGen;
+        private readonly MeshBuilder _mB;
 
         private static ItemsController _ic;
 
@@ -30,10 +31,12 @@ namespace Assets.Scripts.Experimental
 
         private readonly Dictionary<Axis, Tuple<WallInfo, WallInfo>> _axisWalls;
 
+        private List<ExPoint> _facePoints;
+
 
         /*   C O N S T R U C T O R S   */
 
-        public ItemsController(WallController wCtrl, WallCreator wCrt, FacesGenerator fGen)
+        public ItemsController(WallController wCtrl, WallCreator wCrt, FacesGenerator fGen, MeshBuilder mB)
         {
             _workspace = GameObject.Find("WorkspaceExp") ?? new GameObject("WorkspaceExp");
 
@@ -51,9 +54,12 @@ namespace Assets.Scripts.Experimental
 
             _axisWalls = new Dictionary<Axis, Tuple<WallInfo, WallInfo>>();
 
+            _facePoints = new List<ExPoint>();
+
             _wCtrl = wCtrl;
             _wCrt = wCrt;
             _fGen = fGen;
+            _mB = mB;
 
             _ic = this;
         }
@@ -287,6 +293,8 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.Wall: return DrawWall(plane, positionWithPointSensitivity);
 
+                case ExContext.Face: return DrawFace(hitObject as ExPoint);
+
                 default: return null;
             }
         }
@@ -302,6 +310,41 @@ namespace Assets.Scripts.Experimental
             pointComponent.EnabledLabels = true;
 
             labels?.ForEach(label => pointComponent.AddLabel(label));
+
+            return null;
+        }
+
+        public DrawAction DrawFace(ExPoint chosenPoint)
+        {
+            if (chosenPoint == null)
+            {
+                var labels = _facePoints
+                    .Select(p => p.FocusedLabel)
+                    .Where(fl => !string.IsNullOrWhiteSpace(fl))
+                    .Select(fl => fl.Replace("'", ""))
+                    .Distinct()
+                    .ToList();
+
+
+                var points3D = _mB.GetPoints3D()
+                    .Where(kvp => labels.Contains(kvp.Key))
+                    .ToList();
+
+                _fGen.GenerateFace(points3D);
+
+                _facePoints.ForEach(p => p.Color = ReconstructionInfo.NORMAL);
+                _facePoints.Clear();
+            }
+            else if(_facePoints.Contains(chosenPoint) || string.IsNullOrEmpty(chosenPoint.FocusedLabel))
+            {
+                chosenPoint.Color = ReconstructionInfo.NORMAL;
+                _facePoints.Remove(chosenPoint);
+            }
+            else
+            {
+                chosenPoint.Color = ReconstructionInfo.MENTIONED;
+                _facePoints.Add(chosenPoint);
+            }
 
             return null;
         }

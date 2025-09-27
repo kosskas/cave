@@ -82,7 +82,7 @@ namespace Assets.Scripts.Experimental.Utils
         private class RaycastableDrawableComponent : MonoBehaviour, IRaycastable, IDrawable, IAnalyzable
         {
 
-            void Awake()
+            void Start()
             {
                 Plane = gameObject.transform.parent?.parent?.GetComponent<IDrawable>()?.Plane;
             }

@@ -220,7 +220,7 @@ namespace Assets.Scripts.Experimental.Items
         {
             get
             {
-                return _labelComponent?.FocusedLabel.Text
+                return _labelComponent?.FocusedLabel?.Text
                        ?? string.Empty;
             }
             set
@@ -337,7 +337,9 @@ namespace Assets.Scripts.Experimental.Items
 
                 Vector3 intersection = (point1 + point2) * 0.5f;
 
-                return new List<Vector3> { intersection };
+                if(DescriptiveMathLib.IsPointOnSegment(intersection, this.StartPosition, this.EndPosition) && DescriptiveMathLib.IsPointOnSegment(intersection, crossLineObj.StartPosition, crossLineObj.EndPosition))
+                    return new List<Vector3> { intersection };
+                return null;
 
             }
             if (obj is Circle)
@@ -348,7 +350,11 @@ namespace Assets.Scripts.Experimental.Items
                 Vector3 S = crossCircleObj.StartPosition;
                 float r = Vector3.Distance(crossCircleObj.EndPosition, crossCircleObj.StartPosition);
 
-                return DescriptiveMathLib.FindLCIntersections(A, B, S, r);
+                List<Vector3> intersections = DescriptiveMathLib.FindLCIntersections(A, B, S, r)
+                    .Where(p => DescriptiveMathLib.IsPointOnSegment(p, A, B))
+                    .ToList();
+
+                return intersections;
             }
             return null;
         }

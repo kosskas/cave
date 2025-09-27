@@ -10,7 +10,7 @@ using Assets.Scripts.Walls;
 
 public class ModeExperimental : IMode
 {
-    private static float Z_RADIAL_MENU_OFFSET = 0.0f;
+    private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.6f );
     private static float RADIAL_MENU_RADIUS = 20f;
     public PlayerController PCref { get; private set; }
 
@@ -396,7 +396,7 @@ public class ModeExperimental : IMode
         _mb.Init(true);
         _fc = mainObject.AddComponent<FacesGenerator>();
 
-        _items = new ItemsController(_wc, _wcrt, _fc);
+        _items = new ItemsController(_wc, _wcrt, _fc, _mb);
 
         //dodanie bazowej osi rzutuj¹cej
         _AddBaseAxis();
@@ -412,7 +412,8 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.Wall, Act)
+                new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.Face, Act)
             });
 
         _contextMenuView = new ExContextMenuView();
@@ -436,10 +437,9 @@ public class ModeExperimental : IMode
         GameObject flystick = GameObject.Find("TrackedObject");
         GameObject.Find("NextContext")?.SetActive(false);
         GameObject.Find("PrevContext")?.SetActive(false);
-
         if (flystick == null)
         {
-            flystick = GameObject.Find("FlystickPlaceholder");
+            flystick = GameObject.Find("FPSPlayer");
             if (flystick == null)
             {
                 flystick = new GameObject("FlystickPlaceholder");
