@@ -182,7 +182,6 @@ public class ModeExperimental : IMode
     {
         //czyszcenie œcian obiektu
         _fc.Clear();
-        GameObject.Destroy(_fc);
 
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
