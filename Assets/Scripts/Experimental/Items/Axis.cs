@@ -1,15 +1,30 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Security.Cryptography;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Axis : MonoBehaviour, IDrawable
+    public class Axis : MonoBehaviour, IDrawable, IRaycastable
     {
-        private readonly Color _COLOR = Color.black;
+        private Color _color = ReconstructionInfo.NORMAL;
+
+        public Color Color
+        {
+            get
+            {
+                return _color;
+            }
+            set
+            {
+                _color = value;
+                _meshRenderer.material.color = value;
+            }
+        }
 
         public float Width { get; set; } = 0.005f;
 
-        public WallInfo Plane { get; private set; }
+        private float ColliderWidth => Width * 4;
 
         public Vector3 From { get; private set; }
 
@@ -19,22 +34,25 @@ namespace Assets.Scripts.Experimental.Items
 
         private MeshRenderer _meshRenderer;
 
+        private BoxCollider _boxCollider;
+
 
         void Awake()
         {
             _cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            _cylinder.transform.SetParent(transform, worldPositionStays: false);
+            _cylinder.transform.SetParent(gameObject.transform, worldPositionStays: false);
 
             _meshRenderer = _cylinder.GetComponent<MeshRenderer>();
-            if (_meshRenderer != null)
+            _meshRenderer.material = new Material(Shader.Find("Unlit/Color"))
             {
-                var mat = new Material(Shader.Find("Unlit/Color"))
-                {
-                    color = _COLOR
-                };
-                _meshRenderer.material = mat;
-                _meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
-            }
+                color = _color
+            };
+            _meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+
+            Destroy(_cylinder.GetComponent<CapsuleCollider>());
+
+            _boxCollider = gameObject.AddComponent<BoxCollider>();
+            _boxCollider.isTrigger = true;
         }
 
         void Update()
@@ -42,9 +60,13 @@ namespace Assets.Scripts.Experimental.Items
             // Jeśli From/To nieustawione, nic nie rób
             Vector3 dir = To - From;
             float len = dir.magnitude;
-            if (len < 1e-6f) return;
 
-            // Pozycja = środek odcinka
+            // włącz/wyłącz collider dla zdegenerowanej długości
+            bool valid = len >= 1e-6f;
+            if (_boxCollider != null) _boxCollider.enabled = valid;
+            if (!valid) return;
+
+            // pivot w środku odcinka
             Vector3 mid = (From + To) * 0.5f;
             transform.position = mid;
 
@@ -57,8 +79,18 @@ namespace Assets.Scripts.Experimental.Items
             _cylinder.transform.localPosition = Vector3.zero;
             _cylinder.transform.localRotation = Quaternion.identity;
             _cylinder.transform.localScale = new Vector3(Width, len * 0.5f, Width);
+
+            // BoxCollider pokrywający cylinder:
+            // - wysokość (oś Y) = len
+            // - grubość (x, z) = ColliderWidth
+            _boxCollider.size = new Vector3(ColliderWidth, len, ColliderWidth);
+            _boxCollider.center = Vector3.zero; // pivot w środku, więc zero
         }
 
+
+        // IDRAWABLE interface
+
+        public WallInfo Plane { get; private set; }
 
         public void Draw(WallInfo plane, params Vector3[] positions)
         {
@@ -66,6 +98,24 @@ namespace Assets.Scripts.Experimental.Items
             To = positions[1];
 
             Plane = plane;
+        }
+
+
+        // IRAYCASTABLE interface
+
+        public void OnHoverEnter()
+        {
+            _meshRenderer.material.color = ReconstructionInfo.FOCUSED;
+        }
+
+        public void OnHoverAction(Action<GameObject> action)
+        {
+            action(gameObject);
+        }
+
+        public void OnHoverExit()
+        {
+            _meshRenderer.material.color = _color;
         }
     }
 }

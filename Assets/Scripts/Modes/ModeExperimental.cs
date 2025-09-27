@@ -35,9 +35,27 @@ public class ModeExperimental : IMode
 
     private RadialMenu radialMenu;
 
-    private Line _relativeLine;
+    private IRaycastable _relativeObject;
     
     /* * * * CONTEXT ACTIONS begin * * * */
+
+    private void TryColorObject(IRaycastable obj, Color color)
+    {
+        var line = obj as Line;
+        var axis = obj as Axis;
+
+        if (!ReferenceEquals(line, null))
+        {
+            line.Color = color;
+            Debug.Log("FOO: LINE LINE LINE");
+        }
+
+        if (!ReferenceEquals(axis, null))
+        {
+            axis.Color = color;
+            Debug.Log("FOO: AXIS AXIS AXIS");
+        }
+    }
 
     private void Act()
     {
@@ -47,31 +65,30 @@ public class ModeExperimental : IMode
 
         if (_drawAction == null)
         {
-            _drawAction = _items.Add(_context.Current.Key, hitObject, hitPosition, hitWall, _relativeLine);
+            _drawAction = _items.Add(_context.Current.Key, hitObject, hitPosition, hitWall, _relativeObject);
         }
         else
         {
             _drawAction(hitObject, hitPosition, hitWall, true);
             _drawAction = null;
 
-            if (_relativeLine != null)
+            if (_relativeObject != null)
             {
-                _relativeLine.Color = ReconstructionInfo.NORMAL;
-                _relativeLine = null;
+                TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
+
+                _relativeObject = null;
             }
         }
     }
 
-    private void ActRelativeToLine()
+    private void ActRelativeToObject()
     {
-        var relativeLine = _hitObject as Line;
-
-        if (_relativeLine == null)
+        if (_relativeObject == null)
         {
-            _relativeLine = relativeLine;
+            _relativeObject = _hitObject;
+            Debug.Log($"ActRelativeToObject: {_relativeObject}");
 
-            if (_relativeLine != null)
-                _relativeLine.Color = ReconstructionInfo.MENTIONED;
+            TryColorObject(_relativeObject, ReconstructionInfo.MENTIONED);
 
             return;
         }
@@ -343,6 +360,7 @@ public class ModeExperimental : IMode
 
     private void _MoveCursor()
     {
+        Debug.Log($"_MoveCursor: {PCref.Hit.collider.gameObject.transform.parent.gameObject} --> {PCref.Hit.collider.gameObject}");
         var hitObject = PCref.Hit.collider.gameObject.GetComponent<IRaycastable>();
         var hitPosition = PCref.Hit.point;
         var hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
@@ -390,8 +408,8 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Line, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToLine),
-                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToLine),
+                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToObject),
+                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Wall, Act)

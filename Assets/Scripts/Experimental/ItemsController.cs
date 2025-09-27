@@ -252,7 +252,7 @@ namespace Assets.Scripts.Experimental
             IRaycastable hitObject,
             Vector3 hitPosition, 
             WallInfo hitPlane,
-            Line relativeLine = null)
+            IRaycastable relativeObject = null)
         {
             // FIND PLANE
 
@@ -277,9 +277,9 @@ namespace Assets.Scripts.Experimental
                 
                 case ExContext.Line: return DrawLine(plane, positionWithPointSensitivity);
 
-                case ExContext.PerpendicularLine: return DrawLinePerpendicularToLine(plane, positionWithPointSensitivity, relativeLine);
+                case ExContext.PerpendicularLine: return DrawLinePerpendicularToLine(plane, positionWithPointSensitivity, relativeObject);
 
-                case ExContext.ParallelLine: return DrawLineParallelToLine(plane, positionWithPointSensitivity, relativeLine);
+                case ExContext.ParallelLine: return DrawLineParallelToLine(plane, positionWithPointSensitivity, relativeObject);
 
                 case ExContext.Circle: return DrawCircle(plane, positionWithPointSensitivity);
 
@@ -584,7 +584,7 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public DrawAction DrawLineParallelToLine(WallInfo plane, Vector3 startPosition, Line relativeLine = null)
+        public DrawAction DrawLineParallelToLine(WallInfo plane, Vector3 startPosition, IRaycastable relativeObject = null)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -597,6 +597,23 @@ namespace Assets.Scripts.Experimental
             lineComponent.EnabledLabels = true;
             lineComponent.SetLabelVisible(true);
 
+            var relativeLine = relativeObject as Line;
+            var relativeAxis = relativeObject as Axis;
+            var fromPosition = Vector3.zero;
+            var toPosition = Vector3.zero;
+
+            if (relativeLine != null)
+            {
+                fromPosition = relativeLine.StartPosition;
+                toPosition = relativeLine.EndPosition;
+            }
+
+            if (relativeAxis != null)
+            {
+                fromPosition = relativeAxis.From;
+                toPosition = relativeAxis.To;
+            }
+
             var intersectedObjs = new HashSet<IAnalyzable>();
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
@@ -604,15 +621,15 @@ namespace Assets.Scripts.Experimental
                 if (plane != FindPlane(hitPlane, hitObject))
                     return;
 
-                if (relativeLine == null)
+                if (fromPosition == Vector3.zero && toPosition == Vector3.zero)
                     return;
 
-                var startPositionProjection = CalcProjectionOnAxis(relativeLine.StartPosition, relativeLine.EndPosition, startPosition);
+                var startPositionProjection = CalcProjectionOnAxis(fromPosition, toPosition, startPosition);
                 var startPositionOffsetFromAxis = startPosition - startPositionProjection;
 
                 var cursorPosition = CalcPosition(plane, hitPosition);
 
-                var cursorPositionProjection = CalcProjectionOnAxis(relativeLine.StartPosition, relativeLine.EndPosition, cursorPosition);
+                var cursorPositionProjection = CalcProjectionOnAxis(fromPosition, toPosition, cursorPosition);
 
                 var endPosition = cursorPositionProjection + startPositionOffsetFromAxis;
 
@@ -646,7 +663,7 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public DrawAction DrawLinePerpendicularToLine(WallInfo plane, Vector3 startPosition, Line relativeLine = null)
+        public DrawAction DrawLinePerpendicularToLine(WallInfo plane, Vector3 startPosition, IRaycastable relativeObject = null)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -659,6 +676,16 @@ namespace Assets.Scripts.Experimental
             lineComponent.EnabledLabels = true;
             lineComponent.SetLabelVisible(true);
 
+            var relativeLine = relativeObject as Line;
+            var relativeAxis = relativeObject as Axis;
+            var vRelativeLine = Vector3.zero;
+
+            if (relativeLine != null)
+                vRelativeLine = relativeLine.EndPosition - relativeLine.StartPosition;
+
+            if (relativeAxis != null)
+                vRelativeLine = relativeAxis.To - relativeAxis.From;
+
             var intersectedObjs = new HashSet<IAnalyzable>();
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
@@ -666,12 +693,11 @@ namespace Assets.Scripts.Experimental
                 if (plane != FindPlane(hitPlane, hitObject))
                     return;
 
-                if (relativeLine == null)
+                if (vRelativeLine == Vector3.zero)
                     return;
 
                 var cursorPosition = CalcPosition(plane, hitPosition);
 
-                var vRelativeLine = relativeLine.EndPosition - relativeLine.StartPosition;
                 var vDrawnLine = cursorPosition - startPosition;
 
                 if (vDrawnLine.magnitude < 1e-8f)
