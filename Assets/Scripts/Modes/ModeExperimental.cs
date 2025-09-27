@@ -378,7 +378,7 @@ public class ModeExperimental : IMode
         _mb.Init(true);
         _fc = mainObject.AddComponent<FacesGenerator>();
 
-        _items = new ItemsController(_wc, _wcrt, _fc);
+        _items = new ItemsController(_wc, _wcrt, _fc, _mb);
 
         //dodanie bazowej osi rzutuj¹cej
         _AddBaseAxis();
@@ -394,7 +394,8 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToLine),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.Wall, Act)
+                new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.Face, Act)
             });
 
         _contextMenuView = new ExContextMenuView();

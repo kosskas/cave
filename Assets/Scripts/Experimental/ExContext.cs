@@ -28,8 +28,11 @@ namespace Assets.Scripts.Experimental
         [Description("Linia odnosz\u0105ca")]
         Projection,
 
+        [Description("Rzutnia")]
+        Wall,
+
         [Description("\u015aciana")]
-        Wall
+        Face
     }
 
 }
