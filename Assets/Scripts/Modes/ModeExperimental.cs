@@ -10,7 +10,7 @@ using Assets.Scripts.Walls;
 
 public class ModeExperimental : IMode
 {
-    private static float Z_RADIAL_MENU_OFFSET = 0.0f;
+    private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.6f );
     private static float RADIAL_MENU_RADIUS = 20f;
     public PlayerController PCref { get; private set; }
 
@@ -418,10 +418,9 @@ public class ModeExperimental : IMode
         GameObject flystick = GameObject.Find("TrackedObject");
         GameObject.Find("NextContext")?.SetActive(false);
         GameObject.Find("PrevContext")?.SetActive(false);
-
         if (flystick == null)
         {
-            flystick = GameObject.Find("FlystickPlaceholder");
+            flystick = GameObject.Find("FPSPlayer");
             if (flystick == null)
             {
                 flystick = new GameObject("FlystickPlaceholder");
