@@ -125,7 +125,11 @@ namespace Assets.Scripts.Experimental.Items
                 Vector3 S = this.StartPosition;
                 float r = this._radius;
 
-                return DescriptiveMathLib.FindLCIntersections(A, B, S, r);
+                List<Vector3> intersections = DescriptiveMathLib.FindLCIntersections(A, B, S, r)
+                    .Where(p => DescriptiveMathLib.IsPointOnSegment(p, A, B))
+                    .ToList();
+
+                return intersections;
 
             }
             if (obj is Circle)
