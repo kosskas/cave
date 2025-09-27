@@ -2,6 +2,11 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.Experimental.Utils;
+using Assets.Scripts.Experimental;
+using System;
+using System.Linq;
+using UnityEditor;
 
 public class RadialMenu : MonoBehaviour
 {
@@ -31,23 +36,22 @@ public class RadialMenu : MonoBehaviour
     private float baseStartAngle = 0f;
     private float rotationOffset = 0f; 
     private Coroutine rotateCoroutine;
+    private CircularIterator<KeyValuePair<ExContext, Action>> _currentCtx;
 
     public bool isMenuActive = false;
 
  
-    public static RadialMenu Create(Transform parent, int count, float rad, List<string> lbls, GameObject prefab, ModeExperimental modeExperimental)
+    public static RadialMenu Create(Transform parent, float rad, GameObject prefab, ModeExperimental modeExperimental)
     {
         GameObject menuObject = new GameObject("RadialMenu");
         menuObject.transform.SetParent(parent, false);
         menuObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         RadialMenu menu = menuObject.AddComponent<RadialMenu>();
-        menu.itemCount = count;
         menu.radius = rad;
-        menu.labels = lbls;
         menu.itemPrefab = prefab;
         menu.modeExperimental = modeExperimental;
         menu.initialMenuItemScale = prefab.GetComponent<RectTransform>().localScale;
-        menu.Generate();
+        menu.Generate(modeExperimental.GetCtx());
         return menu;
     }
 
@@ -60,13 +64,13 @@ public class RadialMenu : MonoBehaviour
         if (Input.GetKeyDown(prevKey))
         {
             Select((selectedIndex - 1 + itemCount) % itemCount);
-            modeExperimental?._ChangeDrawContextPrev();
+            _currentCtx.Previous();
         }
 
         if (Input.GetKeyDown(nextKey))
         {
             Select((selectedIndex + 1) % itemCount);
-            modeExperimental?._ChangeDrawContextNext();
+            _currentCtx.Next();
         }
 
         if (Input.GetKeyDown(confirmKey))
@@ -92,8 +96,15 @@ public class RadialMenu : MonoBehaviour
         }
     }
 
-    public void Generate()
+    public void Generate(CircularIterator<KeyValuePair<ExContext, Action>> ctx)
     {
+        _currentCtx = ctx;
+        labels = new List<string>();
+        foreach (var kv in _currentCtx.All())
+        {
+            labels.Add(kv.Key.ToString());
+        }
+        itemCount = labels.Count;
         for (int i = transform.childCount - 1; i >= 0; i--)
 #if UNITY_EDITOR
             DestroyImmediate(transform.GetChild(i).gameObject);

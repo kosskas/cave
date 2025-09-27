@@ -4,6 +4,24 @@ namespace Assets.Scripts.Experimental
 {
     public enum ExContext
     {
+        [Description("Zapisz stan")]
+        Save,
+
+        [Description("Wczytaj stan")]
+        Load,
+
+        [Description("Przenies do wiz")]
+        LoadVisual,
+
+        [Description("Wroc do menu")]
+        BackToMenu,
+
+        [Description("Konstruuj")]
+        Const,
+
+        [Description("Wr\u00F3\u0107")]
+        BackToOpt,
+
         [Description("- - -")]
         Idle,
 
@@ -29,7 +47,9 @@ namespace Assets.Scripts.Experimental
         Projection,
 
         [Description("\u015aciana")]
-        Wall
-    }
+        Wall,
 
+        [Description("Linie rzutujace")]
+        ProjLine,
+    }
 }

@@ -25,9 +25,8 @@ public class ModeExperimental : IMode
     private ItemsController _items;
 
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
-
-    private ExContextMenuView _contextMenuView;
-    private ExControlMenuView _controlMenuView;
+    private CircularIterator<KeyValuePair<ExContext, Action>> _creationCtx;
+    private CircularIterator<KeyValuePair<ExContext, Action>> _optCtx;
 
     private IRaycastable _hitObject;
 
@@ -36,7 +35,8 @@ public class ModeExperimental : IMode
     private RadialMenu radialMenu;
 
     private Line _relativeLine;
-    
+
+    private bool _showProjLines = true;
     /* * * * CONTEXT ACTIONS begin * * * */
 
     private void Act()
@@ -86,13 +86,11 @@ public class ModeExperimental : IMode
     public void _ChangeDrawContextNext()
     {
         _context.Next();
-        _contextMenuView.SetCurrentContext(_context.Current.Key);
     }
 
     public void _ChangeDrawContextPrev()
     {
         _context.Previous();
-        _contextMenuView.SetCurrentContext(_context.Current.Key);
     }
 
     private void _DrawAction()
@@ -127,30 +125,12 @@ public class ModeExperimental : IMode
                 _SaveSolidAndSwitchToMode3Dto2D();
                 break;
 
-            case "NextContext":
-                _context.Next();
-                _contextMenuView.SetCurrentContext(_context.Current.Key);
-                break;
-
-            case "PrevContext":
-                _context.Previous();
-                _contextMenuView.SetCurrentContext(_context.Current.Key);
-                break;
-
             case "ExportSolidToVisualButton":
                 _SaveSolidAndSwitchToMode3Dto2D();
                 break;
 
             case "BackToMenuButton":
                 _BackToMenu();
-                break;
-            
-            case "SaveStateButton":
-                _SaveState();
-                break;
-
-            case "LoadStateButton":
-                _LoadState();
                 break;
 
         }
@@ -375,7 +355,7 @@ public class ModeExperimental : IMode
 
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
-        _mb.Init(true);
+        _mb.Init(_showProjLines);
         _fc = mainObject.AddComponent<FacesGenerator>();
 
         _items = new ItemsController(_wc, _wcrt, _fc);
@@ -383,9 +363,10 @@ public class ModeExperimental : IMode
         //dodanie bazowej osi rzutuj¹cej
         _AddBaseAxis();
 
-        _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
+        _creationCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
             {
+                new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _BackToBasicCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Idle, () => {}),
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
@@ -394,17 +375,24 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToLine),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.Wall, Act)
+                new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _SwitchRuleProjectionLine)
             });
 
-        _contextMenuView = new ExContextMenuView();
-        _contextMenuView.SetCurrentContext(_context.Current.Key);
+        _optCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
+            new List<KeyValuePair<ExContext, Action>>()
+            {
+                new KeyValuePair<ExContext, Action>(ExContext.Save, _SaveState),
+                new KeyValuePair<ExContext, Action>(ExContext.Load, _LoadState),
+                new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
+                new KeyValuePair<ExContext, Action>(ExContext.BackToMenu, _BackToMenu),
+                new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
+            });
 
+        _context = _optCtx;
         UIWall.ExportSolidToVisualButton.Show();
         UIWall.BackToMenuButton.Show();
         UIWall.SaveLoadStateButtons.Show();
-
-        //_controlMenuView = new ExControlMenuView();
 
         PointsList.ShowListAndLogs();
         
@@ -413,6 +401,26 @@ public class ModeExperimental : IMode
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
 
+    public CircularIterator<KeyValuePair<ExContext, Action>> GetCtx()
+    {
+        return _context;
+    }
+
+    private void _SwitchRuleProjectionLine()
+    {
+        _showProjLines = !_showProjLines;
+        _mb.SetShowRulesProjectionLine(_showProjLines);
+    }
+    private void _BackToBasicCtx()
+    {
+        _context = _optCtx;
+        radialMenu.Generate(_context);
+    }
+    private void _ChangeToConstrCtx()
+    {
+        _context = _creationCtx;
+        radialMenu.Generate(_context);
+    }
     public void AddRadialMenu()
     {
         GameObject flystick = GameObject.Find("TrackedObject");
@@ -442,12 +450,10 @@ public class ModeExperimental : IMode
                 GameObject itemPrefab = Resources.Load<GameObject>("RadialMenuItem");
                 if (itemPrefab != null)
                 {
-                    List<string> descriptions = Enum.GetValues(typeof(ExContext)).Cast<ExContext>().Select(e => e.GetDescription()).ToList();
+                    //List<string> descriptions = Enum.GetValues(typeof(ExContext)).Cast<ExContext>().Select(e => e.GetDescription()).ToList();
                     this.radialMenu = RadialMenu.Create(
                         radialMenuRoot,
-                        descriptions.Count, // liczba elementów
                         RADIAL_MENU_RADIUS, // promieñ
-                        descriptions, // etykiety
                         itemPrefab,
                         this
                     );
