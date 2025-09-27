@@ -325,9 +325,11 @@ namespace Assets.Scripts.Experimental
                     .Distinct()
                     .ToList();
 
+                var points3DDict = _mB.GetPoints3D(); 
 
-                var points3D = _mB.GetPoints3D()
-                    .Where(kvp => labels.Contains(kvp.Key))
+                var points3D = labels
+                    .Where(lbl => points3DDict.ContainsKey(lbl))
+                    .Select(lbl => new KeyValuePair<string, Vector3>(lbl, points3DDict[lbl]))
                     .ToList();
 
                 _fGen.GenerateFace(points3D);
