@@ -179,7 +179,7 @@ namespace Assets.Scripts.Experimental.Items
         {
             get
             {
-                return _labelComponent?.FocusedLabel.Text
+                return _labelComponent?.FocusedLabel?.Text
                        ?? string.Empty;
             }
             set

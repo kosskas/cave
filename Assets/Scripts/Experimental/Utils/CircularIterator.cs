@@ -13,7 +13,7 @@ namespace Assets.Scripts.Experimental.Utils
 
         private int _index;
 
-        public TItem Current => _items[_index];
+        public TItem Current => (_index >= 0) ? _items[_index] : default(TItem);
 
         public CircularIterator(IList<TItem> items)
         {
