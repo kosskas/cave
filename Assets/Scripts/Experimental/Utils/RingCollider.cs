@@ -23,7 +23,7 @@ namespace Assets.Scripts.Experimental.Utils
         public bool ColliderEnabled { get; set; } = true;
 
 
-        void Start()
+        void Awake()
         {
             var boxColliders = new GameObject("boxColliders");
             boxColliders.transform.SetParent(transform);
@@ -82,7 +82,7 @@ namespace Assets.Scripts.Experimental.Utils
         private class RaycastableDrawableComponent : MonoBehaviour, IRaycastable, IDrawable, IAnalyzable
         {
 
-            void Start()
+            void Awake()
             {
                 Plane = gameObject.transform.parent?.parent?.GetComponent<IDrawable>()?.Plane;
             }

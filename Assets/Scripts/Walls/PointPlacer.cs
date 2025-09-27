@@ -247,7 +247,7 @@ public class PointPlacer : MonoBehaviour {
         _LocateLabels(pointClicked, wall);
 
         var pointInfo = new PointINFO(pointClicked, wall, labelText, fullLabelText);
-        StateManager.Grid.Points.Add(pointInfo);
+        // StateManager.Grid.Points.Add(pointInfo);
         return pointInfo;
     }
 
@@ -275,7 +275,7 @@ public class PointPlacer : MonoBehaviour {
         _LocateLabels(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall);
 
         var pointInfo = new PointINFO(_removePoint_CurrentlyFocusedGridPoint, _removePoint_Wall, labelText, fullLabelText);
-        StateManager.Grid.Points.Remove(pointInfo);
+        // StateManager.Grid.Points.Remove(pointInfo);
         return pointInfo;
     }
 
@@ -306,7 +306,7 @@ public class PointPlacer : MonoBehaviour {
 
         _mc.AddEdgeProjection(labelText_1, labelText_2);
         var edgeInfo = new EdgeINFO(edgeObj, edge, point_1, point_2);
-        StateManager.Grid.Edges.Add(edgeInfo);
+        // StateManager.Grid.Edges.Add(edgeInfo);
         return edgeInfo;
     }
 
@@ -355,7 +355,7 @@ public class PointPlacer : MonoBehaviour {
         Destroy(edgeObj);
 
         var edgeInfo = new EdgeINFO(edgeObj, edge, point_1, point_2);
-        StateManager.Grid.Edges.Remove(edgeInfo);
+        // StateManager.Grid.Edges.Remove(edgeInfo);
         return edgeInfo;
     }
 
@@ -369,9 +369,11 @@ public class PointPlacer : MonoBehaviour {
         _mc.RemoveEdgeProjection(labelText_1, labelText_2);
         Destroy(edgeObj);
 
-        var edgeInfo = StateManager.Grid.Edges.First(e => e.P1.FullLabel.Equals(fullLabelTexts[0]) && e.P2.FullLabel.Equals(fullLabelTexts[1]));
-        StateManager.Grid.Edges.Remove(edgeInfo);
-        return edgeInfo;
+        // var edgeInfo = StateManager.Grid.Edges.First(e => e.P1.FullLabel.Equals(fullLabelTexts[0]) && e.P2.FullLabel.Equals(fullLabelTexts[1]));
+        // StateManager.Grid.Edges.Remove(edgeInfo);
+        // return edgeInfo;
+
+        return new EdgeINFO();
     }
 
     private List<EdgeINFO> _RemoveEdgesWithPointCascade(string pointLabel)
@@ -739,8 +741,8 @@ public class PointPlacer : MonoBehaviour {
 
         _LocateLabels(pointInfo.GridPoint, pointInfo.WallInfo);
 
-        if (!StateManager.Grid.Points.Contains(pointInfo))
-            StateManager.Grid.Points.Add(pointInfo);
+        // if (!StateManager.Grid.Points.Contains(pointInfo))
+        //     StateManager.Grid.Points.Add(pointInfo);
     }
 
     public void AddEdge(PointINFO point1, PointINFO point2)
@@ -758,7 +760,7 @@ public class PointPlacer : MonoBehaviour {
         _mc.AddEdgeProjection(point1.Label, point2.Label);
 
         var edgeInfo = new EdgeINFO(edgeObj, edge, point1, point2);
-        if (!StateManager.Grid.Edges.Contains(edgeInfo))
-            StateManager.Grid.Edges.Add(edgeInfo);
+        // if (!StateManager.Grid.Edges.Contains(edgeInfo))
+        //     StateManager.Grid.Edges.Add(edgeInfo);
     }
 }

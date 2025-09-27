@@ -84,9 +84,9 @@ public class WallCreator : MonoBehaviour
 		}
 	}
 
-    public WallInfo WCrCreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo)
+    public WallInfo WCrCreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo, string fixedName = null)
     {
-        return wallController.CreateWall(point1, point2, parentWallInfo, wallPrefab);
+        return wallController.CreateWall(point1, point2, parentWallInfo, wallPrefab, fixedName);
     }
     public void RestoreWall(string wallName, Vector3 point1, Vector3 point2, string parentWallName)
     {

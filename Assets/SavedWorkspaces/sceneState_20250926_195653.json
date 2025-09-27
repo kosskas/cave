@@ -1,0 +1,90 @@
+{
+  "POINTS": [
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": -0.605069757,
+        "y": 0.005,
+        "z": 0.697556138
+      },
+      "Labels": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "PlaneName": "Wall3",
+      "Position": {
+        "x": 0.217750072,
+        "y": 0.005,
+        "z": 0.252095819
+      },
+      "Labels": [
+        "B"
+      ]
+    }
+  ],
+  "LINES": [
+    {
+      "PlaneName": "Wall3",
+      "StartPosition": {
+        "x": -0.605069757,
+        "y": 0.005,
+        "z": 0.697556138
+      },
+      "EndPosition": {
+        "x": 0.217750072,
+        "y": 0.005,
+        "z": 0.252095819
+      },
+      "Labels": [
+        "0,94"
+      ],
+      "BoundPointsByLabel": [
+        "C",
+        "B"
+      ],
+      "LineWidth": 0.008
+    }
+  ],
+  "CIRCLES": [],
+  "WALLS": [
+    {
+      "WallName": "Wall6",
+      "ConstPoint1": null,
+      "ConstPoint2": null,
+      "ParentWallName": null
+    },
+    {
+      "WallName": "Wall5",
+      "ConstPoint1": null,
+      "ConstPoint2": null,
+      "ParentWallName": null
+    },
+    {
+      "WallName": "Wall4",
+      "ConstPoint1": null,
+      "ConstPoint2": null,
+      "ParentWallName": null
+    },
+    {
+      "WallName": "Wall3",
+      "ConstPoint1": null,
+      "ConstPoint2": null,
+      "ParentWallName": null
+    },
+    {
+      "WallName": "Wall2",
+      "ConstPoint1": null,
+      "ConstPoint2": null,
+      "ParentWallName": null
+    },
+    {
+      "WallName": "Wall1",
+      "ConstPoint1": null,
+      "ConstPoint2": null,
+      "ParentWallName": null
+    }
+  ],
+  "FACES": []
+}

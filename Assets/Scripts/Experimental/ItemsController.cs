@@ -1,38 +1,80 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Reflection;
-using Assets.Scripts.Experimental;
 using Assets.Scripts.Experimental.Items;
 using UnityEngine;
-using UnityEngine.Tizen;
 
 namespace Assets.Scripts.Experimental
 {
     public class ItemsController
     {
-        private WallController _wc;
-        private WallCreator _wcrt;
-        private FacesGenerator _fc;
-        
-        private const float _WALL_HALF_WIDTH = 0.05f;
         private const float _WALL_HALF_LENGTH = 1.7f;
-        private const float _OFFSET_FROM_WALL = 0.01f;
-            
-        private const float _HELP_LINE_WIDTH = 0.0035f;
+        private const float _WALL_OFFSET = 0.005f;
+
+        private const float _AXIS_LINE_WIDTH = 0.02f;
+        private const float _HELP_LINE_WIDTH = 0.004f;
         private const float _BOLD_LINE_WIDTH = 0.008f;
+         
+        private readonly WallController _wCtrl;
+        private readonly WallCreator _wCrt;
+        private readonly FacesGenerator _fGen;
+
+        private static ItemsController _ic;
 
         private readonly GameObject _workspace;
-        private GameObject _axisRepo;
-        private GameObject _lineRepo;
-        private GameObject _pointRepo;
-        private GameObject _circleRepo;
 
-        private Dictionary<Axis, Tuple<WallInfo, WallInfo>> _axisWalls;
+        private static GameObject _axisRepo;
+        private static GameObject _lineRepo;
+        private static GameObject _pointRepo;
+        private static GameObject _circleRepo;
+
+        private readonly Dictionary<Axis, Tuple<WallInfo, WallInfo>> _axisWalls;
 
 
-        /* PRIVATE METHODS */
+        /*   C O N S T R U C T O R S   */
+
+        public ItemsController(WallController wCtrl, WallCreator wCrt, FacesGenerator fGen)
+        {
+            _workspace = GameObject.Find("WorkspaceExp") ?? new GameObject("WorkspaceExp");
+
+            _axisRepo = new GameObject("AxisRepo");
+            _axisRepo.transform.SetParent(_workspace.transform);
+
+            _lineRepo = new GameObject("LineRepo");
+            _lineRepo.transform.SetParent(_workspace.transform);
+
+            _pointRepo = new GameObject("PointRepo");
+            _pointRepo.transform.SetParent(_workspace.transform);
+
+            _circleRepo = new GameObject("CircleRepo");
+            _circleRepo.transform.SetParent(_workspace.transform);
+
+            _axisWalls = new Dictionary<Axis, Tuple<WallInfo, WallInfo>>();
+
+            _wCtrl = wCtrl;
+            _wCrt = wCrt;
+            _fGen = fGen;
+
+            _ic = this;
+        }
+
+
+        /*   P R I V A T E   M E T H O D S   */
+
+        private static List<T> GetComponentsFromRepo<T>(GameObject repo) where T : Component
+        {
+            var result = new List<T>();
+
+            if (repo == null) return result;
+
+            foreach (Transform child in repo.transform)
+            {
+                var comp = child.gameObject.GetComponent<T>();
+                if (comp != null) result.Add(comp);
+            }
+
+            return result;
+        }
 
         private Vector3 CalcProjectionOnAxis(Axis axis, Vector3 point)
         {
@@ -125,17 +167,17 @@ namespace Assets.Scripts.Experimental
             var position = Vector3.zero;
 
             if (Mathf.Approximately(Mathf.Abs(planeNormal.x), 1))
-                position.x = planePosition.x + planeNormal.x * (_WALL_HALF_WIDTH + _OFFSET_FROM_WALL);
+                position.x = planePosition.x + Mathf.Sign(planeNormal.x) * _WALL_OFFSET;
             else
                 position.x = hitPosition.x;
 
             if (Mathf.Approximately(Mathf.Abs(planeNormal.y), 1))
-                position.y = planePosition.y + planeNormal.y * (_WALL_HALF_WIDTH + _OFFSET_FROM_WALL);
+                position.y = planePosition.y + Mathf.Sign(planeNormal.y) * _WALL_OFFSET;
             else
                 position.y = hitPosition.y;
 
             if (Mathf.Approximately(Mathf.Abs(planeNormal.z), 1))
-                position.z = planePosition.z + planeNormal.z * (_WALL_HALF_WIDTH + _OFFSET_FROM_WALL);
+                position.z = planePosition.z + Mathf.Sign(planeNormal.z) * _WALL_OFFSET;
             else
                 position.z = hitPosition.z;
 
@@ -150,52 +192,32 @@ namespace Assets.Scripts.Experimental
             return position;
         }
 
-        /* PUBLIC METHODS */
 
-        public ItemsController(WallController wc, WallCreator wcrt, FacesGenerator fc)
-        {
-            _workspace = GameObject.Find("WorkspaceExp") ?? new GameObject("WorkspaceExp");
-
-            _axisRepo = new GameObject("AxisRepo");
-            _axisRepo.transform.SetParent(_workspace.transform);
-
-            _lineRepo = new GameObject("LineRepo");
-            _lineRepo.transform.SetParent(_workspace.transform);
-
-            _pointRepo = new GameObject("PointRepo");
-            _pointRepo.transform.SetParent(_workspace.transform);
-            
-            _circleRepo = new GameObject("CircleRepo");
-            _circleRepo.transform.SetParent(_workspace.transform);
-
-            _axisWalls = new Dictionary<Axis, Tuple<WallInfo, WallInfo>>();
-
-            _wc = wc;
-            _wcrt = wcrt;
-            _fc = fc;
-        }
+        /*   P U B L I C   M E T H O D S   */
 
         public void AddAxisBetweenPlanes(WallInfo planeA, WallInfo planeB)
         {
             Vector3 normalA = planeA.GetNormal();
             Vector3 normalB = planeB.GetNormal();
+            Vector3 direction = Vector3.Cross(normalA, normalB).normalized;
 
-            Vector3 positionA = planeA.gameObject.transform.position;
-            Vector3 positionB = planeB.gameObject.transform.position;
+            Vector3 posA = planeA.gameObject.transform.position;
+            Vector3 posB = planeB.gameObject.transform.position;
 
-            Vector3 offsetVector = (normalA + normalB) * (_WALL_HALF_WIDTH + _OFFSET_FROM_WALL);
+            Vector3 v1 = posB - posA;
+            Vector3 v2 = Vector3.ProjectOnPlane(v1, normalA);
 
-            Vector3 direction = Vector3.Cross(normalA, normalB);
+            Vector3 contactPoint = posA + v2 + _WALL_OFFSET * (normalA + normalB);
 
-            Vector3 intersectionMiddlePoint = positionA - _WALL_HALF_LENGTH * normalB;
+            Vector3 from = contactPoint - direction * _WALL_HALF_LENGTH;
+            Vector3 to = contactPoint + direction * _WALL_HALF_LENGTH;
 
-            Vector3 from = (intersectionMiddlePoint - direction) + offsetVector;
-            Vector3 to = (intersectionMiddlePoint + direction) + offsetVector;
 
             var axis = new GameObject("AXIS");
             axis.transform.SetParent(_axisRepo.transform);
 
             var axisComponent = axis.AddComponent<Axis>();
+            axisComponent.Width = _AXIS_LINE_WIDTH;
             axisComponent.Draw(default(WallInfo), from, to);
 
             var labelComponent = axis.AddComponent<IndexedLabel>();
@@ -203,53 +225,15 @@ namespace Assets.Scripts.Experimental
             labelComponent.FontSize = 1;
 
             _axisWalls.Add(axisComponent, new Tuple<WallInfo, WallInfo>(planeA, planeB));
-            _wc.LinkConstructionToWall(planeA, axis);
-            _wc.LinkConstructionToWall(planeB, axis);
+            _wCtrl.LinkConstructionToWall(planeA, axis);
+            _wCtrl.LinkConstructionToWall(planeB, axis);
         }
 
-        public void AddAxisBetweenPlanes2(WallInfo planeA, WallInfo planeB)
-        {
-            Vector3 normalA = planeA.GetNormal();
-            Vector3 normalB = planeB.GetNormal();
-
-            Vector3 positionA = planeA.gameObject.transform.position;
-            Vector3 positionB = planeB.gameObject.transform.position;
-
-            // Calculate the intersection point of the two planes
-            Vector3 direction = Vector3.Cross(normalA, normalB);
-
-            // Solve for the intersection point using plane equations
-            float determinant = Vector3.Dot(direction, direction);
-            if (Mathf.Approximately(determinant, 0))
-            {
-                Debug.LogError("Planes are parallel and do not intersect.");
-                return;
-            }
-
-            Vector3 intersectionMiddlePoint = positionA + Vector3.Project(positionB - positionA, direction);
-
-            Vector3 from = (intersectionMiddlePoint - direction.normalized * _WALL_HALF_LENGTH);
-            Vector3 to = (intersectionMiddlePoint + direction.normalized * _WALL_HALF_LENGTH);
-
-            var axis = new GameObject("AXIS");
-            axis.transform.SetParent(_axisRepo.transform);
-
-            var axisComponent = axis.AddComponent<Axis>();
-            axisComponent.Draw(default(WallInfo), from, to);
-
-            var labelComponent = axis.AddComponent<IndexedLabel>();
-            labelComponent.AddLabel("X", "", $"{planeA.numberExp}/{planeB.numberExp}");
-            labelComponent.FontSize = 1;
-
-            _axisWalls.Add(axisComponent, new Tuple<WallInfo, WallInfo>(planeA, planeB));
-            _wc.LinkConstructionToWall(planeA, axis);
-            _wc.LinkConstructionToWall(planeB, axis);
-        }
         public void RemoveLastAxis()
         {
-            if (_axisWalls != null && _axisWalls.Count > 0 && _wc != null)
+            if (_axisWalls != null && _axisWalls.Count > 0 && _wCtrl != null)
             {
-                var deletingWall = _wc.GetLastAddedWall();
+                var deletingWall = _wCtrl.GetLastAddedWall();
                 if (deletingWall != null)
                 {
                     var keysToRemove = _axisWalls
@@ -307,16 +291,18 @@ namespace Assets.Scripts.Experimental
             }
         }
 
-        public DrawAction DrawPoint(WallInfo plane, Vector3 position)
+        public DrawAction DrawPoint(WallInfo plane, Vector3 position, List<string> labels = null)
         {
             var point = new GameObject("POINT");
             point.transform.SetParent(_pointRepo.transform);
-            _wc.LinkConstructionToWall(plane, point);
+            _wCtrl.LinkConstructionToWall(plane, point);
 
             var pointComponent = point.AddComponent<ExPoint>();
             pointComponent.Draw(plane, position);
             pointComponent.EnabledLabels = true;
-            
+
+            labels?.ForEach(label => pointComponent.AddLabel(label));
+
             return null;
         }
 
@@ -324,7 +310,7 @@ namespace Assets.Scripts.Experimental
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
-            _wc.LinkConstructionToWall(plane, line);
+            _wCtrl.LinkConstructionToWall(plane, line);
 
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
@@ -378,12 +364,13 @@ namespace Assets.Scripts.Experimental
                 }
             };
         }
+
         /// TODO Przeciecia sa niedostepne dla scian
-        public DrawAction DrawWall(WallInfo plane, Vector3 startPosition)
+        public DrawAction DrawWall(WallInfo plane, Vector3 startPosition, string fixedName = null)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
-            _wc.LinkConstructionToWall(plane, line);
+            _wCtrl.LinkConstructionToWall(plane, line);
 
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
@@ -406,8 +393,8 @@ namespace Assets.Scripts.Experimental
                 {
                     UnityEngine.Object.Destroy(line);
 
-                    var addedWall = _wcrt.WCrCreateWall(startPosition, endPositionWithPointSensitivity, plane);
-                    AddAxisBetweenPlanes2(addedWall, plane);
+                    var addedWall = _wCrt.WCrCreateWall(startPosition, endPositionWithPointSensitivity, plane, fixedName);
+                    AddAxisBetweenPlanes(addedWall, plane);
                 }
             };
         }
@@ -416,7 +403,7 @@ namespace Assets.Scripts.Experimental
         {
             var circle = new GameObject("CIRCLE");
             circle.transform.SetParent(_circleRepo.transform);
-            _wc.LinkConstructionToWall(plane, circle);
+            _wCtrl.LinkConstructionToWall(plane, circle);
 
             var circleComponent = circle.AddComponent<Circle>();
             circleComponent.ColliderEnabled = false;
@@ -555,8 +542,8 @@ namespace Assets.Scripts.Experimental
                         projectionComponent2.ColliderEnabled = true;
                         projectionComponent1.SetLabelVisible(false);
                         projectionComponent2.SetLabelVisible(false);
-                        _wc.LinkConstructionToWall(startPlane, projection1);
-                        _wc.LinkConstructionToWall(endPlane, projection2);
+                        _wCtrl.LinkConstructionToWall(startPlane, projection1);
+                        _wCtrl.LinkConstructionToWall(endPlane, projection2);
 
                         foreach (var intersected in intersectedObjsPl1)
                         {
@@ -589,7 +576,7 @@ namespace Assets.Scripts.Experimental
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
-            _wc.LinkConstructionToWall(plane, line);
+            _wCtrl.LinkConstructionToWall(plane, line);
 
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
@@ -651,7 +638,7 @@ namespace Assets.Scripts.Experimental
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
-            _wc.LinkConstructionToWall(plane, line);
+            _wCtrl.LinkConstructionToWall(plane, line);
 
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
@@ -725,80 +712,87 @@ namespace Assets.Scripts.Experimental
 
         //---
 
-        public void Save()
+        public static List<ExPoint> GetPoints() => GetComponentsFromRepo<ExPoint>(_pointRepo);
+
+        public static List<Line> GetLines() => GetComponentsFromRepo<Line>(_lineRepo);
+
+        public static List<Circle> GetCircles() => GetComponentsFromRepo<Circle>(_circleRepo);
+
+        public static List<Axis> GetAxes() => GetComponentsFromRepo<Axis>(_axisRepo);
+
+        public static List<WallInfo> GetWalls() => _ic?._wCtrl.GetWalls() ?? new List<WallInfo>();
+
+        public static List<FaceInfo> GetFaces() => FacesGenerator.faceInfoList;
+
+        public static void AddPoint(List<string> pointLabels, string pointPlaneName, Vector3 pointPosition)
         {
-            //walls i faces sa juz zapisane
-            StorePoints();
-            StoreLines();
-            StoreCircles();
-
-            StateManager.Exp.Save();
-        }
-        private void StoreWalls()
-        {
-            foreach (Transform pointTrans in _pointRepo.transform)
-            {
-                var point = pointTrans.gameObject.GetComponent<ExPoint>();
-                if (point == null)
-                    continue;
-
-                var planeName = point.Plane.name;
-                var position = point.Position;
-                var labels = point.Labels;
-
-                StateManager.Exp.StorePoint(planeName, position, labels);
-            }
-        }
-        private void StorePoints()
-        {
-            foreach (Transform pointTrans in _pointRepo.transform)
-            {
-                var point = pointTrans.gameObject.GetComponent<ExPoint>();
-                if (point == null)
-                    continue;
-
-                var planeName = point.Plane.name;
-                var position = point.Position;
-                var labels = point.Labels;
-
-                StateManager.Exp.StorePoint(planeName, position, labels);
-            }
+            _ic?.DrawPoint(_ic._wCtrl.GetWallByName(pointPlaneName), pointPosition, pointLabels);
         }
 
-        private void StoreLines()
+        public static void AddLine(List<string> lineBoundPointsByLabel, Vector3 lineEndPosition, List<string> lineLabels, float lineLineWidth, string linePlaneName, Vector3 lineStartPosition)
         {
-            foreach (Transform lineTrans in _lineRepo.transform)
+            if (_ic == null) return;
+
+            var plane = _ic._wCtrl.GetWallByName(linePlaneName);
+
+            var startPointLabel = lineBoundPointsByLabel.ElementAtOrDefault(0);
+            var endPointLabel = lineBoundPointsByLabel.ElementAtOrDefault(1);
+
+            ExPoint startPoint = null;
+            ExPoint endPoint = null;
+
+            if (startPointLabel != default(string) && endPointLabel != default(string))
             {
-                var line = lineTrans.gameObject.GetComponent<Line>();
-                if (line == null)
-                    continue;
+                foreach (Transform pointTrans in _pointRepo.transform)
+                {
+                    var point = pointTrans.gameObject.GetComponent<ExPoint>();
+                    if (point == null)
+                        continue;
 
-                var planeName = line.Plane.name;
-                var startPosition = line.StartPosition;
-                var endPosition = line.EndPosition;
-                var boundPoints = line.GetLabelsOfBoundPoints();
-                var labels = line.Labels;
-                var lineWidth = line.Width;
+                    if (point.Plane.Equals(plane) && point.Labels.Contains(startPointLabel))
+                    {
+                        startPoint = point;
+                        startPoint.FocusedLabel = startPointLabel;
+                    }
 
-                StateManager.Exp.StoreLine(planeName, startPosition, endPosition, boundPoints, labels, lineWidth);
+                    if (point.Plane.Equals(plane) && point.Labels.Contains(endPointLabel))
+                    {
+                        endPoint = point;
+                        endPoint.FocusedLabel = endPointLabel;
+                    }
+                }
             }
+
+            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, lineLineWidth);
+            da.Invoke(endPoint, lineEndPosition, plane, true);
         }
 
-        private void StoreCircles()
+        public static void AddCircle(Vector3 circleEndPosition, float circleLineWidth, string circlePlaneName, Vector3 circleStartPosition)
         {
-            foreach (Transform circleTrans in _circleRepo.transform)
-            {
-                var circle = circleTrans.gameObject.GetComponent<Circle>();
-                if (circle == null)
-                    continue;
+            if (_ic == null) return;
 
-                var planeName = circle.Plane.name;
-                var startPosition = circle.StartPosition;
-                var endPosition = circle.EndPosition;
-                var lineWidth = circle.Width;
+            var plane = _ic._wCtrl.GetWallByName(circlePlaneName);
 
-                StateManager.Exp.StoreCircle(planeName, startPosition, endPosition, lineWidth);
-            }
+            var da = _ic.DrawCircle(plane, circleStartPosition, circleLineWidth);
+            da.Invoke(null, circleEndPosition, plane, true);
+        }
+
+        public static void AddWall(Vector3? wallConstPoint1, Vector3? wallConstPoint2, string wallParentWallName, string wallWallName)
+        {
+            if (_ic == null) return;
+            if (wallParentWallName == null) return;
+            if (wallConstPoint1 == null) return;
+            if (wallConstPoint2 == null) return;
+
+            var plane = _ic._wCtrl.GetWallByName(wallParentWallName);
+
+            var da = _ic.DrawWall(plane, (Vector3)wallConstPoint1, wallWallName);
+            da.Invoke(null, (Vector3)wallConstPoint2, plane, true);
+        }
+
+        public static void AddFace(List<KeyValuePair<string, Vector3>> faceVertices)
+        {
+            _ic?._fGen.GenerateFace(faceVertices);
         }
 
         //---
@@ -827,95 +821,5 @@ namespace Assets.Scripts.Experimental
             _pointRepo.transform.SetParent(_workspace.transform);
         }
 
-        //---
-
-        public void Restore()
-        {
-            Clear(withAxis: false);
-            StateManager.Exp.Load();
-            StateManager.Exp.RestoreWalls(_wcrt);
-            RestorePoints();
-            RestoreLines();
-            RestoreCircles();
-            StateManager.Exp.RestoreFaces(_fc);
-        }
-
-        private void RestorePoints()
-        {
-            StateManager.Exp.RestorePoints((plane, position, labels) =>
-            {
-                var point = new GameObject("POINT");
-                point.transform.SetParent(_pointRepo.transform);
-                _wc.LinkConstructionToWall(plane, point);
-                var pointComponent = point.AddComponent<ExPoint>();
-                pointComponent.Draw(plane, position);
-                pointComponent.EnabledLabels = true;
-
-                labels.ForEach(label => pointComponent.AddLabel(label));
-            });
-        }
-
-        private void RestoreLines()
-        {
-            StateManager.Exp.RestoreLines((plane, startPosition, endPosition, boundPointsByLabel, labels, lineWidth) =>
-            {
-                var line = new GameObject("LINE");
-                line.transform.SetParent(_lineRepo.transform);
-                _wc.LinkConstructionToWall(plane, line);
-                var lineComponent = line.AddComponent<Line>();
-                lineComponent.Width = lineWidth;
-                lineComponent.Draw(plane, startPosition, endPosition);
-                lineComponent.EnabledLabels = true;
-                lineComponent.ColliderEnabled = true;
-            
-                labels.ForEach(label =>
-                {
-                    float tmp;
-                    if (float.TryParse(label, out tmp))
-                        return;
-
-                    lineComponent.AddLabel(label);
-                });
-
-                var startPointLabel = boundPointsByLabel.ElementAtOrDefault(0);
-                var endPointLabel = boundPointsByLabel.ElementAtOrDefault(1);
-
-                if (startPointLabel == default(string) || endPointLabel == default(string))
-                    return;
-
-                var startPoint = default(ExPoint);
-                var endPoint = default(ExPoint);
-                foreach (Transform pointTrans in _pointRepo.transform)
-                {
-                    var point = pointTrans.gameObject.GetComponent<ExPoint>();
-                    if (point == null)
-                        continue;
-
-                    if (point.Plane.Equals(plane) && point.Labels.Contains(startPointLabel))
-                        startPoint = point;
-
-                    if (point.Plane.Equals(plane) && point.Labels.Contains(endPointLabel))
-                        endPoint = point;
-                }
-
-                if (startPoint == default(ExPoint) || endPoint == default(ExPoint))
-                    return;
-
-                lineComponent.BindPoints(startPoint, startPointLabel, endPoint, endPointLabel);
-            });
-        }
-
-        private void RestoreCircles()
-        {
-            StateManager.Exp.RestoreCircles((plane, startPosition, endPosition, lineWidth) =>
-            {
-                var circle = new GameObject("CIRCLE");
-                circle.transform.SetParent(_circleRepo.transform);
-                _wc.LinkConstructionToWall(plane, circle);
-                var circleComponent = circle.AddComponent<Circle>();
-                circleComponent.Draw(plane, startPosition, endPosition);
-                circleComponent.ColliderEnabled = true;
-            });
-        }
     }
 }

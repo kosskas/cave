@@ -16,10 +16,20 @@ public class WallInfo
     /// </summary>
     public GameObject gameObject;
     /// <summary>
+    /// Pierwszy punkt konstrukcyjny (null dla ściany bazowej)
+    /// </summary>
+    public Vector3? constrPoint1;
+    /// <summary>
+    /// Drugi punkt konstrukcyjny (null dla ściany bazowej)
+    /// </summary>
+    public Vector3? constrPoint2;
+    /// <summary>
     /// Numer ściany
     /// </summary>
     public int number;
-
+    /// <summary>
+    /// Numer ściany na potrzeby oznaczania osi rzutujących
+    /// </summary>
     public int numberExp;
     /// <summary>
     /// Nazwa ściany
@@ -68,9 +78,11 @@ public class WallInfo
     /// <param name="showLines">Flaga dotycząca wyświetlania linii rzutujących.</param>
     /// <param name="showReferenceLines">Flaga dotycząca wyświetlania linii odnoszących.</param>
     /// <param name="canDelete">Flaga dot. możliwości usuwania ściany.</param>
-    public WallInfo(GameObject gameObject, int number, string name, string parentName, bool showProjection, bool showLines, bool showReferenceLines, bool canDelete)
+    public WallInfo(GameObject gameObject, Vector3? constrPoint1, Vector3? constrPoint2, int number, string name, string parentName, bool showProjection, bool showLines, bool showReferenceLines, bool canDelete)
     {
         this.gameObject = gameObject;
+        this.constrPoint1 = constrPoint1;
+        this.constrPoint2 = constrPoint2;
         this.number = number;
         this.name = name;
         this.showProjection = showProjection;
