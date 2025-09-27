@@ -114,6 +114,7 @@ public class MeshBuilder : MonoBehaviour
             return;
         ShowPoints3D();
         ShowEdges3D();
+        ShowProjectionLines();
     }
     /// <summary>
     /// Inicjalizuje klasę, tworzy katalogi do przechowywania punktów i krawędzi 3D
@@ -159,7 +160,7 @@ public class MeshBuilder : MonoBehaviour
         {
 			verticesOnWalls[wall] = new Dictionary<string, PointProjection>();
         }
-        PointProjection toAddProj = new PointProjection(pointObj, pointObj.GetComponent<LineSegment>(),wall.GetNormal(), false);
+        PointProjection toAddProj = new PointProjection(pointObj, pointObj.AddComponent<LineSegment>(),wall.GetNormal(), false);
         verticesOnWalls[wall][label] = toAddProj;
         //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
