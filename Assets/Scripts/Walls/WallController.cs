@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using Assets.Scripts.Walls;
-using Assets.Scripts;
 
 /// <summary>
 /// Klasa WallController zarządza właściwościami ścian

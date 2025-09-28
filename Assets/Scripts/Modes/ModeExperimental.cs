@@ -6,8 +6,6 @@ using Assets.Scripts;
 using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using UnityEngine;
-using Assets.Scripts.Walls;
-
 public class ModeExperimental : IMode
 {
     private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.55f );
@@ -119,44 +117,6 @@ public class ModeExperimental : IMode
         _context.Current.Value();
     }
 
-    private void _MakeActionOnWall()
-    {
-        if (PCref.Hit.collider == null)
-            return;
-
-        if (PCref.Hit.collider.tag == "PointButton")
-        {
-            _fc.points.Add(PointsList.AddPointToVerticesList(PCref.Hit.collider.gameObject));
-        }
-        else switch (PCref.Hit.collider.gameObject.name)
-        {
-            case "UpButton":
-                PointsList.PointListGoUp();
-                break;
-
-            case "DownButton":
-                PointsList.PointListGoDown();
-                break;
-
-            case "GenerateButton":
-                _fc.GenerateFace(_fc.points);
-                break;
-
-            case "SwitchButton":
-                _SaveSolidAndSwitchToMode3Dto2D();
-                break;
-
-            case "ExportSolidToVisualButton":
-                _SaveSolidAndSwitchToMode3Dto2D();
-                break;
-
-            case "BackToMenuButton":
-                _BackToMenu();
-                break;
-
-        }
-    }
-
     private void _SaveState()
     {
         StateManager.Exp.Save();
@@ -194,18 +154,10 @@ public class ModeExperimental : IMode
         _mb.ClearAndDisable();
         GameObject.Destroy(_mb);
 
-        //Hide point list
-        PointsList.HideListAndLogs();
-
         _wc.SetBasicWalls();
         //delete menu
         GameObject.Destroy(radialMenu.gameObject); 
         radialMenu = null;
-
-        //Hide context view
-        ExContextMenuView.Hide();
-        UIWall.ExportSolidToVisualButton.Hide();
-        UIWall.BackToMenuButton.Hide();
 
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.ModeMenu);
@@ -236,16 +188,6 @@ public class ModeExperimental : IMode
         //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
         _mb.ClearAndDisable();
         GameObject.Destroy(_mb);
-
-        //Hide point list
-        PointsList.HideListAndLogs();
-
-        //Hide context view
-        ExContextMenuView.Hide();
-        UIWall.ExportSolidToVisualButton.Hide();
-        UIWall.BackToMenuButton.Hide();
-        UIWall.SaveLoadStateButtons.Hide();
-
 
         //delete menu
         GameObject.Destroy(radialMenu.gameObject);
@@ -363,7 +305,6 @@ public class ModeExperimental : IMode
         _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall4"));
     }
 
-
     public ModeExperimental(PlayerController pc)
     {
         PCref = pc;
@@ -412,11 +353,6 @@ public class ModeExperimental : IMode
             });
 
         _context = _optCtx;
-        UIWall.ExportSolidToVisualButton.Show();
-        UIWall.BackToMenuButton.Show();
-        UIWall.SaveLoadStateButtons.Show();
-
-        PointsList.ShowListAndLogs();
         
         AddRadialMenu();
 
@@ -518,11 +454,6 @@ public class ModeExperimental : IMode
         {
             _TryRemoveFocusedLabel();
         }
-        
-        if (Input.GetKeyDown("5"))
-        {
-            _MakeActionOnWall();
-        }
 
         if (Input.GetKeyDown("6"))
         {
@@ -558,7 +489,6 @@ public class ModeExperimental : IMode
         {
             radialMenu.ToggleRadialMenuActive();
         }
-
     }
 }
 

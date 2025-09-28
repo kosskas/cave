@@ -201,7 +201,6 @@ public class MeshBuilder : MonoBehaviour
             {
                 MarkOK(currPts[0]);
                 MarkOK(currPts[1]);
-                PointsList.UpdatePointsList();
             }
         }
         else
@@ -231,7 +230,6 @@ public class MeshBuilder : MonoBehaviour
                 Debug.Log("nie ma pktu 3d");
                 bool p1 = false, p2 = false, p3 = false;
                 Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-                PointsList.UpdatePointsList();
                 if (result == Status.OK)
                 {
                     if (p1)
@@ -296,7 +294,6 @@ public class MeshBuilder : MonoBehaviour
             {
                 vertices3D[label].deleted = true;
                 FacesGenerator.RemoveFacesFromPoint(label);
-                PointsList.UpdatePointsList();
             }
             MarkOK(currPts[0]);
             MarkOK(currPts[1]);
@@ -306,13 +303,11 @@ public class MeshBuilder : MonoBehaviour
             if (vertices3D.ContainsKey(label)) //sa 3 i jest obiekt 3d
             {
                 vertices3D[label].deleted = true;
-                PointsList.UpdatePointsList();
             }
             //moga byc 3 i zle polozone
             //Rekonstruuj
             bool p1 = false, p2 = false, p3 = false;
             Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-            PointsList.UpdatePointsList();
 
             if (result != Status.OK)
             {
@@ -323,7 +318,6 @@ public class MeshBuilder : MonoBehaviour
             {
                 MarkOK(currPts[0]);
                 MarkOK(currPts[1]);
-                PointsList.UpdatePointsList();
                 FacesGenerator.RemoveFacesFromPoint(label);
             }
         }

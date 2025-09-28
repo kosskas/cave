@@ -147,7 +147,6 @@ public class FacesGenerator : MonoBehaviour {
         }
 
         points = new List<KeyValuePair<string, Vector3>>();
-        PointsList.listTextComponent.text = "";
     }
 
     public static List<FaceInfo> GetFaceInfosFromPointLabel(string pointLabel)
