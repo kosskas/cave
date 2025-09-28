@@ -103,7 +103,6 @@ public class MeshBuilder : MonoBehaviour
     /// </summary>
     GameObject referenceLinesDir = null;
 
-    WallController wc = null;
     bool blocked = false;
     bool showProjectionLines = true;
 
@@ -129,7 +128,6 @@ public class MeshBuilder : MonoBehaviour
         verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
         vertices3D = new Dictionary<string, Vertice3D>();
         edges3D = new Dictionary<string, Edge3D>();
-        wc = (WallController)FindObjectOfType(typeof(WallController));
         blocked = false;
         this.showProjectionLines = showProjectionLines;
 
