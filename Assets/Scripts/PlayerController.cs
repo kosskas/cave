@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 
 /// <summary>
@@ -40,7 +38,6 @@ public class PlayerController : MonoBehaviour
     {
         ModeMenu,
         Mode3Dto2D,
-        //Mode2Dto3D,
         ModeExperimental
     }
 

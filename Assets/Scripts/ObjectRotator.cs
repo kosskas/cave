@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 /// <summary>
 /// Klasa ObjectRotator służy do obracania bryłą przez gracza, jest dołączana do obiektu ładowanej bryły.
 /// </summary>

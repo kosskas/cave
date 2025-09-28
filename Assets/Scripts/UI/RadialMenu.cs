@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using Assets.Scripts.Experimental.Utils;
 using Assets.Scripts.Experimental;
 using System;
-using System.Linq;
-using UnityEditor;
 
 public class RadialMenu : MonoBehaviour
 {
@@ -21,7 +19,6 @@ public class RadialMenu : MonoBehaviour
     public float selectedScale = 1.44f;
     public float fontSizeScale = 0.34f;
     public Vector3 initialMenuItemScale;
-    public Vector3 initialMenuScale = new Vector3(0.5f, 0.5f, 0.5f);
 
     public bool animateRotation = true;
     public float rotationDuration = 0.25f; 
