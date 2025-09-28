@@ -10,10 +10,10 @@ namespace Assets.Scripts.Experimental
         [Description("Wczytaj stan")]
         Load,
 
-        [Description("Przenies do wiz")]
+        [Description("Wizualizuj")]
         LoadVisual,
 
-        [Description("Wroc do menu")]
+        [Description("Wro\u0107 do menu")]
         BackToMenu,
 
         [Description("Konstruuj")]
@@ -49,7 +49,7 @@ namespace Assets.Scripts.Experimental
         [Description("\u015aciana")]
         Wall,
 
-        [Description("Linie rzutujace")]
+        [Description("Linie rzutuj\u0105ce")]
         ProjLine,
     }
 }
