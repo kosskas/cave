@@ -65,6 +65,7 @@ public class LineSegment : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
+		if(lineRenderer == null) return;
 		UpdateLineCoordinates();
 	}
 

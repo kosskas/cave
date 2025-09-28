@@ -160,7 +160,13 @@ public class MeshBuilder : MonoBehaviour
         {
 			verticesOnWalls[wall] = new Dictionary<string, PointProjection>();
         }
-        PointProjection toAddProj = new PointProjection(pointObj, pointObj.AddComponent<LineSegment>(),wall.GetNormal(), false);
+
+        var projLine = pointObj.GetComponent<LineSegment>();
+        if (projLine == null)
+        {
+            projLine = pointObj.AddComponent<LineSegment>();
+        }
+        PointProjection toAddProj = new PointProjection(pointObj, projLine, wall.GetNormal(), false);
         verticesOnWalls[wall][label] = toAddProj;
         //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
@@ -320,9 +326,18 @@ public class MeshBuilder : MonoBehaviour
                 PointsList.UpdatePointsList();
                 FacesGenerator.RemoveFacesFromPoint(label);
             }
-        }   
+        }
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
 	}
+
+    public void RemoveProjectionLine(GameObject pointObj)
+    {
+        var projLine = pointObj.GetComponent<LineSegment>();
+        if (projLine != null)
+        {
+            Destroy(projLine);
+        }
+    }
     /// <summary>
     /// Tworzy krawędź w 3D i jeśli jest odpowiednia ilość informacji wyświetla ją
     /// </summary>

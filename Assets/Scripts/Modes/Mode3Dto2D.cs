@@ -92,6 +92,9 @@ public class Mode3Dto2D : IMode
     private void _BackToMenu()
     {
         _wc.SetBasicWalls();
+        GameObject mainObject = GameObject.Find("MainObject");
+        GameObject.Destroy(mainObject);
+        mainObject = new GameObject("MainObject");
         GameObject.Destroy(_si);
         PCref.ChangeMode(PlayerController.Mode.ModeMenu);
     }

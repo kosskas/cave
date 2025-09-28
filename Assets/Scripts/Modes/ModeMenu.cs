@@ -58,9 +58,15 @@ public class ModeMenu : IMode
     public void HandleInput()
     {
 
-        if (Input.GetKeyDown("5"))
+        if (Input.GetKeyDown("1"))
         {
-            _MakeActionOnWall();
+            _HideModesButtons();
+            PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
+        }
+        if (Input.GetKeyDown("2"))
+        {
+            _HideModesButtons();
+            PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
         }
 
     }
