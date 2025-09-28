@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
-using System.Threading;
-using System.Xml.Serialization;
-using System.Reflection;
 using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 
@@ -103,7 +98,6 @@ public class MeshBuilder : MonoBehaviour
     /// </summary>
     GameObject referenceLinesDir = null;
 
-    WallController wc = null;
     bool blocked = false;
     bool showProjectionLines = true;
 
@@ -129,7 +123,6 @@ public class MeshBuilder : MonoBehaviour
         verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
         vertices3D = new Dictionary<string, Vertice3D>();
         edges3D = new Dictionary<string, Edge3D>();
-        wc = (WallController)FindObjectOfType(typeof(WallController));
         blocked = false;
         this.showProjectionLines = showProjectionLines;
 
@@ -160,7 +153,13 @@ public class MeshBuilder : MonoBehaviour
         {
 			verticesOnWalls[wall] = new Dictionary<string, PointProjection>();
         }
-        PointProjection toAddProj = new PointProjection(pointObj, pointObj.AddComponent<LineSegment>(),wall.GetNormal(), false);
+
+        var projLine = pointObj.GetComponent<LineSegment>();
+        if (projLine == null)
+        {
+            projLine = pointObj.AddComponent<LineSegment>();
+        }
+        PointProjection toAddProj = new PointProjection(pointObj, projLine, wall.GetNormal(), false);
         verticesOnWalls[wall][label] = toAddProj;
         //sprawdz czy istnieja już dwa
         List<PointProjection> currPts = GetCurrentPointProjections(label);
@@ -195,7 +194,6 @@ public class MeshBuilder : MonoBehaviour
             {
                 MarkOK(currPts[0]);
                 MarkOK(currPts[1]);
-                PointsList.UpdatePointsList();
             }
         }
         else
@@ -225,7 +223,6 @@ public class MeshBuilder : MonoBehaviour
                 Debug.Log("nie ma pktu 3d");
                 bool p1 = false, p2 = false, p3 = false;
                 Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-                PointsList.UpdatePointsList();
                 if (result == Status.OK)
                 {
                     if (p1)
@@ -290,7 +287,6 @@ public class MeshBuilder : MonoBehaviour
             {
                 vertices3D[label].deleted = true;
                 FacesGenerator.RemoveFacesFromPoint(label);
-                PointsList.UpdatePointsList();
             }
             MarkOK(currPts[0]);
             MarkOK(currPts[1]);
@@ -300,13 +296,11 @@ public class MeshBuilder : MonoBehaviour
             if (vertices3D.ContainsKey(label)) //sa 3 i jest obiekt 3d
             {
                 vertices3D[label].deleted = true;
-                PointsList.UpdatePointsList();
             }
             //moga byc 3 i zle polozone
             //Rekonstruuj
             bool p1 = false, p2 = false, p3 = false;
             Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-            PointsList.UpdatePointsList();
 
             if (result != Status.OK)
             {
@@ -317,12 +311,20 @@ public class MeshBuilder : MonoBehaviour
             {
                 MarkOK(currPts[0]);
                 MarkOK(currPts[1]);
-                PointsList.UpdatePointsList();
                 FacesGenerator.RemoveFacesFromPoint(label);
             }
-        }   
+        }
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
 	}
+
+    public void RemoveProjectionLine(GameObject pointObj)
+    {
+        var projLine = pointObj.GetComponent<LineSegment>();
+        if (projLine != null)
+        {
+            Destroy(projLine);
+        }
+    }
     /// <summary>
     /// Tworzy krawędź w 3D i jeśli jest odpowiednia ilość informacji wyświetla ją
     /// </summary>
@@ -613,7 +615,6 @@ public class MeshBuilder : MonoBehaviour
         Vector3 point1 = result.Item1;
         Vector3 point2 = result.Item2;
         if(Vector3.SqrMagnitude(point1 - point2) > eps)
-        if (point1 != point2)
         {
             Debug.LogError($"Nierzut: point1={point1}, point2={point2}");
             return Vector3.zero;

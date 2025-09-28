@@ -1,12 +1,8 @@
 ﻿using Assets.Scripts.Experimental.Utils;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngineInternal.Input.NativeTrackingEvent;
 
 namespace Assets.Scripts.Experimental.Items
 {

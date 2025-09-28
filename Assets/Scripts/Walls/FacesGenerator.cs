@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using Assets.Scripts;
-using JetBrains.Annotations;
 using UnityEngine;
 
 public class FacesGenerator : MonoBehaviour {
@@ -147,7 +143,6 @@ public class FacesGenerator : MonoBehaviour {
         }
 
         points = new List<KeyValuePair<string, Vector3>>();
-        PointsList.listTextComponent.text = "";
     }
 
     public static List<FaceInfo> GetFaceInfosFromPointLabel(string pointLabel)

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using Assets.Scripts.Experimental.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -93,34 +90,6 @@ namespace Assets.Scripts.Experimental.Items
                 Mc?.RemovePointProjection(Plane, label);
             });
         }
-
-        private GameObject AddProjectionLine(string labelText)
-        {
-            var projectionLineObj = new GameObject(labelText);
-            projectionLineObj.transform.SetParent(gameObject.transform);
-            projectionLineObj.transform.SetPositionAndRotation(gameObject.transform.position, gameObject.transform.rotation);
-
-            projectionLineObj
-                .AddComponent<LineSegment>()
-                .SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
-
-            return projectionLineObj;
-        }
-
-        private void RemoveProjectionLine(string labelText)
-        {
-            GameObject projectionLineObjToRemove = null;
-
-            foreach (Transform child in gameObject.transform)
-            {
-                if (child.name == labelText)
-                    projectionLineObjToRemove = child.gameObject;
-            }
-
-            if (projectionLineObjToRemove != null)
-                Destroy(projectionLineObjToRemove);
-        }
-
 
         // IDRAWABLE interface
 
@@ -220,8 +189,12 @@ namespace Assets.Scripts.Experimental.Items
                 return;
 
             Mc.RemovePointProjection(Plane, FocusedLabel);
-            RemoveProjectionLine(FocusedLabel);
+
             _labelComponent.RemoveFocusedLabel();
+            if (string.IsNullOrEmpty(FocusedLabel))
+            {
+                Mc.RemoveProjectionLine(this.gameObject);
+            }
         }
 
         public void NextLabel()
@@ -238,7 +211,7 @@ namespace Assets.Scripts.Experimental.Items
         {
             if (_labelComponent == null)
                 return;
-
+            _labelTexts.Begin();
             var found = _labelTexts.NextWhile(current => Mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
 
             if (found)
@@ -273,14 +246,12 @@ namespace Assets.Scripts.Experimental.Items
             var newLabelText = _labelTexts.Current.ToString();
 
             Mc.RemovePointProjection(Plane, oldLabelText);
-            RemoveProjectionLine(oldLabelText);
 
             FocusedLabel = newLabelText;
 
             if (_labelTexts.Current.Equals(DefaultLabelText))
                 return;
 
-            var projectionObj = AddProjectionLine(newLabelText);
             Mc.AddPointProjection(Plane, newLabelText, this.gameObject);
         }
 
