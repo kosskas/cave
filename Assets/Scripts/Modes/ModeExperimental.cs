@@ -10,8 +10,10 @@ using Assets.Scripts.Walls;
 
 public class ModeExperimental : IMode
 {
-    private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.6f );
-    private static float RADIAL_MENU_RADIUS = 20f;
+    private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.55f );
+    private static float Y_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : -0.30f );
+    private static float RADIAL_1ST_MENU_RADIUS = 15f;
+    private static float RADIAL_2ND_MENU_RADIUS = 25f;
     public PlayerController PCref { get; private set; }
 
     private WallController _wc;
@@ -25,9 +27,8 @@ public class ModeExperimental : IMode
     private ItemsController _items;
 
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
-
-    private ExContextMenuView _contextMenuView;
-    private ExControlMenuView _controlMenuView;
+    private CircularIterator<KeyValuePair<ExContext, Action>> _creationCtx;
+    private CircularIterator<KeyValuePair<ExContext, Action>> _optCtx;
 
     private IRaycastable _hitObject;
 
@@ -37,6 +38,9 @@ public class ModeExperimental : IMode
 
     private IRaycastable _relativeObject;
     
+    private Line _relativeLine;
+
+    private bool _showProjLines = true;
     /* * * * CONTEXT ACTIONS begin * * * */
 
     private void TryColorObject(IRaycastable obj, Color color)
@@ -103,13 +107,11 @@ public class ModeExperimental : IMode
     public void _ChangeDrawContextNext()
     {
         _context.Next();
-        _contextMenuView.SetCurrentContext(_context.Current.Key);
     }
 
     public void _ChangeDrawContextPrev()
     {
         _context.Previous();
-        _contextMenuView.SetCurrentContext(_context.Current.Key);
     }
 
     private void _DrawAction()
@@ -144,30 +146,12 @@ public class ModeExperimental : IMode
                 _SaveSolidAndSwitchToMode3Dto2D();
                 break;
 
-            case "NextContext":
-                _context.Next();
-                _contextMenuView.SetCurrentContext(_context.Current.Key);
-                break;
-
-            case "PrevContext":
-                _context.Previous();
-                _contextMenuView.SetCurrentContext(_context.Current.Key);
-                break;
-
             case "ExportSolidToVisualButton":
                 _SaveSolidAndSwitchToMode3Dto2D();
                 break;
 
             case "BackToMenuButton":
                 _BackToMenu();
-                break;
-            
-            case "SaveStateButton":
-                _SaveState();
-                break;
-
-            case "LoadStateButton":
-                _LoadState();
                 break;
 
         }
@@ -392,7 +376,7 @@ public class ModeExperimental : IMode
 
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
-        _mb.Init(true);
+        _mb.Init(_showProjLines);
         _fc = mainObject.AddComponent<FacesGenerator>();
 
         _items = new ItemsController(_wc, _wcrt, _fc, _mb);
@@ -400,9 +384,10 @@ public class ModeExperimental : IMode
         //dodanie bazowej osi rzutuj¹cej
         _AddBaseAxis();
 
-        _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
+        _creationCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
             {
+                new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _BackToBasicCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Idle, () => {}),
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
@@ -412,17 +397,24 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.Face, Act)
+                new KeyValuePair<ExContext, Action>(ExContext.Face, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _SwitchRuleProjectionLine)
             });
 
-        _contextMenuView = new ExContextMenuView();
-        _contextMenuView.SetCurrentContext(_context.Current.Key);
+        _optCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
+            new List<KeyValuePair<ExContext, Action>>()
+            {
+                new KeyValuePair<ExContext, Action>(ExContext.Save, _SaveState),
+                new KeyValuePair<ExContext, Action>(ExContext.Load, _LoadState),
+                new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
+                new KeyValuePair<ExContext, Action>(ExContext.BackToMenu, _BackToMenu),
+                new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
+            });
 
+        _context = _optCtx;
         UIWall.ExportSolidToVisualButton.Show();
         UIWall.BackToMenuButton.Show();
         UIWall.SaveLoadStateButtons.Show();
-
-        //_controlMenuView = new ExControlMenuView();
 
         PointsList.ShowListAndLogs();
         
@@ -431,6 +423,26 @@ public class ModeExperimental : IMode
         Debug.Log($"<color=blue> MODE experimental ON </color>");
     }
 
+    public CircularIterator<KeyValuePair<ExContext, Action>> GetCtx()
+    {
+        return _context;
+    }
+
+    private void _SwitchRuleProjectionLine()
+    {
+        _showProjLines = !_showProjLines;
+        _mb.SetShowRulesProjectionLine(_showProjLines);
+    }
+    private void _BackToBasicCtx()
+    {
+        _context = _optCtx;
+        radialMenu.Generate(_context, RADIAL_1ST_MENU_RADIUS);
+    }
+    private void _ChangeToConstrCtx()
+    {
+        _context = _creationCtx;
+        radialMenu.Generate(_context, RADIAL_2ND_MENU_RADIUS);
+    }
     public void AddRadialMenu()
     {
         GameObject flystick = GameObject.Find("TrackedObject");
@@ -438,7 +450,7 @@ public class ModeExperimental : IMode
         GameObject.Find("PrevContext")?.SetActive(false);
         if (flystick == null)
         {
-            flystick = GameObject.Find("FPSPlayer");
+            flystick = GameObject.Find("Main Camera");
             if (flystick == null)
             {
                 flystick = new GameObject("FlystickPlaceholder");
@@ -452,7 +464,9 @@ public class ModeExperimental : IMode
 
             Vector3 localPos = canvas.transform.localPosition;
             localPos.z = Z_RADIAL_MENU_OFFSET;
+            localPos.y = Y_RADIAL_MENU_OFFSET;
             canvas.transform.localPosition = localPos;
+            canvas.transform.rotation = flystick.transform.rotation;
 
             Transform radialMenuRoot = canvas.transform.Find("RadialMenuRoot");
             if (radialMenuRoot != null)
@@ -460,15 +474,11 @@ public class ModeExperimental : IMode
                 GameObject itemPrefab = Resources.Load<GameObject>("RadialMenuItem");
                 if (itemPrefab != null)
                 {
-                    List<string> descriptions = Enum.GetValues(typeof(ExContext)).Cast<ExContext>().Select(e => e.GetDescription()).ToList();
                     this.radialMenu = RadialMenu.Create(
                         radialMenuRoot,
-                        descriptions.Count, // liczba elementów
-                        RADIAL_MENU_RADIUS, // promieñ
-                        descriptions, // etykiety
-                        itemPrefab,
-                        this
+                        itemPrefab
                     );
+                    _BackToBasicCtx();
                 }
                 else
                 {
@@ -544,15 +554,11 @@ public class ModeExperimental : IMode
             _RemoveLastWall();
         }
 
-        if (Input.GetKeyDown("v"))
+        if (Input.GetKeyDown("m"))
         {
-            radialMenu.SetRadialMenuActive(false);
+            radialMenu.ToggleRadialMenuActive();
         }
 
-        if (Input.GetKeyDown("b"))
-        {
-            radialMenu.SetRadialMenuActive(true);
-        }
     }
 }
 

@@ -21,6 +21,11 @@ namespace Assets.Scripts.Experimental.Utils
             _index = 0;
         }
 
+        public void Begin()
+        {
+            _index = 0;
+        }
+
         public void Previous()
         {
             _index = (_index == 0) ? _items.Count - 1 : _index - 1;
