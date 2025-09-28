@@ -615,7 +615,6 @@ public class MeshBuilder : MonoBehaviour
         Vector3 point1 = result.Item1;
         Vector3 point2 = result.Item2;
         if(Vector3.SqrMagnitude(point1 - point2) > eps)
-        if (point1 != point2)
         {
             Debug.LogError($"Nierzut: point1={point1}, point2={point2}");
             return Vector3.zero;

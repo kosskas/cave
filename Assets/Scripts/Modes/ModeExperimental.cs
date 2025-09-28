@@ -100,17 +100,6 @@ public class ModeExperimental : IMode
     /* * * * CONTEXT ACTIONS end * * * */
 
     /* * * * INPUT HANDLERS begin * * * */
-
-    public void _ChangeDrawContextNext()
-    {
-        _context.Next();
-    }
-
-    public void _ChangeDrawContextPrev()
-    {
-        _context.Previous();
-    }
-
     private void _DrawAction()
     {
         _context.Current.Value();
