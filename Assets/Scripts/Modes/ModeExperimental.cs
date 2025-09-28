@@ -10,8 +10,9 @@ using Assets.Scripts.Walls;
 
 public class ModeExperimental : IMode
 {
-    private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.6f );
-    private static float RADIAL_MENU_RADIUS = 20f;
+    private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.55f );
+    private static float Y_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : -0.35f );
+    private static float RADIAL_MENU_RADIUS = 21f;
     public PlayerController PCref { get; private set; }
 
     private WallController _wc;
@@ -428,7 +429,7 @@ public class ModeExperimental : IMode
         GameObject.Find("PrevContext")?.SetActive(false);
         if (flystick == null)
         {
-            flystick = GameObject.Find("FPSPlayer");
+            flystick = GameObject.Find("Main Camera");
             if (flystick == null)
             {
                 flystick = new GameObject("FlystickPlaceholder");
@@ -442,7 +443,9 @@ public class ModeExperimental : IMode
 
             Vector3 localPos = canvas.transform.localPosition;
             localPos.z = Z_RADIAL_MENU_OFFSET;
+            localPos.y = Y_RADIAL_MENU_OFFSET;
             canvas.transform.localPosition = localPos;
+            canvas.transform.rotation = flystick.transform.rotation;
 
             Transform radialMenuRoot = canvas.transform.Find("RadialMenuRoot");
             if (radialMenuRoot != null)
@@ -532,15 +535,11 @@ public class ModeExperimental : IMode
             _RemoveLastWall();
         }
 
-        if (Input.GetKeyDown("v"))
+        if (Input.GetKeyDown("m"))
         {
-            radialMenu.SetRadialMenuActive(false);
+            radialMenu.ToggleRadialMenuActive();
         }
 
-        if (Input.GetKeyDown("b"))
-        {
-            radialMenu.SetRadialMenuActive(true);
-        }
     }
 }
 

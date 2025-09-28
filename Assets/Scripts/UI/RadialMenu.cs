@@ -15,11 +15,11 @@ public class RadialMenu : MonoBehaviour
     private float radius;
     private List<string> labels;
 
-    public KeyCode prevKey = KeyCode.RightArrow;
-    public KeyCode nextKey = KeyCode.LeftArrow;
+    public KeyCode prevKey = KeyCode.Comma;
+    public KeyCode nextKey = KeyCode.Period;
     public KeyCode confirmKey = KeyCode.Return;
-    public float selectedScale = 1.3f;
-    public float fontSizeScale = 0.1f;
+    public float selectedScale = 1.44f;
+    public float fontSizeScale = 0.34f;
     public Vector3 initialMenuItemScale;
     public Vector3 initialMenuScale = new Vector3(0.5f, 0.5f, 0.5f);
 
@@ -45,7 +45,7 @@ public class RadialMenu : MonoBehaviour
     {
         GameObject menuObject = new GameObject("RadialMenu");
         menuObject.transform.SetParent(parent, false);
-        menuObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        menuObject.transform.localScale = new Vector3(0.55f, 0.34f, 0.13f);
         RadialMenu menu = menuObject.AddComponent<RadialMenu>();
         menu.radius = rad;
         menu.itemPrefab = prefab;
@@ -145,7 +145,10 @@ public class RadialMenu : MonoBehaviour
         rotationOffset = NormalizeAngle(targetAngleForSelected - baseStartAngle - selectedIndex * angleStep);
         UpdatePositions();
         if (spawnedItems.Count > 0 && spawnedItems[selectedIndex] != null)
-            spawnedItems[selectedIndex].GetComponent<RectTransform>().localScale = initialMenuItemScale * selectedScale;
+        {
+            spawnedItems[selectedIndex].GetComponent<RectTransform>().localScale = initialMenuItemScale * selectedScale + new Vector3(0f, 0f, 1f);
+            spawnedItems[selectedIndex].GetComponentInChildren<Text>().fontStyle = FontStyle.Bold;
+        }
         isMenuActive = true;
     }
 
@@ -156,12 +159,18 @@ public class RadialMenu : MonoBehaviour
             if (spawnedItems.Count == 0) return;
 
             if (spawnedItems[selectedIndex] != null)
+            {
                 spawnedItems[selectedIndex].GetComponent<RectTransform>().localScale = initialMenuItemScale;
+                spawnedItems[selectedIndex].GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
+            }
 
             selectedIndex = newIndex;
 
             if (spawnedItems[selectedIndex] != null)
-                spawnedItems[selectedIndex].GetComponent<RectTransform>().localScale = initialMenuItemScale * selectedScale;
+            {
+                spawnedItems[selectedIndex].GetComponent<RectTransform>().localScale = initialMenuItemScale * selectedScale + new Vector3(0f, 0f, 1f);
+                spawnedItems[selectedIndex].GetComponentInChildren<Text>().fontStyle = FontStyle.Bold;
+            }
 
             float rawTarget = targetAngleForSelected - baseStartAngle - selectedIndex * angleStep;
             float targetRotationOffset = NormalizeAngle(rawTarget);
@@ -232,9 +241,9 @@ public class RadialMenu : MonoBehaviour
         Select((index % itemCount + itemCount) % itemCount);
     }
 
-    public void SetRadialMenuActive(bool flag)
+    public void ToggleRadialMenuActive()
     {
-        isMenuActive = flag;
+        isMenuActive = !isMenuActive;
         foreach (GameObject item in spawnedItems)
         {
             item.SetActive(isMenuActive);
