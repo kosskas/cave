@@ -1,13 +1,13 @@
-using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
-using System;
 using System.Linq;
 using Assets.Scripts.Experimental;
 using Assets.Scripts.JsonConverters;
+using Newtonsoft.Json;
+using UnityEngine;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.FileManagers
 {
     public class StateManager
     {
