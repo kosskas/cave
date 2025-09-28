@@ -30,7 +30,6 @@ public class RadialMenu : MonoBehaviour
 
     private List<GameObject> spawnedItems = new List<GameObject>();
     private int selectedIndex = 0;
-    private ModeExperimental modeExperimental;
 
     private float angleStep;
     private float baseStartAngle = 0f;
@@ -41,17 +40,14 @@ public class RadialMenu : MonoBehaviour
     public bool isMenuActive = false;
 
  
-    public static RadialMenu Create(Transform parent, float rad, GameObject prefab, ModeExperimental modeExperimental)
+    public static RadialMenu Create(Transform parent, GameObject prefab)
     {
         GameObject menuObject = new GameObject("RadialMenu");
         menuObject.transform.SetParent(parent, false);
         menuObject.transform.localScale = new Vector3(0.55f, 0.34f, 0.13f);
         RadialMenu menu = menuObject.AddComponent<RadialMenu>();
-        menu.radius = rad;
         menu.itemPrefab = prefab;
-        menu.modeExperimental = modeExperimental;
         menu.initialMenuItemScale = prefab.GetComponent<RectTransform>().localScale;
-        menu.Generate(modeExperimental.GetCtx());
         return menu;
     }
 
@@ -96,13 +92,16 @@ public class RadialMenu : MonoBehaviour
         }
     }
 
-    public void Generate(CircularIterator<KeyValuePair<ExContext, Action>> ctx)
+    public void Generate(CircularIterator<KeyValuePair<ExContext, Action>> ctx, float menuRadius)
     {
+        radius = menuRadius;
         _currentCtx = ctx;
+        _currentCtx.Begin();
+        selectedIndex = 0;
         labels = new List<string>();
         foreach (var kv in _currentCtx.All())
         {
-            labels.Add(kv.Key.ToString());
+            labels.Add(kv.Key.GetDescription());
         }
         itemCount = labels.Count;
         for (int i = transform.childCount - 1; i >= 0; i--)

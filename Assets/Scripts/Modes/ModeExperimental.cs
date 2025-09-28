@@ -12,7 +12,8 @@ public class ModeExperimental : IMode
 {
     private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.55f );
     private static float Y_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : -0.35f );
-    private static float RADIAL_MENU_RADIUS = 21f;
+    private static float RADIAL_1ST_MENU_RADIUS = 15f;
+    private static float RADIAL_2ND_MENU_RADIUS = 25f;
     public PlayerController PCref { get; private set; }
 
     private WallController _wc;
@@ -415,12 +416,12 @@ public class ModeExperimental : IMode
     private void _BackToBasicCtx()
     {
         _context = _optCtx;
-        radialMenu.Generate(_context);
+        radialMenu.Generate(_context, RADIAL_1ST_MENU_RADIUS);
     }
     private void _ChangeToConstrCtx()
     {
         _context = _creationCtx;
-        radialMenu.Generate(_context);
+        radialMenu.Generate(_context, RADIAL_2ND_MENU_RADIUS);
     }
     public void AddRadialMenu()
     {
@@ -453,13 +454,11 @@ public class ModeExperimental : IMode
                 GameObject itemPrefab = Resources.Load<GameObject>("RadialMenuItem");
                 if (itemPrefab != null)
                 {
-                    //List<string> descriptions = Enum.GetValues(typeof(ExContext)).Cast<ExContext>().Select(e => e.GetDescription()).ToList();
                     this.radialMenu = RadialMenu.Create(
                         radialMenuRoot,
-                        RADIAL_MENU_RADIUS, // promieñ
-                        itemPrefab,
-                        this
+                        itemPrefab
                     );
+                    _BackToBasicCtx();
                 }
                 else
                 {
