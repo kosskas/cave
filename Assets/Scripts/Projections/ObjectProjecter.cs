@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Scripts.FileManagers;
 using UnityEngine;
 /// <summary>
 /// Zarządza projekcją obiektu na płaszczyzny 
