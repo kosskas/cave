@@ -8,7 +8,7 @@ namespace Assets.Scripts.Experimental.Items
 {
     public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable, IAnalyzable
     {
-        private Color _color = ReconstructionInfo.NORMAL;
+        private Color _color = ReconstructionInfo.LINE_2D_COLOR;
 
         public Color Color
         {
@@ -23,7 +23,7 @@ namespace Assets.Scripts.Experimental.Items
             }
         } 
 
-        public float Width { get; set; } = 0.005f;
+        public float Width { get; set; } = ReconstructionInfo.LINE_2D_WIDTH;
 
         private float ColliderWidth => Width * 4;
 

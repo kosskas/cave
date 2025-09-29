@@ -9,7 +9,7 @@ namespace Assets.Scripts.Experimental.Items
 {
     public class ExPoint : MonoBehaviour, IDrawable, IRaycastable, ILabelable
     {
-        private Color _color = ReconstructionInfo.NORMAL;
+        private Color _color = ReconstructionInfo.POINT_2D_COLOR;
 
         public Color Color
         {
@@ -27,7 +27,7 @@ namespace Assets.Scripts.Experimental.Items
             }
         }
 
-        private static readonly float Size = 0.025f;
+        private static readonly float Size = ReconstructionInfo.POINT_2D_SIZE;
 
         private static readonly float ColliderSize = Size * 4;
 

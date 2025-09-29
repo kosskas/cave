@@ -112,8 +112,8 @@ public class FacesGenerator : MonoBehaviour {
 
         
         meshRenderer.material = new Material(Shader.Find("Transparent/Diffuse"));
-        Color color = Color.white;
-        color.a = SOLID_WALL_TRANSPARENCY;
+        Color color = ReconstructionInfo.FACE_COLOR;
+        color.a = ReconstructionInfo.SOLID_FACE_TRANSPARENCY;
 
         
         meshRenderer.material.color = color;
