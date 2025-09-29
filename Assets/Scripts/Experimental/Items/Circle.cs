@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Circle : MonoBehaviour, IDrawable, IRaycastable, IAnalyzable
+    public class Circle : MonoBehaviour, IDrawable, IRaycastable, IAnalyzable, IColorable
     {
-        private Color _color = ReconstructionInfo.CIRCLE_2D_COLOR;
+        private Color _color = ReconstructionInfo.NORMAL;
 
         public Color Color
         {

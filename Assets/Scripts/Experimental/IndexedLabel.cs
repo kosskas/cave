@@ -13,7 +13,7 @@ namespace Assets.Scripts.Experimental
 
         private static readonly float LabelFontSize = ReconstructionInfo.LABEL_2D_FONT_SIZE;
 
-        private static readonly Color ColorNormal = ReconstructionInfo.LABEL_2D_COLOR;
+        private static readonly Color ColorNormal = ReconstructionInfo.NORMAL;
 
         private TextMeshPro _textMeshPro;
 

@@ -4,9 +4,9 @@ using UnityEngine.Rendering;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Axis : MonoBehaviour, IDrawable, IRaycastable
+    public class Axis : MonoBehaviour, IDrawable, IRaycastable, IColorable
     {
-        private Color _color = ReconstructionInfo.LINE_2D_COLOR;
+        private Color _color = ReconstructionInfo.NORMAL;
 
         public Color Color
         {

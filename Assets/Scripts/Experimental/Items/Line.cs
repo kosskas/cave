@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable, IAnalyzable
+    public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable, IAnalyzable, IColorable
     {
-        private Color _color = ReconstructionInfo.LINE_2D_COLOR;
+        private Color _color = ReconstructionInfo.NORMAL;
 
         public Color Color
         {
@@ -195,6 +195,7 @@ namespace Assets.Scripts.Experimental.Items
         public void OnHoverExit()
         {
             _lineRenderer.material.color = _color;
+            //event new DeleteScopeEvent()
             //_labelComponent?.SetVisible(false);
         }
 

@@ -7,9 +7,9 @@ using UnityEngine.Rendering;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class ExPoint : MonoBehaviour, IDrawable, IRaycastable, ILabelable
+    public class ExPoint : MonoBehaviour, IDrawable, IRaycastable, ILabelable, IColorable
     {
-        private Color _color = ReconstructionInfo.POINT_2D_COLOR;
+        private Color _color = ReconstructionInfo.NORMAL;
 
         public Color Color
         {
