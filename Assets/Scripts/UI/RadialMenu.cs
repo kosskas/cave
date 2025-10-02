@@ -15,7 +15,6 @@ public class RadialMenu : MonoBehaviour
 
     public KeyCode prevKey = KeyCode.Comma;
     public KeyCode nextKey = KeyCode.Period;
-    public KeyCode confirmKey = KeyCode.Return;
     public float selectedScale = 1.44f;
     public float fontSizeScale = 0.34f;
     public Vector3 initialMenuItemScale;
@@ -56,37 +55,25 @@ public class RadialMenu : MonoBehaviour
 
         if (Input.GetKeyDown(prevKey))
         {
-            Select((selectedIndex - 1 + itemCount) % itemCount);
-            _currentCtx.Previous();
+            PreviousOption();
         }
 
         if (Input.GetKeyDown(nextKey))
         {
-            Select((selectedIndex + 1) % itemCount);
-            _currentCtx.Next();
+            NextOption();
         }
-
-        if (Input.GetKeyDown(confirmKey))
-            ConfirmSelection();
     }
 
-    private void ConfirmSelection()
+    public void PreviousOption()
     {
-        switch (selectedIndex)
-        {
-            case 0:
-                Debug.Log("Wybrano opcję 0");
-                break;
-            case 1:
-                Debug.Log("Wybrano opcję 1");
-                break;
-            case 2:
-                Debug.Log("Wybrano opcję 2");
-                break;
-            default:
-                Debug.LogWarning($"Brak obsługi dla indeksu {selectedIndex}");
-                break;
-        }
+        Select((selectedIndex - 1 + itemCount) % itemCount);
+        _currentCtx.Previous();
+    }
+
+    public void NextOption()
+    {
+        Select((selectedIndex + 1) % itemCount);
+        _currentCtx.Next();
     }
 
     public void Generate(CircularIterator<KeyValuePair<ExContext, Action>> ctx, float menuRadius)
