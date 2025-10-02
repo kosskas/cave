@@ -377,10 +377,16 @@ namespace Assets.Scripts.Experimental
 
                 lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
 
-                if (hitObject is IAnalyzable)
+                if (hitObject is IAnalyzable && hitObject != line.GetComponent<IRaycastable>())
                 {
                     IAnalyzable aHitObject = (IAnalyzable)hitObject;
                     intersectedObjs.Add(aHitObject.GetElement());
+
+                    if (hitObject is IColorable)
+                    {
+                        IColorable cHitObject = (IColorable)hitObject;
+                        cHitObject.Color = ReconstructionInfo.MENTIONED;
+                    }
                 }
                 
                 if (isEnd)
@@ -404,6 +410,11 @@ namespace Assets.Scripts.Experimental
                                 if(Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
                                 DrawPoint(plane, point);
                             }
+                        }
+                        if (intersected is IColorable)
+                        {
+                            IColorable cIntersected = (IColorable)intersected;
+                            cIntersected.Color = ReconstructionInfo.NORMAL;
                         }
                     }
                 }
@@ -466,10 +477,16 @@ namespace Assets.Scripts.Experimental
 
                 circleComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
 
-                if (hitObject is IAnalyzable)
+                if (hitObject is IAnalyzable && hitObject != circleComponent.GetComponent<IRaycastable>())
                 {
                     IAnalyzable aHitObject = (IAnalyzable)hitObject;
                     intersectedObjs.Add(aHitObject.GetElement());
+
+                    if (hitObject is IColorable)
+                    {
+                        IColorable cHitObject = (IColorable)hitObject;
+                        cHitObject.Color = ReconstructionInfo.MENTIONED;
+                    }
                 }
 
                 if (isEnd)
@@ -485,6 +502,11 @@ namespace Assets.Scripts.Experimental
                                 if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
                                 DrawPoint(plane, point);
                             }
+                        }
+                        if (intersected is IColorable)
+                        {
+                            IColorable cIntersected = (IColorable)intersected;
+                            cIntersected.Color = ReconstructionInfo.NORMAL;
                         }
                     }
                 }
@@ -561,11 +583,17 @@ namespace Assets.Scripts.Experimental
 
                     projectionComponent2.Draw(startPlane, startPosition, endPosition);
                     projectionComponent2.SetLabelVisible(false);
-                    
-                    if (hitObject is IAnalyzable)
+
+                    if (hitObject is IAnalyzable && hitObject != projectionComponent1.GetComponent<IRaycastable>())
                     {
                         IAnalyzable aHitObject = (IAnalyzable)hitObject;
                         intersectedObjsPl1.Add(aHitObject.GetElement());
+
+                        if (hitObject is IColorable)
+                        {
+                            IColorable cHitObject = (IColorable)hitObject;
+                            cHitObject.Color = ReconstructionInfo.MENTIONED;
+                        }
                     }
 
                     if (isEnd)
@@ -583,10 +611,16 @@ namespace Assets.Scripts.Experimental
                     projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
                     projectionComponent2.SetLabelVisible(true);
 
-                    if (hitObject is IAnalyzable)
+                    if (hitObject is IAnalyzable && hitObject != projectionComponent2.GetComponent<IRaycastable>())
                     {
                         IAnalyzable aHitObject = (IAnalyzable)hitObject;
                         intersectedObjsPl2.Add(aHitObject.GetElement());
+
+                        if (hitObject is IColorable)
+                        {
+                            IColorable cHitObject = (IColorable)hitObject;
+                            cHitObject.Color = ReconstructionInfo.MENTIONED;
+                        }
                     }
 
                     if (isEnd)
@@ -611,6 +645,11 @@ namespace Assets.Scripts.Experimental
                                     DrawPoint(startPlane, point);
                                 }
                             }
+                            if (intersected is IColorable)
+                            {
+                                IColorable cIntersected = (IColorable)intersected;
+                                cIntersected.Color = ReconstructionInfo.NORMAL;
+                            }
                         }
 
                         foreach (var intersected in intersectedObjsPl2)
@@ -622,6 +661,11 @@ namespace Assets.Scripts.Experimental
                                 {
                                     DrawPoint(endPlane, point);
                                 }
+                            }
+                            if (intersected is IColorable)
+                            {
+                                IColorable cIntersected = (IColorable)intersected;
+                                cIntersected.Color = ReconstructionInfo.NORMAL;
                             }
                         }
                     }
@@ -680,11 +724,17 @@ namespace Assets.Scripts.Experimental
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
                 lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
-                
-                if (hitObject is IAnalyzable)
+
+                if (hitObject is IAnalyzable && hitObject != line.GetComponent<IRaycastable>())
                 {
                     IAnalyzable aHitObject = (IAnalyzable)hitObject;
                     intersectedObjs.Add(aHitObject.GetElement());
+
+                    if (hitObject is IColorable)
+                    {
+                        IColorable cHitObject = (IColorable)hitObject;
+                        cHitObject.Color = ReconstructionInfo.MENTIONED;
+                    }
                 }
 
                 if (isEnd)
@@ -702,6 +752,11 @@ namespace Assets.Scripts.Experimental
                                 //if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
                                 DrawPoint(plane, point);
                             }
+                        }
+                        if (intersected is IColorable)
+                        {
+                            IColorable cIntersected = (IColorable)intersected;
+                            cIntersected.Color = ReconstructionInfo.NORMAL;
                         }
                     }
                 }
@@ -766,10 +821,16 @@ namespace Assets.Scripts.Experimental
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
                 lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
 
-                if (hitObject is IAnalyzable)
+                if (hitObject is IAnalyzable && hitObject != line.GetComponent<IRaycastable>())
                 {
                     IAnalyzable aHitObject = (IAnalyzable)hitObject;
                     intersectedObjs.Add(aHitObject.GetElement());
+
+                    if (hitObject is IColorable)
+                    {
+                        IColorable cHitObject = (IColorable)hitObject;
+                        cHitObject.Color = ReconstructionInfo.MENTIONED;
+                    }
                 }
 
                 if (isEnd)
@@ -787,6 +848,11 @@ namespace Assets.Scripts.Experimental
                                 //if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
                                 DrawPoint(plane, point);
                             }
+                        }
+                        if (intersected is IColorable)
+                        {
+                            IColorable cIntersected = (IColorable)intersected;
+                            cIntersected.Color = ReconstructionInfo.NORMAL;
                         }
                     }
                 }

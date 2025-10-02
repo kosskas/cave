@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Axis : MonoBehaviour, IDrawable, IRaycastable
+    public class Axis : MonoBehaviour, IDrawable, IRaycastable, IColorable
     {
         private Color _color = ReconstructionInfo.NORMAL;
 
@@ -21,7 +21,7 @@ namespace Assets.Scripts.Experimental.Items
             }
         }
 
-        public float Width { get; set; } = 0.005f;
+        public float Width { get; set; } = ReconstructionInfo.LINE_2D_WIDTH;
 
         private float ColliderWidth => Width * 4;
 

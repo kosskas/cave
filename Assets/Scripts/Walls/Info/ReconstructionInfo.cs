@@ -6,25 +6,9 @@ public static class ReconstructionInfo
     public static Color NORMAL = Color.black;
     public static Color MENTIONED = new Color(0.5f, 0.5f, 0.5f, 1f);
     public static Color FOCUSED = Color.white;
-
-    // -- CURSOR
-    public static float _CURSOR_SIZE = 0.05f;
-    public static Color _CURSOR_COLOR = new Color(1, 1, 1, 0.3f);
-    public static Color _CURSOR_COLOR_FOCUSED = new Color(1, 0, 0, 1f);
-    // -- POINT ON WALL
-    public static float POINT_SIZE = 0.025f;
-    public static Color POINT_COLOR = Color.black;
-    // -- EDGE ON WALL
-    public static float EDGE_LINE_WIDTH = 0.01f;
-    public static Color EDGE_COLOR = Color.black;
-    // -- LABEL ON WALL
-    public static float LABEL_SIZE_PLACED = 0.04f;
-    public static float LABEL_SIZE_PICKED = 0.06f;
-    public static float LABEL_OFFSET_FROM_POINT = 0.03f;
-    public static Color LABEL_COLOR_PLACED = Color.white;
-    public static Color LABEL_COLOR_CHOSEN = Color.red;
-    public static Color LABEL_COLOR_PICKED_FOCUSED = Color.green;
-    public static Color LABEL_COLOR_PICKED_UNFOCUSED = new Color(0, 0.8f, 0);
+    // -- FACE
+    public static Color FACE_COLOR = Color.white;
+    public static float SOLID_FACE_TRANSPARENCY = 0.3f;
     // -- PROJECTION LINE
     public static Color PROJECTION_LINE_COLOR = Color.blue;
     public static Color PROJECTION_LINE_ERROR_COLOR = Color.red;
@@ -40,9 +24,16 @@ public static class ReconstructionInfo
     public static Color LABEL_3D_COLOR = Color.white;
     public static Color LABEL_3D_ERR_COLOR = Color.red;
     // -- 2D CIRCLE
-    public static float CIRCLE_2D_WIDTH = 0.005f;
-    public static Color CIRCLE_2D_COLOR = Color.green;
+    public static float CIRCLE_2D_WIDTH = 0.002f;
+    public static Color CIRCLE_2D_COLOR = Color.black;
     // -- 2D LINE
     public static float LINE_2D_WIDTH = 0.005f;
-    public static Color LINE_2D_COLOR = Color.green;
+    public static Color LINE_2D_COLOR = Color.black;
+    // -- 2D POINT
+    public static float POINT_2D_SIZE = 0.025f;
+    public static Color POINT_2D_COLOR = Color.black;
+    // -- 2D LABEl
+    public static float LABEL_2D_FONT_SIZE = 0.6f;
+    public static float LABEL_2D_OFFSET = 0.08f;
+    public static Color LABEL_2D_COLOR = Color.black;
 }

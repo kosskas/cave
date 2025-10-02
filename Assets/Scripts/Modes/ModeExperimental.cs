@@ -291,7 +291,24 @@ public class ModeExperimental : IMode
 
     private void _AddBaseAxis()
     {
-        _items.AddAxisBetweenPlanes(_wc.GetWallByName("Wall3"), _wc.GetWallByName("Wall4"));
+        var wallConnections = new Dictionary<string, List<string>>
+        {
+            ["Wall1"] = new List<string> { "Wall2", "Wall3", "Wall4", "Wall5" },
+            ["Wall2"] = new List<string> { "Wall3", "Wall5", "Wall6" },
+            ["Wall3"] = new List<string> { "Wall4", "Wall6" },
+            ["Wall4"] = new List<string> { "Wall5", "Wall6" },
+            ["Wall5"] = new List<string> { "Wall6" }
+        };
+
+        foreach (var kvp in wallConnections)
+        {
+            string wall = kvp.Key;
+            foreach (var neighbor in kvp.Value)
+            {
+                _items.AddAxisBetweenPlanes(_wc.GetWallByName(wall),
+                    _wc.GetWallByName(neighbor));
+            }
+        }
     }
 
     public ModeExperimental(PlayerController pc)

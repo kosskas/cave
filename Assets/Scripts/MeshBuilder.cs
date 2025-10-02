@@ -12,19 +12,99 @@ public class MeshBuilder : MonoBehaviour
     private class PointProjection
     {
         public GameObject pointObject;
-		public LineSegment projLine;
-		public bool is_ok_placed;
+        public LineSegment projLine;
+        public bool is_ok_placed;
         public Vector3 wallNormal;
 
-		public PointProjection(GameObject pointObject, LineSegment projLine, Vector3 wallNormal, bool is_ok_placed)
-		{
-			this.pointObject = pointObject;
+        public PointProjection(GameObject pointObject, LineSegment projLine, Vector3 wallNormal, bool is_ok_placed)
+        {
+            this.pointObject = pointObject;
             this.projLine = projLine;
             this.is_ok_placed = is_ok_placed;
             this.wallNormal = wallNormal;
         }
+        public Vector3 GetIntersection(PointProjection proj2)
+        {
+            /* Komentarz
+             * Zobacz FindLLIntersections
+             * Dodatkowo trzeba sprawdzić czy płaszczyzny nie są prostopadłe
+             * Rzut jest wtedy kiedy s = t, czyli najkrótszy odcinek jest punktem
+             */
+            const float eps = 1e-5f;
+            Vector3 p1 = this.pointObject.transform.position;
+            Vector3 p2 = proj2.pointObject.transform.position;
+            Vector3 n1 = this.wallNormal;
+            Vector3 n2 = proj2.wallNormal;
+            if (Math.Abs(Vector3.Dot(n1, n2)) > eps)
+            {
+                Debug.LogError($"Płaszczyzny nie są prostopadłe: n1={n1}, n2={n2}, dot={Vector3.Dot(n1, n2)}");
+                return Vector3.zero;
+            }
 
+            Tuple<Vector3, Vector3> result = DescriptiveMathLib.FindLLIntersections(p1, n1, p2, n2);
+            if (result == null)
+            {
+                return Vector3.zero;
+            }
+
+            Vector3 point1 = result.Item1;
+            Vector3 point2 = result.Item2;
+            if (Vector3.SqrMagnitude(point1 - point2) > eps)
+            {
+                Debug.LogError($"Nierzut: point1={point1}, point2={point2}");
+                return Vector3.zero;
+            }
+
+            return point1;
+        }
+
+        public void MarkError()
+        {
+            ExPoint et = this.pointObject.GetComponent<ExPoint>();
+            if (et == null)
+            {
+                Debug.LogWarning("GameObj nie ma komponentu ExPoint, nie mozna oznaczyc etykiety");
+                //return;
+            }
+
+            if (this.projLine == null)
+            {
+                Debug.LogWarning("GameObj nie ma komponentu pointProj, nie mozna oznaczyc linii");
+                //return;
+            }
+            else
+            {
+                this.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_ERROR_COLOR,
+                    ReconstructionInfo.PROJECTION_LINE_WIDTH);
+            }
+
+            this.is_ok_placed = false;
+        }
+
+        public void MarkOK()
+        {
+            ExPoint et = this.pointObject.GetComponent<ExPoint>();
+            if (et == null)
+            {
+                Debug.LogWarning("GameObj nie ma komponentu ExPoint, nie mozna oznaczyc etykiety");
+                //return;
+            }
+
+            if (this.projLine == null)
+            {
+                Debug.LogWarning("GameObj nie ma komponentu pointProj, nie mozna oznaczyc linii");
+                //return;
+            }
+            else
+            {
+                this.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR,
+                    ReconstructionInfo.PROJECTION_LINE_WIDTH);
+            }
+
+            this.is_ok_placed = true;
+        }
     }
+
     private enum Status
     {
         OK,
@@ -173,7 +253,7 @@ public class MeshBuilder : MonoBehaviour
             Debug.Log($"Pierwszy {label}");
             //nie bylo zadnych rzutow tego pktu
             //bedzie 1
-            MarkOK(currPts[0]);
+            currPts[0].MarkOK();
         }
         else if (currPts.Count == 2)
         {
@@ -186,14 +266,14 @@ public class MeshBuilder : MonoBehaviour
             if (result == Status.PLANE_ERR)
             {
                 //podswietl dodawany na czerwono
-                MarkError(currPts[0]);
-                MarkError(currPts[1]);
+                currPts[0].MarkError();
+                currPts[1].MarkError();
 
             }
             else if (result == Status.OK)
             {
-                MarkOK(currPts[0]);
-                MarkOK(currPts[1]);
+                currPts[0].MarkOK();
+                currPts[1].MarkOK();
             }
         }
         else
@@ -207,13 +287,13 @@ public class MeshBuilder : MonoBehaviour
                 if (Check3Pos(currPts[0], currPts[1], currPts[2]))
                 {
                     Debug.Log("3 polozony OK");
-                    MarkOK(currPts[0]);
-                    MarkOK(currPts[1]);
-                    MarkOK(currPts[2]);
+                    currPts[0].MarkOK();
+                    currPts[1].MarkOK();
+                    currPts[2].MarkOK();
                 }
                 else
                 {
-                    MarkError(toAddProj);
+                    toAddProj.MarkError();
                     Debug.Log("3 polozony ZLE");
                 }
             }
@@ -227,26 +307,26 @@ public class MeshBuilder : MonoBehaviour
                 {
                     if (p1)
                     {
-                        MarkOK(currPts[0]);
-                        MarkOK(currPts[1]);
-                        MarkError(currPts[2]);
+                        currPts[0].MarkOK();
+                        currPts[1].MarkOK();
+                        currPts[2].MarkError();
                     }
                     else if (p2)
                     {
-                        MarkError(currPts[0]);
-                        MarkOK(currPts[1]);
-                        MarkOK(currPts[2]);
+                        currPts[0].MarkError();
+                        currPts[1].MarkOK();
+                        currPts[2].MarkOK();
                     }
                     else // (!p3)
                     {
-                        MarkOK(currPts[0]);
-                        MarkError(currPts[1]);
-                        MarkOK(currPts[2]);
+                        currPts[0].MarkOK();
+                        currPts[1].MarkError();
+                        currPts[2].MarkOK();
                     }
                 }
                 else
                 {
-                    MarkError(toAddProj);
+                    toAddProj.MarkError();
                     Debug.Log("3 polozony ZLE");
                 }
             }
@@ -254,9 +334,9 @@ public class MeshBuilder : MonoBehaviour
     }
     private bool Check3Pos(PointProjection proj1, PointProjection proj2, PointProjection proj3)
     {
-        Vector3 test1 = CalcPosIn3D(proj1, proj2);
-        Vector3 test2 = CalcPosIn3D(proj2, proj3);
-        Vector3 test3 = CalcPosIn3D(proj1, proj3);
+        Vector3 test1 = proj1.GetIntersection(proj2);
+        Vector3 test2 = proj2.GetIntersection(proj3);
+        Vector3 test3 = proj1.GetIntersection(proj3);
         return (!(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3));
     }
     /// <summary>
@@ -288,8 +368,8 @@ public class MeshBuilder : MonoBehaviour
                 vertices3D[label].deleted = true;
                 FacesGenerator.RemoveFacesFromPoint(label);
             }
-            MarkOK(currPts[0]);
-            MarkOK(currPts[1]);
+            currPts[0].MarkOK();
+            currPts[1].MarkOK();
         }
         else if (count > 2) //sa trzy
         {
@@ -304,13 +384,13 @@ public class MeshBuilder : MonoBehaviour
 
             if (result != Status.OK)
             {
-                MarkError(currPts[0]);
-                MarkError(currPts[1]);
+                currPts[0].MarkError();
+                currPts[1].MarkError();
             }
             else
             {
-                MarkOK(currPts[0]);
-                MarkOK(currPts[1]);
+                currPts[0].MarkOK();
+                currPts[1].MarkOK();
                 FacesGenerator.RemoveFacesFromPoint(label);
             }
         }
@@ -477,7 +557,7 @@ public class MeshBuilder : MonoBehaviour
         licz = pointsInfo.Count;
 		if(licz == 2)
 		{
-			Vector3 pkt3D = CalcPosIn3D(pointsInfo[0], pointsInfo[1]);
+			Vector3 pkt3D = pointsInfo[0].GetIntersection(pointsInfo[1]);
             if (pkt3D != Vector3.zero)
 			{
                 if (vertices3D.ContainsKey(label))
@@ -505,9 +585,9 @@ public class MeshBuilder : MonoBehaviour
         }
 		if (licz > 2) //sa 3 rzuty, zadne moga nie byc wspolne
 		{
-            Vector3 test1 = CalcPosIn3D(pointsInfo[0], pointsInfo[1]);
-            Vector3 test2 = CalcPosIn3D(pointsInfo[1], pointsInfo[2]);
-            Vector3 test3 = CalcPosIn3D(pointsInfo[0], pointsInfo[2]);
+            Vector3 test1 = pointsInfo[0].GetIntersection(pointsInfo[1]);
+            Vector3 test2 = pointsInfo[1].GetIntersection(pointsInfo[2]);
+            Vector3 test3 = pointsInfo[0].GetIntersection(pointsInfo[2]);
             //Sprawdz czy 3 jest dobrze polozony
             p1 = (test1 != Vector3.zero);
             p2 = (test2 != Vector3.zero);
@@ -588,41 +668,6 @@ public class MeshBuilder : MonoBehaviour
 
         vertices3D[label] = new Vertice3D(obj);
     }
-    private Vector3 CalcPosIn3D(PointProjection proj1, PointProjection proj2)
-    {
-        /* Komentarz
-         * Zobacz FindLLIntersections
-         * Dodatkowo trzeba sprawdzić czy płaszczyzny nie są prostopadłe
-         * Rzut jest wtedy kiedy s = t, czyli najkrótszy odcinek jest punktem
-         */
-        const float eps = 1e-5f;
-        Vector3 p1 = proj1.pointObject.transform.position;
-        Vector3 p2 = proj2.pointObject.transform.position;
-        Vector3 n1 = proj1.wallNormal;
-        Vector3 n2 = proj2.wallNormal;
-        if (Math.Abs(Vector3.Dot(n1, n2)) > eps)
-        {
-            Debug.LogError($"Płaszczyzny nie są prostopadłe: n1={n1}, n2={n2}, dot={Vector3.Dot(n1, n2)}");
-            return Vector3.zero;
-        }
-
-        Tuple<Vector3, Vector3> result = DescriptiveMathLib.FindLLIntersections(p1, n1, p2, n2);
-        if (result == null)
-        {
-            return Vector3.zero;
-        }
-
-        Vector3 point1 = result.Item1;
-        Vector3 point2 = result.Item2;
-        if(Vector3.SqrMagnitude(point1 - point2) > eps)
-        {
-            Debug.LogError($"Nierzut: point1={point1}, point2={point2}");
-            return Vector3.zero;
-        }
-
-        return point1;
-    }
-
     private void ShowProjectionLines()
     {
         foreach (WallInfo wall in verticesOnWalls.Keys)
@@ -683,47 +728,5 @@ public class MeshBuilder : MonoBehaviour
             }
         }
 		return pointsInfo;
-    }
-
-    private void MarkError(PointProjection pointProj)
-    {
-        ExPoint et = pointProj.pointObject.GetComponent<ExPoint>();
-        if (et == null)
-        {
-            Debug.LogWarning("GameObj nie ma komponentu ExPoint, nie mozna oznaczyc etykiety");
-            //return;
-        }
-
-        if (pointProj.projLine == null)
-        {
-            Debug.LogWarning("GameObj nie ma komponentu pointProj, nie mozna oznaczyc linii");
-            //return;
-        }
-        else
-        {
-            pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_ERROR_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
-        }
-        pointProj.is_ok_placed = false;
-    }
-
-    private void MarkOK(PointProjection pointProj)
-    {
-        ExPoint et = pointProj.pointObject.GetComponent<ExPoint>();
-        if (et == null)
-        {
-            Debug.LogWarning("GameObj nie ma komponentu ExPoint, nie mozna oznaczyc etykiety");
-            //return;
-        }
-
-        if (pointProj.projLine == null)
-        {
-            Debug.LogWarning("GameObj nie ma komponentu pointProj, nie mozna oznaczyc linii");
-            //return;
-        }
-        else
-        {
-            pointProj.projLine.SetStyle(ReconstructionInfo.PROJECTION_LINE_COLOR, ReconstructionInfo.PROJECTION_LINE_WIDTH);
-        }
-        pointProj.is_ok_placed = true;
     }
 }

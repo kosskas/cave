@@ -9,9 +9,9 @@ namespace Assets.Scripts.Experimental
 {
     public class IndexedLabel : MonoBehaviour
     {
-        private Vector3 Offset(Transform t) => 0.08f * FontSize * t.up;
+        private Vector3 Offset(Transform t) => ReconstructionInfo.LABEL_2D_OFFSET * FontSize * t.up;
 
-        private const float LabelFontSize = 0.6f;
+        private static readonly float LabelFontSize = ReconstructionInfo.LABEL_2D_FONT_SIZE;
 
         private static readonly Color ColorNormal = ReconstructionInfo.NORMAL;
 

@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class ExPoint : MonoBehaviour, IDrawable, IRaycastable, ILabelable
+    public class ExPoint : MonoBehaviour, IDrawable, IRaycastable, ILabelable, IColorable
     {
         private Color _color = ReconstructionInfo.NORMAL;
 
@@ -27,7 +27,7 @@ namespace Assets.Scripts.Experimental.Items
             }
         }
 
-        private static readonly float Size = 0.025f;
+        private static readonly float Size = ReconstructionInfo.POINT_2D_SIZE;
 
         private static readonly float ColliderSize = Size * 4;
 

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable, IAnalyzable
+    public class Line : MonoBehaviour, IDrawable, IRaycastable, ILabelable, IAnalyzable, IColorable
     {
         private Color _color = ReconstructionInfo.NORMAL;
 
@@ -23,7 +23,7 @@ namespace Assets.Scripts.Experimental.Items
             }
         } 
 
-        public float Width { get; set; } = 0.005f;
+        public float Width { get; set; } = ReconstructionInfo.LINE_2D_WIDTH;
 
         private float ColliderWidth => Width * 4;
 
@@ -195,6 +195,7 @@ namespace Assets.Scripts.Experimental.Items
         public void OnHoverExit()
         {
             _lineRenderer.material.color = _color;
+            //event new DeleteScopeEvent()
             //_labelComponent?.SetVisible(false);
         }
 

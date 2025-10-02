@@ -6,12 +6,24 @@ using UnityEngine;
 
 namespace Assets.Scripts.Experimental.Items
 {
-    public class Circle : MonoBehaviour, IDrawable, IRaycastable, IAnalyzable
+    public class Circle : MonoBehaviour, IDrawable, IRaycastable, IAnalyzable, IColorable
     {
-        private Color ColorNormal = ReconstructionInfo.NORMAL;
-        private Color ColorFocused = ReconstructionInfo.FOCUSED;
+        private Color _color = ReconstructionInfo.NORMAL;
 
-        public float Width = 0.002f;
+        public Color Color
+        {
+            get
+            {
+                return _color;
+            }
+            set
+            {
+                _color = value;
+                _circleRenderer.material.color = value;
+            }
+        }
+
+        public float Width = ReconstructionInfo.CIRCLE_2D_WIDTH;
 
         private float ColliderWidth => Width * 4;
 
@@ -41,7 +53,7 @@ namespace Assets.Scripts.Experimental.Items
             _circleRenderer = gameObject.AddComponent<LineRenderer>();
             _circleRenderer.material = new Material(Shader.Find("Unlit/Color"))
             {
-                color = ColorNormal
+                color = _color
             };
             _circleRenderer.positionCount = PositionsCount + 1;
 
@@ -101,12 +113,12 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverEnter()
         {
-            _circleRenderer.material.color = ColorFocused;
+            _circleRenderer.material.color = ReconstructionInfo.FOCUSED;
         }
 
         public void OnHoverExit()
         {
-            _circleRenderer.material.color = ColorNormal;
+            _circleRenderer.material.color = _color;
         }
 
         // IAnalyzable interface
