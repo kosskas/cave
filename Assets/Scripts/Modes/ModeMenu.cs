@@ -15,14 +15,24 @@ public class ModeMenu : IMode
 
         if (Input.GetKeyDown("1"))
         {
-            PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
+            _LoadVisualization();
         }
 
         if (Input.GetKeyDown("2"))
         {
-            PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
+            _LoadReconstruction();
         }
 
+    }
+
+    private void _LoadVisualization()
+    {
+        PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
+    }
+
+    private void _LoadReconstruction()
+    {
+        PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
     }
 }
 
