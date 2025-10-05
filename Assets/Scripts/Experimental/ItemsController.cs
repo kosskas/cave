@@ -235,11 +235,11 @@ namespace Assets.Scripts.Experimental
             _wCtrl.LinkConstructionToWall(planeB, axis);
         }
 
-        public void RemoveLastAxis()
+        public void RemoveAxis(WallInfo wallToRem)
         {
             if (_axisWalls != null && _axisWalls.Count > 0 && _wCtrl != null)
             {
-                var deletingWall = _wCtrl.GetLastAddedWall();
+                var deletingWall = wallToRem;
                 if (deletingWall != null)
                 {
                     var keysToRemove = _axisWalls

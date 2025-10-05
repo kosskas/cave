@@ -214,7 +214,7 @@ namespace Assets.Scripts.FileManagers
                         ConstPoint1 = wall.constrPoint1,
                         ConstPoint2 = wall.constrPoint2,
                         WallName = wall.name,
-                        ParentWallName = wall.parentName
+                        ParentWallName = wall.parentName //Moze juz nie istniec
                     });
                 });
 
@@ -259,7 +259,7 @@ namespace Assets.Scripts.FileManagers
                     ItemsController.AddWall(
                         wall.ConstPoint1,
                         wall.ConstPoint2,
-                        wall.ParentWallName,
+                        wall.ParentWallName, //Moze juz nie istniec
                         wall.WallName);
                 });
 

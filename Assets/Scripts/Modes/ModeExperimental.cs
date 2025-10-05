@@ -202,7 +202,7 @@ public class ModeExperimental : IMode
     {
         if (_context.Current.Key == ExContext.Wall)
         {
-            _wc.PopBackWall();
+            _RemoveWall();
             return;
         }
 
@@ -264,10 +264,11 @@ public class ModeExperimental : IMode
         });
     }
 
-    private void _RemoveLastWall()
+    private void _RemoveWall()
     {
-        _items.RemoveLastAxis();
-        _wc.PopBackWall();
+        WallInfo wallToRem = _wc.FindWallInfoByGameObject(PCref.Hit.collider.gameObject);
+        _wc.RemoveWall(wallToRem);
+        _items.RemoveAxis(wallToRem);
     }
     /* * * * INPUT HANDLERS end * * * */
 
@@ -483,12 +484,7 @@ public class ModeExperimental : IMode
 
         if (Input.GetKeyDown("l"))
         {
-            _wc.RemoveWall(_wc.FindWallInfoByGameObject(PCref.Hit.collider.gameObject));
-        }
-
-        if (Input.GetKeyDown("p"))
-        {
-            _RemoveLastWall();
+            _RemoveWall();
         }
 
         if (Input.GetKeyDown("m"))

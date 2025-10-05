@@ -208,7 +208,7 @@ public class WallController : MonoBehaviour {
         wallRelatedObjects[wall].Add(constructionObject);
     }
 
-    public void RemoveWall(WallInfo wall)
+    private void ClearAndRemoveWall(WallInfo wall)
     {
         if(!wall.canDelete)
             return;
@@ -226,7 +226,15 @@ public class WallController : MonoBehaviour {
         }
         Destroy(wall.gameObject);
     }
-
+    public void RemoveWall(WallInfo wall)
+    {
+        if (!wall.canDelete)
+            return;
+        playerAddedWalls.Remove(wall);
+        walls.Remove(wall);
+        wallcounter--;
+        ClearAndRemoveWall(wall);
+    }
     /// <summary>
     /// Usuwa ściany z odwróconą chronologią ich dodania
     /// </summary>
@@ -239,7 +247,7 @@ public class WallController : MonoBehaviour {
             lastWall.showProjection = false;
             playerAddedWalls.RemoveAt(playerAddedWalls.Count - 1);
             walls.RemoveAt(walls.Count - 1);
-            RemoveWall(lastWall);
+            ClearAndRemoveWall(lastWall);
             lastWall.gameObject = null;
             wallcounter--;
             ResetProjection();
