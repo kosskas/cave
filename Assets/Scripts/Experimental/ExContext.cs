@@ -54,5 +54,24 @@ namespace Assets.Scripts.Experimental
 
         [Description("Linie rzutuj\u0105ce")]
         ProjLine,
+
+        //---------WIZUALIZACJA-------------------
+
+        [Description("Nastepna bryla")]
+        NextSolid,
+
+        [Description("Poprzednia bryla")]
+        PrevSolid,
+
+        [Description("Usun sciane")]
+        RemoveWall,
+
+        [Description("Dodaj sciane")]
+        AddWall,
+
+        [Description("Pokaz rzut")]
+        ShowProj,
+
+        
     }
 }

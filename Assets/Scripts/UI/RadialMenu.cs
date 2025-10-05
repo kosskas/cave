@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Assets.Scripts.Experimental.Utils;
 using Assets.Scripts.Experimental;
 using System;
+using System.Runtime.Remoting.Contexts;
 
 public class RadialMenu : MonoBehaviour
 {
@@ -13,8 +14,8 @@ public class RadialMenu : MonoBehaviour
     private float radius;
     private List<string> labels;
 
-    public KeyCode prevKey = KeyCode.Comma;
-    public KeyCode nextKey = KeyCode.Period;
+    public KeyCode prevKey = KeyCode.Period;
+    public KeyCode nextKey = KeyCode.Comma;
     public float selectedScale = 1.44f;
     public float fontSizeScale = 0.34f;
     public Vector3 initialMenuItemScale;
@@ -231,5 +232,11 @@ public class RadialMenu : MonoBehaviour
         {
             item.SetActive(isMenuActive);
         }
+    }
+    public void RemoveFromScene()
+    {
+        Transform menuRoot = this.transform.parent;
+        Transform canvas = menuRoot.transform.parent;
+        GameObject.Destroy(canvas.gameObject);
     }
 }
