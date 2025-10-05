@@ -56,6 +56,22 @@ namespace Assets.Scripts.Experimental
         Undo,
 
         [Description("Pon\u00F3w")]
-        Redo
+        Redo,
+        //---------WIZUALIZACJA-------------------
+
+        [Description("Nastepna bryla")]
+        NextSolid,
+
+        [Description("Poprzednia bryla")]
+        PrevSolid,
+
+        [Description("Usun sciane")]
+        RemoveWall,
+
+        [Description("Dodaj sciane")]
+        AddWall,
+
+        [Description("Pokaz rzut")]
+        ShowProj,
     }
 }
