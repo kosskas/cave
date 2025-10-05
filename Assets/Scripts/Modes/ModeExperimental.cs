@@ -148,7 +148,7 @@ public class ModeExperimental : IMode
         GameObject.Destroy(_mb);
 
         //delete menu
-        GameObject.Destroy(radialMenu.gameObject);
+        radialMenu.RemoveFromScene();
         radialMenu = null;
 
         ///Zaladuj grupowy
@@ -447,8 +447,6 @@ public class ModeExperimental : IMode
     public void AddRadialMenu()
     {
         GameObject flystick = GameObject.Find("TrackedObject");
-        GameObject.Find("NextContext")?.SetActive(false);
-        GameObject.Find("PrevContext")?.SetActive(false);
         if (flystick == null)
         {
             flystick = GameObject.Find("Main Camera");
