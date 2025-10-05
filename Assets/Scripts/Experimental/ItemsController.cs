@@ -33,6 +33,21 @@ namespace Assets.Scripts.Experimental
 
         private List<ExPoint> _facePoints;
 
+        public enum DrawType
+        {
+            Full,
+            Part
+        }
+
+        /*   E V E N T S   */
+
+        public event EventHandler<DrawType> DrawingCompleted;
+
+        protected virtual void OnDrawingCompleted(DrawType type)
+        {
+            DrawingCompleted?.Invoke(this, type);
+        }
+
 
         /*   C O N S T R U C T O R S   */
 
@@ -299,7 +314,7 @@ namespace Assets.Scripts.Experimental
             }
         }
 
-        public DrawAction DrawPoint(WallInfo plane, Vector3 position, List<string> labels = null)
+        public DrawAction DrawPoint(WallInfo plane, Vector3 position, List<string> labels = null, DrawType type = DrawType.Full)
         {
             var point = new GameObject("POINT");
             point.transform.SetParent(_pointRepo.transform);
@@ -310,6 +325,8 @@ namespace Assets.Scripts.Experimental
             pointComponent.EnabledLabels = true;
 
             labels?.ForEach(label => pointComponent.AddLabel(label));
+
+            OnDrawingCompleted(type);
 
             return null;
         }
@@ -336,6 +353,8 @@ namespace Assets.Scripts.Experimental
 
                 _facePoints.ForEach(p => p.Color = ReconstructionInfo.NORMAL);
                 _facePoints.Clear();
+
+                OnDrawingCompleted(DrawType.Full);
             }
             else if(_facePoints.Contains(chosenPoint) || string.IsNullOrEmpty(chosenPoint.FocusedLabel))
             {
@@ -351,7 +370,7 @@ namespace Assets.Scripts.Experimental
             return null;
         }
 
-        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH)
+        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH, DrawType type = DrawType.Full)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -402,16 +421,18 @@ namespace Assets.Scripts.Experimental
                             foreach (var point in crossings)
                             {
                                 if(Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
-                                DrawPoint(plane, point);
+                                DrawPoint(plane, point, null, DrawType.Part);
                             }
                         }
                     }
+
+                    OnDrawingCompleted(type);
                 }
             };
         }
 
         /// TODO Przeciecia sa niedostepne dla scian
-        public DrawAction DrawWall(WallInfo plane, Vector3 startPosition, string fixedName = null)
+        public DrawAction DrawWall(WallInfo plane, Vector3 startPosition, string fixedName = null, DrawType type = DrawType.Full)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -440,11 +461,13 @@ namespace Assets.Scripts.Experimental
 
                     var addedWall = _wCrt.WCrCreateWall(startPosition, endPositionWithPointSensitivity, plane, fixedName);
                     AddAxisBetweenPlanes(addedWall, plane);
+
+                    OnDrawingCompleted(type);
                 }
             };
         }
 
-        public DrawAction DrawCircle(WallInfo plane, Vector3 startPosition, float lineWidth = _HELP_LINE_WIDTH)
+        public DrawAction DrawCircle(WallInfo plane, Vector3 startPosition, float lineWidth = _HELP_LINE_WIDTH, DrawType type = DrawType.Full)
         {
             var circle = new GameObject("CIRCLE");
             circle.transform.SetParent(_circleRepo.transform);
@@ -483,10 +506,12 @@ namespace Assets.Scripts.Experimental
                             foreach (var point in crossings)
                             {
                                 if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
-                                DrawPoint(plane, point);
+                                DrawPoint(plane, point, null, DrawType.Part);
                             }
                         }
                     }
+
+                    OnDrawingCompleted(type);
                 }
             };
         }
@@ -591,7 +616,7 @@ namespace Assets.Scripts.Experimental
 
                     if (isEnd)
                     {
-                        DrawPoint(endPlane, endPosition);
+                        DrawPoint(endPlane, endPosition, null, DrawType.Part);
 
                         projectionComponent1.ColliderEnabled = true;
                         projectionComponent1.SetLabelVisible(false);
@@ -608,7 +633,7 @@ namespace Assets.Scripts.Experimental
                             {
                                 foreach (var point in crossings)
                                 {
-                                    DrawPoint(startPlane, point);
+                                    DrawPoint(startPlane, point, null, DrawType.Part);
                                 }
                             }
                         }
@@ -620,10 +645,12 @@ namespace Assets.Scripts.Experimental
                             {
                                 foreach (var point in crossings)
                                 {
-                                    DrawPoint(endPlane, point);
+                                    DrawPoint(endPlane, point, null, DrawType.Part);
                                 }
                             }
                         }
+
+                        OnDrawingCompleted(DrawType.Full);
                     }
                 }
             };
@@ -700,10 +727,12 @@ namespace Assets.Scripts.Experimental
                             foreach (var point in crossings)
                             {
                                 //if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
-                                DrawPoint(plane, point);
+                                DrawPoint(plane, point, null, DrawType.Part);
                             }
                         }
                     }
+
+                    OnDrawingCompleted(DrawType.Full);
                 }
             };
         }
@@ -785,10 +814,12 @@ namespace Assets.Scripts.Experimental
                             foreach (var point in crossings)
                             {
                                 //if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
-                                DrawPoint(plane, point);
+                                DrawPoint(plane, point, null, DrawType.Part);
                             }
                         }
                     }
+
+                    OnDrawingCompleted(DrawType.Full);
                 }
             };
         }
@@ -809,7 +840,7 @@ namespace Assets.Scripts.Experimental
 
         public static void AddPoint(List<string> pointLabels, string pointPlaneName, Vector3 pointPosition)
         {
-            _ic?.DrawPoint(_ic._wCtrl.GetWallByName(pointPlaneName), pointPosition, pointLabels);
+            _ic?.DrawPoint(_ic._wCtrl.GetWallByName(pointPlaneName), pointPosition, pointLabels, DrawType.Part);
         }
 
         public static void AddLine(List<string> lineBoundPointsByLabel, Vector3 lineEndPosition, List<string> lineLabels, float lineLineWidth, string linePlaneName, Vector3 lineStartPosition)
@@ -846,7 +877,7 @@ namespace Assets.Scripts.Experimental
                 }
             }
 
-            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, lineLineWidth);
+            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, lineLineWidth, DrawType.Part);
             da.Invoke(endPoint, lineEndPosition, plane, true);
         }
 
@@ -856,7 +887,7 @@ namespace Assets.Scripts.Experimental
 
             var plane = _ic._wCtrl.GetWallByName(circlePlaneName);
 
-            var da = _ic.DrawCircle(plane, circleStartPosition, circleLineWidth);
+            var da = _ic.DrawCircle(plane, circleStartPosition, circleLineWidth, DrawType.Part);
             da.Invoke(null, circleEndPosition, plane, true);
         }
 
@@ -869,7 +900,7 @@ namespace Assets.Scripts.Experimental
 
             var plane = _ic._wCtrl.GetWallByName(wallParentWallName);
 
-            var da = _ic.DrawWall(plane, (Vector3)wallConstPoint1, wallWallName);
+            var da = _ic.DrawWall(plane, (Vector3)wallConstPoint1, wallWallName, DrawType.Part);
             da.Invoke(null, (Vector3)wallConstPoint2, plane, true);
         }
 
