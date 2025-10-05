@@ -54,5 +54,11 @@ namespace Assets.Scripts.Experimental
 
         [Description("Linie rzutuj\u0105ce")]
         ProjLine,
+
+        [Description("Cofnij")]
+        Undo,
+
+        [Description("Pon\u00F3w")]
+        Redo
     }
 }

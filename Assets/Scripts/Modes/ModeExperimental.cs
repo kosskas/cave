@@ -1,7 +1,6 @@
 using Assets.Scripts.Experimental;
 using System;
 using System.Collections.Generic;
-using Assets.Scripts;
 using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using Assets.Scripts.FileManagers;
@@ -23,6 +22,8 @@ public class ModeExperimental : IMode
     private WallCreator _wcrt;
 
     private ItemsController _items;
+
+    private HistoryManager _hm;
 
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
     private CircularIterator<KeyValuePair<ExContext, Action>> _creationCtx;
@@ -113,18 +114,7 @@ public class ModeExperimental : IMode
 
     private void _LoadState()
     {
-        //czyszcenie œcian obiektu
-        _fc.Clear();
-
-        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
-        _items.Clear();
-
-        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
-        _mb.ClearAndDisable();
-        _mb.Init(true);
-
-        //dodanie bazowej osi rzutuj¹cej
-        _AddBaseAxis();
+        _ClearScene();
 
         //wczytanie pliku
         StateManager.Exp.Load();
@@ -202,7 +192,9 @@ public class ModeExperimental : IMode
     {
         if (_context.Current.Key == ExContext.Wall)
         {
-            _wc.PopBackWall();
+            var isDeleted = _wc.PopBackWall();
+            if (isDeleted)
+                _SceneChangedHandler();
             return;
         }
 
@@ -211,16 +203,24 @@ public class ModeExperimental : IMode
         //Debug.Log("Objekt " + hitGameObject.name);
         if (hitGameObject == null) return;
 
-        UnityEngine.Object.Destroy(hitGameObject);
+        UnityEngine.Object.DestroyImmediate(hitGameObject);
 
         _hitObject = null;
+
+        _SceneChangedHandler();
     }
 
     private void _TryGetNextLabelText()
     {
         _hitObject?.OnHoverAction((gameObject) =>
         {
-            gameObject.GetComponent<ILabelable>()?.NextText();
+            var l = gameObject.GetComponent<ILabelable>();
+            if (l == null) return;
+
+            l.NextText();
+
+            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            _SceneChangedHandler();
         });
     }
 
@@ -228,7 +228,13 @@ public class ModeExperimental : IMode
     {
         _hitObject?.OnHoverAction((gameObject) =>
         {
-            gameObject.GetComponent<ILabelable>()?.PrevText();
+            var l = gameObject.GetComponent<ILabelable>();
+            if (l == null) return;
+
+            l.PrevText();
+
+            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            _SceneChangedHandler();
         });
     }
 
@@ -236,7 +242,13 @@ public class ModeExperimental : IMode
     {
         _hitObject?.OnHoverAction((gameObject) =>
         {
-            gameObject.GetComponent<ILabelable>()?.NextLabel();
+            var l = gameObject.GetComponent<ILabelable>();
+            if (l == null) return;
+
+            l.NextLabel();
+
+            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            _SceneChangedHandler();
         });
     }
 
@@ -244,7 +256,13 @@ public class ModeExperimental : IMode
     {
         _hitObject?.OnHoverAction((gameObject) =>
         {
-            gameObject.GetComponent<ILabelable>()?.PrevLabel();
+            var l = gameObject.GetComponent<ILabelable>();
+            if (l == null) return;
+
+            l.PrevLabel();
+
+            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            _SceneChangedHandler();
         });
     }
 
@@ -252,7 +270,13 @@ public class ModeExperimental : IMode
     {
         _hitObject?.OnHoverAction((gameObject) =>
         {
-            gameObject.GetComponent<ILabelable>()?.RemoveFocusedLabel();
+            var l = gameObject.GetComponent<ILabelable>();
+            if (l == null) return;
+                
+            l.RemoveFocusedLabel();
+
+            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE USUNIÊTO LABEL
+            _SceneChangedHandler();
         });
     }
 
@@ -260,17 +284,60 @@ public class ModeExperimental : IMode
     {
         _hitObject?.OnHoverAction((gameObject) =>
         {
-            gameObject.GetComponent<ILabelable>()?.AddLabel();
+            var l = gameObject.GetComponent<ILabelable>();
+            if (l == null) return;
+                
+            l.AddLabel();
+
+            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE DODANO LABEL
+            _SceneChangedHandler();
         });
     }
 
     private void _RemoveLastWall()
     {
         _items.RemoveLastAxis();
-        _wc.PopBackWall();
+        var isDeleted = _wc.PopBackWall();
+
+        if  (isDeleted)
+            _SceneChangedHandler();
     }
+
+    private void _Undo()
+    {
+        if (_hm.CanUndo())
+        {
+            _ClearScene();
+            _hm.Undo();
+        }
+    }
+
+    private void _Redo()
+    {
+        if (_hm.CanRedo())
+        {
+            _ClearScene();
+            _hm.Redo();
+        }
+    }
+
     /* * * * INPUT HANDLERS end * * * */
 
+    private void _ClearScene()
+    {
+        //czyszcenie œcian obiektu
+        _fc.Clear();
+        
+        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
+        _items.Clear();
+        
+        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
+        _mb.ClearAndDisable();
+        _mb.Init(true);
+        
+        //dodanie bazowej osi rzutuj¹cej
+        _AddBaseAxis();
+    }
 
     private void _MoveCursor()
     {
@@ -313,6 +380,8 @@ public class ModeExperimental : IMode
 
     public ModeExperimental(PlayerController pc)
     {
+        _hm = new HistoryManager(30);
+
         PCref = pc;
         _wc = GameObject.Find("Walls").GetComponent<WallController>();
 
@@ -327,6 +396,11 @@ public class ModeExperimental : IMode
         _fc = mainObject.AddComponent<FacesGenerator>();
 
         _items = new ItemsController(_wc, _wcrt, _fc, _mb);
+        _items.DrawingCompleted += (sender, drawOrigin) =>
+        {
+            if (drawOrigin == ItemsController.DrawType.Full)
+                _SceneChangedHandler();
+        };
 
         //dodanie bazowej osi rzutuj¹cej
         _AddBaseAxis();
@@ -345,7 +419,9 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Face, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _SwitchRuleProjectionLine)
+                new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _SwitchRuleProjectionLine),
+                new KeyValuePair<ExContext, Action>(ExContext.Undo, _Undo),
+                new KeyValuePair<ExContext, Action>(ExContext.Redo, _Redo)
             });
 
         _optCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
@@ -362,7 +438,15 @@ public class ModeExperimental : IMode
         
         AddRadialMenu();
 
+        _SceneChangedHandler();
+
         Debug.Log($"<color=blue> MODE experimental ON </color>");
+    }
+
+    private void _SceneChangedHandler()
+    {
+        Debug.Log("_SceneChangedHandler");
+        _hm.AddCheckpoint();
     }
 
     public CircularIterator<KeyValuePair<ExContext, Action>> GetCtx()
