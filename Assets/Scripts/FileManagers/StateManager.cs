@@ -17,7 +17,8 @@ namespace Assets.Scripts.FileManagers
 #else
     private const string PathToFolderWithSavedStates = "./SavedWorkspaces";
 #endif
-
+        private static List<string> _savedStates = new List<string>();
+        private static int _currentSavedState = 0;
         public class Exp
         {
             /*   J S O N   */
@@ -114,6 +115,22 @@ namespace Assets.Scripts.FileManagers
                 return Directory.EnumerateFiles(folderPath, "*.json", SearchOption.TopDirectoryOnly)
                     .OrderBy(Path.GetFileName, StringComparer.Ordinal)
                     .LastOrDefault();
+            }
+
+            private static string GetCurrentJson()
+            {
+                var folderPath = PathToFolderWithSavedStates;
+
+                if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
+                    return null;
+
+                _savedStates = Directory.EnumerateFiles(folderPath, "*.json", SearchOption.TopDirectoryOnly)
+                    .ToList();
+
+                string json = _savedStates[_currentSavedState % _savedStates.Count()];
+                _currentSavedState++;
+
+                return json;
             }
 
             private static T LoadJson<T>(string fullPath, JsonSerializerSettings settings)
@@ -233,7 +250,8 @@ namespace Assets.Scripts.FileManagers
 
             public static void Load()
             {
-                var path = GetLexicographicallyLastJson();
+                //var path = GetLexicographicallyLastJson();
+                var path = GetCurrentJson();
 
                 if (string.IsNullOrEmpty(path) || !File.Exists(path))
                 {
