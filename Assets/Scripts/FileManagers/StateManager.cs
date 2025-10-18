@@ -215,6 +215,7 @@ namespace Assets.Scripts.FileManagers
                         ConstPoint1 = wall.constrPoint1,
                         ConstPoint2 = wall.constrPoint2,
                         WallName = wall.name,
+                        ParentWallName = wall.parentName,
                         ParentNormal = wall.parentNormal
                     });
                 });

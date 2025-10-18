@@ -122,7 +122,7 @@ public class ModeExperimental : IMode
         //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
         _mb.ClearAndDisable();
         _mb.Init(true);
-
+        _wc.SetBasicWalls();
         //dodanie bazowej osi rzutuj¹cej
         _AddBaseAxis();
 
