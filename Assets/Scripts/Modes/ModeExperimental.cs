@@ -336,7 +336,6 @@ public class ModeExperimental : IMode
             new List<KeyValuePair<ExContext, Action>>()
             {
                 new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _BackToBasicCtx),
-                new KeyValuePair<ExContext, Action>(ExContext.Idle, () => {}),
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Line, Act),

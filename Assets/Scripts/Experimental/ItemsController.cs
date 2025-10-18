@@ -275,8 +275,6 @@ namespace Assets.Scripts.Experimental
 
             switch (context)
             {
-                case ExContext.Idle: return null;
-
                 case ExContext.Point: return DrawPoint(plane, position);
 
                 case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, _BOLD_LINE_WIDTH);
