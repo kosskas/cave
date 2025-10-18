@@ -53,6 +53,7 @@ namespace Assets.Scripts.FileManagers
                 [JsonConverter(typeof(Vector3Converter))] public Vector3? ConstPoint1 { get; set; }
                 [JsonConverter(typeof(Vector3Converter))] public Vector3? ConstPoint2 { get; set; }
                 public string ParentWallName { get; set; }
+                [JsonConverter(typeof(Vector3Converter))] public Vector3? ParentNormal { get; set; }
             }
             private class FaceJson
             {
@@ -214,7 +215,7 @@ namespace Assets.Scripts.FileManagers
                         ConstPoint1 = wall.constrPoint1,
                         ConstPoint2 = wall.constrPoint2,
                         WallName = wall.name,
-                        ParentWallName = wall.parentName //Moze juz nie istniec
+                        ParentNormal = wall.parentNormal
                     });
                 });
 
@@ -259,7 +260,8 @@ namespace Assets.Scripts.FileManagers
                     ItemsController.AddWall(
                         wall.ConstPoint1,
                         wall.ConstPoint2,
-                        wall.ParentWallName, //Moze juz nie istniec
+                        wall.ParentNormal,
+                        wall.ParentWallName,
                         wall.WallName);
                 });
 

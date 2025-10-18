@@ -291,7 +291,7 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity);
 
-                case ExContext.Wall: return DrawWall(plane, positionWithPointSensitivity);
+                case ExContext.Wall: return DrawWall(plane, positionWithPointSensitivity, plane.GetNormal());
 
                 case ExContext.Face: return DrawFace(hitObject as ExPoint);
 
@@ -422,7 +422,7 @@ namespace Assets.Scripts.Experimental
         }
 
         /// TODO Przeciecia sa niedostepne dla scian
-        public DrawAction DrawWall(WallInfo plane, Vector3 startPosition, string fixedName = null)
+        public DrawAction DrawWall(WallInfo plane, Vector3 startPosition, Vector3 wallParentNormal, string fixedName = null)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -449,7 +449,7 @@ namespace Assets.Scripts.Experimental
                 {
                     UnityEngine.Object.Destroy(line);
 
-                    var addedWall = _wCrt.WCrCreateWall(startPosition, endPositionWithPointSensitivity, plane, fixedName);
+                    var addedWall = _wCrt.WCrCreateWall(startPosition, endPositionWithPointSensitivity, wallParentNormal, plane.name, fixedName);
                     AddAxisBetweenPlanes(addedWall, plane);
                 }
             };
@@ -926,19 +926,24 @@ namespace Assets.Scripts.Experimental
             da.Invoke(null, circleEndPosition, plane, true);
         }
 
-        public static void AddWall(Vector3? wallConstPoint1, Vector3? wallConstPoint2, string wallParentWallName, string wallWallName)
+        public static void AddWall(Vector3? wallConstPoint1, Vector3? wallConstPoint2, Vector3? wallParentNormal, string wallParentWallName, string wallWallName)
         {
             if (_ic == null) return;
-            if (wallParentWallName == null) return;
             if (wallConstPoint1 == null) return;
             if (wallConstPoint2 == null) return;
 
             var plane = _ic._wCtrl.GetWallByName(wallParentWallName);
-
-            var da = _ic.DrawWall(plane, (Vector3)wallConstPoint1, wallWallName);
-            da.Invoke(null, (Vector3)wallConstPoint2, plane, true);
+            if (plane == null)
+            {
+                var addedWall = _ic._wCrt.WCrCreateWall((Vector3)wallConstPoint1, (Vector3)wallConstPoint2, (Vector3)wallParentNormal, null, wallWallName);
+            }
+            else
+            {
+                var da = _ic.DrawWall(plane, (Vector3)wallConstPoint1, (Vector3)wallParentNormal, wallWallName);
+                da.Invoke(null, (Vector3)wallConstPoint2, plane, true);
+            }
         }
-
+ 
         public static void AddFace(List<KeyValuePair<string, Vector3>> faceVertices)
         {
             _ic?._fGen.GenerateFace(faceVertices);

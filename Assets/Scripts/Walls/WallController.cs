@@ -41,7 +41,7 @@ public class WallController : MonoBehaviour {
         int idx = 0;
         foreach (GameObject wall in wallsobject)
         {
-            ret.Add(new WallInfo(wall, null, null, idx, wall.name, null,
+            ret.Add(new WallInfo(wall, null, null, idx, wall.name, Vector3.zero, null,
                 true,   //show projection
                 true,  //showLines
                 true,  //showReferenceLines
@@ -60,10 +60,9 @@ public class WallController : MonoBehaviour {
     /// <param name="parentWallInfo">Ściana, od której powstała nowa ściana</param>
     /// <param name="wallPrefab">Szablon ściany</param>
     /// <param name="fixedName">Opcjonalna nazwa dodawanej ściany</param>
-    public WallInfo CreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo, GameObject wallPrefab, string fixedName = null)
+    public WallInfo CreateWall(Vector3 point1, Vector3 point2, Vector3 parentNormal, string parentName, GameObject wallPrefab, string fixedName = null)
     {
         Vector3 direction = point2 - point1;
-        Vector3 parentNormal = parentWallInfo.GetNormal();
         Vector3 newWallNormal = Vector3.Cross(direction.normalized, parentNormal).normalized;
         Vector3 toCenterNormal = FindVectorFromPlaneTowardsSolid(point1, point2);
 
@@ -109,7 +108,7 @@ public class WallController : MonoBehaviour {
         BoxCollider boxCollider = newWall.GetComponent<BoxCollider>();
         boxCollider.isTrigger = false;
 
-        WallInfo wall = new WallInfo(newWall, point1, point2, wallcounter++, newWall.name, parentWallInfo.name , true, true, true, true);
+        WallInfo wall = new WallInfo(newWall, point1, point2, wallcounter++, newWall.name, parentNormal, parentName, true, true, true, true);
         walls.Add(wall);
         playerAddedWalls.Add(wall);
         ResetProjection();
