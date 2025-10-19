@@ -22,9 +22,6 @@ namespace Assets.Scripts.Experimental
         [Description("Wr\u00F3\u0107")]
         BackToOpt,
 
-        [Description("- - -")]
-        Idle,
-
         [Description("Punkt")]
         Point,
 

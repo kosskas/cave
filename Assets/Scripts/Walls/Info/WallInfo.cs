@@ -30,6 +30,10 @@ public class WallInfo
     /// </summary>
     public string name;
     /// <summary>
+    /// Wektor normalny rodzica
+    /// </summary>
+    public Vector3 parentNormal;
+    /// <summary>
     /// Nazwa ściany rodzica
     /// </summary>
     public string parentName;
@@ -72,7 +76,7 @@ public class WallInfo
     /// <param name="showLines">Flaga dotycząca wyświetlania linii rzutujących.</param>
     /// <param name="showReferenceLines">Flaga dotycząca wyświetlania linii odnoszących.</param>
     /// <param name="canDelete">Flaga dot. możliwości usuwania ściany.</param>
-    public WallInfo(GameObject gameObject, Vector3? constrPoint1, Vector3? constrPoint2, int number, string name, string parentName, bool showProjection, bool showLines, bool showReferenceLines, bool canDelete)
+    public WallInfo(GameObject gameObject, Vector3? constrPoint1, Vector3? constrPoint2, int number, string name, Vector3 parentNormal, string parentName, bool showProjection, bool showLines, bool showReferenceLines, bool canDelete)
     {
         this.gameObject = gameObject;
         this.constrPoint1 = constrPoint1;
@@ -84,6 +88,7 @@ public class WallInfo
         this.showReferenceLines = showReferenceLines;
         this.canDelete = canDelete;
         this.parentName = parentName;
+        this.parentNormal = parentNormal;
 
         switch (number)
         {

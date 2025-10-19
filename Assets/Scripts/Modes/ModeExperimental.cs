@@ -122,7 +122,7 @@ public class ModeExperimental : IMode
         //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
         _mb.ClearAndDisable();
         _mb.Init(true);
-
+        _wc.SetBasicWalls();
         //dodanie bazowej osi rzutuj¹cej
         _AddBaseAxis();
 
@@ -173,6 +173,7 @@ public class ModeExperimental : IMode
 
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
+        _items.RemoveWorkspace();
 
         //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
         _mb.ClearAndDisable();
@@ -202,7 +203,7 @@ public class ModeExperimental : IMode
     {
         if (_context.Current.Key == ExContext.Wall)
         {
-            _wc.PopBackWall();
+            _RemoveWall();
             return;
         }
 
@@ -264,10 +265,11 @@ public class ModeExperimental : IMode
         });
     }
 
-    private void _RemoveLastWall()
+    private void _RemoveWall()
     {
-        _items.RemoveLastAxis();
-        _wc.PopBackWall();
+        WallInfo wallToRem = _wc.FindWallInfoByGameObject(PCref.Hit.collider.gameObject);
+        _wc.RemoveWall(wallToRem);
+        _items.RemoveAxis(wallToRem);
     }
     /* * * * INPUT HANDLERS end * * * */
 
@@ -335,7 +337,6 @@ public class ModeExperimental : IMode
             new List<KeyValuePair<ExContext, Action>>()
             {
                 new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _BackToBasicCtx),
-                new KeyValuePair<ExContext, Action>(ExContext.Idle, () => {}),
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Line, Act),
@@ -483,12 +484,7 @@ public class ModeExperimental : IMode
 
         if (Input.GetKeyDown("l"))
         {
-            _wc.RemoveWall(_wc.FindWallInfoByGameObject(PCref.Hit.collider.gameObject));
-        }
-
-        if (Input.GetKeyDown("p"))
-        {
-            _RemoveLastWall();
+            _RemoveWall();
         }
 
         if (Input.GetKeyDown("m"))

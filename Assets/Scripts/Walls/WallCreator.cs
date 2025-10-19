@@ -71,7 +71,7 @@ public class WallCreator : MonoBehaviour
 				return;
 			}
 
-			wallController.CreateWall(points[0].transform.position, points[1].transform.position, hitWallInfo, wallPrefab);
+			wallController.CreateWall(points[0].transform.position, points[1].transform.position, hitWallInfo.GetNormal(), hitWallInfo.name, wallPrefab);
 			ClearPoints();
         }
 
@@ -82,19 +82,9 @@ public class WallCreator : MonoBehaviour
 		}
 	}
 
-    public WallInfo WCrCreateWall(Vector3 point1, Vector3 point2, WallInfo parentWallInfo, string fixedName = null)
+    public WallInfo WCrCreateWall(Vector3 point1, Vector3 point2, Vector3 parentNormal, string parentName, string fixedName = null)
     {
-        return wallController.CreateWall(point1, point2, parentWallInfo, wallPrefab, fixedName);
-    }
-    public void RestoreWall(string wallName, Vector3 point1, Vector3 point2, string parentWallName)
-    {
-        WallInfo parentWallInfo = wallController.GetWallByName(parentWallName);
-        if (parentWallInfo == null)
-        {
-            Debug.LogError("Nie znaleziono rodzica potrzebnego do stworzenia sciany");
-			return;
-        }
-        wallController.CreateWall(point1, point2, parentWallInfo, wallPrefab, wallName);
+        return wallController.CreateWall(point1, point2, parentNormal, parentName, wallPrefab, fixedName);
     }
 
     void ClearPoints()
