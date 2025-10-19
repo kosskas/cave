@@ -22,7 +22,7 @@ namespace Assets.Scripts.Experimental
 
         private static ItemsController _ic;
 
-        private readonly GameObject _workspace;
+        private static GameObject _workspace;
 
         private static GameObject _axisRepo;
         private static GameObject _lineRepo;
@@ -973,5 +973,10 @@ namespace Assets.Scripts.Experimental
             _pointRepo.transform.SetParent(_workspace.transform);
         }
 
+        public void RemoveWorkspace()
+        {
+            UnityEngine.Object.DestroyImmediate(_workspace);
+            _workspace = new GameObject("WorkspaceExp");
+        }
     }
 }

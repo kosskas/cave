@@ -173,6 +173,7 @@ public class ModeExperimental : IMode
 
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
+        _items.RemoveWorkspace();
 
         //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
         _mb.ClearAndDisable();
