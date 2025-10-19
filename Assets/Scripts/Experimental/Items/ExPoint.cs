@@ -211,7 +211,9 @@ namespace Assets.Scripts.Experimental.Items
         {
             if (_labelComponent == null)
                 return;
+
             _labelTexts.Begin();
+
             var found = _labelTexts.NextWhile(current => Mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
 
             if (found)

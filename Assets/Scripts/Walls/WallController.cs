@@ -235,9 +235,9 @@ public class WallController : MonoBehaviour {
         ClearAndRemoveWall(wall);
     }
     /// <summary>
-    /// Usuwa ściany z odwróconą chronologią ich dodania
+    /// Usuwa ściany z odwróconą chronologią ich dodania. Zwraca true, jeśli ściana została usunięta.
     /// </summary>
-    public void PopBackWall()
+    public bool PopBackWall()
     {
         if(playerAddedWalls !=  null && playerAddedWalls.Count > 0)
         {
@@ -250,7 +250,11 @@ public class WallController : MonoBehaviour {
             lastWall.gameObject = null;
             wallcounter--;
             ResetProjection();
-        } 
+
+            return true;
+        }
+
+        return false;
     }
 
     public WallInfo GetLastAddedWall()

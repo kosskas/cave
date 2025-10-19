@@ -72,20 +72,19 @@ namespace Assets.Scripts.FileManagers
 
             /*   P R I V A T E   M E T H O D S   */
 
-            private static void SaveJson(string json, string fileName, bool withTimestamp)
+            private static void SaveJson(string json, string dirPath, string fileName, bool withTimestamp)
             {
                 const string extension = "json";
 
-                var folderPath = PathToFolderWithSavedStates;
                 var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
                 var fullFileName = withTimestamp ? $"{fileName}_{timestamp}.{extension}" : $"{fileName}.{extension}";
-                var fullPath = Path.Combine(folderPath, fullFileName);
+                var fullPath = Path.Combine(dirPath, fullFileName);
 
                 try
                 {
                     // Upewnij siê, ¿e katalog istnieje
-                    Directory.CreateDirectory(folderPath);
+                    Directory.CreateDirectory(dirPath);
 
                     File.WriteAllText(fullPath, json);
 
@@ -150,7 +149,7 @@ namespace Assets.Scripts.FileManagers
 
             /*   P U B L I C   M E T H O D S   */
 
-            public static void Save(string fileName = "sceneState", bool withTimestamp = true)
+            public static void Save(string dirPath = PathToFolderWithSavedStates, string fileName = "sceneState", bool withTimestamp = true)
             {
                 var settings = new JsonSerializerSettings
                 {
@@ -230,12 +229,12 @@ namespace Assets.Scripts.FileManagers
 
                 var json = JsonConvert.SerializeObject(ss, Formatting.Indented, settings);
 
-                SaveJson(json, fileName, withTimestamp);
+                SaveJson(json, dirPath, fileName, withTimestamp);
             }
 
-            public static void Load()
+            public static void Load(string fullFilePath = "")
             {
-                var path = GetLexicographicallyLastJson();
+                var path = string.IsNullOrEmpty(fullFilePath) ? GetLexicographicallyLastJson() : fullFilePath;
 
                 if (string.IsNullOrEmpty(path) || !File.Exists(path))
                 {
