@@ -36,7 +36,6 @@ public class PlayerController : MonoBehaviour
 
     public enum Mode
     {
-        ModeMenu,
         Mode3Dto2D,
         ModeExperimental
     }
@@ -47,7 +46,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController _characterController;
     private Ray _ray;
     private IMode _modeController;
-    private Mode _mode = Mode.ModeMenu;
+    private Mode _mode = Mode.ModeExperimental;
     private bool _isModeChanged = false;
 
 
@@ -115,10 +114,6 @@ public class PlayerController : MonoBehaviour
     {
         switch (_mode)
         {
-            case Mode.ModeMenu:
-                _modeController = new ModeMenu(this);
-                break;
-
             case Mode.Mode3Dto2D:
                 _modeController = new Mode3Dto2D(this);
                 break;
@@ -128,7 +123,7 @@ public class PlayerController : MonoBehaviour
                 break;
 
             default:
-                _modeController = new ModeMenu(this);
+                _modeController = new ModeExperimental(this);
                 break;
         }
     }

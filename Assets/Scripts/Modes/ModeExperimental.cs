@@ -120,28 +120,6 @@ public class ModeExperimental : IMode
         StateManager.Exp.Load();
     }
 
-    private void _BackToMenu()
-    {
-        //czyszcenie œcian obiektu
-        _fc.Clear();
-        GameObject.Destroy(_fc);
-
-        //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
-        _items.Clear();
-
-        //clear meshBuilder usuwa pkty 3D,krawedzie 3d,linie rzutujace,odnoszace
-        _mb.ClearAndDisable();
-        GameObject.Destroy(_mb);
-
-        _wc.SetBasicWalls();
-        //delete menu
-        GameObject.Destroy(radialMenu.gameObject); 
-        radialMenu = null;
-
-        ///Zaladuj grupowy
-        PCref.ChangeMode(PlayerController.Mode.ModeMenu);
-    }
-
     private void _SaveSolidAndSwitchToMode3Dto2D()
     {
         GameObject mainObject = GameObject.Find("MainObject");
@@ -428,7 +406,6 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Save, _SaveState),
                 new KeyValuePair<ExContext, Action>(ExContext.Load, _LoadState),
                 new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
-                new KeyValuePair<ExContext, Action>(ExContext.BackToMenu, _BackToMenu),
                 new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
             });
 

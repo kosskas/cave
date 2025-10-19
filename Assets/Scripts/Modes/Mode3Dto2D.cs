@@ -97,7 +97,7 @@ public class Mode3Dto2D : IMode
         GameObject.Destroy(mainObject);
         mainObject = new GameObject("MainObject");
         GameObject.Destroy(_si);
-        PCref.ChangeMode(PlayerController.Mode.ModeMenu);
+        PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
     }
     ////
     /// NOTE: jedyny Input nie będący tutaj jest w pliku ObjectRotator!
