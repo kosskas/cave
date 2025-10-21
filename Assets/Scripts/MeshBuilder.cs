@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
+using UnityEngine.Experimental.UIElements;
+using System.Linq;
+using System.Reflection;
 
 /// <summary>
 /// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi.
 /// </summary>
 public class MeshBuilder : MonoBehaviour
 {
+    const float PTS_3D_EQ_MARGIN = 1e-4f;
     private class PointProjection
     {
         public GameObject pointObject;
@@ -30,12 +34,11 @@ public class MeshBuilder : MonoBehaviour
              * Dodatkowo trzeba sprawdzić czy płaszczyzny nie są prostopadłe
              * Rzut jest wtedy kiedy s = t, czyli najkrótszy odcinek jest punktem
              */
-            const float eps = 1e-5f;
             Vector3 p1 = this.pointObject.transform.position;
             Vector3 p2 = proj2.pointObject.transform.position;
             Vector3 n1 = this.wallNormal;
             Vector3 n2 = proj2.wallNormal;
-            if (Math.Abs(Vector3.Dot(n1, n2)) > eps)
+            if (Math.Abs(Vector3.Dot(n1, n2)) > 1e-5f)
             {
                 Debug.LogError($"Płaszczyzny nie są prostopadłe: n1={n1}, n2={n2}, dot={Vector3.Dot(n1, n2)}");
                 return Vector3.zero;
@@ -49,7 +52,7 @@ public class MeshBuilder : MonoBehaviour
 
             Vector3 point1 = result.Item1;
             Vector3 point2 = result.Item2;
-            if (Vector3.SqrMagnitude(point1 - point2) > eps)
+            if (Vector3.SqrMagnitude(point1 - point2) > PTS_3D_EQ_MARGIN)
             {
                 Debug.LogError($"Nierzut: point1={point1}, point2={point2}");
                 return Vector3.zero;
@@ -105,12 +108,6 @@ public class MeshBuilder : MonoBehaviour
         }
     }
 
-    private enum Status
-    {
-        OK,
-        PLANE_ERR,
-        OTHER_ERR
-    }
     private class Edge3D
     {
         public GameObject edgeObject;
@@ -261,16 +258,14 @@ public class MeshBuilder : MonoBehaviour
             //jest juz 1 bedzie 2
             //podejmij rekonstrukcje
             //sprawdz plawszczyzny
-            bool p1 = false, p2 = false, p3 = false;
-            Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-            if (result == Status.PLANE_ERR)
+            bool result = Create3DPoint(label, currPts[0], currPts[1]);
+            if (result == false)
             {
                 //podswietl dodawany na czerwono
                 currPts[0].MarkError();
                 currPts[1].MarkError();
-
             }
-            else if (result == Status.OK)
+            else
             {
                 currPts[0].MarkOK();
                 currPts[1].MarkOK();
@@ -278,66 +273,65 @@ public class MeshBuilder : MonoBehaviour
         }
         else
         {
-            Debug.Log("Trzeci");
+            Debug.Log("Trzeci lub wiecej");
+            Vector3 pt3d = Get3DProj(label);
+            var pairs = GetProjectionPairs(label);
 
-            if (vertices3D.ContainsKey(label) && !(vertices3D[label].deleted || vertices3D[label].disabled))
+            if (pt3d != Vector3.zero)
             {
                 //sa juz 2
-                //sprawdz czy dobrze postawiony trzeci
-                if (Check3Pos(currPts[0], currPts[1], currPts[2]))
+                //sprawdz sa dobrze postawione w stosunku do tego co jest    
+                foreach(var pair in pairs)
                 {
-                    Debug.Log("3 polozony OK");
-                    currPts[0].MarkOK();
-                    currPts[1].MarkOK();
-                    currPts[2].MarkOK();
+                    if (Vector3.SqrMagnitude(pair.Item1.GetIntersection(pair.Item2) - pt3d) < PTS_3D_EQ_MARGIN)
+                    {
+                        pair.Item1.MarkOK();
+                        pair.Item2.MarkOK();
+                        //ok ale pozjniej jako nie?
+                    }
+                    else
+                    {
+                        pair.Item1.MarkOK();
+                        pair.Item2.MarkOK();
+                    }
                 }
-                else
-                {
-                    toAddProj.MarkError();
-                    Debug.Log("3 polozony ZLE");
-                }
+
             }
             else
             {
                 //nie bylo wczesnej pktu, moze byc psrawdz
                 Debug.Log("nie ma pktu 3d");
-                bool p1 = false, p2 = false, p3 = false;
-                Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
-                if (result == Status.OK)
+                foreach (var pair in pairs)
                 {
-                    if (p1)
+                    bool result = Create3DPoint(label, pair.Item1, pair.Item2);
+                    if (result == true)
                     {
-                        currPts[0].MarkOK();
-                        currPts[1].MarkOK();
-                        currPts[2].MarkError();
-                    }
-                    else if (p2)
-                    {
-                        currPts[0].MarkError();
-                        currPts[1].MarkOK();
-                        currPts[2].MarkOK();
-                    }
-                    else // (!p3)
-                    {
-                        currPts[0].MarkOK();
-                        currPts[1].MarkError();
-                        currPts[2].MarkOK();
+                        break;
                     }
                 }
-                else
+                pt3d = Get3DProj(label);
+
+                foreach (var pair in pairs)
                 {
-                    toAddProj.MarkError();
-                    Debug.Log("3 polozony ZLE");
+                    if ((Vector3.SqrMagnitude(pair.Item1.GetIntersection(pair.Item2) - pt3d) < PTS_3D_EQ_MARGIN) && pt3d != Vector3.zero)
+                    {
+                        pair.Item1.MarkOK();
+                        pair.Item2.MarkOK();
+                    }
+                    else
+                    {
+                        pair.Item1.MarkError();
+                        pair.Item2.MarkError();
+                    }
                 }
             }
         }
     }
-    private bool Check3Pos(PointProjection proj1, PointProjection proj2, PointProjection proj3)
+    private Vector3 Get3DProj(string label)
     {
-        Vector3 test1 = proj1.GetIntersection(proj2);
-        Vector3 test2 = proj2.GetIntersection(proj3);
-        Vector3 test3 = proj1.GetIntersection(proj3);
-        return (!(test1 == Vector3.zero || test2 == Vector3.zero || test3 == Vector3.zero) && (test1 == test2 && test1 == test3 && test2 == test3));
+        if (vertices3D.ContainsKey(label) && !(vertices3D[label].deleted || vertices3D[label].disabled))
+            return vertices3D[label].gameObject.transform.position;
+        return Vector3.zero;
     }
     /// <summary>
     /// Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D. Jeśli istnieje pkt w 3D to następuje ponownw obliczenie jego pozycji lub usunięcie
@@ -371,27 +365,39 @@ public class MeshBuilder : MonoBehaviour
             currPts[0].MarkOK();
             currPts[1].MarkOK();
         }
-        else if (count > 2) //sa trzy
+        else if (count > 2) //sa trzy lub wiecej
         {
-            if (vertices3D.ContainsKey(label)) //sa 3 i jest obiekt 3d
+            if (vertices3D.ContainsKey(label)) //sa 3 lub wiecej i jest obiekt 3d
             {
                 vertices3D[label].deleted = true;
             }
             //moga byc 3 i zle polozone
             //Rekonstruuj
-            bool p1 = false, p2 = false, p3 = false;
-            Status result = Create3DPoint(label, ref p1, ref p2, ref p3);
+            var pairs = GetProjectionPairs(label);
 
-            if (result != Status.OK)
+            foreach (var pair in pairs)
             {
-                currPts[0].MarkError();
-                currPts[1].MarkError();
+                bool result = Create3DPoint(label, pair.Item1, pair.Item2);
+                if (result == true)
+                {
+                    FacesGenerator.RemoveFacesFromPoint(label);
+                    break;
+                }
             }
-            else
+            Vector3 pt3d = Get3DProj(label);
+
+            foreach (var pair in pairs)
             {
-                currPts[0].MarkOK();
-                currPts[1].MarkOK();
-                FacesGenerator.RemoveFacesFromPoint(label);
+                if ((Vector3.SqrMagnitude(pair.Item1.GetIntersection(pair.Item2) - pt3d) < PTS_3D_EQ_MARGIN) && pt3d != Vector3.zero)
+                {
+                    pair.Item1.MarkOK();
+                    pair.Item2.MarkOK();
+                }
+                else
+                {
+                    pair.Item1.MarkError();
+                    pair.Item2.MarkError();
+                }
             }
         }
         Debug.Log($"Point removed: wall[{wall.number}] label[{label}] ");
@@ -549,111 +555,27 @@ public class MeshBuilder : MonoBehaviour
         return tmp;
     }
 
-    private Status Create3DPoint(string label,ref bool p1, ref bool p2, ref bool p3)
-	{
-		int licz = 0;
-        List<PointProjection> pointsInfo = GetCurrentPointProjections(label);
-        //sprawdz ile jest juz rzutow jednego pktu
-        licz = pointsInfo.Count;
-		if(licz == 2)
-		{
-			Vector3 pkt3D = pointsInfo[0].GetIntersection(pointsInfo[1]);
-            if (pkt3D != Vector3.zero)
-			{
-                if (vertices3D.ContainsKey(label))
-                {
-                    //byl usuniety?, przywroc go w nowej pozycji
-                    Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
-                    vertexObject.SetCoordinates(pkt3D);
-                    vertices3D[label].deleted = false;
-                    vertices3D[label].disabled = false;
-
-                }
-                else
-                {
-                    //1 raz
-                    CreateEntryForPoint(label, pkt3D);
-                }
-
-                return Status.OK;
-
+    private bool Create3DPoint(string label, PointProjection proj1, PointProjection proj2)
+    {
+        Vector3 pkt3D = proj1.GetIntersection(proj2);
+        if (pkt3D != Vector3.zero)
+        {
+            if (vertices3D.ContainsKey(label))
+            {
+                //byl usuniety?, przywroc go w nowej pozycji
+                Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
+                vertexObject.SetCoordinates(pkt3D);
+                vertices3D[label].deleted = false;
+                vertices3D[label].disabled = false;
             }
-			else
-			{
-                return Status.PLANE_ERR;
+            else
+            {
+                //1 raz
+                CreateEntryForPoint(label, pkt3D);
             }
+            return true;
         }
-		if (licz > 2) //sa 3 rzuty, zadne moga nie byc wspolne
-		{
-            Vector3 test1 = pointsInfo[0].GetIntersection(pointsInfo[1]);
-            Vector3 test2 = pointsInfo[1].GetIntersection(pointsInfo[2]);
-            Vector3 test3 = pointsInfo[0].GetIntersection(pointsInfo[2]);
-            //Sprawdz czy 3 jest dobrze polozony
-            p1 = (test1 != Vector3.zero);
-            p2 = (test2 != Vector3.zero);
-            p3 = (test3 != Vector3.zero);
-            if (p1)
-            {
-                if (vertices3D.ContainsKey(label))
-                {
-                    //byl usuniety?, przywroc go w nowej pozycji
-                    Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
-                    vertexObject.SetCoordinates(test1);
-                    vertices3D[label].deleted = false;
-                    vertices3D[label].disabled = false;
-
-                }
-                else
-                {
-                    //1 raz
-                    CreateEntryForPoint(label, test1);
-                }
-
-                return Status.OK;
-            }
-            if (p2)
-            {
-                if (vertices3D.ContainsKey(label))
-                {
-                    //byl usuniety?, przywroc go w nowej pozycji
-                    Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
-                    vertexObject.SetCoordinates(test2);
-                    vertices3D[label].deleted = false;
-                    vertices3D[label].disabled = false;
-
-                }
-                else
-                {
-                    //1 raz
-                    CreateEntryForPoint(label, test2);
-                }
-
-                return Status.OK;
-            }
-            if (p3)
-            {
-                if (vertices3D.ContainsKey(label))
-                {
-                    //byl usuniety?, przywroc go w nowej pozycji
-                    Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
-                    vertexObject.SetCoordinates(test3);
-                    vertices3D[label].deleted = false;
-                    vertices3D[label].disabled = false;
-
-                }
-                else
-                {
-                    //1 raz
-                    CreateEntryForPoint(label, test3);
-                }
-
-                return Status.OK;
-            }
-            return Status.PLANE_ERR;
-
-        }
-        return Status.OTHER_ERR;
-
+        return false;
     }
 
     private void CreateEntryForPoint(string label, Vector3 pos)
@@ -728,5 +650,19 @@ public class MeshBuilder : MonoBehaviour
             }
         }
 		return pointsInfo;
+    }
+    private List<Tuple<PointProjection, PointProjection>> GetProjectionPairs(string label)
+    {
+        List<PointProjection> pointsInfo = GetCurrentPointProjections(label);
+        List<Tuple<PointProjection, PointProjection>> pairs = new List<Tuple<PointProjection, PointProjection>>();
+
+        for (int i = 0; i < pointsInfo.Count; i++)
+        {
+            for (int j = i + 1; j < pointsInfo.Count; j++)
+            {
+                pairs.Add(Tuple.Create(pointsInfo[i], pointsInfo[j]));
+            }
+        }
+        return pairs;
     }
 }
