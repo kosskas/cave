@@ -13,9 +13,6 @@ namespace Assets.Scripts.Experimental
         [Description("Wizualizuj")]
         LoadVisual,
 
-        [Description("Wro\u0107 do menu")]
-        BackToMenu,
-
         [Description("Konstruuj")]
         Const,
 
