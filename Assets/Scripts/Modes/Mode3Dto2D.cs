@@ -99,7 +99,7 @@ public class Mode3Dto2D : IMode
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
             {
-                new KeyValuePair<ExContext, Action>(ExContext.BackToMenu, _BackToMenu),
+                new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _BackToMenu),
                 new KeyValuePair<ExContext, Action>(ExContext.NextSolid, _DisplayNextSolid),
                 new KeyValuePair<ExContext, Action>(ExContext.PrevSolid, _DisplayPreviousSolid),
                 new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _ShowProjectionLines),

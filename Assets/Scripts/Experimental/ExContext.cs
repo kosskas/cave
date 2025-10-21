@@ -16,7 +16,7 @@ namespace Assets.Scripts.Experimental
         [Description("Konstruuj")]
         Const,
 
-        [Description("Wr\u00F3\u0107")]
+        [Description("<Wr\u00F3\u0107>")]
         BackToOpt,
 
         [Description("Punkt")]
