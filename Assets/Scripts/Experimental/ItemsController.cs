@@ -233,7 +233,6 @@ namespace Assets.Scripts.Experimental
             Vector3 from = contactPoint - direction * _WALL_HALF_LENGTH;
             Vector3 to = contactPoint + direction * _WALL_HALF_LENGTH;
 
-
             var axis = new GameObject("AXIS");
             axis.transform.SetParent(_axisRepo.transform);
 
@@ -242,7 +241,7 @@ namespace Assets.Scripts.Experimental
             axisComponent.Draw(default(WallInfo), from, to);
 
             var labelComponent = axis.AddComponent<IndexedLabel>();
-            labelComponent.AddLabel("X", "", $"{planeA.numberExp}/{planeB.numberExp}");
+            labelComponent.AddLabel("X", "", $"{planeA.constructionNumber}/{planeB.constructionNumber}");
             labelComponent.FontSize = 1;
 
             _axisWalls.Add(axisComponent, new Tuple<WallInfo, WallInfo>(planeA, planeB));
@@ -469,7 +468,10 @@ namespace Assets.Scripts.Experimental
                     UnityEngine.Object.Destroy(line);
 
                     var addedWall = _wCrt.WCrCreateWall(startPosition, endPositionWithPointSensitivity, wallParentNormal, plane.name, fixedName);
-                    AddAxisBetweenPlanes(addedWall, plane);
+                    var axesCount = _axisRepo.transform.childCount;
+                    addedWall.SetConstructionNumber(axesCount + 2);
+
+                    AddAxisBetweenPlanes(plane, addedWall);
 
                     OnDrawingCompleted(type);
                 }

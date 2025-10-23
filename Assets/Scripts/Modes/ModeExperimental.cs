@@ -357,24 +357,32 @@ public class ModeExperimental : IMode
 
     private void _AddBaseAxis()
     {
-        var wallConnections = new Dictionary<string, List<string>>
-        {
-            ["Wall1"] = new List<string> { "Wall2", "Wall3", "Wall4", "Wall5" },
-            ["Wall2"] = new List<string> { "Wall3", "Wall5", "Wall6" },
-            ["Wall3"] = new List<string> { "Wall4", "Wall6" },
-            ["Wall4"] = new List<string> { "Wall5", "Wall6" },
-            ["Wall5"] = new List<string> { "Wall6" }
-        };
+        // var wallConnections = new Dictionary<string, List<string>>
+        // {
+        //     ["Wall1"] = new List<string> { "Wall2", "Wall3", "Wall4", "Wall5" },
+        //     ["Wall2"] = new List<string> { "Wall3", "Wall5", "Wall6" },
+        //     ["Wall3"] = new List<string> { "Wall4", "Wall6" },
+        //     ["Wall4"] = new List<string> { "Wall5", "Wall6" },
+        //     ["Wall5"] = new List<string> { "Wall6" }
+        // };
+        //
+        // foreach (var kvp in wallConnections)
+        // {
+        //     string wall = kvp.Key;
+        //     foreach (var neighbor in kvp.Value)
+        //     {
+        //         _items.AddAxisBetweenPlanes(_wc.GetWallByName(wall),
+        //             _wc.GetWallByName(neighbor));
+        //     }
+        // }
 
-        foreach (var kvp in wallConnections)
-        {
-            string wall = kvp.Key;
-            foreach (var neighbor in kvp.Value)
-            {
-                _items.AddAxisBetweenPlanes(_wc.GetWallByName(wall),
-                    _wc.GetWallByName(neighbor));
-            }
-        }
+        var wall1 = _wc.GetWallByName("Wall3");
+        wall1.SetConstructionNumber(1);
+
+        var wall2 = _wc.GetWallByName("Wall6");
+        wall2.SetConstructionNumber(2);
+
+        _items.AddAxisBetweenPlanes(wall1, wall2);
     }
 
     public ModeExperimental(PlayerController pc)

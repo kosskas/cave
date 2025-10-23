@@ -169,7 +169,7 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 _labelComponent = gameObject.AddComponent<IndexedLabel>();
             
-            _labelComponent.AddLabel(DefaultLabelText.ToString(), new string('\'', Plane.numberExp), "");
+            _labelComponent.AddLabel(DefaultLabelText.ToString(), new string('\'', Plane.constructionNumber), "");
             
             NextText();
 
