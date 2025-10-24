@@ -20,6 +20,9 @@ namespace Assets.Scripts.Experimental.Items
             {
                 _color = value;
                 _lineRenderer.material.color = value;
+
+                if (_labelComponent != null)
+                    _labelComponent.FocusedLabelColor = value;
             }
         } 
 
@@ -189,12 +192,20 @@ namespace Assets.Scripts.Experimental.Items
         public void OnHoverEnter()
         {
             _lineRenderer.material.color = ReconstructionInfo.FOCUSED;
-           // _labelComponent?.SetVisible(true);
+
+            if (_labelComponent != null)
+                _labelComponent.FocusedLabelColor = ReconstructionInfo.FOCUSED;
+
+            // _labelComponent?.SetVisible(true);
         }
 
         public void OnHoverExit()
         {
             _lineRenderer.material.color = _color;
+
+            if (_labelComponent != null)
+                _labelComponent.FocusedLabelColor = _color;
+
             //event new DeleteScopeEvent()
             //_labelComponent?.SetVisible(false);
         }
@@ -308,6 +319,8 @@ namespace Assets.Scripts.Experimental.Items
                 return;
 
             _labelTexts.NextWhile(current => current.ToString() != text);
+
+            FocusedLabel = _labelTexts.Current.ToString();
         }
 
         // IAnalyzable interface

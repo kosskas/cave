@@ -117,10 +117,10 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverEnter()
         {
-            _pointRenderer.material.color = ReconstructionInfo.FOCUSED; ;
+            _pointRenderer.material.color = ReconstructionInfo.FOCUSED;
 
             if (_labelComponent != null)
-                _labelComponent.FocusedLabelColor = ReconstructionInfo.FOCUSED; ;
+                _labelComponent.FocusedLabelColor = ReconstructionInfo.FOCUSED;
         }
 
         public void OnHoverExit()
@@ -212,7 +212,7 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 return;
 
-            _labelTexts.Begin();
+            // _labelTexts.Begin();
 
             var found = _labelTexts.NextWhile(current => Mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
 
