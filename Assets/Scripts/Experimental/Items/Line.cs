@@ -201,7 +201,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverExit()
         {
-            _lineRenderer.material.color = _color;
+            if (_lineRenderer != null)
+                _lineRenderer.material.color = _color;
 
             if (_labelComponent != null)
                 _labelComponent.FocusedLabelColor = _color;
