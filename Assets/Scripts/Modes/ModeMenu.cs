@@ -115,15 +115,30 @@ public class ModeMenu : IMode
         FlystickController.ClearActions();
 
         FlystickController.SetAction(
-            FlystickController.Btn._1,
-            FlystickController.ActOn.PRESS,
-            _LoadVisualization
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            () =>
+            {
+                radialMenu.PreviousOption();
+            }
         );
 
         FlystickController.SetAction(
-            FlystickController.Btn._2,
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            () =>
+            {
+                radialMenu.NextOption();
+            }
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1,
             FlystickController.ActOn.PRESS,
-            _LoadReconstruction
+            () =>
+            {
+                _context.Current.Value();            
+            }
         );
     }
 }
