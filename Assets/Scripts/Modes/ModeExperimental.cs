@@ -340,7 +340,7 @@ public class ModeExperimental : IMode
 
     private void _MoveCursor()
     {
-        Debug.Log($"_MoveCursor: {PCref.Hit.collider.gameObject.transform.parent.gameObject} --> {PCref.Hit.collider.gameObject}");
+        // Debug.Log($"_MoveCursor: {PCref.Hit.collider.gameObject.transform.parent.gameObject} --> {PCref.Hit.collider.gameObject}");
         var hitObject = PCref.Hit.collider.gameObject.GetComponent<IRaycastable>();
         var hitPosition = PCref.Hit.point;
         var hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
@@ -387,7 +387,7 @@ public class ModeExperimental : IMode
 
     public ModeExperimental(PlayerController pc)
     {
-        _hm = new HistoryManager(30);
+        _hm = new HistoryManager(1000);
 
         PCref = pc;
         _wc = GameObject.Find("Walls").GetComponent<WallController>();
