@@ -37,11 +37,14 @@ namespace Assets.Scripts.Experimental
         [Description("Linia r\u00F3wnoleg\u0142a")]
         ParallelLine,
 
-        [Description("Okr\u0105g")]
-        Circle,
-
         [Description("Linia odnosz\u0105ca")]
         Projection,
+
+        [Description("Linia odnosz\u0105ca wskazanej d\u0142ugo\u015bci")]
+        FixedProjection,
+
+        [Description("Okr\u0105g")]
+        Circle,
 
         [Description("Rzutnia")]
         Wall,

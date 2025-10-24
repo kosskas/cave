@@ -213,6 +213,20 @@ namespace Assets.Scripts.Experimental
             return position;
         }
 
+        Vector3 ScaleToLength(Vector3 from, Vector3 to, float length)
+        {
+            var v = to - from;
+            var d = v.magnitude;
+
+            // brak kierunku
+            if (d < 1e-6f) return from;    
+            
+            var dir = v / d;
+            length = Mathf.Max(0f, length);
+
+            return from + dir * length;
+        }
+
 
         /*   P U B L I C   M E T H O D S   */
 
@@ -299,9 +313,11 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.ParallelLine: return DrawLineParallelToLine(plane, positionWithPointSensitivity, relativeObject);
 
-                case ExContext.Circle: return DrawCircle(plane, positionWithPointSensitivity);
-
                 case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity);
+
+                case ExContext.FixedProjection: return DrawFixedProjection(plane, positionWithPointSensitivity, relativeObject);
+
+                case ExContext.Circle: return DrawCircle(plane, positionWithPointSensitivity);
 
                 case ExContext.Wall: return DrawWall(plane, positionWithPointSensitivity, plane.GetNormal());
 
@@ -542,7 +558,20 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public DrawAction DrawProjection(WallInfo startPlane, Vector3 startPosition, float lineWidth = _HELP_LINE_WIDTH)
+        public DrawAction DrawFixedProjection(WallInfo startPlane, Vector3 startPosition, IRaycastable relativeObject = null)
+        {
+            var relativeLine = relativeObject as Line;
+            if (relativeLine == null)
+                return null;
+
+            var length = Vector3.Distance(relativeLine.StartPosition, relativeLine.EndPosition);
+
+            return DrawProjection(startPlane, startPosition, true, length);
+        }
+
+        //return DrawProjection(plane, positionWithPointSensitivity);
+
+        public DrawAction DrawProjection(WallInfo startPlane, Vector3 startPosition, bool withFixedLength = false, float fixedLength = 0.0f, float lineWidth = _HELP_LINE_WIDTH)
         {
             // FIRST PART
             var projection1 = new GameObject("PROJECTION");
@@ -635,6 +664,13 @@ namespace Assets.Scripts.Experimental
                 {
                     projectionComponent1.Draw(startPlane, startPosition, startPositionProjection);
                     projectionComponent1.SetLabelVisible(false);
+
+                    // FIXED LENGTH PROJECTION  
+                    if (withFixedLength)
+                    {
+                        var scaledEnd = ScaleToLength(startPositionProjection, endPosition, fixedLength);
+                        endPosition = scaledEnd;
+                    }
 
                     projectionComponent2.Draw(endPlane, startPositionProjection, endPosition);
                     // projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
