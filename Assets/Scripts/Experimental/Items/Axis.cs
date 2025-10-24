@@ -65,25 +65,23 @@ namespace Assets.Scripts.Experimental.Items
             if (_boxCollider != null) _boxCollider.enabled = valid;
             if (!valid) return;
 
-            // pivot w środku odcinka
-            Vector3 mid = (From + To) * 0.5f;
-            transform.position = mid;
+            // Obrót z osi Y na kierunek
+            Quaternion rot = Quaternion.FromToRotation(Vector3.up, dir);
 
-            // Obrót: z osi Y na kierunek odcinka
-            transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+            // 1) Root wskazuje na From i ma obrót wzdłuż odcinka
+            transform.SetPositionAndRotation(From, rot);
 
-            // Skalowanie cylindra (lokalne):
-            // Cylinder ma wysokość 2 → skala.y = L/2
-            // Grubość = Width (średnica)
-            _cylinder.transform.localPosition = Vector3.zero;
-            _cylinder.transform.localRotation = Quaternion.identity;
+            // 2) Dziecko (cylinder + collider) ustawiamy lokalnie:
+            //    - oś Y rodzica jest wzdłuż odcinka, więc połowa długości to przesunięcie do środka
+            _cylinder.transform.localPosition = new Vector3(0f, len * 0.5f, 0f);
+            _cylinder.transform.localRotation = Quaternion.identity; // światowy obrót = rot (dziedziczony z rodzica)
+
+            // 3) Skala cylindra: wysokość modelu bazowego 2 -> y = L/2
             _cylinder.transform.localScale = new Vector3(Width, len * 0.5f, Width);
 
-            // BoxCollider pokrywający cylinder:
-            // - wysokość (oś Y) = len
-            // - grubość (x, z) = ColliderWidth
+            // 4) BoxCollider na dziecku: środek w lokalnym (0,0,0) dziecka = środek odcinka w świecie
+            _boxCollider.center = Vector3.zero;
             _boxCollider.size = new Vector3(ColliderWidth, len, ColliderWidth);
-            _boxCollider.center = Vector3.zero; // pivot w środku, więc zero
         }
 
 
