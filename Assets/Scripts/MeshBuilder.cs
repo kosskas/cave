@@ -291,9 +291,10 @@ public class MeshBuilder : MonoBehaviour
                     }
                     else
                     {
-                        //WA
-                        pair.Item1.MarkOK();
-                        pair.Item2.MarkOK();
+                        if(!pair.Item1.is_ok_placed)
+                            pair.Item1.MarkError();
+                        if (!pair.Item2.is_ok_placed)
+                            pair.Item2.MarkError();
                     }
                 }
 
