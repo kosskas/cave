@@ -291,8 +291,8 @@ public class MeshBuilder : MonoBehaviour
                     }
                     else
                     {
-                        pair.Item1.MarkOK();
-                        pair.Item2.MarkOK();
+                        pair.Item1.MarkError();
+                        pair.Item2.MarkError();
                     }
                 }
 
