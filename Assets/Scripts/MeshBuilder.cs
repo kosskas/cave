@@ -289,7 +289,12 @@ public class MeshBuilder : MonoBehaviour
                         pair.Item2.MarkOK();
                         //ok ale pozjniej jako nie?
                     }
-                    //todo
+                    else
+                    {
+                        //WA
+                        pair.Item1.MarkOK();
+                        pair.Item2.MarkOK();
+                    }
                 }
 
             }
