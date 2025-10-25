@@ -28,6 +28,7 @@ public class ModeExperimental : IMode
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
     private CircularIterator<KeyValuePair<ExContext, Action>> _creationCtx;
     private CircularIterator<KeyValuePair<ExContext, Action>> _optCtx;
+    private CircularIterator<KeyValuePair<ExContext, Action>> _lineCtx;
 
     private IRaycastable _hitObject;
 
@@ -412,21 +413,27 @@ public class ModeExperimental : IMode
         //dodanie bazowej osi rzutuj¹cej
         _AddBaseAxis();
 
+        _lineCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
+            new List<KeyValuePair<ExContext, Action>>()
+            {
+                new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _ChangeToConstrCtx),
+                new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToObject),
+                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
+                new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.FixedProjection, ActRelativeToObject),
+                new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _SwitchRuleProjectionLine),
+            });
+
         _creationCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
             {
                 new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _BackToBasicCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.Line, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToObject),
-                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
-                new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.FixedProjection, ActRelativeToObject),
+                new KeyValuePair<ExContext, Action>(ExContext.Line, _ChangeToLineCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Face, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _SwitchRuleProjectionLine),
             });
 
         _optCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
@@ -474,7 +481,12 @@ public class ModeExperimental : IMode
     private void _ChangeToConstrCtx()
     {
         _context = _creationCtx;
-        radialMenu.Generate(_context, RADIAL_2ND_MENU_RADIUS);
+        radialMenu.Generate(_context, RADIAL_1ST_MENU_RADIUS);
+    }
+    private void _ChangeToLineCtx()
+    {
+        _context = _lineCtx;
+        radialMenu.Generate(_context, RADIAL_1ST_MENU_RADIUS);
     }
     public void AddRadialMenu()
     {

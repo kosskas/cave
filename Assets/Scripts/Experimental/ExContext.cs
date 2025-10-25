@@ -28,8 +28,11 @@ namespace Assets.Scripts.Experimental
         [Description("Kraw\u0119d\u017a")]
         BoldLine,
 
-        [Description("Linia pomocznicza")]
+        [Description("Linia")]
         Line,
+
+        [Description("Linia pomocznicza")]
+        HelpLine,
 
         [Description("Linia prostopad\u0142a")]
         PerpendicularLine,

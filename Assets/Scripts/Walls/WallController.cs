@@ -227,7 +227,7 @@ public class WallController : MonoBehaviour {
     }
     public void RemoveWall(WallInfo wall)
     {
-        if (!wall.canDelete)
+        if (wall == null || !wall.canDelete)
             return;
         playerAddedWalls.Remove(wall);
         walls.Remove(wall);
