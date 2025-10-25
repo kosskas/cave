@@ -242,27 +242,35 @@ namespace Assets.Scripts.Experimental
 
         public void AddAxisBetweenPlanes(WallInfo planeA, WallInfo planeB)
         {
-            Vector3 normalA = planeA.GetNormal();
-            Vector3 normalB = planeB.GetNormal();
-            Vector3 direction = Vector3.Cross(normalA, normalB).normalized;
-
-            Vector3 posA = planeA.gameObject.transform.position;
-            Vector3 posB = planeB.gameObject.transform.position;
-
-            Vector3 v1 = posB - posA;
-            Vector3 v2 = Vector3.ProjectOnPlane(v1, normalA);
-
-            Vector3 contactPoint = posA + v2 + _WALL_OFFSET * (normalA + normalB);
-
-            Vector3 from = contactPoint - direction * _WALL_HALF_LENGTH;
-            Vector3 to = contactPoint + direction * _WALL_HALF_LENGTH;
-
             var axis = new GameObject("AXIS");
-            axis.transform.SetParent(_axisRepo.transform);
-
+            axis.transform.SetParent(_axisRepo.transform); 
+            
             var axisComponent = axis.AddComponent<Axis>();
             axisComponent.Width = _AXIS_LINE_WIDTH;
-            axisComponent.Draw(default(WallInfo), from, to);
+
+            if (planeB.constrPoint1 != null && planeB.constrPoint2 != null)
+            {
+                axisComponent.Draw(default(WallInfo), planeB.constrPoint1.Value, planeB.constrPoint2.Value);
+            }
+            else
+            {
+                Vector3 normalA = planeA.GetNormal();
+                Vector3 normalB = planeB.GetNormal();
+                Vector3 direction = Vector3.Cross(normalA, normalB).normalized;
+
+                Vector3 posA = planeA.gameObject.transform.position;
+                Vector3 posB = planeB.gameObject.transform.position;
+
+                Vector3 v1 = posB - posA;
+                Vector3 v2 = Vector3.ProjectOnPlane(v1, normalA);
+
+                Vector3 contactPoint = posA + v2 + _WALL_OFFSET * (normalA + normalB);
+
+                Vector3 from = contactPoint - direction * _WALL_HALF_LENGTH;
+                Vector3 to = contactPoint + direction * _WALL_HALF_LENGTH;
+
+                axisComponent.Draw(default(WallInfo), from, to);
+            }
 
             var labelComponent = axis.AddComponent<IndexedLabel>();
             labelComponent.AddLabel("X", "", $"{planeA.constructionNumber}/{planeB.constructionNumber}");
