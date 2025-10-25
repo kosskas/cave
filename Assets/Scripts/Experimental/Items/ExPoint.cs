@@ -117,7 +117,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverEnter()
         {
-            _pointRenderer.material.color = ReconstructionInfo.FOCUSED;
+            if (_pointRenderer != null) 
+                _pointRenderer.material.color = ReconstructionInfo.FOCUSED;
 
             if (_labelComponent != null)
                 _labelComponent.FocusedLabelColor = ReconstructionInfo.FOCUSED;
@@ -125,7 +126,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverExit()
         {
-            _pointRenderer.material.color = _color;
+            if (_pointRenderer != null)
+                _pointRenderer.material.color = _color;
 
             if (_labelComponent != null)
                 _labelComponent.FocusedLabelColor = _color;

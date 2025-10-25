@@ -113,12 +113,14 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverEnter()
         {
-            _circleRenderer.material.color = ReconstructionInfo.FOCUSED;
+            if (_circleRenderer != null)
+                _circleRenderer.material.color = ReconstructionInfo.FOCUSED;
         }
 
         public void OnHoverExit()
         {
-            _circleRenderer.material.color = _color;
+            if (_circleRenderer != null)
+                _circleRenderer.material.color = _color;
         }
 
         // IAnalyzable interface

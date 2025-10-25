@@ -126,6 +126,16 @@ namespace Assets.Scripts.Experimental
             return axis;
         }
 
+        private Axis GetAxis(WallInfo planeA, WallInfo planeB)
+        {
+            var axis = _axisWalls
+                .FirstOrDefault(e =>
+                    e.Value.Item1.Equals(planeA) && e.Value.Item2.Equals(planeB) ||
+                    e.Value.Item1.Equals(planeB) && e.Value.Item2.Equals(planeA)
+                    ).Key;
+            return axis;
+        }
+
         private List<Axis> GetAllAxes(WallInfo plane)
         {
             var axes = _axisWalls
@@ -561,12 +571,29 @@ namespace Assets.Scripts.Experimental
         public DrawAction DrawFixedProjection(WallInfo startPlane, Vector3 startPosition, IRaycastable relativeObject = null)
         {
             var relativeLine = relativeObject as Line;
-            if (relativeLine == null)
-                return null;
+            var relativePoint = relativeObject as ExPoint;
 
-            var length = Vector3.Distance(relativeLine.StartPosition, relativeLine.EndPosition);
+            if (relativeLine != null)
+            {
+                var length = Vector3.Distance(relativeLine.StartPosition, relativeLine.EndPosition);
+                return DrawProjection(startPlane, startPosition, true, length);
+            }
 
-            return DrawProjection(startPlane, startPosition, true, length);
+            if (relativePoint != null)
+            {
+                var pointPosition = relativePoint.Position;
+                var pointPlane = relativePoint.Plane;
+
+                var axis = GetAxis(startPlane, pointPlane);
+                if (axis != null)
+                {
+                    var startProjectionPosition = CalcProjectionOnAxis(axis, relativePoint.Position);
+                    var length = Vector3.Distance(startProjectionPosition, pointPosition);
+                    return DrawProjection(startPlane, startPosition, true, length);
+                }
+            }
+
+            return null;
         }
 
         //return DrawProjection(plane, positionWithPointSensitivity);

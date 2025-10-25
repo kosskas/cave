@@ -102,7 +102,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverEnter()
         {
-            _meshRenderer.material.color = ReconstructionInfo.FOCUSED;
+            if (_meshRenderer != null)
+                _meshRenderer.material.color = ReconstructionInfo.FOCUSED;
         }
 
         public void OnHoverAction(Action<GameObject> action)
@@ -112,7 +113,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverExit()
         {
-            _meshRenderer.material.color = _color;
+            if (_meshRenderer != null)
+                _meshRenderer.material.color = _color;
         }
     }
 }
