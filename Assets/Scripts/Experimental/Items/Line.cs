@@ -191,7 +191,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public void OnHoverEnter()
         {
-            _lineRenderer.material.color = ReconstructionInfo.FOCUSED;
+            if (_lineRenderer != null)
+                _lineRenderer.material.color = ReconstructionInfo.FOCUSED;
 
             if (_labelComponent != null)
                 _labelComponent.FocusedLabelColor = ReconstructionInfo.FOCUSED;
