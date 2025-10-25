@@ -387,7 +387,7 @@ public class ModeExperimental : IMode
         var wall1 = _wc.GetWallByName("Wall3");
         wall1.SetConstructionNumber(1);
 
-        var wall2 = _wc.GetWallByName("Wall6");
+        var wall2 = _wc.GetWallByName("Wall1");
         wall2.SetConstructionNumber(2);
 
         _items.AddAxisBetweenPlanes(wall1, wall2);
