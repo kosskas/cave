@@ -46,6 +46,7 @@ public class ModeExperimental : IMode
     {
         var line = obj as Line;
         var axis = obj as Axis;
+        var point = obj as ExPoint;
 
         if (!ReferenceEquals(line, null))
         {
@@ -57,6 +58,12 @@ public class ModeExperimental : IMode
         {
             axis.Color = color;
             Debug.Log("FOO: AXIS AXIS AXIS");
+        }
+
+        if (!ReferenceEquals(point, null))
+        {
+            point.Color = color;
+            Debug.Log("FOO: POINT POINT POINT");
         }
     }
 
