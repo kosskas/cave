@@ -19,7 +19,7 @@ namespace Assets.Scripts.Experimental.Items
             set
             {
                 _color = value;
-                _lineRenderer.material.color = value;
+                _lineRenderer.material.SetColor("_color", value);
 
                 if (_labelComponent != null)
                     _labelComponent.FocusedLabelColor = value;
@@ -64,10 +64,8 @@ namespace Assets.Scripts.Experimental.Items
         void Awake()
         {
             _lineRenderer = gameObject.AddComponent<LineRenderer>();
-            _lineRenderer.material = new Material(Shader.Find("Unlit/Color"))
-            {
-                color = _color
-            };
+            _lineRenderer.material = new Material(Shader.Find("Unlit/Unlit_line"));
+            _lineRenderer.material.SetColor("_color", _color);
             _lineRenderer.positionCount = 2;
 
             _lineRenderer.startWidth = Width;
@@ -192,7 +190,7 @@ namespace Assets.Scripts.Experimental.Items
         public void OnHoverEnter()
         {
             if (_lineRenderer != null)
-                _lineRenderer.material.color = ReconstructionInfo.FOCUSED;
+                _lineRenderer.material.SetColor("_color", ReconstructionInfo.FOCUSED);
 
             if (_labelComponent != null)
                 _labelComponent.FocusedLabelColor = ReconstructionInfo.FOCUSED;
@@ -203,7 +201,7 @@ namespace Assets.Scripts.Experimental.Items
         public void OnHoverExit()
         {
             if (_lineRenderer != null)
-                _lineRenderer.material.color = _color;
+                _lineRenderer.material.SetColor("_color", _color);
 
             if (_labelComponent != null)
                 _labelComponent.FocusedLabelColor = _color;

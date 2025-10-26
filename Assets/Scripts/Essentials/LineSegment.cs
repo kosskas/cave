@@ -48,8 +48,8 @@ public class LineSegment : MonoBehaviour {
         }
 
         lineRenderer.positionCount = 2;
-        lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
-        lineRenderer.material.color = lineColor;
+        lineRenderer.material = new Material(Shader.Find("Unlit/Unlit_line"));
+        lineRenderer.material.SetColor("_color", lineColor);
         lineRenderer.numCapVertices = 10;
 		lineRenderer.shadowCastingMode = ShadowCastingMode.Off;
 
@@ -112,7 +112,7 @@ public class LineSegment : MonoBehaviour {
 		if (lineRenderer)
 		{
             lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
-            lineRenderer.material.color = this.lineColor;
+            lineRenderer.material.SetColor("_color", this.lineColor);
             lineRenderer.startColor = this.lineColor;
             lineRenderer.endColor = this.lineColor;
             lineRenderer.startWidth = this.lineWidth;
