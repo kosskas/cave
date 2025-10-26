@@ -40,7 +40,7 @@ public class MeshBuilder : MonoBehaviour
             Vector3 n2 = proj2.wallNormal;
             if (Math.Abs(Vector3.Dot(n1, n2)) > 1e-5f)
             {
-                Debug.LogError($"Płaszczyzny nie są prostopadłe: n1={n1}, n2={n2}, dot={Vector3.Dot(n1, n2)}");
+                Debug.LogWarning($"Płaszczyzny nie są prostopadłe: n1={n1}, n2={n2}, dot={Vector3.Dot(n1, n2)}");
                 return Vector3.zero;
             }
 
@@ -54,7 +54,7 @@ public class MeshBuilder : MonoBehaviour
             Vector3 point2 = result.Item2;
             if (Vector3.SqrMagnitude(point1 - point2) > PTS_3D_EQ_MARGIN)
             {
-                Debug.LogError($"Nierzut: point1={point1}, point2={point2}");
+                Debug.LogWarning($"Nierzut: point1={point1}, point2={point2}");
                 return Vector3.zero;
             }
 
