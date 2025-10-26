@@ -325,7 +325,7 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, _BOLD_LINE_WIDTH);
                 
-                case ExContext.Line: return DrawLine(plane, positionWithPointSensitivity);
+                case ExContext.HelpLine: return DrawLine(plane, positionWithPointSensitivity);
 
                 case ExContext.PerpendicularLine: return DrawLinePerpendicularToLine(plane, positionWithPointSensitivity, relativeObject);
 

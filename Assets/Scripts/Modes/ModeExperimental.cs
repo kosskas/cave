@@ -424,6 +424,7 @@ public class ModeExperimental : IMode
             new List<KeyValuePair<ExContext, Action>>()
             {
                 new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _ChangeToConstrCtx),
+                new KeyValuePair<ExContext, Action>(ExContext.HelpLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
