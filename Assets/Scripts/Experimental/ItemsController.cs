@@ -1007,13 +1007,17 @@ namespace Assets.Scripts.Experimental
                     if (point.Plane.Equals(plane) && point.Labels.Contains(startPointLabel))
                     {
                         startPoint = point;
-                        startPoint.FocusedLabel = startPointLabel;
+
+                        while (startPoint.FocusedLabel != startPointLabel)
+                            startPoint.NextLabel();
                     }
 
                     if (point.Plane.Equals(plane) && point.Labels.Contains(endPointLabel))
                     {
                         endPoint = point;
-                        endPoint.FocusedLabel = endPointLabel;
+
+                        while (endPoint.FocusedLabel != endPointLabel)
+                            endPoint.NextLabel();
                     }
                 }
             }
