@@ -106,57 +106,36 @@ namespace Assets.Scripts.Experimental.Utils
             return intersections;
         }
 
-        public static List<Vector3> FindCCIntersections(Vector3 S1, Vector3 A1, Vector3 S2, Vector3 A2)
+        public static List<Vector3> FindCCIntersections(Vector3 S1, Vector3 A1, Vector3 S2, Vector3 A2, Vector3 n)
         {
             List<Vector3> intersections = new List<Vector3>();
 
             float r1 = (A1 - S1).magnitude;
             float r2 = (A2 - S2).magnitude;
 
-            // Normalna wspólnej płaszczyzny (przez S1, S2, A2)
-            Vector3 n = Vector3.Cross(S2 - S1, A2 - S1).normalized;
-            if (n.sqrMagnitude < 1e-8f)
-            {
-                Debug.LogWarning("Punkty współliniowe -> brak jednoznacznej płaszczyzny.");
+            Vector3 d = S2 - S1;
+            float dist = d.magnitude;
+
+            // Brak przecięcia
+            if (dist > r1 + r2 || dist < Mathf.Abs(r1 - r2) || dist < 1e-6f)
                 return intersections;
-            }
 
-            // Budujemy bazę w tej płaszczyźnie
-            Vector3 e1 = (S2 - S1).normalized;
-            Vector3 e2 = Vector3.Cross(n, e1).normalized;
+            // Odległość od S1 do punktu "P" wzdłuż linii łączącej środki
+            float a = (r1 * r1 - r2 * r2 + dist * dist) / (2 * dist);
+            float h = Mathf.Sqrt(r1 * r1 - a * a);
 
-            // Rzutujemy środki do 2D
-            Vector2 S1_2 = Vector2.zero;
-            Vector2 S2_2 = new Vector2((S2 - S1).magnitude, 0f);
+            // Punkt P - środek linii łączącej punkty przecięcia
+            Vector3 P = S1 + a * d.normalized;
 
-            // Promienie
-            float d = (S2 - S1).magnitude;
-            if (d < 1e-6f) return intersections; // te same środki -> nieskończoność albo nic
+            // Wektor prostopadły do d w płaszczyźnie okręgu
+            Vector3 dPerp = Vector3.Cross(n.normalized, d.normalized).normalized;
 
-            // Odległość od S1 do osi przecięcia dwóch kół
-            float x = (d * d - r2 * r2 + r1 * r1) / (2f * d);
-            float y2 = r1 * r1 - x * x;
-            if (y2 < -1e-6f)
-            {
-                return intersections; // brak przecięć
-            }
+            // Dwa punkty przecięcia
+            Vector3 i1 = P + h * dPerp;
+            Vector3 i2 = P - h * dPerp;
 
-            float y = Mathf.Sqrt(Mathf.Max(0f, y2));
-
-            // Dwa rozwiązania w 2D
-            Vector2 P1_2 = new Vector2(x, y);
-            Vector2 P2_2 = new Vector2(x, -y);
-
-            // Rzutowanie z powrotem do 3D
-            Vector3 P1 = S1 + P1_2.x * e1 + P1_2.y * e2;
-            intersections.Add(P1);
-
-            if (y > 1e-6f)
-            {
-                Vector3 P2 = S1 + P2_2.x * e1 + P2_2.y * e2;
-                intersections.Add(P2);
-            }
-
+            intersections.Add(i1);
+            intersections.Add(i2);
             return intersections;
         }
         public static bool IsPointOnSegment(Vector3 p, Vector3 a, Vector3 b)
