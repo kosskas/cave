@@ -6,6 +6,45 @@ using Assets.Scripts.Experimental.Utils;
 using UnityEngine.Experimental.UIElements;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
+
+public class Edge3D
+{
+    public GameObject edgeObject;
+    public string firstPoint;
+    public string secondPoint;
+    /// <summary>
+    /// Ile krawędzi jest na ścianach
+    /// </summary>
+    public int wallOrigins;
+    public bool standalone = false;
+
+    public Edge3D(GameObject edgeObject, string firstPoint, string secondPoint)
+    {
+        this.edgeObject = edgeObject;
+        this.firstPoint = firstPoint;
+        this.secondPoint = secondPoint;
+        this.wallOrigins = 0;
+    }
+
+}
+public class Vertice3D
+{
+    public GameObject gameObject;
+    /// <summary>
+    /// Flaga czy pkt3D jest usunięty
+    /// </summary>
+    public bool deleted = false;
+    /// <summary>
+    /// Flaga czy pkt3D jest wyłączony
+    /// </summary>
+    public bool disabled = false;
+
+    public Vertice3D(GameObject gameObject)
+    {
+        this.gameObject = gameObject;
+    }
+}
 
 /// <summary>
 /// Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi.
@@ -107,51 +146,28 @@ public class MeshBuilder : MonoBehaviour
             this.is_ok_placed = true;
         }
     }
-
-    private class Edge3D
+    private class EdgeProjection
     {
-        public GameObject edgeObject;
-        public string firstPoint;
-        public string secondPoint;
-        /// <summary>
-        /// Ile krawędzi jest na ścianach
-        /// </summary>
-        public int wallOrigins;
+        public Line line;
+        public Vector3 wallNormal;
 
-        public Edge3D(GameObject edgeObject, string firstPoint, string secondPoint)
+        public EdgeProjection(Line line, Vector3 wallNormal)
         {
-            this.edgeObject = edgeObject;
-            this.firstPoint = firstPoint;
-            this.secondPoint = secondPoint;
-            this.wallOrigins = 0;
+            this.line = line;
+            this.wallNormal = wallNormal;
         }
 
     }
-    
-    private class Vertice3D
-    {
-        public GameObject gameObject;
-        /// <summary>
-        /// Flaga czy pkt3D jest usunięty
-        /// </summary>
-        public bool deleted = false;
-        /// <summary>
-        /// Flaga czy pkt3D jest wyłączony
-        /// </summary>
-        public bool disabled = false;
-
-        public Vertice3D(GameObject gameObject)
-        {
-            this.gameObject = gameObject;
-        }
-    }
-
     /// <summary>
     /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
     /// </summary>
     /// 
     Dictionary<WallInfo, Dictionary<string, PointProjection>> verticesOnWalls;
-
+    /// <summary>
+    /// Opisuje zbiór rzutowanych wierzchołków na danej płaszczyźnie
+    /// </summary>
+    /// 
+    Dictionary<WallInfo, Dictionary<string, EdgeProjection>> edgesOnWalls;
     /// <summary>
     /// Zbiór wierzchołków rysowanych w trójwymiarze. Elementy nigdy nie są usuwane jedynie oznaczane jako usunięte lub wyłączone.
     /// </summary>
@@ -198,6 +214,7 @@ public class MeshBuilder : MonoBehaviour
         edges3DDir.transform.SetParent(gameObject.transform);
         referenceLinesDir = new GameObject("referenceLinesDir");
         verticesOnWalls = new Dictionary<WallInfo, Dictionary<string, PointProjection>>();
+        edgesOnWalls = new Dictionary<WallInfo, Dictionary<string, EdgeProjection>>();
         vertices3D = new Dictionary<string, Vertice3D>();
         edges3D = new Dictionary<string, Edge3D>();
         blocked = false;
@@ -214,6 +231,7 @@ public class MeshBuilder : MonoBehaviour
         Destroy(edges3DDir);
         Destroy(referenceLinesDir);
         verticesOnWalls = null;
+        edgesOnWalls = null;
         vertices3D = null;
         edges3D = null;
     }
@@ -466,12 +484,26 @@ public class MeshBuilder : MonoBehaviour
         }
     }
     /// <summary>
+    /// Tworzy krawędź w 3D i jeśli jest odpowiednia ilość informacji wyświetla ją
+    /// </summary>
+    /// <param name="wall">Rzutnia</param>
+    /// <param name="label">Etykieta linii</param>
+    public void AddEdgeProjectionStandalone(WallInfo wall, string label, Line line)
+    {
+        if (!edgesOnWalls.ContainsKey(wall))
+        {
+            edgesOnWalls[wall] = new Dictionary<string, EdgeProjection>();
+        }
+
+        EdgeProjection toAddProj = new EdgeProjection(line, wall.GetNormal());
+        edgesOnWalls[wall][label] = toAddProj;
+    }
+    /// <summary>
     /// Usuwa informację o krawędzi w 3D. Jeżeli krawędź istnieje na wielu ścianach to krawędź w 3D zostanie usunięta jeśli nie będzie jej na żadnej ścianie.
     /// </summary>
     /// <param name="labelA">Etykieta punktu A</param>
     /// <param name="labelB">Etykieta punktu B</param>
-    /// <param name="nowait">Flaga określająca czy krawędz ma zostać natychmiast usunięta</param>
-    public void RemoveEdgeProjection(string labelA, string labelB, bool nowait = false)
+    public void RemoveEdgeProjection(string labelA, string labelB)
     {
         //znajdz klucz
         string key = null;
@@ -492,10 +524,45 @@ public class MeshBuilder : MonoBehaviour
 
         edges3D[key].wallOrigins--; //zmiejsz licznik scian
 
-        if (edges3D[key].wallOrigins < 1 || nowait)
+        if (edges3D[key].wallOrigins < 1)
         {
             GameObject todel = edge.edgeObject;
             edges3D.Remove(key);
+            Destroy(todel);
+        }
+
+    }
+    /// <summary>
+    /// Usuwa informację o krawędzi w 3D. Jeżeli krawędź istnieje na wielu ścianach to krawędź w 3D zostanie usunięta jeśli nie będzie jej na żadnej ścianie.
+    /// </summary>
+    /// <param name="wall">Rzutnia</param>
+    /// <param name="label">Etykieta linii</param>
+    /// <param name="line">Komponent rysowania</param>
+    public void RemoveEdgeProjectionStandalone(WallInfo wall, string label, Line line)
+    {
+        if (edgesOnWalls == null)
+            return;
+        if (!edgesOnWalls.ContainsKey(wall))
+            return;
+        if (!edgesOnWalls[wall].ContainsKey(label))
+            return;
+
+        EdgeProjection edgeToRemove = edgesOnWalls[wall][label];
+
+        if (edgeToRemove == null)
+            return;
+
+        int count = GetCurrentPointProjections(label).Count;
+        List<PointProjection> currPts = GetCurrentPointProjections(label);
+        edgesOnWalls[wall].Remove(label);
+        Edge3D edge = edges3D[label];
+
+        edges3D[label].wallOrigins--; //zmiejsz licznik scian
+
+        if (edges3D[label].wallOrigins < 1)
+        {
+            GameObject todel = edge.edgeObject;
+            edges3D.Remove(label);
             Destroy(todel);
         }
 
@@ -509,6 +576,15 @@ public class MeshBuilder : MonoBehaviour
         showProjectionLines = rule;
     }
 
+    public Tuple<Vector3, Vector3> GetEdge3DCoords(string label)
+    {
+        if (!edges3D.ContainsKey(label))
+        {
+            return null;
+        }
+        LineSegment line = edges3D[label].edgeObject.GetComponent<LineSegment>();
+        return line.GetCoordinates();
+    }
     /// <summary>
     /// Sprawdza czy na scianie znajduje juz sie rzut
     /// </summary>
