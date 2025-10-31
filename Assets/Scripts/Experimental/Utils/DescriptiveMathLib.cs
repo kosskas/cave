@@ -147,7 +147,10 @@ namespace Assets.Scripts.Experimental.Utils
 
             return (d1 + d2 <= segmentLength + epsilon);
         }
-
+        public static Vector3 FindLinePlaneIntersections(Vector3 l1_p, Vector3 l1_n, Vector3 l2_p, Vector3 l2_n)
+        {
+            return Vector3.zero;
+        }
 
     }
 }

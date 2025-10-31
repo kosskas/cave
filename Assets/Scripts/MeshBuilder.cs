@@ -494,9 +494,48 @@ public class MeshBuilder : MonoBehaviour
         {
             edgesOnWalls[wall] = new Dictionary<string, EdgeProjection>();
         }
-
+        
         EdgeProjection toAddProj = new EdgeProjection(line, wall.GetNormal());
         edgesOnWalls[wall][label] = toAddProj;
+        //sprawdz czy istnieja już dwa
+        List<EdgeProjection> currEdges = GetCurrentEdgeProjections(label);
+        ResolveAddEdgeProjection(currEdges, label);
+    }
+    private void ResolveAddEdgeProjection(List<EdgeProjection> currEdges, string label)
+    {
+        if (currEdges.Count == 1)
+        {
+            Debug.Log($"Pierwszy raz linia {label}");
+        }
+        else
+        {
+            //tylko dwa pierwsze wpisy bierzemy pod uwage
+            EdgeProjection e1 = currEdges[0];
+            EdgeProjection e2 = currEdges[1];
+
+            string label1 = label + "_point1";
+            string label2 = label + "_point2";
+
+            //var result1 = DescriptiveMathLib.FindLinePlaneIntersections(e1.line.StartPosition, e1.wallNormal, e2.line.StartPosition, e2.wallNormal);
+            //var result2 = DescriptiveMathLib.FindLinePlaneIntersections(e1.line.StartPosition, e1.wallNormal, e2.line.StartPosition, e2.wallNormal);
+            //MATEMATYCZNA MEGA FUNKCJA
+
+            //CreateEntryForPoint(label1, result1)
+            //CreateEntryForPoint(label2, result2)
+
+            GameObject edgeObj = new GameObject("Edge3D_standalone" + label1 + label2);
+            edgeObj.transform.SetParent(edges3DDir.transform);
+
+            LineSegment edge = edgeObj.AddComponent<LineSegment>();
+            edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, ReconstructionInfo.EDGE_3D_LINE_WIDTH); //moze inne wartosci
+
+            //edge.SetCoordinates(
+            //    vertices3D[label1].gameObject.transform.position,
+            //    vertices3D[label1].gameObject.transform.position
+            //);
+            edges3D[label] = new Edge3D(edgeObj, label1, label2);
+            edges3D[label].standalone = true;
+        }
     }
     /// <summary>
     /// Usuwa informację o krawędzi w 3D. Jeżeli krawędź istnieje na wielu ścianach to krawędź w 3D zostanie usunięta jeśli nie będzie jej na żadnej ścianie.
@@ -555,16 +594,26 @@ public class MeshBuilder : MonoBehaviour
         int count = GetCurrentPointProjections(label).Count;
         List<PointProjection> currPts = GetCurrentPointProjections(label);
         edgesOnWalls[wall].Remove(label);
+
+        //zawsze usun i sprawdz na nowo
+
+        //string label1 = label + "_point1";
+        //string label2 = label + "_point2";
+        //if (vertices3D.ContainsKey(label1))
+        //{
+        //    vertices3D[label1].deleted = true;
+        //}
+        //if (vertices3D.ContainsKey(label2))
+        //{
+        //    vertices3D[label2].deleted = true;
+        //}
+
         Edge3D edge = edges3D[label];
-
-        edges3D[label].wallOrigins--; //zmiejsz licznik scian
-
-        if (edges3D[label].wallOrigins < 1)
-        {
-            GameObject todel = edge.edgeObject;
-            edges3D.Remove(label);
-            Destroy(todel);
-        }
+        GameObject todel = edge.edgeObject;
+        edges3D.Remove(label);
+        Destroy(todel);
+        
+        ResolveAddEdgeProjection(GetCurrentEdgeProjections(label), label);
 
     }
     /// <summary>
@@ -640,19 +689,7 @@ public class MeshBuilder : MonoBehaviour
         Vector3 pkt3D = proj1.GetIntersection(proj2);
         if (pkt3D != Vector3.zero)
         {
-            if (vertices3D.ContainsKey(label))
-            {
-                //byl usuniety?, przywroc go w nowej pozycji
-                Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
-                vertexObject.SetCoordinates(pkt3D);
-                vertices3D[label].deleted = false;
-                vertices3D[label].disabled = false;
-            }
-            else
-            {
-                //1 raz
-                CreateEntryForPoint(label, pkt3D);
-            }
+            CreateEntryForPoint(label, pkt3D);
             return true;
         }
         return false;
@@ -660,15 +697,27 @@ public class MeshBuilder : MonoBehaviour
 
     private void CreateEntryForPoint(string label, Vector3 pos)
     {
-        GameObject obj = new GameObject("Vertex3D " + label);
-        obj.transform.SetParent(reconstrVertDir.transform);
+        if (vertices3D.ContainsKey(label))
+        {
+            //byl usuniety?, przywroc go w nowej pozycji
+            Point vertexObject = vertices3D[label].gameObject.GetComponent<Point>();
+            vertexObject.SetCoordinates(pos);
+            vertices3D[label].deleted = false;
+            vertices3D[label].disabled = false;
+        }
+        else
+        {
+            //1 raz
+            GameObject obj = new GameObject("Vertex3D " + label);
+            obj.transform.SetParent(reconstrVertDir.transform);
 
-        Point vertexObject = obj.AddComponent<Point>();
-        vertexObject.SetStyle(ReconstructionInfo.POINT_3D_COLOR, ReconstructionInfo.POINT_3D_DIAMETER);
-        vertexObject.SetCoordinates(pos);
-        vertexObject.SetLabel(label, ReconstructionInfo.LABEL_3D_SIZE, ReconstructionInfo.LABEL_3D_COLOR);
+            Point vertexObject = obj.AddComponent<Point>();
+            vertexObject.SetStyle(ReconstructionInfo.POINT_3D_COLOR, ReconstructionInfo.POINT_3D_DIAMETER);
+            vertexObject.SetCoordinates(pos);
+            vertexObject.SetLabel(label, ReconstructionInfo.LABEL_3D_SIZE, ReconstructionInfo.LABEL_3D_COLOR);
 
-        vertices3D[label] = new Vertice3D(obj);
+            vertices3D[label] = new Vertice3D(obj);
+        }
     }
     private void ShowProjectionLines()
     {
@@ -730,6 +779,19 @@ public class MeshBuilder : MonoBehaviour
             }
         }
 		return pointsInfo;
+    }
+    private List<EdgeProjection> GetCurrentEdgeProjections(string label)
+    {
+        List<EdgeProjection> edgeInfo = new List<EdgeProjection>();
+        //sprawdz ile jest juz rzutow jednego pktu
+        foreach (WallInfo wall in edgesOnWalls.Keys)
+        {
+            if (edgesOnWalls[wall].ContainsKey(label))
+            {
+                edgeInfo.Add(edgesOnWalls[wall][label]);
+            }
+        }
+        return edgeInfo;
     }
     private List<Tuple<PointProjection, PointProjection>> GetProjectionPairs(string label)
     {
