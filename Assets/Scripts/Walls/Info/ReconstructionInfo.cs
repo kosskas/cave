@@ -4,7 +4,7 @@ public static class ReconstructionInfo
 {
     // -- COLOR
     public static Color NORMAL = Color.black;
-    public static Color MENTIONED = new Color(0.5f, 0.5f, 0.5f, 1f);
+    public static Color MENTIONED = new Color(1f, 0.5f, 0f);
     public static Color FOCUSED = Color.white;
     // -- FACE
     public static Color FACE_COLOR = Color.white;
@@ -24,7 +24,7 @@ public static class ReconstructionInfo
     public static Color LABEL_3D_COLOR = Color.white;
     public static Color LABEL_3D_ERR_COLOR = Color.red;
     // -- 2D CIRCLE
-    public static float CIRCLE_2D_WIDTH = 0.002f;
+    public static float CIRCLE_2D_WIDTH = 0.003f;
     public static Color CIRCLE_2D_COLOR = Color.black;
     // -- 2D LINE
     public static float LINE_2D_WIDTH = 0.005f;

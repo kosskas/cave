@@ -108,6 +108,9 @@ public class WallController : MonoBehaviour {
         BoxCollider boxCollider = newWall.GetComponent<BoxCollider>();
         boxCollider.isTrigger = false;
 
+        CharacterController playerCollider = FindObjectOfType<PlayerController>().GetComponent<CharacterController>();
+        Physics.IgnoreCollision(playerCollider, boxCollider);
+
         WallInfo wall = new WallInfo(newWall, point1, point2, wallcounter++, newWall.name, parentNormal, parentName, true, true, true, true);
         walls.Add(wall);
         playerAddedWalls.Add(wall);
@@ -227,7 +230,7 @@ public class WallController : MonoBehaviour {
     }
     public void RemoveWall(WallInfo wall)
     {
-        if (!wall.canDelete)
+        if (wall == null || !wall.canDelete)
             return;
         playerAddedWalls.Remove(wall);
         walls.Remove(wall);

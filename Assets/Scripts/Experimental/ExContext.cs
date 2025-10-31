@@ -19,7 +19,7 @@ namespace Assets.Scripts.Experimental
         [Description("Konstruuj")]
         Const,
 
-        [Description("Wr\u00F3\u0107")]
+        [Description("<Wr\u00F3\u0107>")]
         BackToOpt,
 
         [Description("Punkt")]
@@ -28,8 +28,11 @@ namespace Assets.Scripts.Experimental
         [Description("Kraw\u0119d\u017a")]
         BoldLine,
 
-        [Description("Linia pomocznicza")]
+        [Description("Linia")]
         Line,
+
+        [Description("Linia pomocznicza")]
+        HelpLine,
 
         [Description("Linia prostopad\u0142a")]
         PerpendicularLine,
@@ -37,11 +40,14 @@ namespace Assets.Scripts.Experimental
         [Description("Linia r\u00F3wnoleg\u0142a")]
         ParallelLine,
 
-        [Description("Okr\u0105g")]
-        Circle,
-
         [Description("Linia odnosz\u0105ca")]
         Projection,
+
+        [Description("Linia odnosz\u0105ca wskazanej d\u0142ugo\u015bci")]
+        FixedProjection,
+
+        [Description("Okr\u0105g")]
+        Circle,
 
         [Description("Rzutnia")]
         Wall,
@@ -56,6 +62,22 @@ namespace Assets.Scripts.Experimental
         Undo,
 
         [Description("Pon\u00F3w")]
-        Redo
+        Redo,
+        //---------WIZUALIZACJA-------------------
+
+        [Description("Nastepna bryla")]
+        NextSolid,
+
+        [Description("Poprzednia bryla")]
+        PrevSolid,
+
+        [Description("Usun sciane")]
+        RemoveWall,
+
+        [Description("Dodaj sciane")]
+        AddWall,
+
+        [Description("Pokaz rzut")]
+        ShowProj,
     }
 }

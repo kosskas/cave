@@ -28,6 +28,7 @@ public class ModeExperimental : IMode
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
     private CircularIterator<KeyValuePair<ExContext, Action>> _creationCtx;
     private CircularIterator<KeyValuePair<ExContext, Action>> _optCtx;
+    private CircularIterator<KeyValuePair<ExContext, Action>> _lineCtx;
 
     private IRaycastable _hitObject;
 
@@ -46,6 +47,7 @@ public class ModeExperimental : IMode
     {
         var line = obj as Line;
         var axis = obj as Axis;
+        var point = obj as ExPoint;
 
         if (!ReferenceEquals(line, null))
         {
@@ -57,6 +59,12 @@ public class ModeExperimental : IMode
         {
             axis.Color = color;
             Debug.Log("FOO: AXIS AXIS AXIS");
+        }
+
+        if (!ReferenceEquals(point, null))
+        {
+            point.Color = color;
+            Debug.Log("FOO: POINT POINT POINT");
         }
     }
 
@@ -135,7 +143,7 @@ public class ModeExperimental : IMode
 
         _wc.SetBasicWalls();
         //delete menu
-        GameObject.Destroy(radialMenu.gameObject); 
+        radialMenu.RemoveFromScene(); 
         radialMenu = null;
 
         ///Zaladuj grupowy
@@ -170,7 +178,7 @@ public class ModeExperimental : IMode
         GameObject.Destroy(_mb);
 
         //delete menu
-        GameObject.Destroy(radialMenu.gameObject);
+        radialMenu.RemoveFromScene();
         radialMenu = null;
 
         ///Zaladuj grupowy
@@ -340,7 +348,7 @@ public class ModeExperimental : IMode
 
     private void _MoveCursor()
     {
-        Debug.Log($"_MoveCursor: {PCref.Hit.collider.gameObject.transform.parent.gameObject} --> {PCref.Hit.collider.gameObject}");
+        // Debug.Log($"_MoveCursor: {PCref.Hit.collider.gameObject.transform.parent.gameObject} --> {PCref.Hit.collider.gameObject}");
         var hitObject = PCref.Hit.collider.gameObject.GetComponent<IRaycastable>();
         var hitPosition = PCref.Hit.point;
         var hitWall = _wc.GetWallByName(PCref.Hit.collider.gameObject.name);
@@ -357,29 +365,37 @@ public class ModeExperimental : IMode
 
     private void _AddBaseAxis()
     {
-        var wallConnections = new Dictionary<string, List<string>>
-        {
-            ["Wall1"] = new List<string> { "Wall2", "Wall3", "Wall4", "Wall5" },
-            ["Wall2"] = new List<string> { "Wall3", "Wall5", "Wall6" },
-            ["Wall3"] = new List<string> { "Wall4", "Wall6" },
-            ["Wall4"] = new List<string> { "Wall5", "Wall6" },
-            ["Wall5"] = new List<string> { "Wall6" }
-        };
+        // var wallConnections = new Dictionary<string, List<string>>
+        // {
+        //     ["Wall1"] = new List<string> { "Wall2", "Wall3", "Wall4", "Wall5" },
+        //     ["Wall2"] = new List<string> { "Wall3", "Wall5", "Wall6" },
+        //     ["Wall3"] = new List<string> { "Wall4", "Wall6" },
+        //     ["Wall4"] = new List<string> { "Wall5", "Wall6" },
+        //     ["Wall5"] = new List<string> { "Wall6" }
+        // };
+        //
+        // foreach (var kvp in wallConnections)
+        // {
+        //     string wall = kvp.Key;
+        //     foreach (var neighbor in kvp.Value)
+        //     {
+        //         _items.AddAxisBetweenPlanes(_wc.GetWallByName(wall),
+        //             _wc.GetWallByName(neighbor));
+        //     }
+        // }
 
-        foreach (var kvp in wallConnections)
-        {
-            string wall = kvp.Key;
-            foreach (var neighbor in kvp.Value)
-            {
-                _items.AddAxisBetweenPlanes(_wc.GetWallByName(wall),
-                    _wc.GetWallByName(neighbor));
-            }
-        }
+        var wall1 = _wc.GetWallByName("Wall3");
+        wall1.SetConstructionNumber(1);
+
+        var wall2 = _wc.GetWallByName("Wall1");
+        wall2.SetConstructionNumber(2);
+
+        _items.AddAxisBetweenPlanes(wall1, wall2);
     }
 
     public ModeExperimental(PlayerController pc)
     {
-        _hm = new HistoryManager(30);
+        _hm = new HistoryManager(1000);
 
         PCref = pc;
         _wc = GameObject.Find("Walls").GetComponent<WallController>();
@@ -404,22 +420,28 @@ public class ModeExperimental : IMode
         //dodanie bazowej osi rzutuj¹cej
         _AddBaseAxis();
 
+        _lineCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
+            new List<KeyValuePair<ExContext, Action>>()
+            {
+                new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _ChangeToConstrCtx),
+                new KeyValuePair<ExContext, Action>(ExContext.HelpLine, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToObject),
+                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
+                new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.FixedProjection, ActRelativeToObject),
+                new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _SwitchRuleProjectionLine),
+            });
+
         _creationCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
             {
                 new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _BackToBasicCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.Line, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToObject),
-                new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
+                new KeyValuePair<ExContext, Action>(ExContext.Line, _ChangeToLineCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Face, Act),
-                new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _SwitchRuleProjectionLine),
-                new KeyValuePair<ExContext, Action>(ExContext.Undo, _Undo),
-                new KeyValuePair<ExContext, Action>(ExContext.Redo, _Redo)
             });
 
         _optCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
@@ -430,6 +452,8 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
                 new KeyValuePair<ExContext, Action>(ExContext.BackToMenu, _BackToMenu),
                 new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
+                new KeyValuePair<ExContext, Action>(ExContext.Undo, _Undo),
+                new KeyValuePair<ExContext, Action>(ExContext.Redo, _Redo),
             });
 
         _context = _optCtx;
@@ -465,13 +489,16 @@ public class ModeExperimental : IMode
     private void _ChangeToConstrCtx()
     {
         _context = _creationCtx;
-        radialMenu.Generate(_context, RADIAL_2ND_MENU_RADIUS);
+        radialMenu.Generate(_context, RADIAL_1ST_MENU_RADIUS);
+    }
+    private void _ChangeToLineCtx()
+    {
+        _context = _lineCtx;
+        radialMenu.Generate(_context, RADIAL_1ST_MENU_RADIUS);
     }
     public void AddRadialMenu()
     {
         GameObject flystick = GameObject.Find("TrackedObject");
-        GameObject.Find("NextContext")?.SetActive(false);
-        GameObject.Find("PrevContext")?.SetActive(false);
         if (flystick == null)
         {
             flystick = GameObject.Find("Main Camera");

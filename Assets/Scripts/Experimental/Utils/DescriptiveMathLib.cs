@@ -28,35 +28,35 @@ namespace Assets.Scripts.Experimental.Utils
              *
              * Układ równań (to wektory więc nie można dzielić)
              * 1. n1 (r - s*n2 + t*n1) = 0
-             * 2. n2 (r - s*n2 + t*n1) = 0
+             * 2. -n2 (r - s*n2 + t*n1) = 0
              *
              * 1. n1*n1 * t - n1*n2 * s = -n1 * r
-             * 2. n1*n2 * t - n2*n2 * s = -n2 * r
+             * 2. -n1*n2 * t + n2*n2 * s = n2 * r
              *
              * Niech:
              * a = n1 * n1
              * b = n1 * n2
              * c = n2 * n2
-             * d = -n1 * r
-             * e = -n2 * r
+             * d = n1 * r
+             * e = n2 * r
              *
              * Czyli mamy po uproszczeniu
              *
-             * 1. at - bs = d
-             * 2. bt - cs = e
+             * 1.-bs + at = -d
+             * 2. cs - bt = e
              *
-             * s = (ae - bd) / (b^2 - ac)
-             * t = (be - cd) / (b^2 - ac)
+             * s = (ae - bd) / (ac - b^2)
+             * t = (be - cd) / (ac - b^2)
              */
             Vector3 r = p1 - p2;
 
             float a = Vector3.Dot(n1, n1);
             float b = Vector3.Dot(n1, n2);
             float c = Vector3.Dot(n2, n2);
-            float d = -Vector3.Dot(n1, r);
-            float e = -Vector3.Dot(n2, r);
+            float d = Vector3.Dot(n1, r);
+            float e = Vector3.Dot(n2, r);
 
-            float mian = b * b - a * c;
+            float mian = a * c - b * b;
             if (Mathf.Abs(mian) < EPS)
             {
                 Debug.LogWarning($"Płaszczyzny są równoległe lub prawie równoległe – brak przecięcia. n1={n1}, n2={n2}");

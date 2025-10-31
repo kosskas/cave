@@ -24,7 +24,7 @@ public class WallInfo
     /// <summary>
     /// Numer ściany na potrzeby oznaczania osi rzutujących
     /// </summary>
-    public int numberExp;
+    public int constructionNumber;
     /// <summary>
     /// Nazwa ściany
     /// </summary>
@@ -89,19 +89,6 @@ public class WallInfo
         this.canDelete = canDelete;
         this.parentName = parentName;
         this.parentNormal = parentNormal;
-
-        switch (number)
-        {
-            case 1:
-                this.numberExp = 3;
-                break;
-            case 3:
-                this.numberExp = 1;
-                break;
-            default:
-                this.numberExp = number;
-                break;
-        }
     }
 
     /// <summary>
@@ -122,5 +109,10 @@ public class WallInfo
         this.showProjection = showProjection;
         this.showLines = showLines;
         this.showReferenceLines = showReferenceLines;
+    }
+
+    public void SetConstructionNumber(int constructionNumber)
+    {
+        this.constructionNumber = constructionNumber;
     }
 }

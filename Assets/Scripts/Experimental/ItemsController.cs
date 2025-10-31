@@ -126,6 +126,16 @@ namespace Assets.Scripts.Experimental
             return axis;
         }
 
+        private Axis GetAxis(WallInfo planeA, WallInfo planeB)
+        {
+            var axis = _axisWalls
+                .FirstOrDefault(e =>
+                    e.Value.Item1.Equals(planeA) && e.Value.Item2.Equals(planeB) ||
+                    e.Value.Item1.Equals(planeB) && e.Value.Item2.Equals(planeA)
+                    ).Key;
+            return axis;
+        }
+
         private List<Axis> GetAllAxes(WallInfo plane)
         {
             var axes = _axisWalls
@@ -213,36 +223,57 @@ namespace Assets.Scripts.Experimental
             return position;
         }
 
+        Vector3 ScaleToLength(Vector3 from, Vector3 to, float length)
+        {
+            var v = to - from;
+            var d = v.magnitude;
+
+            // brak kierunku
+            if (d < 1e-6f) return from;    
+            
+            var dir = v / d;
+            length = Mathf.Max(0f, length);
+
+            return from + dir * length;
+        }
+
 
         /*   P U B L I C   M E T H O D S   */
 
         public void AddAxisBetweenPlanes(WallInfo planeA, WallInfo planeB)
         {
-            Vector3 normalA = planeA.GetNormal();
-            Vector3 normalB = planeB.GetNormal();
-            Vector3 direction = Vector3.Cross(normalA, normalB).normalized;
-
-            Vector3 posA = planeA.gameObject.transform.position;
-            Vector3 posB = planeB.gameObject.transform.position;
-
-            Vector3 v1 = posB - posA;
-            Vector3 v2 = Vector3.ProjectOnPlane(v1, normalA);
-
-            Vector3 contactPoint = posA + v2 + _WALL_OFFSET * (normalA + normalB);
-
-            Vector3 from = contactPoint - direction * _WALL_HALF_LENGTH;
-            Vector3 to = contactPoint + direction * _WALL_HALF_LENGTH;
-
-
             var axis = new GameObject("AXIS");
-            axis.transform.SetParent(_axisRepo.transform);
-
+            axis.transform.SetParent(_axisRepo.transform); 
+            
             var axisComponent = axis.AddComponent<Axis>();
             axisComponent.Width = _AXIS_LINE_WIDTH;
-            axisComponent.Draw(default(WallInfo), from, to);
+
+            if (planeB.constrPoint1 != null && planeB.constrPoint2 != null)
+            {
+                axisComponent.Draw(default(WallInfo), planeB.constrPoint1.Value, planeB.constrPoint2.Value);
+            }
+            else
+            {
+                Vector3 normalA = planeA.GetNormal();
+                Vector3 normalB = planeB.GetNormal();
+                Vector3 direction = Vector3.Cross(normalA, normalB).normalized;
+
+                Vector3 posA = planeA.gameObject.transform.position;
+                Vector3 posB = planeB.gameObject.transform.position;
+
+                Vector3 v1 = posB - posA;
+                Vector3 v2 = Vector3.ProjectOnPlane(v1, normalA);
+
+                Vector3 contactPoint = posA + v2 + _WALL_OFFSET * (normalA + normalB);
+
+                Vector3 from = contactPoint - direction * _WALL_HALF_LENGTH;
+                Vector3 to = contactPoint + direction * _WALL_HALF_LENGTH;
+
+                axisComponent.Draw(default(WallInfo), from, to);
+            }
 
             var labelComponent = axis.AddComponent<IndexedLabel>();
-            labelComponent.AddLabel("X", "", $"{planeA.numberExp}/{planeB.numberExp}");
+            labelComponent.AddLabel("X", "", $"{planeA.constructionNumber}/{planeB.constructionNumber}");
             labelComponent.FontSize = 1;
 
             _axisWalls.Add(axisComponent, new Tuple<WallInfo, WallInfo>(planeA, planeB));
@@ -294,15 +325,17 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, _BOLD_LINE_WIDTH);
                 
-                case ExContext.Line: return DrawLine(plane, positionWithPointSensitivity);
+                case ExContext.HelpLine: return DrawLine(plane, positionWithPointSensitivity);
 
                 case ExContext.PerpendicularLine: return DrawLinePerpendicularToLine(plane, positionWithPointSensitivity, relativeObject);
 
                 case ExContext.ParallelLine: return DrawLineParallelToLine(plane, positionWithPointSensitivity, relativeObject);
 
-                case ExContext.Circle: return DrawCircle(plane, positionWithPointSensitivity);
-
                 case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity);
+
+                case ExContext.FixedProjection: return DrawFixedProjection(plane, positionWithPointSensitivity, relativeObject);
+
+                case ExContext.Circle: return DrawCircle(plane, positionWithPointSensitivity);
 
                 case ExContext.Wall: return DrawWall(plane, positionWithPointSensitivity, plane.GetNormal());
 
@@ -323,6 +356,7 @@ namespace Assets.Scripts.Experimental
             pointComponent.EnabledLabels = true;
 
             labels?.ForEach(label => pointComponent.AddLabel(label));
+            pointComponent.Color = ReconstructionInfo.NORMAL;
 
             OnDrawingCompleted(type);
 
@@ -368,7 +402,7 @@ namespace Assets.Scripts.Experimental
             return null;
         }
 
-        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH, DrawType type = DrawType.Full)
+        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH, List<string> labels = null, DrawType type = DrawType.Full)
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -392,7 +426,7 @@ namespace Assets.Scripts.Experimental
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
 
-                lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
+                // lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
 
                 if (hitObject is IAnalyzable && hitObject != line.GetComponent<IRaycastable>())
                 {
@@ -409,7 +443,10 @@ namespace Assets.Scripts.Experimental
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
-                    lineComponent.SetLabelVisible(false);
+                    lineComponent.RemoveFocusedLabel();
+                    labels?.ForEach(label => lineComponent.AddLabel(label));
+                    lineComponent.Color = ReconstructionInfo.NORMAL;
+
                     var endPoint = hitObject as ExPoint;
 
                     if (startPoint != null && endPoint != null)
@@ -462,14 +499,17 @@ namespace Assets.Scripts.Experimental
                 var endPositionWithPointSensitivity = CalcPosition(plane, hitPosition, hitObject as ExPoint);
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
-                lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
+                // lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
                 
                 if (isEnd)
                 {
-                    UnityEngine.Object.Destroy(line);
+                    UnityEngine.Object.DestroyImmediate(line);
 
                     var addedWall = _wCrt.WCrCreateWall(startPosition, endPositionWithPointSensitivity, wallParentNormal, plane.name, fixedName);
-                    AddAxisBetweenPlanes(addedWall, plane);
+                    var axesCount = _axisRepo.transform.childCount;
+                    addedWall.SetConstructionNumber(axesCount + 2);
+
+                    AddAxisBetweenPlanes(plane, addedWall);
 
                     OnDrawingCompleted(type);
                 }
@@ -536,7 +576,37 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public DrawAction DrawProjection(WallInfo startPlane, Vector3 startPosition, float lineWidth = _HELP_LINE_WIDTH)
+        public DrawAction DrawFixedProjection(WallInfo startPlane, Vector3 startPosition, IRaycastable relativeObject = null)
+        {
+            var relativeLine = relativeObject as Line;
+            var relativePoint = relativeObject as ExPoint;
+
+            if (relativeLine != null)
+            {
+                var length = Vector3.Distance(relativeLine.StartPosition, relativeLine.EndPosition);
+                return DrawProjection(startPlane, startPosition, true, length);
+            }
+
+            if (relativePoint != null)
+            {
+                var pointPosition = relativePoint.Position;
+                var pointPlane = relativePoint.Plane;
+
+                var axis = GetAxis(startPlane, pointPlane);
+                if (axis != null)
+                {
+                    var startProjectionPosition = CalcProjectionOnAxis(axis, relativePoint.Position);
+                    var length = Vector3.Distance(startProjectionPosition, pointPosition);
+                    return DrawProjection(startPlane, startPosition, true, length);
+                }
+            }
+
+            return null;
+        }
+
+        //return DrawProjection(plane, positionWithPointSensitivity);
+
+        public DrawAction DrawProjection(WallInfo startPlane, Vector3 startPosition, bool withFixedLength = false, float fixedLength = 0.0f, float lineWidth = _HELP_LINE_WIDTH)
         {
             // FIRST PART
             var projection1 = new GameObject("PROJECTION");
@@ -601,7 +671,7 @@ namespace Assets.Scripts.Experimental
                 if (startPlane == currPlane)
                 {
                     projectionComponent1.Draw(startPlane, startPosition, endPosition);
-                    projectionComponent1.SetLabel(Vector3.Distance(startPosition, endPosition));
+                    // projectionComponent1.SetLabel(Vector3.Distance(startPosition, endPosition));
                     projectionComponent1.SetLabelVisible(true);
 
                     projectionComponent2.Draw(startPlane, startPosition, endPosition);
@@ -630,8 +700,15 @@ namespace Assets.Scripts.Experimental
                     projectionComponent1.Draw(startPlane, startPosition, startPositionProjection);
                     projectionComponent1.SetLabelVisible(false);
 
+                    // FIXED LENGTH PROJECTION  
+                    if (withFixedLength)
+                    {
+                        var scaledEnd = ScaleToLength(startPositionProjection, endPosition, fixedLength);
+                        endPosition = scaledEnd;
+                    }
+
                     projectionComponent2.Draw(endPlane, startPositionProjection, endPosition);
-                    projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
+                    // projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
                     projectionComponent2.SetLabelVisible(true);
 
                     if (hitObject is IAnalyzable && hitObject != projectionComponent2.GetComponent<IRaycastable>())
@@ -748,7 +825,7 @@ namespace Assets.Scripts.Experimental
                 var endPosition = cursorPositionProjection + startPositionOffsetFromAxis;
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-                lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
+                // lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
 
                 if (hitObject is IAnalyzable && hitObject != line.GetComponent<IRaycastable>())
                 {
@@ -846,7 +923,7 @@ namespace Assets.Scripts.Experimental
                 var endPosition = startPosition + vDrawnLinePerpendicular;
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-                lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
+                // lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
 
                 if (hitObject is IAnalyzable && hitObject != line.GetComponent<IRaycastable>())
                 {
@@ -930,18 +1007,22 @@ namespace Assets.Scripts.Experimental
                     if (point.Plane.Equals(plane) && point.Labels.Contains(startPointLabel))
                     {
                         startPoint = point;
-                        startPoint.FocusedLabel = startPointLabel;
+
+                        while (startPoint.FocusedLabel != startPointLabel)
+                            startPoint.NextLabel();
                     }
 
                     if (point.Plane.Equals(plane) && point.Labels.Contains(endPointLabel))
                     {
                         endPoint = point;
-                        endPoint.FocusedLabel = endPointLabel;
+
+                        while (endPoint.FocusedLabel != endPointLabel)
+                            endPoint.NextLabel();
                     }
                 }
             }
 
-            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, lineLineWidth, DrawType.Part);
+            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, lineLineWidth, lineLabels, DrawType.Part);
             da.Invoke(endPoint, lineEndPosition, plane, true);
         }
 
