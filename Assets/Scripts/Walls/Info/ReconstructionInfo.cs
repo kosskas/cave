@@ -18,6 +18,7 @@ public static class ReconstructionInfo
     public static Color POINT_3D_COLOR = Color.black;
     // -- 3D EDGE
     public static float EDGE_3D_LINE_WIDTH = 0.01f;
+    public static float EDGE_3D_FONT_SIZE = 0.05f;
     public static Color EDGE_3D_COLOR = Color.black;
     // -- 3D LABEl
     public static float LABEL_3D_SIZE = 0.04f;

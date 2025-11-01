@@ -10,7 +10,7 @@ using System.Reflection.Emit;
 
 public class Edge3D
 {
-    public GameObject edgeObject;
+    public GameObject edgeObject; // Ma w sobie LineSegment jako obiekt wizualizacji w 3D
     public string firstPoint;
     public string secondPoint;
     /// <summary>
@@ -148,7 +148,7 @@ public class MeshBuilder : MonoBehaviour
     }
     private class EdgeProjection
     {
-        public Line line;
+        public Line line; // Linia jako obiekt konstrukcji na rzutni
         public Vector3 wallNormal;
 
         public EdgeProjection(Line line, Vector3 wallNormal)
@@ -507,33 +507,40 @@ public class MeshBuilder : MonoBehaviour
         {
             Debug.Log($"Pierwszy raz linia {label}");
         }
-        else
+        else if (currEdges.Count > 1)
         {
+            Debug.Log($"Drugi raz linia {label}");
             //tylko dwa pierwsze wpisy bierzemy pod uwage
             EdgeProjection e1 = currEdges[0];
             EdgeProjection e2 = currEdges[1];
 
-            string label1 = label + "_point1";
-            string label2 = label + "_point2";
+            string labelA = label + "_pointA";
+            string labelB = label + "_pointB";
 
-            //var result1 = DescriptiveMathLib.FindLinePlaneIntersections(e1.line.StartPosition, e1.wallNormal, e2.line.StartPosition, e2.wallNormal);
-            //var result2 = DescriptiveMathLib.FindLinePlaneIntersections(e1.line.StartPosition, e1.wallNormal, e2.line.StartPosition, e2.wallNormal);
-            //MATEMATYCZNA MEGA FUNKCJA
+            Vector3 t1a = DescriptiveMathLib.FindLinePlaneIntersections(e1.line.StartPosition, e1.wallNormal, e2.line.StartPosition, e2.line.StartPosition - e2.line.EndPosition, e2.wallNormal);
+            Vector3 t1b = DescriptiveMathLib.FindLinePlaneIntersections(e1.line.EndPosition, e1.wallNormal, e2.line.StartPosition, e2.line.StartPosition - e2.line.EndPosition, e2.wallNormal);
 
-            //CreateEntryForPoint(label1, result1)
-            //CreateEntryForPoint(label2, result2)
+            Vector3 t2a = DescriptiveMathLib.FindLinePlaneIntersections(e2.line.StartPosition, e2.wallNormal, e1.line.StartPosition, e1.line.StartPosition - e1.line.EndPosition, e1.wallNormal);
+            Vector3 t2b = DescriptiveMathLib.FindLinePlaneIntersections(e2.line.EndPosition, e2.wallNormal, e1.line.StartPosition, e1.line.StartPosition - e1.line.EndPosition, e1.wallNormal);
 
-            GameObject edgeObj = new GameObject("Edge3D_standalone" + label1 + label2);
+            /// find least common part
+
+            CreateEntryForPoint(labelA, t1a);
+            CreateEntryForPoint(labelB, t1b);
+            vertices3D[labelA].disabled = true;
+            vertices3D[labelB].disabled = true;
+
+            GameObject edgeObj = new GameObject("Edge3D_standalone" + labelA + labelB);
             edgeObj.transform.SetParent(edges3DDir.transform);
 
             LineSegment edge = edgeObj.AddComponent<LineSegment>();
             edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, ReconstructionInfo.EDGE_3D_LINE_WIDTH); //moze inne wartosci
-
-            //edge.SetCoordinates(
-            //    vertices3D[label1].gameObject.transform.position,
-            //    vertices3D[label1].gameObject.transform.position
-            //);
-            edges3D[label] = new Edge3D(edgeObj, label1, label2);
+            //edge.SetLabel(label, ReconstructionInfo.EDGE_3D_FONT_SIZE, ReconstructionInfo.EDGE_3D_COLOR); nie dziala
+            edge.SetCoordinates(
+                vertices3D[labelA].gameObject.transform.position,
+                vertices3D[labelB].gameObject.transform.position
+            );
+            edges3D[label] = new Edge3D(edgeObj, labelA, labelB);
             edges3D[label].standalone = true;
         }
     }
@@ -597,16 +604,16 @@ public class MeshBuilder : MonoBehaviour
 
         //zawsze usun i sprawdz na nowo
 
-        //string label1 = label + "_point1";
-        //string label2 = label + "_point2";
-        //if (vertices3D.ContainsKey(label1))
-        //{
-        //    vertices3D[label1].deleted = true;
-        //}
-        //if (vertices3D.ContainsKey(label2))
-        //{
-        //    vertices3D[label2].deleted = true;
-        //}
+        string labelA = label + "_pointA";
+        string labelB = label + "_pointB";
+        if (vertices3D.ContainsKey(labelA))
+        {
+            vertices3D[labelA].deleted = true;
+        }
+        if (vertices3D.ContainsKey(labelA))
+        {
+            vertices3D[labelB].deleted = true;
+        }
 
         Edge3D edge = edges3D[label];
         GameObject todel = edge.edgeObject;
@@ -763,8 +770,12 @@ public class MeshBuilder : MonoBehaviour
         foreach (string key in edges3D.Keys)
         {
             LineSegment line = edges3D[key].edgeObject.GetComponent<LineSegment>();
+            bool isStandalone = edges3D[key].standalone;
+            var v1 = vertices3D[edges3D[key].firstPoint];
+            var v2 = vertices3D[edges3D[key].secondPoint];
+
+            line.SetEnable(!(v1.deleted || v2.deleted || (!isStandalone && (v1.disabled || v2.disabled))));
             line.SetCoordinates(vertices3D[edges3D[key].firstPoint].gameObject.transform.position, vertices3D[edges3D[key].secondPoint].gameObject.transform.position);
-            line.SetEnable(!(vertices3D[edges3D[key].firstPoint].deleted || vertices3D[edges3D[key].firstPoint].disabled || vertices3D[edges3D[key].secondPoint].deleted || vertices3D[edges3D[key].secondPoint].disabled));
         }
     }
     private List<PointProjection> GetCurrentPointProjections(string label)

@@ -7,6 +7,8 @@ namespace Assets.Scripts.Experimental.Utils
     public static class DescriptiveMathLib
     {
         private const float EPS = 1e-5f;
+        private static Func<Vector3, float, Vector3, Vector3> line = (A, t, v) => A + t * v;
+
         public static Tuple<Vector3, Vector3> FindLLIntersections(Vector3 p1, Vector3 n1, Vector3 p2, Vector3 n2)
         {
             /* Komentarz
@@ -66,8 +68,8 @@ namespace Assets.Scripts.Experimental.Utils
             float t = (b * e - c * d) / mian;
             float s = (a * e - b * d) / mian;
 
-            Vector3 point1 = p1 + t * n1;
-            Vector3 point2 = p2 + s * n2;
+            Vector3 point1 = line(p1,t,n1);
+            Vector3 point2 = line(p2,s,n2);
 
             return new Tuple<Vector3, Vector3>(point1, point2);
         }
@@ -147,9 +149,22 @@ namespace Assets.Scripts.Experimental.Utils
 
             return (d1 + d2 <= segmentLength + epsilon);
         }
-        public static Vector3 FindLinePlaneIntersections(Vector3 l1_p, Vector3 l1_n, Vector3 l2_p, Vector3 l2_n)
+        public static Vector3 FindLinePlaneIntersections(Vector3 p_l, Vector3 vec_l, Vector3 p_p, Vector3 n1_p, Vector3 n2_p)
         {
-            return Vector3.zero;
+            /*
+             * Prosta l(t) = A + t*v
+             * Płaszczyzna Q = P + sn1 + vn2
+             * 
+             * Wektor normalny do płaszczyzny n = Cross(n1, n2)
+             * 
+             * dowolny punkt (x,y,z) leży w płaszczyźnie, jeśli wektor od P do tego punktu jest prostopadły do normalnej płaszczyzny. 
+             * wyznacznik.pl/plaszczyzna-w-przestrzeni-teoria
+             * 
+             * [(A+tv)-P]*n = 0
+             */
+            Vector3 n = Vector3.Cross(n1_p, n2_p);
+            float t_found = -Vector3.Dot((p_l - p_p), n) / (Vector3.Dot(vec_l, n));
+            return line(p_l, t_found, vec_l);
         }
 
     }

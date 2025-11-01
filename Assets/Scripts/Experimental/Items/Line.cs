@@ -254,6 +254,7 @@ namespace Assets.Scripts.Experimental.Items
             _labelComponent.AddLabel("", new string('\'', Plane.constructionNumber), "");
 
             NextText();
+            Mc.AddEdgeProjectionStandalone(Plane, FocusedLabel, this);
         }
         public void SetLabel(float value)
         {
