@@ -603,8 +603,8 @@ public class MeshBuilder : MonoBehaviour
         if (edgeToRemove == null)
             return;
 
-        int count = GetCurrentPointProjections(label).Count;
-        List<PointProjection> currPts = GetCurrentPointProjections(label);
+        int count = GetCurrentEdgeProjections(label).Count;
+        List<EdgeProjection> currPts = GetCurrentEdgeProjections(label);
         edgesOnWalls[wall].Remove(label);
         
         //byla tylko jedna
