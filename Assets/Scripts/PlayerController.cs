@@ -61,6 +61,9 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
+        GameObject crosshair = new GameObject("Crosshair");
+        CrosshairGUI crosshairScript = crosshair.AddComponent<CrosshairGUI>();
+
         Debug.Log($"<color=blue> [MODE MENU]  1 -> grp  ,  2 -> inz  [MODE MENU] </color>");
     }
 
