@@ -539,7 +539,7 @@ public class MeshBuilder : MonoBehaviour
             edgeObj.transform.SetParent(edges3DDir.transform);
 
             LineSegment edge = edgeObj.AddComponent<LineSegment>();
-            edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, ReconstructionInfo.EDGE_3D_LINE_WIDTH); //moze inne wartosci
+            edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, e1.line.Width);
             //edge.SetLabel(label, ReconstructionInfo.EDGE_3D_FONT_SIZE, ReconstructionInfo.EDGE_3D_COLOR); nie dziala
             edge.SetCoordinates(
                 vertices3D[labelA].gameObject.transform.position,
