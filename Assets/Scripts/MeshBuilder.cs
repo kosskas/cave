@@ -540,11 +540,11 @@ public class MeshBuilder : MonoBehaviour
 
             LineSegment edge = edgeObj.AddComponent<LineSegment>();
             edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, e1.line.Width);
-            //edge.SetLabel(label, ReconstructionInfo.EDGE_3D_FONT_SIZE, ReconstructionInfo.EDGE_3D_COLOR); nie dziala
             edge.SetCoordinates(
                 vertices3D[labelA].gameObject.transform.position,
                 vertices3D[labelB].gameObject.transform.position
             );
+            edge.SetLabel(label, ReconstructionInfo.EDGE_3D_FONT_SIZE, ReconstructionInfo.LABEL_3D_COLOR);
             edges3D[label] = new Edge3D(edgeObj, labelA, labelB);
             edges3D[label].standalone = true;
         }
