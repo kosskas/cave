@@ -597,7 +597,8 @@ public class MeshBuilder : MonoBehaviour
             return;
         if (!edgesOnWalls[wall].ContainsKey(label))
             return;
-
+        if (!edges3D.ContainsKey(label))
+            return;
         EdgeProjection edgeToRemove = edgesOnWalls[wall][label];
 
         if (edgeToRemove == null)
@@ -606,7 +607,12 @@ public class MeshBuilder : MonoBehaviour
         int count = GetCurrentPointProjections(label).Count;
         List<PointProjection> currPts = GetCurrentPointProjections(label);
         edgesOnWalls[wall].Remove(label);
-
+        
+        //byla tylko jedna
+        if (count == 1)
+        {
+            return;
+        }
         //zawsze usun i sprawdz na nowo
 
         string labelA = label + "_pointA";
