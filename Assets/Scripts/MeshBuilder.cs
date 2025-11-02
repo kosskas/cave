@@ -641,6 +641,18 @@ public class MeshBuilder : MonoBehaviour
         LineSegment line = edges3D[label].edgeObject.GetComponent<LineSegment>();
         return line.GetCoordinates();
     }
+
+    public Vector3? GetPoint3DCoords(string label)
+    {
+        Vertice3D value;
+        if (!vertices3D.TryGetValue(label, out value))
+            return null;
+
+        var point = value.gameObject.transform.position;
+        return point;
+    }
+
+
     /// <summary>
     /// Sprawdza czy na scianie znajduje juz sie rzut
     /// </summary>

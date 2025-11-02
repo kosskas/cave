@@ -442,6 +442,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Face, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.HelpPlane, ActRelativeToObject),
             });
 
         _optCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(

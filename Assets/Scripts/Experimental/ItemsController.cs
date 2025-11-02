@@ -33,6 +33,8 @@ namespace Assets.Scripts.Experimental
 
         private List<ExPoint> _facePoints;
 
+        private int hiddenLabelId = 1;
+
         public enum DrawType
         {
             Full,
@@ -376,6 +378,8 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.Face: return DrawFace(hitObject as ExPoint);
 
+                case ExContext.HelpPlane: return DrawHelpPlane(hitObject as ExPoint, relativeObject as Line);
+
                 default: return null;
             }
         }
@@ -433,6 +437,43 @@ namespace Assets.Scripts.Experimental
                 chosenPoint.Color = ReconstructionInfo.MENTIONED;
                 _facePoints.Add(chosenPoint);
             }
+
+            return null;
+        }
+
+        private DrawAction DrawHelpPlane(ExPoint hitPoint, Line relativeLine)
+        {
+            if (hitPoint == null || relativeLine == null)
+                return null;
+
+            var coords = _mB.GetEdge3DCoords(relativeLine.FocusedLabel);
+            if (coords == null)
+                return null;
+
+            var f = _mB.GetPoint3DCoords(hitPoint.FocusedLabel);
+            if (f == null) 
+                return null;
+
+            var a = coords.Item1;
+            var b = coords.Item2;
+
+            var v = b - a;
+            var vv = Vector3.Dot(v, v);
+            if (vv < 1e-9f)
+                return null;
+
+            var c = f.Value + v * Vector3.Dot(b - f.Value, v) / vv;
+            var d = f.Value + v * Vector3.Dot(a - f.Value, v) / vv;
+
+            _fGen.GenerateFace(new List<KeyValuePair<string, Vector3>>()
+            {
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_a", a),
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_b", b),
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_c", c),
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_d", d)
+            });
+
+            hiddenLabelId++;
 
             return null;
         }
