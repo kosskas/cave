@@ -490,11 +490,16 @@ public class MeshBuilder : MonoBehaviour
     /// <param name="label">Etykieta linii</param>
     public void AddEdgeProjectionStandalone(WallInfo wall, string label, Line line)
     {
+        Debug.Log($"Lina {line} o et {label}; ");
         if (!edgesOnWalls.ContainsKey(wall))
         {
             edgesOnWalls[wall] = new Dictionary<string, EdgeProjection>();
         }
-        
+        if (edgesOnWalls[wall].ContainsKey(label))
+        {
+            Debug.Log($"Juz jest taka linia na scianie {label}");
+            return;
+        }
         EdgeProjection toAddProj = new EdgeProjection(line, wall.GetNormal());
         edgesOnWalls[wall][label] = toAddProj;
         //sprawdz czy istnieja już dwa
