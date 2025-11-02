@@ -21,7 +21,7 @@ public class ModeMenu : IMode
             new List<KeyValuePair<ExContext, Action>>()
             {
                 new KeyValuePair<ExContext, Action>(ExContext.Const, _LoadReconstruction),
-                new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _LoadVisualization),
+                new KeyValuePair<ExContext, Action>(ExContext.ExitApp, _QuitApp),
                 
             });
         AddRadialMenu();
@@ -94,18 +94,23 @@ public class ModeMenu : IMode
 
     }
 
-    private void _LoadVisualization()
-    {
-        radialMenu.RemoveFromScene();
-        radialMenu = null;
-        PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
-    }
+    //private void _LoadVisualization()
+    //{
+    //    radialMenu.RemoveFromScene();
+    //    radialMenu = null;
+    //    PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
+    //}
 
     private void _LoadReconstruction()
     {
         radialMenu.RemoveFromScene();
         radialMenu = null;
         PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
+    }
+
+    private void _QuitApp()
+    {
+        Application.Quit();
     }
 }
 

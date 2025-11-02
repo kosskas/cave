@@ -79,5 +79,9 @@ namespace Assets.Scripts.Experimental
 
         [Description("Pokaz rzut")]
         ShowProj,
+
+        //MENU
+        [Description("Wyjdz")]
+        ExitApp,
     }
 }
