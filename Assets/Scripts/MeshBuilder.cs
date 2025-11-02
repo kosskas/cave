@@ -597,8 +597,7 @@ public class MeshBuilder : MonoBehaviour
             return;
         if (!edgesOnWalls[wall].ContainsKey(label))
             return;
-        if (!edges3D.ContainsKey(label))
-            return;
+
         EdgeProjection edgeToRemove = edgesOnWalls[wall][label];
 
         if (edgeToRemove == null)
