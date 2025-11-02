@@ -489,7 +489,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = lineWidth;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
-            lineComponent.SetLabelVisible(true);
+            //lineComponent.SetLabelVisible(true);
 
             var intersectedObjs = new HashSet<IAnalyzable>();
 
@@ -509,7 +509,7 @@ namespace Assets.Scripts.Experimental
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
-                    lineComponent.RemoveFocusedLabel();
+                    //lineComponent.RemoveFocusedLabel();
                     labels?.ForEach(label => lineComponent.AddLabel(label));
                     lineComponent.Color = ReconstructionInfo.NORMAL;
 
@@ -539,7 +539,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = _HELP_LINE_WIDTH;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
-            lineComponent.SetLabelVisible(true);
+            //lineComponent.SetLabelVisible(true);
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
@@ -641,7 +641,7 @@ namespace Assets.Scripts.Experimental
             projectionComponent1.EnabledLabels = true;
             projectionComponent1.Width = lineWidth;
             projectionComponent1.Draw(startPlane, startPosition, startPosition);
-            projectionComponent1.SetLabelVisible(true);
+            //projectionComponent1.SetLabelVisible(true);
 
             var intersectedObjsPl1 = new HashSet<IAnalyzable>();
 
@@ -654,7 +654,7 @@ namespace Assets.Scripts.Experimental
             projectionComponent2.EnabledLabels = true;
             projectionComponent2.Width = lineWidth;
             projectionComponent2.Draw(startPlane, startPosition, startPosition);
-            projectionComponent1.SetLabelVisible(false);
+            //projectionComponent1.SetLabelVisible(false);
 
             var intersectedObjsPl2 = new HashSet<IAnalyzable>();
 
@@ -696,10 +696,10 @@ namespace Assets.Scripts.Experimental
                 {
                     projectionComponent1.Draw(startPlane, startPosition, endPosition);
                     // projectionComponent1.SetLabel(Vector3.Distance(startPosition, endPosition));
-                    projectionComponent1.SetLabelVisible(true);
+                    //projectionComponent1.SetLabelVisible(true);
 
                     projectionComponent2.Draw(startPlane, startPosition, endPosition);
-                    projectionComponent2.SetLabelVisible(false);
+                    //projectionComponent2.SetLabelVisible(false);
 
                     HandleIntersectionStart(hitObject, intersectedObjsPl1, projectionComponent1.GetComponent<IRaycastable>());
 
@@ -712,7 +712,7 @@ namespace Assets.Scripts.Experimental
                 else
                 {
                     projectionComponent1.Draw(startPlane, startPosition, startPositionProjection);
-                    projectionComponent1.SetLabelVisible(false);
+                    //projectionComponent1.SetLabelVisible(false);
 
                     // FIXED LENGTH PROJECTION  
                     if (withFixedLength)
@@ -723,7 +723,7 @@ namespace Assets.Scripts.Experimental
 
                     projectionComponent2.Draw(endPlane, startPositionProjection, endPosition);
                     // projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
-                    projectionComponent2.SetLabelVisible(true);
+                    //projectionComponent2.SetLabelVisible(true);
 
                     HandleIntersectionStart(hitObject, intersectedObjsPl2, projectionComponent2.GetComponent<IRaycastable>());
 
@@ -732,11 +732,11 @@ namespace Assets.Scripts.Experimental
                         DrawPoint(endPlane, endPosition, null, DrawType.Part);
 
                         projectionComponent1.ColliderEnabled = true;
-                        projectionComponent1.SetLabelVisible(false);
+                        //projectionComponent1.SetLabelVisible(false);
                         _wCtrl.LinkConstructionToWall(startPlane, projection1);
 
                         projectionComponent2.ColliderEnabled = true;
-                        projectionComponent2.SetLabelVisible(false);
+                        //projectionComponent2.SetLabelVisible(false);
                         _wCtrl.LinkConstructionToWall(endPlane, projection2);
 
                         HandleIntersectionsEnd(startPlane, intersectedObjsPl1, projectionComponent1);
@@ -759,7 +759,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = _HELP_LINE_WIDTH;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
-            lineComponent.SetLabelVisible(true);
+            //lineComponent.SetLabelVisible(true);
 
             var relativeLine = relativeObject as Line;
             var relativeAxis = relativeObject as Axis;
@@ -805,7 +805,7 @@ namespace Assets.Scripts.Experimental
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
-                    lineComponent.SetLabelVisible(false);
+                    //lineComponent.SetLabelVisible(false);
 
                     HandleIntersectionsEnd(plane, intersectedObjs, lineComponent);
 
@@ -825,7 +825,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = _HELP_LINE_WIDTH;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
-            lineComponent.SetLabelVisible(true);
+            //lineComponent.SetLabelVisible(true);
 
             var relativeLine = relativeObject as Line;
             var relativeAxis = relativeObject as Axis;
@@ -877,7 +877,7 @@ namespace Assets.Scripts.Experimental
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
-                    lineComponent.SetLabelVisible(false);
+                    //lineComponent.SetLabelVisible(false);
 
                     HandleIntersectionsEnd(plane, intersectedObjs, lineComponent);
 
