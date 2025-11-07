@@ -150,8 +150,9 @@ namespace Assets.Scripts.Experimental.Items
                 Vector3 A1 = this.EndPosition;
                 Vector3 S2 = crossCircleObj.StartPosition;
                 Vector3 B2 = crossCircleObj.EndPosition;
+                Vector3 n = Plane.GetNormal();
 
-                return DescriptiveMathLib.FindCCIntersections(S1, A1, S2, B2);
+                return DescriptiveMathLib.FindCCIntersections(S1, A1, S2, B2, n);
             }
             return null;
         }

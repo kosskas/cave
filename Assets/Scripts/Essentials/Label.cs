@@ -77,8 +77,10 @@ public class Label : MonoBehaviour {
 		this._textMesh.characterSize = this._fontSize;
 		this._textMesh.color = this._color;
 		this._labelRenderer.enabled = this._isEnabled;
-		gameObject.transform.position = gameObject.transform.parent.transform.position + this._offset;
-	}
+		gameObject.transform.position = gameObject.transform.parent.transform.position;
+        _labelRenderer.transform.position = gameObject.transform.parent.transform.position;
+
+    }
 
 	/// <summary>
 	/// Metoda obracająca przód/awers etykiety w kierunku do gracza
