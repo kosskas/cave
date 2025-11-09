@@ -55,6 +55,9 @@ namespace Assets.Scripts.Experimental
         [Description("\u015aciana")]
         Face,
 
+        [Description("P\u0142aszczyzna pomocnicza")]
+        HelpPlane,
+
         [Description("Linie rzutuj\u0105ce")]
         ProjLine,
 

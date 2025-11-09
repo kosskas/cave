@@ -33,6 +33,8 @@ namespace Assets.Scripts.Experimental
 
         private List<ExPoint> _facePoints;
 
+        private int hiddenLabelId = 1;
+
         public enum DrawType
         {
             Full,
@@ -236,6 +238,41 @@ namespace Assets.Scripts.Experimental
 
             return from + dir * length;
         }
+        private void HandleIntersectionStart(IRaycastable hitObject, HashSet<IAnalyzable> intersectedObjs, IRaycastable currentComponent)
+        {
+            if (hitObject is IAnalyzable && hitObject != currentComponent)
+            {
+                IAnalyzable aHitObject = (IAnalyzable)hitObject;
+                intersectedObjs.Add(aHitObject.GetElement());
+
+                if (hitObject is IColorable)
+                {
+                    IColorable cHitObject = (IColorable)hitObject;
+                    cHitObject.Color = ReconstructionInfo.MENTIONED;
+                }
+            }
+        }
+
+        private void HandleIntersectionsEnd(WallInfo plane,HashSet<IAnalyzable> intersectedObjs, IAnalyzable drawableComponent, Vector3? excludePoint = null)
+        {
+            foreach (var intersected in intersectedObjs)
+            {
+                List<Vector3> crossings = intersected.FindCrossingPoints(drawableComponent);
+                if (crossings != null)
+                {
+                    foreach (var point in crossings)
+                    {
+                        if (excludePoint != null && Vector3.SqrMagnitude(excludePoint.Value - point) < 1e-5f) continue;
+                        DrawPoint(plane, point, null, DrawType.Part);
+                    }
+                }
+                if (intersected is IColorable)
+                {
+                    IColorable cIntersected = (IColorable)intersected;
+                    cIntersected.Color = ReconstructionInfo.NORMAL;
+                }
+            }
+        }
 
 
         /*   P U B L I C   M E T H O D S   */
@@ -341,6 +378,8 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.Face: return DrawFace(hitObject as ExPoint);
 
+                case ExContext.HelpPlane: return DrawHelpPlane(hitObject as ExPoint, relativeObject as Line);
+
                 default: return null;
             }
         }
@@ -402,6 +441,43 @@ namespace Assets.Scripts.Experimental
             return null;
         }
 
+        private DrawAction DrawHelpPlane(ExPoint hitPoint, Line relativeLine)
+        {
+            if (hitPoint == null || relativeLine == null)
+                return null;
+
+            var coords = _mB.GetEdge3DCoords(relativeLine.FocusedLabel);
+            if (coords == null)
+                return null;
+
+            var f = _mB.GetPoint3DCoords(hitPoint.FocusedLabel);
+            if (f == null) 
+                return null;
+
+            var a = coords.Item1;
+            var b = coords.Item2;
+
+            var v = b - a;
+            var vv = Vector3.Dot(v, v);
+            if (vv < 1e-9f)
+                return null;
+
+            var c = f.Value + v * Vector3.Dot(b - f.Value, v) / vv;
+            var d = f.Value + v * Vector3.Dot(a - f.Value, v) / vv;
+
+            _fGen.GenerateFace(new List<KeyValuePair<string, Vector3>>()
+            {
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_a", a),
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_b", b),
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_c", c),
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_d", d)
+            });
+
+            hiddenLabelId++;
+
+            return null;
+        }
+
         public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH, List<string> labels = null, DrawType type = DrawType.Full)
         {
             var line = new GameObject("LINE");
@@ -413,7 +489,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = lineWidth;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
-            lineComponent.SetLabelVisible(true);
+            //lineComponent.SetLabelVisible(true);
 
             var intersectedObjs = new HashSet<IAnalyzable>();
 
@@ -428,22 +504,12 @@ namespace Assets.Scripts.Experimental
 
                 // lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
 
-                if (hitObject is IAnalyzable && hitObject != line.GetComponent<IRaycastable>())
-                {
-                    IAnalyzable aHitObject = (IAnalyzable)hitObject;
-                    intersectedObjs.Add(aHitObject.GetElement());
-
-                    if (hitObject is IColorable)
-                    {
-                        IColorable cHitObject = (IColorable)hitObject;
-                        cHitObject.Color = ReconstructionInfo.MENTIONED;
-                    }
-                }
+                HandleIntersectionStart(hitObject, intersectedObjs, line.GetComponent<IRaycastable>());
                 
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
-                    lineComponent.RemoveFocusedLabel();
+                    //lineComponent.RemoveFocusedLabel();
                     labels?.ForEach(label => lineComponent.AddLabel(label));
                     lineComponent.Color = ReconstructionInfo.NORMAL;
 
@@ -454,23 +520,7 @@ namespace Assets.Scripts.Experimental
                         lineComponent.BindPoints(startPoint, endPoint);
                     }
 
-                    foreach (var intersected in intersectedObjs)
-                    {
-                        List<Vector3> crossings = intersected.FindCrossingPoints(lineComponent);
-                        if (crossings != null)
-                        {
-                            foreach (var point in crossings)
-                            {
-                                if(Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
-                                DrawPoint(plane, point, null, DrawType.Part);
-                            }
-                        }
-                        if (intersected is IColorable)
-                        {
-                            IColorable cIntersected = (IColorable)intersected;
-                            cIntersected.Color = ReconstructionInfo.NORMAL;
-                        }
-                    }
+                    HandleIntersectionsEnd(plane, intersectedObjs, lineComponent, endPositionWithPointSensitivity);
 
                     OnDrawingCompleted(type);
                 }
@@ -489,7 +539,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = _HELP_LINE_WIDTH;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
-            lineComponent.SetLabelVisible(true);
+            //lineComponent.SetLabelVisible(true);
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
@@ -538,38 +588,12 @@ namespace Assets.Scripts.Experimental
 
                 circleComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
 
-                if (hitObject is IAnalyzable && hitObject != circleComponent.GetComponent<IRaycastable>())
-                {
-                    IAnalyzable aHitObject = (IAnalyzable)hitObject;
-                    intersectedObjs.Add(aHitObject.GetElement());
-
-                    if (hitObject is IColorable)
-                    {
-                        IColorable cHitObject = (IColorable)hitObject;
-                        cHitObject.Color = ReconstructionInfo.MENTIONED;
-                    }
-                }
+                HandleIntersectionStart(hitObject, intersectedObjs, circleComponent.GetComponent<IRaycastable>());
 
                 if (isEnd)
                 {
                     circleComponent.ColliderEnabled = true;
-                    foreach (var intersected in intersectedObjs)
-                    {
-                        List<Vector3> crossings = intersected.FindCrossingPoints(circleComponent);
-                        if (crossings != null)
-                        {
-                            foreach (var point in crossings)
-                            {
-                                if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
-                                DrawPoint(plane, point, null, DrawType.Part);
-                            }
-                        }
-                        if (intersected is IColorable)
-                        {
-                            IColorable cIntersected = (IColorable)intersected;
-                            cIntersected.Color = ReconstructionInfo.NORMAL;
-                        }
-                    }
+                    HandleIntersectionsEnd(plane, intersectedObjs, circleComponent, endPositionWithPointSensitivity);
 
                     OnDrawingCompleted(type);
                 }
@@ -617,7 +641,7 @@ namespace Assets.Scripts.Experimental
             projectionComponent1.EnabledLabels = true;
             projectionComponent1.Width = lineWidth;
             projectionComponent1.Draw(startPlane, startPosition, startPosition);
-            projectionComponent1.SetLabelVisible(true);
+            //projectionComponent1.SetLabelVisible(true);
 
             var intersectedObjsPl1 = new HashSet<IAnalyzable>();
 
@@ -630,7 +654,7 @@ namespace Assets.Scripts.Experimental
             projectionComponent2.EnabledLabels = true;
             projectionComponent2.Width = lineWidth;
             projectionComponent2.Draw(startPlane, startPosition, startPosition);
-            projectionComponent1.SetLabelVisible(false);
+            //projectionComponent1.SetLabelVisible(false);
 
             var intersectedObjsPl2 = new HashSet<IAnalyzable>();
 
@@ -672,22 +696,12 @@ namespace Assets.Scripts.Experimental
                 {
                     projectionComponent1.Draw(startPlane, startPosition, endPosition);
                     // projectionComponent1.SetLabel(Vector3.Distance(startPosition, endPosition));
-                    projectionComponent1.SetLabelVisible(true);
+                    //projectionComponent1.SetLabelVisible(true);
 
                     projectionComponent2.Draw(startPlane, startPosition, endPosition);
-                    projectionComponent2.SetLabelVisible(false);
+                    //projectionComponent2.SetLabelVisible(false);
 
-                    if (hitObject is IAnalyzable && hitObject != projectionComponent1.GetComponent<IRaycastable>())
-                    {
-                        IAnalyzable aHitObject = (IAnalyzable)hitObject;
-                        intersectedObjsPl1.Add(aHitObject.GetElement());
-
-                        if (hitObject is IColorable)
-                        {
-                            IColorable cHitObject = (IColorable)hitObject;
-                            cHitObject.Color = ReconstructionInfo.MENTIONED;
-                        }
-                    }
+                    HandleIntersectionStart(hitObject, intersectedObjsPl1, projectionComponent1.GetComponent<IRaycastable>());
 
                     if (isEnd)
                     {
@@ -698,7 +712,7 @@ namespace Assets.Scripts.Experimental
                 else
                 {
                     projectionComponent1.Draw(startPlane, startPosition, startPositionProjection);
-                    projectionComponent1.SetLabelVisible(false);
+                    //projectionComponent1.SetLabelVisible(false);
 
                     // FIXED LENGTH PROJECTION  
                     if (withFixedLength)
@@ -709,65 +723,24 @@ namespace Assets.Scripts.Experimental
 
                     projectionComponent2.Draw(endPlane, startPositionProjection, endPosition);
                     // projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
-                    projectionComponent2.SetLabelVisible(true);
+                    //projectionComponent2.SetLabelVisible(true);
 
-                    if (hitObject is IAnalyzable && hitObject != projectionComponent2.GetComponent<IRaycastable>())
-                    {
-                        IAnalyzable aHitObject = (IAnalyzable)hitObject;
-                        intersectedObjsPl2.Add(aHitObject.GetElement());
-
-                        if (hitObject is IColorable)
-                        {
-                            IColorable cHitObject = (IColorable)hitObject;
-                            cHitObject.Color = ReconstructionInfo.MENTIONED;
-                        }
-                    }
+                    HandleIntersectionStart(hitObject, intersectedObjsPl2, projectionComponent2.GetComponent<IRaycastable>());
 
                     if (isEnd)
                     {
                         DrawPoint(endPlane, endPosition, null, DrawType.Part);
 
                         projectionComponent1.ColliderEnabled = true;
-                        projectionComponent1.SetLabelVisible(false);
+                        //projectionComponent1.SetLabelVisible(false);
                         _wCtrl.LinkConstructionToWall(startPlane, projection1);
 
                         projectionComponent2.ColliderEnabled = true;
-                        projectionComponent2.SetLabelVisible(false);
+                        //projectionComponent2.SetLabelVisible(false);
                         _wCtrl.LinkConstructionToWall(endPlane, projection2);
 
-                        foreach (var intersected in intersectedObjsPl1)
-                        {
-                            List<Vector3> crossings = intersected.FindCrossingPoints(projectionComponent1);
-                            if (crossings != null)
-                            {
-                                foreach (var point in crossings)
-                                {
-                                    DrawPoint(startPlane, point, null, DrawType.Part);
-                                }
-                            }
-                            if (intersected is IColorable)
-                            {
-                                IColorable cIntersected = (IColorable)intersected;
-                                cIntersected.Color = ReconstructionInfo.NORMAL;
-                            }
-                        }
-
-                        foreach (var intersected in intersectedObjsPl2)
-                        {
-                            List<Vector3> crossings = intersected.FindCrossingPoints(projectionComponent2);
-                            if (crossings != null)
-                            {
-                                foreach (var point in crossings)
-                                {
-                                    DrawPoint(endPlane, point, null, DrawType.Part);
-                                }
-                            }
-                            if (intersected is IColorable)
-                            {
-                                IColorable cIntersected = (IColorable)intersected;
-                                cIntersected.Color = ReconstructionInfo.NORMAL;
-                            }
-                        }
+                        HandleIntersectionsEnd(startPlane, intersectedObjsPl1, projectionComponent1);
+                        HandleIntersectionsEnd(endPlane, intersectedObjsPl2, projectionComponent2);
 
                         OnDrawingCompleted(DrawType.Full);
                     }
@@ -786,7 +759,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = _HELP_LINE_WIDTH;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
-            lineComponent.SetLabelVisible(true);
+            //lineComponent.SetLabelVisible(true);
 
             var relativeLine = relativeObject as Line;
             var relativeAxis = relativeObject as Axis;
@@ -827,40 +800,14 @@ namespace Assets.Scripts.Experimental
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
                 // lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
 
-                if (hitObject is IAnalyzable && hitObject != line.GetComponent<IRaycastable>())
-                {
-                    IAnalyzable aHitObject = (IAnalyzable)hitObject;
-                    intersectedObjs.Add(aHitObject.GetElement());
-
-                    if (hitObject is IColorable)
-                    {
-                        IColorable cHitObject = (IColorable)hitObject;
-                        cHitObject.Color = ReconstructionInfo.MENTIONED;
-                    }
-                }
+                HandleIntersectionStart(hitObject, intersectedObjs, line.GetComponent<IRaycastable>());
 
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
-                    lineComponent.SetLabelVisible(false);
+                    //lineComponent.SetLabelVisible(false);
 
-                    foreach (var intersected in intersectedObjs)
-                    {
-                        List<Vector3> crossings = intersected.FindCrossingPoints(lineComponent);
-                        if (crossings != null)
-                        {
-                            foreach (var point in crossings)
-                            {
-                                //if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
-                                DrawPoint(plane, point, null, DrawType.Part);
-                            }
-                        }
-                        if (intersected is IColorable)
-                        {
-                            IColorable cIntersected = (IColorable)intersected;
-                            cIntersected.Color = ReconstructionInfo.NORMAL;
-                        }
-                    }
+                    HandleIntersectionsEnd(plane, intersectedObjs, lineComponent);
 
                     OnDrawingCompleted(DrawType.Full);
                 }
@@ -878,7 +825,7 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = _HELP_LINE_WIDTH;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
-            lineComponent.SetLabelVisible(true);
+            //lineComponent.SetLabelVisible(true);
 
             var relativeLine = relativeObject as Line;
             var relativeAxis = relativeObject as Axis;
@@ -925,40 +872,14 @@ namespace Assets.Scripts.Experimental
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
                 // lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
 
-                if (hitObject is IAnalyzable && hitObject != line.GetComponent<IRaycastable>())
-                {
-                    IAnalyzable aHitObject = (IAnalyzable)hitObject;
-                    intersectedObjs.Add(aHitObject.GetElement());
-
-                    if (hitObject is IColorable)
-                    {
-                        IColorable cHitObject = (IColorable)hitObject;
-                        cHitObject.Color = ReconstructionInfo.MENTIONED;
-                    }
-                }
+                HandleIntersectionStart(hitObject, intersectedObjs, line.GetComponent<IRaycastable>());
 
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
-                    lineComponent.SetLabelVisible(false);
+                    //lineComponent.SetLabelVisible(false);
 
-                    foreach (var intersected in intersectedObjs)
-                    {
-                        List<Vector3> crossings = intersected.FindCrossingPoints(lineComponent);
-                        if (crossings != null)
-                        {
-                            foreach (var point in crossings)
-                            {
-                                //if (Vector3.SqrMagnitude(endPositionWithPointSensitivity - point) < 1e-5f) continue;
-                                DrawPoint(plane, point, null, DrawType.Part);
-                            }
-                        }
-                        if (intersected is IColorable)
-                        {
-                            IColorable cIntersected = (IColorable)intersected;
-                            cIntersected.Color = ReconstructionInfo.NORMAL;
-                        }
-                    }
+                    HandleIntersectionsEnd(plane, intersectedObjs, lineComponent);
 
                     OnDrawingCompleted(DrawType.Full);
                 }

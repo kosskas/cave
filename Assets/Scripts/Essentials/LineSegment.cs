@@ -75,6 +75,7 @@ public class LineSegment : MonoBehaviour {
 	{
 		lineRenderer.SetPosition(0, startPoint);
 		lineRenderer.SetPosition(1, endPoint);
+		gameObject.transform.position = startPoint;
 	}
 
 

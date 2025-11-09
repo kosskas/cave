@@ -254,26 +254,12 @@ namespace Assets.Scripts.Experimental.Items
             _labelComponent.AddLabel("", new string('\'', Plane.constructionNumber), "");
 
             NextText();
+
+            if (FocusedLabel.Equals(DefaultLabelText.ToString()))
+                RemoveFocusedLabel();
+
+            //Mc.AddEdgeProjectionStandalone(Plane, FocusedLabel, this);
         }
-        public void SetLabel(float value)
-        {
-            if (!EnabledLabels)
-                return;
-
-            if (_labelComponent == null)
-            {
-                _labelComponent = gameObject.AddComponent<IndexedLabel>();
-                _labelComponent.AddLabel("", "", "");
-            }
-
-            _labelComponent.Labels[0].Text = value.ToString("F2");
-        }
-
-        public void SetLabelVisible(bool flag)
-        {
-            _labelComponent?.SetVisible(flag);
-        }
-
         public void AddLabel(string labelText)
         {
             AddLabel();
@@ -282,7 +268,12 @@ namespace Assets.Scripts.Experimental.Items
 
         public void RemoveFocusedLabel()
         {
-            _labelComponent?.RemoveFocusedLabel();
+            if (_labelComponent == null)
+                return;
+
+            Mc.RemoveEdgeProjectionStandalone(Plane, FocusedLabel, this);
+
+            _labelComponent.RemoveFocusedLabel();
         }
 
         public void NextLabel()
@@ -300,9 +291,15 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 return;
 
-            _labelTexts.Next();
+            var found = _labelTexts.NextWhile(
+                current => Mc.CheckIfEdgeAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
 
-            FocusedLabel = _labelTexts.Current.ToString();
+            if (found)
+                UpdateText();
+
+            //_labelTexts.Next();
+
+            //FocusedLabel = _labelTexts.Current.ToString();
         }
 
         public void PrevText()
@@ -310,9 +307,13 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 return;
 
-            _labelTexts.Previous();
+            var found = _labelTexts.PreviousWhile(
+                current => Mc.CheckIfEdgeAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
 
-            FocusedLabel = _labelTexts.Current.ToString();
+            if (found)
+                UpdateText();
+            
+            //FocusedLabel = _labelTexts.Current.ToString();
         }
 
         private void SetToText(string text)
@@ -320,10 +321,61 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 return;
 
-            _labelTexts.NextWhile(current => current.ToString() != text);
+            var found = _labelTexts.NextWhile(
+                current => Mc.CheckIfEdgeAlreadyExist(Plane, current.ToString()) || current.ToString() != text);
 
-            FocusedLabel = _labelTexts.Current.ToString();
+            if (found)
+                UpdateText();
+
+            //_labelTexts.NextWhile(current => current.ToString() != text);
+
+            //FocusedLabel = _labelTexts.Current.ToString();
         }
+
+        private void UpdateText()
+        {
+            var oldLabelText = FocusedLabel;
+            var newLabelText = _labelTexts.Current.ToString();
+
+            Mc.RemoveEdgeProjectionStandalone(Plane, oldLabelText, this);
+
+            FocusedLabel = newLabelText;
+
+            if (_labelTexts.Current.Equals(DefaultLabelText))
+                return;
+
+            Mc.AddEdgeProjectionStandalone(Plane, newLabelText, this);
+        }
+
+
+
+
+        // public void SetLabel(float value)
+        // {
+        //     if (!EnabledLabels)
+        //         return;
+        //
+        //     if (_labelComponent == null)
+        //     {
+        //         _labelComponent = gameObject.AddComponent<IndexedLabel>();
+        //         _labelComponent.AddLabel("", "", "");
+        //     }
+        //
+        //     _labelComponent.Labels[0].Text = value.ToString("F2");
+        // }
+        //
+        // public void SetLabelVisible(bool flag)
+        // {
+        //     _labelComponent?.SetVisible(flag);
+        // }
+
+        
+
+        
+
+        
+
+        
 
         // IAnalyzable interface
         public List<Vector3> FindCrossingPoints(IAnalyzable obj)
