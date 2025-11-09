@@ -438,7 +438,7 @@ public class MeshBuilder : MonoBehaviour
     /// </summary>
     /// <param name="labelA">Etykieta punktu A</param>
     /// <param name="labelB">Etykieta punktu B</param>
-    public void AddEdgeProjection(string labelA, string labelB)
+    public void CreateEdge3D(string labelA, string labelB)
     {
         //sprawdz czy taka krawedz juz nie istnieje(zostala stworzona z innej sciany)
         //jesli tak to odnotuj to(przy usuwaniu bedzie przydatne)
@@ -484,11 +484,11 @@ public class MeshBuilder : MonoBehaviour
         }
     }
     /// <summary>
-    /// Tworzy krawędź w 3D i jeśli jest odpowiednia ilość informacji wyświetla ją
+    /// Tworzy krawędź w 3D na postawie rzutów i jeśli jest odpowiednia ilość informacji wyświetla ją
     /// </summary>
     /// <param name="wall">Rzutnia</param>
     /// <param name="label">Etykieta linii</param>
-    public void AddEdgeProjectionStandalone(WallInfo wall, string label, Line line)
+    public void AddEdgeProjection(WallInfo wall, string label, Line line)
     {
         Debug.Log($"Lina {line} o et {label}; ");
         if (!edgesOnWalls.ContainsKey(wall))
@@ -554,7 +554,7 @@ public class MeshBuilder : MonoBehaviour
     /// </summary>
     /// <param name="labelA">Etykieta punktu A</param>
     /// <param name="labelB">Etykieta punktu B</param>
-    public void RemoveEdgeProjection(string labelA, string labelB)
+    public void RemoveEdge3D(string labelA, string labelB)
     {
         //znajdz klucz
         string key = null;
@@ -589,7 +589,7 @@ public class MeshBuilder : MonoBehaviour
     /// <param name="wall">Rzutnia</param>
     /// <param name="label">Etykieta linii</param>
     /// <param name="line">Komponent rysowania</param>
-    public void RemoveEdgeProjectionStandalone(WallInfo wall, string label, Line line)
+    public void RemoveEdgeProjection(WallInfo wall, string label, Line line)
     {
         if (edgesOnWalls == null)
             return;
