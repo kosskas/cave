@@ -504,9 +504,9 @@ public class MeshBuilder : MonoBehaviour
         edgesOnWalls[wall][label] = toAddProj;
         //sprawdz czy istnieja już dwa
         List<EdgeProjection> currEdges = GetCurrentEdgeProjections(label);
-        ResolveAddEdgeProjection(currEdges, label);
+        ResolveAddEdgeProjection(wall, currEdges, label);
     }
-    private void ResolveAddEdgeProjection(List<EdgeProjection> currEdges, string label)
+    private void ResolveAddEdgeProjection(WallInfo wall, List<EdgeProjection> currEdges, string label)
     {
         if (currEdges.Count == 1)
         {
@@ -529,9 +529,16 @@ public class MeshBuilder : MonoBehaviour
             Vector3 t2b = DescriptiveMathLib.FindLinePlaneIntersections(e2.line.EndPosition, e2.wallNormal, e1.line.StartPosition, e1.line.StartPosition - e1.line.EndPosition, e1.wallNormal);
 
             /// find least common part
+            var lcp = DescriptiveMathLib.FindLeastCommonLinePart(t1a, t1b, t2a, t2b);
+            if (lcp == null)
+            {
+                Debug.Log($"Brak wspolnej czesci linii");
+                edgesOnWalls[wall].Remove(label);
+                return;
+            }
 
-            CreateEntryForPoint(labelA, t1a);
-            CreateEntryForPoint(labelB, t1b);
+            CreateEntryForPoint(labelA, lcp.Item1);
+            CreateEntryForPoint(labelB, lcp.Item2);
             vertices3D[labelA].disabled = true;
             vertices3D[labelB].disabled = true;
 
@@ -589,7 +596,7 @@ public class MeshBuilder : MonoBehaviour
     /// <param name="wall">Rzutnia</param>
     /// <param name="label">Etykieta linii</param>
     /// <param name="line">Komponent rysowania</param>
-    public void RemoveEdgeProjection(WallInfo wall, string label, Line line)
+    public void RemoveEdgeProjection(WallInfo wall, string label)
     {
         if (edgesOnWalls == null)
             return;
@@ -630,7 +637,7 @@ public class MeshBuilder : MonoBehaviour
         edges3D.Remove(label);
         Destroy(todel);
         
-        ResolveAddEdgeProjection(GetCurrentEdgeProjections(label), label);
+        ResolveAddEdgeProjection(wall, GetCurrentEdgeProjections(label), label);
 
     }
     /// <summary>

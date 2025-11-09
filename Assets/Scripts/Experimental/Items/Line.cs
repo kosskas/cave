@@ -102,6 +102,10 @@ namespace Assets.Scripts.Experimental.Items
 
         void OnDestroy()
         {
+            Labels?.ForEach(label =>
+            {
+                Mc?.RemoveEdgeProjection(Plane, label);
+            });
             if (_isBoundToPoints)
                 RemoveEdge3D();
         }
@@ -271,7 +275,7 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 return;
 
-            Mc.RemoveEdgeProjection(Plane, FocusedLabel, this);
+            Mc.RemoveEdgeProjection(Plane, FocusedLabel);
 
             _labelComponent.RemoveFocusedLabel();
         }
@@ -337,7 +341,7 @@ namespace Assets.Scripts.Experimental.Items
             var oldLabelText = FocusedLabel;
             var newLabelText = _labelTexts.Current.ToString();
 
-            Mc.RemoveEdgeProjection(Plane, oldLabelText, this);
+            Mc.RemoveEdgeProjection(Plane, oldLabelText);
 
             FocusedLabel = newLabelText;
 
