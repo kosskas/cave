@@ -19,7 +19,7 @@ namespace Assets.Scripts.Experimental.Items
             set
             {
                 _color = value;
-                _circleRenderer.material.color = value;
+                _circleRenderer.material.SetColor("_color", value);
             }
         }
 
@@ -51,10 +51,8 @@ namespace Assets.Scripts.Experimental.Items
         void Awake()
         {
             _circleRenderer = gameObject.AddComponent<LineRenderer>();
-            _circleRenderer.material = new Material(Shader.Find("Unlit/Color"))
-            {
-                color = _color
-            };
+            _circleRenderer.material = new Material(Shader.Find("Unlit/Unlit_line"));
+            _circleRenderer.material.SetColor("_color", _color);
             _circleRenderer.positionCount = PositionsCount + 1;
 
             _circleRenderer.startWidth = Width;
@@ -114,13 +112,13 @@ namespace Assets.Scripts.Experimental.Items
         public void OnHoverEnter()
         {
             if (_circleRenderer != null)
-                _circleRenderer.material.color = ReconstructionInfo.FOCUSED;
+                _circleRenderer.material.SetColor("_color", ReconstructionInfo.FOCUSED);
         }
 
         public void OnHoverExit()
         {
             if (_circleRenderer != null)
-                _circleRenderer.material.color = _color;
+                _circleRenderer.material.SetColor("_color", _color);
         }
 
         // IAnalyzable interface

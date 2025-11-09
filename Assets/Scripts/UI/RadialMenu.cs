@@ -34,7 +34,7 @@ public class RadialMenu : MonoBehaviour
     private Coroutine rotateCoroutine;
     private CircularIterator<KeyValuePair<ExContext, Action>> _currentCtx;
 
-    public bool isMenuActive = false;
+    public bool isMenuActive = true;
 
  
     public static RadialMenu Create(Transform parent, GameObject prefab)

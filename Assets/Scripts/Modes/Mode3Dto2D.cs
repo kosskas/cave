@@ -111,6 +111,8 @@ public class Mode3Dto2D : IMode
             });
         AddRadialMenu();
 
+        SetUpFlystick();
+
         Debug.Log($"<color=blue> MODE grupowy ON </color>");
     }
 
@@ -225,5 +227,37 @@ public class Mode3Dto2D : IMode
         {
             _context.Current.Value();
         }
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            () =>
+            {
+                radialMenu.PreviousOption();
+            }
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            () =>
+            {
+                radialMenu.NextOption();
+            }
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1,
+            FlystickController.ActOn.PRESS,
+            () =>
+            {
+                _context.Current.Value();            
+            }
+        );
     }
 }

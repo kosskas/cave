@@ -26,6 +26,8 @@ public class ModeMenu : IMode
             });
         AddRadialMenu();
         Debug.Log($"<color=blue> MODE menu ON </color>");
+
+        SetUpFlystick();
     }
 
     public void AddRadialMenu()
@@ -106,6 +108,38 @@ public class ModeMenu : IMode
         radialMenu.RemoveFromScene();
         radialMenu = null;
         PCref.ChangeMode(PlayerController.Mode.ModeExperimental);
+    }
+
+    public void SetUpFlystick()
+    {
+        FlystickController.ClearActions();
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_LEFT,
+            () =>
+            {
+                radialMenu.PreviousOption();
+            }
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn.JOYSTICK,
+            FlystickController.ActOn.TILT_RIGHT,
+            () =>
+            {
+                radialMenu.NextOption();
+            }
+        );
+
+        FlystickController.SetAction(
+            FlystickController.Btn._1,
+            FlystickController.ActOn.PRESS,
+            () =>
+            {
+                _context.Current.Value();            
+            }
+        );
     }
 }
 
