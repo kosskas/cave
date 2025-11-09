@@ -301,6 +301,17 @@ namespace Assets.Scripts.FileManagers
 
                 Debug.Log($"State from file '{path}' restored successfully.");
             }
+
+            public static List<string> GetSavedTopicsDirectoriesList()
+            {
+                List<string> topics = new List<string>();
+                string[] dirs = Directory.GetDirectories(PathToFolderWithSavedStates);
+                foreach (string dir in dirs)
+                {
+                    topics.Add(Path.GetFileName(dir));
+                }
+                return topics;
+            }
         }
     }
 }

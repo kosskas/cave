@@ -29,6 +29,7 @@ public class ModeExperimental : IMode
     private CircularIterator<KeyValuePair<ExContext, Action>> _creationCtx;
     private CircularIterator<KeyValuePair<ExContext, Action>> _optCtx;
     private CircularIterator<KeyValuePair<ExContext, Action>> _lineCtx;
+    private CircularIterator<KeyValuePair<ExContext, Action>> _topicsCtx;
 
     private IRaycastable _hitObject;
 
@@ -455,6 +456,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Undo, _Undo),
                 new KeyValuePair<ExContext, Action>(ExContext.Redo, _Redo),
+                new KeyValuePair<ExContext, Action>(ExContext.Topics, _ChangeToTopicsCtx),
             });
 
         _context = _optCtx;
@@ -496,6 +498,17 @@ public class ModeExperimental : IMode
     {
         _context = _lineCtx;
         radialMenu.Generate(_context, RADIAL_1ST_MENU_RADIUS);
+    }
+    private void _ChangeToTopicsCtx()
+    {
+        var topics = StateManager.Exp.GetSavedTopicsDirectoriesList();
+
+        foreach (var topic in topics)
+        {
+            Debug.Log($"{topic}");
+        }
+        //_topicsCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
+        //            new List<KeyValuePair<ExContext, Action>>() { });
     }
     public void AddRadialMenu()
     {

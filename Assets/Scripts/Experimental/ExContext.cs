@@ -66,6 +66,10 @@ namespace Assets.Scripts.Experimental
 
         [Description("Pon\u00F3w")]
         Redo,
+
+        [Description("Tematy")]
+        Topics,
+
         //---------WIZUALIZACJA-------------------
 
         [Description("Nastepna bryla")]
