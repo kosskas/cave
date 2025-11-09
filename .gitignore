@@ -77,5 +77,3 @@ crashlytics-build.properties
 
 # History files
 /[Aa]ssets/History/*
-
-*.meta
