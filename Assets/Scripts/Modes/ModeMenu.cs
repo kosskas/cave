@@ -87,6 +87,11 @@ public class ModeMenu : IMode
             _context.Current.Value();
         }
 
+        if (Input.GetMouseButtonDown(0)) //lewy
+        {
+            _context.Current.Value();
+        }
+
         //if (Input.GetKeyDown("2"))
         //{
         //    _LoadReconstruction();

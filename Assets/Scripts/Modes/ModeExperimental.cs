@@ -556,6 +556,11 @@ public class ModeExperimental : IMode
             _DrawAction();
         }
 
+        if (Input.GetMouseButtonDown(0)) //lewy
+        {
+            _DrawAction();
+        }
+
         if (Input.GetKeyDown("2"))
         {
             _DeleteHoveredObject();

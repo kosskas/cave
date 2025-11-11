@@ -225,5 +225,10 @@ public class Mode3Dto2D : IMode
         {
             _context.Current.Value();
         }
+
+        if (Input.GetMouseButtonDown(0)) //lewy
+        {
+            _context.Current.Value();
+        }
     }
 }
