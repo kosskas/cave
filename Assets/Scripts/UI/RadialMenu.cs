@@ -73,6 +73,16 @@ public class RadialMenu : MonoBehaviour
         {
             ChangeSize();
         }
+
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll > 0f)
+        {
+            NextOption(); //góra
+        }
+        else if (scroll < 0f)
+        {
+            PreviousOption(); //dół
+        }
     }
 
     public void PreviousOption()
