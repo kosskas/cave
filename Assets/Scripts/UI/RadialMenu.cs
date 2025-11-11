@@ -16,8 +16,9 @@ public class RadialMenu : MonoBehaviour
 
     public KeyCode prevKey = KeyCode.Period;
     public KeyCode nextKey = KeyCode.Comma;
+    public KeyCode changeSizeKey = KeyCode.Tab;
     public float selectedScale = 1.44f;
-    public float fontSizeScale = 0.34f;
+    public float fontSizeScale = 0.16f;
     public Vector3 initialMenuItemScale;
 
     public bool animateRotation = true;
@@ -36,7 +37,11 @@ public class RadialMenu : MonoBehaviour
 
     public bool isMenuActive = false;
 
- 
+    private Vector3 originalPosition;
+    private Vector3 originalScale;
+    private bool isMinimized = false;
+
+
     public static RadialMenu Create(Transform parent, GameObject prefab)
     {
         GameObject menuObject = new GameObject("RadialMenu");
@@ -62,6 +67,11 @@ public class RadialMenu : MonoBehaviour
         if (Input.GetKeyDown(nextKey))
         {
             NextOption();
+        }
+
+        if (Input.GetKeyDown(changeSizeKey))
+        {
+            ChangeSize();
         }
     }
 
@@ -231,6 +241,47 @@ public class RadialMenu : MonoBehaviour
         foreach (GameObject item in spawnedItems)
         {
             item.SetActive(isMenuActive);
+        }
+    }
+
+    public void Minimize()
+    {
+        if (isMinimized) return;
+        isMinimized = true;
+
+        originalPosition = transform.localPosition;
+        originalScale = transform.localScale;
+
+        RectTransform canvas = GetComponentInParent<Canvas>()?.GetComponent<RectTransform>();
+        if (canvas)
+        {
+            Vector2 corner = new Vector2(80f, 50f); //margines
+            Vector3 newPos = new Vector3(-canvas.rect.width / 2 + corner.x, -canvas.rect.height / 2 + corner.y, 0);
+            transform.localPosition = newPos;
+        }
+
+        //skala
+        transform.localScale = originalScale * 0.6f;
+    }
+
+    public void Maximize()
+    {
+        if (!isMinimized) return;
+        isMinimized = false;
+
+        transform.localPosition = originalPosition;
+        transform.localScale = originalScale;
+    }
+
+    public void ChangeSize()
+    {
+        if (isMinimized)
+        {
+            Maximize();
+        }
+        else
+        {
+            Minimize();
         }
     }
     public void RemoveFromScene()

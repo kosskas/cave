@@ -10,7 +10,7 @@ public class ModeMenu : IMode
     private CircularIterator<KeyValuePair<ExContext, Action>> _context;
     private static float Z_RADIAL_MENU_OFFSET = (GameObject.Find("TrackedObject") != null ? 0.0f : 0.55f);
     private static float Y_RADIAL_MENU_OFFSET = (GameObject.Find("TrackedObject") != null ? 0.0f : -0.30f);
-    private static float RADIAL_1ST_MENU_RADIUS = 15f;
+    private static float RADIAL_1ST_MENU_RADIUS = 150f;
     private static float RADIAL_2ND_MENU_RADIUS = 25f;
     private RadialMenu radialMenu;
 
