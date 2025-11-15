@@ -252,7 +252,7 @@ namespace Assets.Scripts.FileManagers
             public static void Load(string fullFilePath = "")
             {
                 //var path = GetLexicographicallyLastJson();
-                var path = GetCurrentJson();
+                var path = string.IsNullOrEmpty(fullFilePath) ? GetCurrentJson() : fullFilePath;
 
                 if (string.IsNullOrEmpty(path) || !File.Exists(path))
                 {
