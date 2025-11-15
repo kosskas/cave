@@ -19,10 +19,28 @@ namespace Assets.Scripts.FileManagers
 #endif
         private static List<string> _savedStates = new List<string>();
         private static int _currentSavedState = 0;
+
+        private static String CameraObjectId = null;
+        private static String OrthoObjectId = null;
+        private static String AngleObjectId = null;
+        private static String AutoSaverObjectId = null;
+        private static String ModeObjectId = null;
+
         public class Exp
         {
             /*   J S O N   */
 
+            public class Settings
+            {
+                public string Unit { get; set; }
+                public string CameraObjectId { get; set; }
+                public string OrthoObjectId { get; set; }
+                public string AngleObjectId { get; set; }
+                public string AutoSaverObjectId { get; set; }
+                public string ModeObjectId { get; set; }
+                public bool AutoSaveEnabled { get; set; }
+            }
+        
             private class LineJson
             {
                 public string PlaneName { get; set; }
@@ -63,6 +81,7 @@ namespace Assets.Scripts.FileManagers
 
             private class SceneState
             {
+                public Settings SETTINGS { get; set; }
                 public List<PointJson> POINTS { get; set; }
                 public List<LineJson> LINES { get; set; }
                 public List<CircleJson> CIRCLES { get; set; }
@@ -183,12 +202,29 @@ namespace Assets.Scripts.FileManagers
 
                 var ss = new SceneState()
                 {
+                    SETTINGS = new Settings(),
                     POINTS = new List<PointJson>(),
                     LINES = new List<LineJson>(),
                     CIRCLES = new List<CircleJson>(),
                     WALLS = new List<WallJson>(),
                     FACES = new List<FaceJson>()
                 };
+
+                var id = Guid.NewGuid().ToString("D").Split('-');
+
+                CameraObjectId = string.IsNullOrEmpty(CameraObjectId) ? id[0] : CameraObjectId;
+                OrthoObjectId = string.IsNullOrEmpty(OrthoObjectId) ? id[1] : OrthoObjectId;
+                AngleObjectId = string.IsNullOrEmpty(AngleObjectId) ? id[2] : AngleObjectId;
+                AutoSaverObjectId = string.IsNullOrEmpty(AutoSaverObjectId) ? id[3] : AutoSaverObjectId;
+                ModeObjectId = string.IsNullOrEmpty(ModeObjectId) ? id[4] : ModeObjectId;
+
+                ss.SETTINGS.Unit = "Meters";
+                ss.SETTINGS.CameraObjectId = CameraObjectId;
+                ss.SETTINGS.OrthoObjectId = OrthoObjectId;
+                ss.SETTINGS.AngleObjectId = AngleObjectId;
+                ss.SETTINGS.AutoSaverObjectId = AutoSaverObjectId;
+                ss.SETTINGS.ModeObjectId = ModeObjectId;
+                ss.SETTINGS.AutoSaveEnabled = true;
 
                 points.ForEach(point =>
                 {
@@ -272,6 +308,12 @@ namespace Assets.Scripts.FileManagers
                     Debug.LogError($"Load: Deserialization returned null for '{path}'.");
                     return;
                 }
+
+                AngleObjectId = ss.SETTINGS.AngleObjectId;
+                CameraObjectId = ss.SETTINGS.CameraObjectId;
+                OrthoObjectId = ss.SETTINGS.OrthoObjectId;
+                AutoSaverObjectId = ss.SETTINGS.AutoSaverObjectId;
+                ModeObjectId = ss.SETTINGS.ModeObjectId;
 
                 ss.WALLS.ForEach(wall =>
                 {
