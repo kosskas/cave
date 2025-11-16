@@ -41,6 +41,9 @@ public class RadialMenu : MonoBehaviour
     private Vector3 originalScale;
     private bool isMinimized = false;
 
+    private float scrollCooldown = 0.15f;
+    private float lastScrollTime = 0f;
+
 
     public static RadialMenu Create(Transform parent, GameObject prefab)
     {
@@ -75,13 +78,18 @@ public class RadialMenu : MonoBehaviour
         }
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
-        if (scroll > 0f)
+        if (Time.unscaledTime - lastScrollTime > scrollCooldown)
         {
-            NextOption(); //góra
-        }
-        else if (scroll < 0f)
-        {
-            PreviousOption(); //dół
+            if (scroll > 0f)
+            {
+                NextOption();
+                lastScrollTime = Time.unscaledTime; //góra
+            }
+            else if (scroll < 0f)
+            {
+                PreviousOption();
+                lastScrollTime = Time.unscaledTime; //dół
+            }
         }
     }
 
