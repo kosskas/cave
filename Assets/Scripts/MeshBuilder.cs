@@ -551,7 +551,10 @@ public class MeshBuilder : MonoBehaviour
                 vertices3D[labelA].gameObject.transform.position,
                 vertices3D[labelB].gameObject.transform.position
             );
-            edge.SetLabel(label, ReconstructionInfo.EDGE_3D_FONT_SIZE, ReconstructionInfo.LABEL_3D_COLOR);
+            if (label.StartsWith("#") == false)
+            {
+                edge.SetLabel(label, ReconstructionInfo.EDGE_3D_FONT_SIZE, ReconstructionInfo.LABEL_3D_COLOR);
+            }
             edges3D[label] = new Edge3D(edgeObj, labelA, labelB);
             edges3D[label].standalone = true;
         }
