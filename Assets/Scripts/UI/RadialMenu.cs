@@ -273,7 +273,7 @@ public class RadialMenu : MonoBehaviour
         }
 
         //skala
-        transform.localScale = originalScale * 0.6f;
+        transform.localScale = originalScale * 0.7f;
     }
 
     public void Maximize()
