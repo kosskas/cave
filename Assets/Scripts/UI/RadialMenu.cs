@@ -154,6 +154,8 @@ public class RadialMenu : MonoBehaviour
             spawnedItems[selectedIndex].GetComponentInChildren<Text>().fontStyle = FontStyle.Bold;
         }
         isMenuActive = true;
+
+        Minimize();
     }
 
     private void Select(int newIndex, bool instant = false)
