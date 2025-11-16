@@ -44,6 +44,10 @@ public class RadialMenu : MonoBehaviour
     private float scrollCooldown = 0.15f;
     private float lastScrollTime = 0f;
 
+    private String versionString = "Descriptive3D_v1.0.0";
+    private Text versionText;
+    private GameObject versionTextGO;
+
 
     public static RadialMenu Create(Transform parent, GameObject prefab)
     {
@@ -125,6 +129,8 @@ public class RadialMenu : MonoBehaviour
 #endif
         spawnedItems.Clear();
 
+        GameObject.Destroy(versionTextGO);
+
         while (labels.Count < itemCount)
             labels.Add($"Item {labels.Count + 1}");
         if (labels.Count > itemCount)
@@ -164,6 +170,9 @@ public class RadialMenu : MonoBehaviour
         isMenuActive = true;
 
         Minimize();
+
+        //wersja w rogu
+        CreateVersionTextOverlay();
     }
 
     private void Select(int newIndex, bool instant = false)
@@ -303,6 +312,33 @@ public class RadialMenu : MonoBehaviour
         {
             Minimize();
         }
+    }
+
+    private void CreateVersionTextOverlay()
+    {
+        Canvas canvas = GetComponentInParent<Canvas>();
+        if (canvas == null)
+        {
+            Debug.LogError("Brak Canvas w rodzicu");
+            return;
+        }
+
+        versionTextGO = new GameObject("VersionText");
+        versionTextGO.transform.SetParent(canvas.transform, false);
+
+        versionText = versionTextGO.AddComponent<Text>();
+        versionText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        versionText.color = Color.white;
+        versionText.fontSize = 7;
+        versionText.text = versionString;
+
+        RectTransform rt = versionText.rectTransform;
+        rt.anchorMin = new Vector2(0f, 1f);
+        rt.anchorMax = new Vector2(0f, 1f);
+        rt.pivot = new Vector2(0f, 1f);
+        rt.anchoredPosition = new Vector2(20f, -20f);
+
+        rt.sizeDelta = new Vector2(300f, 30f);
     }
     public void RemoveFromScene()
     {
