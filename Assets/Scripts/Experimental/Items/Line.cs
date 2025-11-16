@@ -266,8 +266,15 @@ namespace Assets.Scripts.Experimental.Items
         }
         public void AddLabel(string labelText)
         {
-            AddLabel();
-            SetToText(labelText);
+            if (labelText.StartsWith("#"))
+            {
+                Mc.AddEdgeProjection(Plane, labelText, this);
+            }
+            else
+            {
+                AddLabel();
+                SetToText(labelText);
+            }
         }
 
         public void RemoveFocusedLabel()
