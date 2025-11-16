@@ -596,15 +596,15 @@ public class ModeExperimental : IMode
             _TryGetNextLabelText();
         }
 
-        if (Input.GetKeyDown("l"))
-        {
-            _RemoveWall();
-        }
+        //if (Input.GetKeyDown("l"))
+        //{
+        //    _RemoveWall();
+        //}
 
-        if (Input.GetKeyDown("m"))
-        {
-            radialMenu.ToggleRadialMenuActive();
-        }
+        //if (Input.GetKeyDown("m"))
+        //{
+        //    radialMenu.ToggleRadialMenuActive();
+        //}
     }
 }
 
