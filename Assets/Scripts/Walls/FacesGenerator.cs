@@ -198,5 +198,7 @@ public class FacesGenerator : MonoBehaviour {
                 Destroy(faceInfo.FaceObject);
             }
         }
+
+        faceInfoList = new List<FaceInfo>();
     }
 }

@@ -166,6 +166,42 @@ namespace Assets.Scripts.Experimental.Utils
             float t_found = -Vector3.Dot((p_l - p_p), n) / (Vector3.Dot(vec_l, n));
             return line(p_l, t_found, vec_l);
         }
+        public static Tuple<Vector3, Vector3> FindLeastCommonLinePart(Vector3 A1, Vector3 A2, Vector3 B1, Vector3 B2)
+        {
+            /*
+             * Skoro wszystkie są na jednej lini to pasują to równania:
+             * dir = A - B
+             * l(t) = A + dir * t
+             * 
+             * ustalamy pocz. i kon. linii,
+             * wynikiem jest odcinek
+             * start = MAX(startA, startB)
+             * end = MIN(endA, endB)
+             * 
+             */
+            Debug.Log($"A1 {A1} A2 {A2} B1 {B1} B2 {B2}");
+            Vector3 dir = (A2 - A1).normalized;
 
+            float t1a = Vector3.Dot(A1 - A1, dir);
+            float t2a = Vector3.Dot(A2 - A1, dir);
+            float t1b = Vector3.Dot(B1 - A1, dir);
+            float t2b = Vector3.Dot(B2 - A1, dir);
+            Debug.Log($"A1 {t1a} A2 {t2a} B1 {t1a} B2 {t2b}");
+
+            float startA = Math.Min(t1a, t2a);
+            float endA = Math.Max(t1a, t2a);
+
+            float startB = Math.Min(t1b, t2b);
+            float endB = Math.Max(t1b, t2b);
+
+            float start = Math.Max(startA, startB);
+            float end = Math.Min(endA, endB);
+
+            if(start > end)
+            {
+                return null;
+            }
+            return new Tuple<Vector3, Vector3>(line(A1, start, dir), line(A1, end, dir));
+        }
     }
 }

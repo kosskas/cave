@@ -138,7 +138,7 @@ namespace Assets.Scripts.Experimental.Items
 
         private const string DefaultLabelText = " ";
 
-        private static readonly List<string> LabelTexts = " ABCDEFGHIJKLMNOPRQSTUVWXYZ123456789".Select(c => c.ToString())
+        private static readonly List<string> LabelTexts = " ABCDEFGHIJKLMNOPRQSTUVWXYZabcdefghijklmnoprstuvwxyz123456789".Select(c => c.ToString())
             .Concat(new[] { "I","II","III","IV","V","VI","VII","VIII","IX","X" })
             .ToList();
 

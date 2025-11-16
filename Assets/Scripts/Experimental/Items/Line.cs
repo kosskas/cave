@@ -100,8 +100,12 @@ namespace Assets.Scripts.Experimental.Items
 
         void OnDestroy()
         {
+            Labels?.ForEach(label =>
+            {
+                Mc?.RemoveEdgeProjection(Plane, label);
+            });
             if (_isBoundToPoints)
-                RemoveEdgeProjection();
+                RemoveEdge3D();
         }
 
         public void BindPoints(ExPoint startPoint, ExPoint endPoint)
@@ -115,7 +119,7 @@ namespace Assets.Scripts.Experimental.Items
             _startPointLabel = startPoint.FocusedLabel;
             _endPointLabel = endPoint.FocusedLabel;
 
-            AddEdgeProjection();
+            AddEdge3D();
 
             _isBoundToPoints = true;
         }
@@ -131,7 +135,7 @@ namespace Assets.Scripts.Experimental.Items
             _startPointLabel = startPointLabel;
             _endPointLabel = endPointLabel;
 
-            AddEdgeProjection();
+            AddEdge3D();
 
             _isBoundToPoints = true;
         }
@@ -153,18 +157,18 @@ namespace Assets.Scripts.Experimental.Items
                 )
                 return;
 
-            RemoveEdgeProjection();
+            RemoveEdge3D();
             Destroy(gameObject);
         }
 
-        private void RemoveEdgeProjection()
+        private void RemoveEdge3D()
         {
-            Mc?.RemoveEdgeProjection(_startPointLabel, _endPointLabel);
+            Mc?.RemoveEdge3D(_startPointLabel, _endPointLabel);
         }
 
-        private void AddEdgeProjection()
+        private void AddEdge3D()
         {
-            Mc.AddEdgeProjection(_startPointLabel, _endPointLabel);
+            Mc.CreateEdge3D(_startPointLabel, _endPointLabel);
         }
 
 
@@ -260,8 +264,15 @@ namespace Assets.Scripts.Experimental.Items
         }
         public void AddLabel(string labelText)
         {
-            AddLabel();
-            SetToText(labelText);
+            if (labelText.StartsWith("#"))
+            {
+                Mc.AddEdgeProjection(Plane, labelText, this);
+            }
+            else
+            {
+                AddLabel();
+                SetToText(labelText);
+            }
         }
 
         public void RemoveFocusedLabel()
@@ -269,7 +280,7 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 return;
 
-            Mc.RemoveEdgeProjectionStandalone(Plane, FocusedLabel, this);
+            Mc.RemoveEdgeProjection(Plane, FocusedLabel);
 
             _labelComponent.RemoveFocusedLabel();
         }
@@ -335,14 +346,14 @@ namespace Assets.Scripts.Experimental.Items
             var oldLabelText = FocusedLabel;
             var newLabelText = _labelTexts.Current.ToString();
 
-            Mc.RemoveEdgeProjectionStandalone(Plane, oldLabelText, this);
+            Mc.RemoveEdgeProjection(Plane, oldLabelText);
 
             FocusedLabel = newLabelText;
 
             if (_labelTexts.Current.Equals(DefaultLabelText))
                 return;
 
-            Mc.AddEdgeProjectionStandalone(Plane, newLabelText, this);
+            Mc.AddEdgeProjection(Plane, newLabelText, this);
         }
 
 
