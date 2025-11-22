@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gameobject_0',['gameObject',['../class_wall_info.html#ab32813f87e7cd3159c6093de43de432b',1,'WallInfo']]]
+  ['faces_0',['faces',['../class_object3_d.html#a84a12535f8e034a772a6ea6a20f16bbd',1,'Object3D']]]
 ];

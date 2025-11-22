@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['uiwall_0',['UIWall',['../class_assets_1_1_scripts_1_1_walls_1_1_u_i_wall.html',1,'Assets::Scripts::Walls']]]
+  ['wallcontroller_0',['WallController',['../class_wall_controller.html',1,'']]],
+  ['wallcreator_1',['WallCreator',['../class_wall_creator.html',1,'']]],
+  ['wallinfo_2',['WallInfo',['../class_wall_info.html',1,'']]]
 ];

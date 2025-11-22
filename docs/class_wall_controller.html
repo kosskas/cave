@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.7"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>VR CAVE - Projekt - Dokumentacja kodu: Dokumentacja klasy WallController</title>
+<title>Rekonstrukcja rzutów 2D: Dokumentacja klasy WallController</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,9 +22,9 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="weti.png"/></td>
   <td id="projectalign">
-   <div id="projectname">VR CAVE - Projekt - Dokumentacja kodu
+   <div id="projectname">Rekonstrukcja rzutów 2D
    </div>
-   <div id="projectbrief">Rzuty</div>
+   <div id="projectbrief">VR CAVE - Projekt</div>
   </td>
  </tr>
  </tbody>
@@ -83,9 +83,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Metody publiczne</h2></td></tr>
-<tr class="memitem:a7b4054fa755b7677882d65ae0dab7b4d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_wall_controller.html#a7b4054fa755b7677882d65ae0dab7b4d">AddWall</a> (GameObject wallobject, bool showProjection, bool showLines, bool showReferenceLines)</td></tr>
-<tr class="memdesc:a7b4054fa755b7677882d65ae0dab7b4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dodaje nową ścianę do kolekcji ścian.  <br /></td></tr>
-<tr class="separator:a7b4054fa755b7677882d65ae0dab7b4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21a80b372f2978d3fba626899228023a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_wall_controller.html#a21a80b372f2978d3fba626899228023a">CreateWall</a> (Vector3 point1, Vector3 point2, Vector3 parentNormal, string parentName, GameObject wallPrefab, string fixedName=null)</td></tr>
+<tr class="memdesc:a21a80b372f2978d3fba626899228023a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dodaje nową ścianę do kolekcji ścian.  <br /></td></tr>
+<tr class="separator:a21a80b372f2978d3fba626899228023a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e223d265ceda01654eb5173aab5498a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_wall_controller.html#a1e223d265ceda01654eb5173aab5498a">FindWallInfoByGameObject</a> (GameObject wallObject)</td></tr>
 <tr class="memdesc:a1e223d265ceda01654eb5173aab5498a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Szuka informacji o ścianie na podstawie jej obiektu Unity.  <br /></td></tr>
 <tr class="separator:a1e223d265ceda01654eb5173aab5498a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -96,10 +96,19 @@ Metody publiczne</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetBasicWalls</b> ()</td></tr>
 <tr class="memdesc:a7c8f60c518ec8cdc58ff6d8e8ddafaa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Usuwa wszystkie nowo dodane ściany. <br /></td></tr>
 <tr class="separator:a7c8f60c518ec8cdc58ff6d8e8ddafaa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1507a2246150c9d54f3d42130d2441c0"><td class="memItemLeft" align="right" valign="top"><a id="a1507a2246150c9d54f3d42130d2441c0" name="a1507a2246150c9d54f3d42130d2441c0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>PopBackWall</b> ()</td></tr>
-<tr class="memdesc:a1507a2246150c9d54f3d42130d2441c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Usuwa ściany z odwróconą chronologią ich dodania. <br /></td></tr>
-<tr class="separator:a1507a2246150c9d54f3d42130d2441c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99f2bd8b0685192c5b5c4402be7de09c"><td class="memItemLeft" align="right" valign="top"><a id="a99f2bd8b0685192c5b5c4402be7de09c" name="a99f2bd8b0685192c5b5c4402be7de09c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>LinkConstructionToWall</b> (<a class="el" href="class_wall_info.html">WallInfo</a> wall, GameObject constructionObject)</td></tr>
+<tr class="separator:a99f2bd8b0685192c5b5c4402be7de09c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0776dc0faa8310ff67eed9e2bcdc3395"><td class="memItemLeft" align="right" valign="top"><a id="a0776dc0faa8310ff67eed9e2bcdc3395" name="a0776dc0faa8310ff67eed9e2bcdc3395"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveWall</b> (<a class="el" href="class_wall_info.html">WallInfo</a> wall)</td></tr>
+<tr class="separator:a0776dc0faa8310ff67eed9e2bcdc3395"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a201aac177c3f4ba7f86ebd7bbe2f35b9"><td class="memItemLeft" align="right" valign="top"><a id="a201aac177c3f4ba7f86ebd7bbe2f35b9" name="a201aac177c3f4ba7f86ebd7bbe2f35b9"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>PopBackWall</b> ()</td></tr>
+<tr class="memdesc:a201aac177c3f4ba7f86ebd7bbe2f35b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Usuwa ściany z odwróconą chronologią ich dodania. Zwraca true, jeśli ściana została usunięta. <br /></td></tr>
+<tr class="separator:a201aac177c3f4ba7f86ebd7bbe2f35b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a992a40fbe0616644d44a196ac42144b3"><td class="memItemLeft" align="right" valign="top"><a id="a992a40fbe0616644d44a196ac42144b3" name="a992a40fbe0616644d44a196ac42144b3"></a>
+<a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetLastAddedWall</b> ()</td></tr>
+<tr class="separator:a992a40fbe0616644d44a196ac42144b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6202f1c853133ac74da78d89ace5983b"><td class="memItemLeft" align="right" valign="top">List&lt; <a class="el" href="class_wall_info.html">WallInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_wall_controller.html#a6202f1c853133ac74da78d89ace5983b">GetWalls</a> ()</td></tr>
 <tr class="memdesc:a6202f1c853133ac74da78d89ace5983b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pobiera listę ścian i ją zwraca.  <br /></td></tr>
 <tr class="separator:a6202f1c853133ac74da78d89ace5983b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,51 +131,54 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>PopBackWall</b> ()</t
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDefaultShowRules</b> ()</td></tr>
 <tr class="memdesc:a987944d3b084eb223473175ed1a8dc97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ustawia flagi ścian na wartości domyślne. <br /></td></tr>
 <tr class="separator:a987944d3b084eb223473175ed1a8dc97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3967632c252abb048b5c598d93d9fe4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_wall_controller.html#ac3967632c252abb048b5c598d93d9fe4">GetWallIndex</a> (<a class="el" href="class_wall_info.html">WallInfo</a> wall)</td></tr>
-<tr class="memdesc:ac3967632c252abb048b5c598d93d9fe4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wyznacza indeks w zależności od nazwy ściany.  <br /></td></tr>
-<tr class="separator:ac3967632c252abb048b5c598d93d9fe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19b8a90afd33c5c2e219caba89765f2a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_wall_controller.html#a19b8a90afd33c5c2e219caba89765f2a">GetGroundWall</a> ()</td></tr>
-<tr class="memdesc:a19b8a90afd33c5c2e219caba89765f2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Znajduje ściane położoną na podłodze.  <br /></td></tr>
-<tr class="separator:a19b8a90afd33c5c2e219caba89765f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34670b7e84a5f39df2c276db59f35239"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_wall_controller.html#a34670b7e84a5f39df2c276db59f35239">GetWallByName</a> (string name)</td></tr>
 <tr class="memdesc:a34670b7e84a5f39df2c276db59f35239"><td class="mdescLeft">&#160;</td><td class="mdescRight">Znajduje ściane na podstawie nazwy.  <br /></td></tr>
 <tr class="separator:a34670b7e84a5f39df2c276db59f35239"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6bd7e64c5800538a3407e962ac0d4c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_wall_info.html">WallInfo</a>[]&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_wall_controller.html#ad6bd7e64c5800538a3407e962ac0d4c5">RecGetRemainingWalls</a> (<a class="el" href="class_wall_info.html">WallInfo</a> wall)</td></tr>
-<tr class="memdesc:ad6bd7e64c5800538a3407e962ac0d4c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Znajduje dwie pozostałe ściany z trybu rekonstrukcji.  <br /></td></tr>
-<tr class="separator:ad6bd7e64c5800538a3407e962ac0d4c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Opis szczegółowy</h2>
 <div class="textblock"><p>Klasa <a class="el" href="class_wall_controller.html" title="Klasa WallController zarządza właściwościami ścian.">WallController</a> zarządza właściwościami ścian. </p>
 </div><h2 class="groupheader">Dokumentacja funkcji składowych</h2>
-<a id="a7b4054fa755b7677882d65ae0dab7b4d" name="a7b4054fa755b7677882d65ae0dab7b4d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7b4054fa755b7677882d65ae0dab7b4d">&#9670;&#160;</a></span>AddWall()</h2>
+<a id="a21a80b372f2978d3fba626899228023a" name="a21a80b372f2978d3fba626899228023a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21a80b372f2978d3fba626899228023a">&#9670;&#160;</a></span>CreateWall()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void WallController.AddWall </td>
+          <td class="memname"><a class="el" href="class_wall_info.html">WallInfo</a> WallController.CreateWall </td>
           <td>(</td>
+          <td class="paramtype">Vector3&#160;</td>
+          <td class="paramname"><em>point1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Vector3&#160;</td>
+          <td class="paramname"><em>point2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Vector3&#160;</td>
+          <td class="paramname"><em>parentNormal</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>parentName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">GameObject&#160;</td>
-          <td class="paramname"><em>wallobject</em>, </td>
+          <td class="paramname"><em>wallPrefab</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>showProjection</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>showLines</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>showReferenceLines</em>&#160;</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>fixedName</em> = <code>null</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -179,10 +191,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDefaultShowRules</
 <p>Dodaje nową ścianę do kolekcji ścian. </p>
 <dl class="params"><dt>Parametry</dt><dd>
   <table class="params">
-    <tr><td class="paramname">wallobject</td><td>Obiekt ściany Unity na scenie</td></tr>
-    <tr><td class="paramname">showProjection</td><td>Flaga dot. wyświetlania na ścianie rzutów</td></tr>
-    <tr><td class="paramname">showLines</td><td>Flaga dot. wyświetlania linii rzutujących</td></tr>
-    <tr><td class="paramname">showReferenceLines</td><td>Flaga dot. wyświetlania linii odnoszących</td></tr>
+    <tr><td class="paramname">point1</td><td>Koordynaty 1</td></tr>
+    <tr><td class="paramname">point2</td><td>Koordynaty 2</td></tr>
+    <tr><td class="paramname">parentWallInfo</td><td>Ściana, od której powstała nowa ściana</td></tr>
+    <tr><td class="paramname">wallPrefab</td><td>Szablon ściany</td></tr>
+    <tr><td class="paramname">fixedName</td><td>Opcjonalna nazwa dodawanej ściany</td></tr>
   </table>
   </dd>
 </dl>
@@ -329,26 +342,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDefaultShowRules</
 
 </div>
 </div>
-<a id="a19b8a90afd33c5c2e219caba89765f2a" name="a19b8a90afd33c5c2e219caba89765f2a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a19b8a90afd33c5c2e219caba89765f2a">&#9670;&#160;</a></span>GetGroundWall()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_wall_info.html">WallInfo</a> WallController.GetGroundWall </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Znajduje ściane położoną na podłodze. </p>
-<dl class="section return"><dt>Zwraca</dt><dd>Podłoga jeśli jest, Null jeśli nie ma</dd></dl>
-
-</div>
-</div>
 <a id="a34670b7e84a5f39df2c276db59f35239" name="a34670b7e84a5f39df2c276db59f35239"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a34670b7e84a5f39df2c276db59f35239">&#9670;&#160;</a></span>GetWallByName()</h2>
 
@@ -396,33 +389,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDefaultShowRules</
 
 </div>
 </div>
-<a id="ac3967632c252abb048b5c598d93d9fe4" name="ac3967632c252abb048b5c598d93d9fe4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3967632c252abb048b5c598d93d9fe4">&#9670;&#160;</a></span>GetWallIndex()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int WallController.GetWallIndex </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td>
-          <td class="paramname"><em>wall</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Wyznacza indeks w zależności od nazwy ściany. </p>
-<dl class="params"><dt>Parametry</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">wall</td><td>Metadane o ścianie</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Zwraca</dt><dd>Numer indeksu</dd></dl>
-
-</div>
-</div>
 <a id="a5f9e84d099f48f0d32ec647b89c3f366" name="a5f9e84d099f48f0d32ec647b89c3f366"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5f9e84d099f48f0d32ec647b89c3f366">&#9670;&#160;</a></span>GetWallNormals()</h2>
 
@@ -460,33 +426,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDefaultShowRules</
 
 <p>Pobiera listę ścian i ją zwraca. </p>
 <dl class="section return"><dt>Zwraca</dt><dd>Lista ścian jaka jest na scenie</dd></dl>
-
-</div>
-</div>
-<a id="ad6bd7e64c5800538a3407e962ac0d4c5" name="ad6bd7e64c5800538a3407e962ac0d4c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad6bd7e64c5800538a3407e962ac0d4c5">&#9670;&#160;</a></span>RecGetRemainingWalls()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_wall_info.html">WallInfo</a>[] WallController.RecGetRemainingWalls </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td>
-          <td class="paramname"><em>wall</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Znajduje dwie pozostałe ściany z trybu rekonstrukcji. </p>
-<dl class="params"><dt>Parametry</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">wall</td><td>Sciana</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Zwraca</dt><dd></dd></dl>
 
 </div>
 </div>

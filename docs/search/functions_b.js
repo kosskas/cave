@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['wallinfo_0',['WallInfo',['../class_wall_info.html#ab9bca63a9ef3f163f636269219827df7',1,'WallInfo.WallInfo(GameObject gameObject, int number, string name)'],['../class_wall_info.html#a662e737c0645bb9fdb758e4abcd2e338',1,'WallInfo.WallInfo(GameObject gameObject, int number, string name, bool showProjection, bool showLines, bool showReferenceLines)']]]
+  ['undo_0',['Undo',['../class_assets_1_1_scripts_1_1_file_managers_1_1_history_manager.html#a2b2a40fb8b21a0d5215ec821539127e4',1,'Assets::Scripts::FileManagers::HistoryManager']]]
 ];

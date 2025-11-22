@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['recgetremainingwalls_0',['RecGetRemainingWalls',['../class_wall_controller.html#ad6bd7e64c5800538a3407e962ac0d4c5',1,'WallController']]],
-  ['refreshraydirection_1',['RefreshRayDirection',['../class_object_projecter.html#a98ee7e5953272a17c11ad0e7d2466557',1,'ObjectProjecter']]],
-  ['removeedgeprojection_2',['RemoveEdgeProjection',['../class_mesh_builder.html#a0b6d6d24fc181747d92cb64e507f0717',1,'MeshBuilder']]],
-  ['removepointprojection_3',['RemovePointProjection',['../class_mesh_builder.html#aaad53d4bf96306c6e5f3fa4cfc82fbd0',1,'MeshBuilder']]],
-  ['resetprojections_4',['ResetProjections',['../class_object_projecter.html#a1f6ab96eeff85b0629c5867e76cc8176',1,'ObjectProjecter']]]
+  ['popbackwall_0',['PopBackWall',['../class_wall_controller.html#a201aac177c3f4ba7f86ebd7bbe2f35b9',1,'WallController']]],
+  ['projectioninfo_1',['ProjectionInfo',['../class_projection_info.html#a4fa183a99d4c3c2716aa48b8a28783ee',1,'ProjectionInfo.ProjectionInfo()'],['../class_projection_info.html#a78736490162d8ec65bda4c02dc5f045d',1,'ProjectionInfo.ProjectionInfo(Color pointColor, Color pointLabelColor, float pointSize, float pointLabelSize, Color edgeLineColor, Color edgeLabelColor, float edgeLineWidth, float edgeLabelSize, Color projectionLineColor, Color projectionLabelColor, float projectionLineWidth, float projectionLabelSize, Color referenceLineColor, Color referenceLabelColor, float referenceLineWidth, float referenceLabelSize, bool showProjectionLines)']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.7"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>VR CAVE - Projekt - Dokumentacja kodu: Pola danych</title>
+<title>Rekonstrukcja rzutów 2D: Pola danych</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,9 +22,9 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="weti.png"/></td>
   <td id="projectalign">
-   <div id="projectname">VR CAVE - Projekt - Dokumentacja kodu
+   <div id="projectname">Rekonstrukcja rzutów 2D
    </div>
-   <div id="projectbrief">Rzuty</div>
+   <div id="projectbrief">VR CAVE - Projekt</div>
   </td>
  </tr>
  </tbody>
@@ -74,10 +74,10 @@ $(function() {
 <div class="textblock">Tutaj znajduje się lista wszystkich udokumentowanych pól struktur i unii wraz z odnośnikami do dokumentacji struktur/unii dla każdego pola:</div>
 
 <h3><a id="index_a" name="index_a"></a>- a -</h3><ul>
-<li>AddEdgeProjection()&#160;:&#160;<a class="el" href="class_mesh_builder.html#aee53d305c09eee52eb84cbfc4ce17887">MeshBuilder</a></li>
-<li>AddPoint()&#160;:&#160;<a class="el" href="class_point_placer.html#a9f463f0388b326ce06d1b4944e82679f">PointPlacer</a></li>
+<li>AddAnchorPoint()&#160;:&#160;<a class="el" href="class_wall_creator.html#aa9e3cab5dfc6ab7a3b49fa92761df967">WallCreator</a></li>
+<li>AddCheckpoint()&#160;:&#160;<a class="el" href="class_assets_1_1_scripts_1_1_file_managers_1_1_history_manager.html#aae97e31964e69f44227055bbda51b5d0">Assets.Scripts.FileManagers.HistoryManager</a></li>
+<li>AddEdgeProjection()&#160;:&#160;<a class="el" href="class_mesh_builder.html#abc4afadc745e311ae819be9c09e7e6ce">MeshBuilder</a></li>
 <li>AddPointProjection()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a15522f8797cdc3cf01a6809568f140e9">MeshBuilder</a></li>
-<li>AddWall()&#160;:&#160;<a class="el" href="class_wall_controller.html#a7b4054fa755b7677882d65ae0dab7b4d">WallController</a></li>
 </ul>
 
 
@@ -87,17 +87,32 @@ $(function() {
 
 
 <h3><a id="index_c" name="index_c"></a>- c -</h3><ul>
+<li>canDelete&#160;:&#160;<a class="el" href="class_wall_info.html#ae2f6a13206b872841d737d6f22e51055">WallInfo</a></li>
 <li>canMove&#160;:&#160;<a class="el" href="class_player_controller.html#a14bb057d727180f87728bd6fe62dffc9">PlayerController</a></li>
+<li>CanRedo()&#160;:&#160;<a class="el" href="class_assets_1_1_scripts_1_1_file_managers_1_1_history_manager.html#af63a53b5d41dfb862a8239e9b4d380e5">Assets.Scripts.FileManagers.HistoryManager</a></li>
+<li>CanUndo()&#160;:&#160;<a class="el" href="class_assets_1_1_scripts_1_1_file_managers_1_1_history_manager.html#a69248cf9f92240ecb0c0cb14e395a1af">Assets.Scripts.FileManagers.HistoryManager</a></li>
 <li>CheckIfAlreadyExist()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a3e6d4933855d5169f6d3526e10a8163f">MeshBuilder</a></li>
+<li>CheckIfEdgeAlreadyExist()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a2460571dfd1ecc1e811cdcafdd52da5f">MeshBuilder</a></li>
 <li>ClearAndDisable()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a27e5fb55cb4060228546c45f9652f9e9">MeshBuilder</a></li>
+<li>constrPoint1&#160;:&#160;<a class="el" href="class_wall_info.html#a064490e02dcc25632e70e025aeab5a0c">WallInfo</a></li>
+<li>constrPoint2&#160;:&#160;<a class="el" href="class_wall_info.html#a374198d16f51627ca71718b9657e85ba">WallInfo</a></li>
+<li>constructionNumber&#160;:&#160;<a class="el" href="class_wall_info.html#ab1c74fc9a6270854cd7aa73c25a8ea90">WallInfo</a></li>
+<li>CreateEdge3D()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a75fe7a71329105d13e43977f48bc85bd">MeshBuilder</a></li>
 <li>CreateEgdeProjection()&#160;:&#160;<a class="el" href="class_edge_projection.html#a6616a4c0d607f76fbc433541ba36cc35">EdgeProjection</a></li>
-<li>CreatePoint()&#160;:&#160;<a class="el" href="class_wall_creator.html#a0b9d215349f961abd03a15e493feba5d">WallCreator</a></li>
 <li>CreateVertexProjection()&#160;:&#160;<a class="el" href="class_vertex_projection.html#abc898d0f18c2302a850da0af509f28c3">VertexProjection</a></li>
+<li>CreateWall()&#160;:&#160;<a class="el" href="class_wall_controller.html#a21a80b372f2978d3fba626899228023a">WallController</a></li>
+</ul>
+
+
+<h3><a id="index_d" name="index_d"></a>- d -</h3><ul>
+<li>deleted&#160;:&#160;<a class="el" href="class_vertice3_d.html#af78a1e1df68bd20f3d4a96e098783975">Vertice3D</a></li>
+<li>disabled&#160;:&#160;<a class="el" href="class_vertice3_d.html#a9cbce6e646295678ffbac815b0313520">Vertice3D</a></li>
+<li>DrawWall()&#160;:&#160;<a class="el" href="class_assets_1_1_scripts_1_1_experimental_1_1_items_controller.html#abdd8a967f4baaee3d3abf7f192edf5d7">Assets.Scripts.Experimental.ItemsController</a></li>
 </ul>
 
 
 <h3><a id="index_e" name="index_e"></a>- e -</h3><ul>
-<li>EdgeInfo()&#160;:&#160;<a class="el" href="struct_edge_info.html#a4119d2723db23ed3d0a1a8f9369c7091">EdgeInfo</a></li>
+<li>EdgeInfo()&#160;:&#160;<a class="el" href="struct_assets_1_1_scripts_1_1_file_managers_1_1_edge_info.html#a7d5d992577e4e4b1cec6f37e9cee9dbb">Assets.Scripts.FileManagers.EdgeInfo</a></li>
 <li>edgeLabelColor&#160;:&#160;<a class="el" href="class_projection_info.html#a4909fc07fd4c3f09e59b5da77dae4e68">ProjectionInfo</a></li>
 <li>edgeLabelSize&#160;:&#160;<a class="el" href="class_projection_info.html#a94ba2ee904174cb4137f8f7ed4975c64">ProjectionInfo</a></li>
 <li>edgeLineColor&#160;:&#160;<a class="el" href="class_projection_info.html#a28d32e57deae21aa299dab8c081af4f3">ProjectionInfo</a></li>
@@ -105,7 +120,7 @@ $(function() {
 <li>EdgeProjection()&#160;:&#160;<a class="el" href="class_edge_projection.html#a685af33733d13d400b9fb6519091468d">EdgeProjection</a></li>
 <li>edges&#160;:&#160;<a class="el" href="class_object3_d.html#a47330087167918651b80e90e8dc1174b">Object3D</a></li>
 <li>end&#160;:&#160;<a class="el" href="class_edge_projection.html#ac146d69d3c8569794b326a21153b3bea">EdgeProjection</a></li>
-<li>endPoints&#160;:&#160;<a class="el" href="struct_edge_info.html#a71ff49342d9deb1751bfbd20615dad9c">EdgeInfo</a></li>
+<li>endPoints&#160;:&#160;<a class="el" href="struct_assets_1_1_scripts_1_1_file_managers_1_1_edge_info.html#a05f6f453067348251ba4709f8da1afd0">Assets.Scripts.FileManagers.EdgeInfo</a></li>
 </ul>
 
 
@@ -122,12 +137,10 @@ $(function() {
 <li>gameObject&#160;:&#160;<a class="el" href="class_wall_info.html#ab32813f87e7cd3159c6093de43de432b">WallInfo</a></li>
 <li>GetCoordinates()&#160;:&#160;<a class="el" href="class_line_segment.html#abefb4c02961363cb6cdba952e1cf08a7">LineSegment</a>, <a class="el" href="class_point.html#a2b4bb9305f0cec4a4cffbd3e5aec32de">Point</a></li>
 <li>GetEdges3D()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a1c2d994574a9f86c597a2cda9aa463b7">MeshBuilder</a></li>
-<li>GetGroundWall()&#160;:&#160;<a class="el" href="class_wall_controller.html#a19b8a90afd33c5c2e219caba89765f2a">WallController</a></li>
 <li>GetNormal()&#160;:&#160;<a class="el" href="class_wall_info.html#ae8d6079bf737cb25cb030fd7f0704773">WallInfo</a></li>
 <li>GetPoints3D()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a2729370be15b0070ca8dd6be4a4ca330">MeshBuilder</a></li>
 <li>GetWallByName()&#160;:&#160;<a class="el" href="class_wall_controller.html#a34670b7e84a5f39df2c276db59f35239">WallController</a></li>
 <li>GetWallCount()&#160;:&#160;<a class="el" href="class_wall_controller.html#a6835c21a72f3ca8c5ed4e3616ee935a9">WallController</a></li>
-<li>GetWallIndex()&#160;:&#160;<a class="el" href="class_wall_controller.html#ac3967632c252abb048b5c598d93d9fe4">WallController</a></li>
 <li>GetWallNormals()&#160;:&#160;<a class="el" href="class_wall_controller.html#a5f9e84d099f48f0d32ec647b89c3f366">WallController</a></li>
 <li>GetWalls()&#160;:&#160;<a class="el" href="class_wall_controller.html#a6202f1c853133ac74da78d89ace5983b">WallController</a></li>
 </ul>
@@ -135,12 +148,13 @@ $(function() {
 
 <h3><a id="index_h" name="index_h"></a>- h -</h3><ul>
 <li>HandleInput()&#160;:&#160;<a class="el" href="class_mode3_dto2_d.html#ae6405a05d5ca8df38f2ace5acb08731b">Mode3Dto2D</a></li>
+<li>HistoryManager()&#160;:&#160;<a class="el" href="class_assets_1_1_scripts_1_1_file_managers_1_1_history_manager.html#adef2928d0f63c3b137355a626163740a">Assets.Scripts.FileManagers.HistoryManager</a></li>
 </ul>
 
 
 <h3><a id="index_i" name="index_i"></a>- i -</h3><ul>
-<li>ImportSolid()&#160;:&#160;<a class="el" href="class_solid_importer.html#a837ef40ce30e2d529f493be8a9ad63c1">SolidImporter</a></li>
-<li>Init()&#160;:&#160;<a class="el" href="class_mesh_builder.html#aaede9c2d5bad1dbdd4dbf20f1eb021bd">MeshBuilder</a></li>
+<li>ImportSolid()&#160;:&#160;<a class="el" href="class_assets_1_1_scripts_1_1_file_managers_1_1_solid_importer.html#aae168cf2048261104356b7bb164002d4">Assets.Scripts.FileManagers.SolidImporter</a></li>
+<li>Init()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a420ca68ee64e3b098f7ccf691c96a1ac">MeshBuilder</a></li>
 <li>InitObject()&#160;:&#160;<a class="el" href="class_object3_d.html#ab1c8674ed6dbc3f96ae1784960e43c32">Object3D</a></li>
 <li>InitProjecter()&#160;:&#160;<a class="el" href="class_object_projecter.html#a976d392426c9b4f7ffdc0f2991afa79f">ObjectProjecter</a></li>
 <li>IsEnabled()&#160;:&#160;<a class="el" href="class_point.html#ab4f1aa8fb68e11a479dd8000ab17baad">Point</a></li>
@@ -148,7 +162,7 @@ $(function() {
 
 
 <h3><a id="index_l" name="index_l"></a>- l -</h3><ul>
-<li>label&#160;:&#160;<a class="el" href="struct_edge_info.html#a01f12e0177f8d7437119b108542c7686">EdgeInfo</a>, <a class="el" href="class_edge_projection.html#ae6d8334c164328b20de8283a29336263">EdgeProjection</a></li>
+<li>label&#160;:&#160;<a class="el" href="struct_assets_1_1_scripts_1_1_file_managers_1_1_edge_info.html#a1d20e7d6d5e60679b0f480c091eeb80d">Assets.Scripts.FileManagers.EdgeInfo</a>, <a class="el" href="class_edge_projection.html#ae6d8334c164328b20de8283a29336263">EdgeProjection</a></li>
 <li>line&#160;:&#160;<a class="el" href="class_edge_projection.html#a6cd6c949ae812e3f75189621da017641">EdgeProjection</a>, <a class="el" href="class_vertex_projection.html#a5f50ded8d5d54f88b99fd1a4b35fa8a6">VertexProjection</a></li>
 <li>lookSpeed&#160;:&#160;<a class="el" href="class_player_controller.html#a6b4825ea64759f2679bfcf15224d475b">PlayerController</a></li>
 <li>lookXLimit&#160;:&#160;<a class="el" href="class_player_controller.html#a170b83eefd166c144c891bd372b52260">PlayerController</a></li>
@@ -168,13 +182,15 @@ $(function() {
 
 
 <h3><a id="index_p" name="index_p"></a>- p -</h3><ul>
+<li>parentName&#160;:&#160;<a class="el" href="class_wall_info.html#a7e2c15ce5af50ab977645609cfa472ad">WallInfo</a></li>
+<li>parentNormal&#160;:&#160;<a class="el" href="class_wall_info.html#a3236ee21be6a320a6e5722e68fa46c63">WallInfo</a></li>
 <li>player&#160;:&#160;<a class="el" href="class_object3_d.html#afbc7a46d2854d643c125034fbab8730d">Object3D</a></li>
 <li>playerCamera&#160;:&#160;<a class="el" href="class_player_controller.html#afd5f9e06691272d7e6dac76e44831cb8">PlayerController</a></li>
 <li>pointColor&#160;:&#160;<a class="el" href="class_projection_info.html#ac49de0e34dabc797601ca039bb16a6a4">ProjectionInfo</a></li>
 <li>pointLabelColor&#160;:&#160;<a class="el" href="class_projection_info.html#ab1b823fba4ceed361bacee162a8f4dc5">ProjectionInfo</a></li>
 <li>pointLabelSize&#160;:&#160;<a class="el" href="class_projection_info.html#ae44b4112067310068907869b106cc64b">ProjectionInfo</a></li>
 <li>pointSize&#160;:&#160;<a class="el" href="class_projection_info.html#adbbbb616ba7b434d9223c8e818929942">ProjectionInfo</a></li>
-<li>PopBackWall()&#160;:&#160;<a class="el" href="class_wall_controller.html#a1507a2246150c9d54f3d42130d2441c0">WallController</a></li>
+<li>PopBackWall()&#160;:&#160;<a class="el" href="class_wall_controller.html#a201aac177c3f4ba7f86ebd7bbe2f35b9">WallController</a></li>
 <li>ProjectionInfo()&#160;:&#160;<a class="el" href="class_projection_info.html#a4fa183a99d4c3c2716aa48b8a28783ee">ProjectionInfo</a></li>
 <li>projectionLabelColor&#160;:&#160;<a class="el" href="class_projection_info.html#af9f9183821a068d9d36b2574f9cc01f7">ProjectionInfo</a></li>
 <li>projectionLabelSize&#160;:&#160;<a class="el" href="class_projection_info.html#a8e642bf78d937f8c99d8521ced1e62a3">ProjectionInfo</a></li>
@@ -184,13 +200,14 @@ $(function() {
 
 
 <h3><a id="index_r" name="index_r"></a>- r -</h3><ul>
-<li>RecGetRemainingWalls()&#160;:&#160;<a class="el" href="class_wall_controller.html#ad6bd7e64c5800538a3407e962ac0d4c5">WallController</a></li>
+<li>Redo()&#160;:&#160;<a class="el" href="class_assets_1_1_scripts_1_1_file_managers_1_1_history_manager.html#a677dd164f99fada87bfeb37f2012c956">Assets.Scripts.FileManagers.HistoryManager</a></li>
 <li>referenceLabelColor&#160;:&#160;<a class="el" href="class_projection_info.html#add6ccd739083110b8d124f88c8583abc">ProjectionInfo</a></li>
 <li>referenceLabelSize&#160;:&#160;<a class="el" href="class_projection_info.html#a00b774b4e0c482e1e8115756aebeeb2c">ProjectionInfo</a></li>
 <li>referenceLineColor&#160;:&#160;<a class="el" href="class_projection_info.html#aa7e244640b6208340a5b86f59ba342f1">ProjectionInfo</a></li>
 <li>referenceLineWidth&#160;:&#160;<a class="el" href="class_projection_info.html#a92f25c164053d24e7716a0bec1109ad3">ProjectionInfo</a></li>
 <li>RefreshRayDirection()&#160;:&#160;<a class="el" href="class_object_projecter.html#a98ee7e5953272a17c11ad0e7d2466557">ObjectProjecter</a></li>
-<li>RemoveEdgeProjection()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a0b6d6d24fc181747d92cb64e507f0717">MeshBuilder</a></li>
+<li>RemoveEdge3D()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a672c10c24e32bbdfe4e16848c56957d4">MeshBuilder</a></li>
+<li>RemoveEdgeProjection()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a45a98d050035ca9f8b57d29584b8d67d">MeshBuilder</a></li>
 <li>RemovePointProjection()&#160;:&#160;<a class="el" href="class_mesh_builder.html#aaad53d4bf96306c6e5f3fa4cfc82fbd0">MeshBuilder</a></li>
 <li>ResetProjections()&#160;:&#160;<a class="el" href="class_object_projecter.html#a1f6ab96eeff85b0629c5867e76cc8176">ObjectProjecter</a></li>
 <li>rotatedVertices&#160;:&#160;<a class="el" href="class_object3_d.html#a7de92d39cc892766cf44d5d030881d8e">Object3D</a></li>
@@ -203,23 +220,26 @@ $(function() {
 <li>SetCoordinates()&#160;:&#160;<a class="el" href="class_line_segment.html#aa09ff564182db995809d8a1236cdb4d0">LineSegment</a>, <a class="el" href="class_point.html#a7d982e773ba71ebe1acd84f99c2596a7">Point</a></li>
 <li>SetDefaultShowRules()&#160;:&#160;<a class="el" href="class_wall_controller.html#a987944d3b084eb223473175ed1a8dc97">WallController</a></li>
 <li>SetDisplay()&#160;:&#160;<a class="el" href="class_edge_projection.html#a3b5b54c3c1c36161a4281c31855a0325">EdgeProjection</a>, <a class="el" href="class_vertex_projection.html#a2025be75fed3011e9144004ea5d1b624">VertexProjection</a></li>
-<li>SetDownDirection()&#160;:&#160;<a class="el" href="class_solid_importer.html#a5f9deedcf0f714191aa1bc61075220e9">SolidImporter</a></li>
+<li>SetDownDirection()&#160;:&#160;<a class="el" href="class_assets_1_1_scripts_1_1_file_managers_1_1_solid_importer.html#a34effa5078077433686c84682bb43ef3">Assets.Scripts.FileManagers.SolidImporter</a></li>
 <li>SetEnable()&#160;:&#160;<a class="el" href="class_label.html#ab72fc2184d7b7d7c6656ef35d55a65ba">Label</a>, <a class="el" href="class_line_segment.html#ae5eae892be01953c5a09bd6b9099e6b2">LineSegment</a>, <a class="el" href="class_point.html#a968aed5842523899ad7121befe4045b4">Point</a></li>
 <li>SetFlags()&#160;:&#160;<a class="el" href="class_wall_info.html#ad104b867ceb94ecbb68f7677aeb99eb0">WallInfo</a></li>
-<li>SetGenerateRulesReferenceLine()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a0f286a42fe82c73963e0a49d6c10e71c">MeshBuilder</a></li>
 <li>SetLabel()&#160;:&#160;<a class="el" href="class_label.html#a3309314781416820eb352a8f1f8f78fa">Label</a>, <a class="el" href="class_line_segment.html#aedd1eb5d6a5128352c0a6b2473a02150">LineSegment</a>, <a class="el" href="class_point.html#a1bae7e8f2f73de3784400625b7955035">Point</a></li>
 <li>SetShowingProjectionLines()&#160;:&#160;<a class="el" href="class_object_projecter.html#adf01c970f760942d4f85c3f802bfda55">ObjectProjecter</a></li>
 <li>SetShowingReferenceLines()&#160;:&#160;<a class="el" href="class_object_projecter.html#aab92800afc418b93782bed7419af14e4">ObjectProjecter</a></li>
 <li>SetShowRulesProjectionLine()&#160;:&#160;<a class="el" href="class_mesh_builder.html#a7368db1d6c17eea8c673d3065919bcb8">MeshBuilder</a></li>
-<li>SetShowRulesReferencenLine()&#160;:&#160;<a class="el" href="class_mesh_builder.html#ab8f49f8bcbba3756ab0870f2519bb131">MeshBuilder</a></li>
 <li>SetStyle()&#160;:&#160;<a class="el" href="class_line_segment.html#a7853a165cb93bd03978d4eb2d5259ea4">LineSegment</a>, <a class="el" href="class_point.html#a3da3a41ecfbca4da27e3489d76c24071">Point</a></li>
-<li>SetUpDirection()&#160;:&#160;<a class="el" href="class_solid_importer.html#af771ab8dbf193574376e36876701e8c9">SolidImporter</a></li>
+<li>SetUpDirection()&#160;:&#160;<a class="el" href="class_assets_1_1_scripts_1_1_file_managers_1_1_solid_importer.html#ad5de5522bd6ad60abfb06accc096c487">Assets.Scripts.FileManagers.SolidImporter</a></li>
 <li>SetWallInfo()&#160;:&#160;<a class="el" href="class_wall_controller.html#a1449ccba463981959d002fa8ecc5c315">WallController</a></li>
 <li>showLines&#160;:&#160;<a class="el" href="class_wall_info.html#acb3b35f7e9f45f7586887df4509d0e4c">WallInfo</a></li>
 <li>showProjection&#160;:&#160;<a class="el" href="class_wall_info.html#a02b898fbfc993dd6c2f3db0e38342d05">WallInfo</a></li>
 <li>showProjectionLines&#160;:&#160;<a class="el" href="class_projection_info.html#a5de4aa1f0531f3055c9e39b53790c424">ProjectionInfo</a></li>
 <li>showReferenceLines&#160;:&#160;<a class="el" href="class_wall_info.html#a1510a5f2b876038a23c5d5d6cf11f107">WallInfo</a></li>
 <li>start&#160;:&#160;<a class="el" href="class_edge_projection.html#a3d762b898b8b96f21eb22e9d099f14a7">EdgeProjection</a></li>
+</ul>
+
+
+<h3><a id="index_u" name="index_u"></a>- u -</h3><ul>
+<li>Undo()&#160;:&#160;<a class="el" href="class_assets_1_1_scripts_1_1_file_managers_1_1_history_manager.html#a2b2a40fb8b21a0d5215ec821539127e4">Assets.Scripts.FileManagers.HistoryManager</a></li>
 </ul>
 
 
@@ -233,6 +253,7 @@ $(function() {
 <h3><a id="index_w" name="index_w"></a>- w -</h3><ul>
 <li>walkingSpeed&#160;:&#160;<a class="el" href="class_player_controller.html#ae6e1c6a57e0b0e8b1aee16486263ab20">PlayerController</a></li>
 <li>WallInfo()&#160;:&#160;<a class="el" href="class_wall_info.html#ab9bca63a9ef3f163f636269219827df7">WallInfo</a></li>
+<li>wallOrigins&#160;:&#160;<a class="el" href="class_edge3_d.html#a1f59952c0ee48f133800a0e47725125b">Edge3D</a></li>
 <li>wallPrefab&#160;:&#160;<a class="el" href="class_wall_creator.html#a5a19a2e3718ddea3577c9e7af31aafb1">WallCreator</a></li>
 </ul>
 </div><!-- contents -->

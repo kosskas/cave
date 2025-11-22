@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['showlines_0',['showLines',['../class_wall_info.html#acb3b35f7e9f45f7586887df4509d0e4c',1,'WallInfo']]],
-  ['showprojection_1',['showProjection',['../class_wall_info.html#a02b898fbfc993dd6c2f3db0e38342d05',1,'WallInfo']]],
-  ['showprojectionlines_2',['showProjectionLines',['../class_projection_info.html#a5de4aa1f0531f3055c9e39b53790c424',1,'ProjectionInfo']]],
-  ['showreferencelines_3',['showReferenceLines',['../class_wall_info.html#a1510a5f2b876038a23c5d5d6cf11f107',1,'WallInfo']]],
-  ['start_4',['start',['../class_edge_projection.html#a3d762b898b8b96f21eb22e9d099f14a7',1,'EdgeProjection']]]
+  ['referencelabelcolor_0',['referenceLabelColor',['../class_projection_info.html#add6ccd739083110b8d124f88c8583abc',1,'ProjectionInfo']]],
+  ['referencelabelsize_1',['referenceLabelSize',['../class_projection_info.html#a00b774b4e0c482e1e8115756aebeeb2c',1,'ProjectionInfo']]],
+  ['referencelinecolor_2',['referenceLineColor',['../class_projection_info.html#aa7e244640b6208340a5b86f59ba342f1',1,'ProjectionInfo']]],
+  ['referencelinewidth_3',['referenceLineWidth',['../class_projection_info.html#a92f25c164053d24e7716a0bec1109ad3',1,'ProjectionInfo']]],
+  ['rotatedvertices_4',['rotatedVertices',['../class_object3_d.html#a7de92d39cc892766cf44d5d030881d8e',1,'Object3D']]],
+  ['rotationspeed_5',['rotationSpeed',['../class_object_rotator.html#a6d1a87995a9c142080f1754180b20f1e',1,'ObjectRotator']]]
 ];

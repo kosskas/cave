@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.7"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>VR CAVE - Projekt - Dokumentacja kodu: Dokumentacja przestrzeni nazw Assets.Scripts.Experimental</title>
+<title>Rekonstrukcja rzutów 2D: Dokumentacja przestrzeni nazw Assets.Scripts.Experimental</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,9 +22,9 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="weti.png"/></td>
   <td id="projectalign">
-   <div id="projectname">VR CAVE - Projekt - Dokumentacja kodu
+   <div id="projectname">Rekonstrukcja rzutów 2D
    </div>
-   <div id="projectbrief">Rzuty</div>
+   <div id="projectbrief">VR CAVE - Projekt</div>
   </td>
  </tr>
  </tbody>
@@ -87,11 +87,7 @@ $(function() {
 Struktury danych</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_assets_1_1_scripts_1_1_experimental_1_1_atomic_label.html">AtomicLabel</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_assets_1_1_scripts_1_1_experimental_1_1_ex_context_menu_view.html">ExContextMenuView</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_assets_1_1_scripts_1_1_experimental_1_1_ex_control_menu_view.html">ExControlMenuView</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_assets_1_1_scripts_1_1_experimental_1_1_ex_wall_builder_view.html">ExWallBuilderView</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_assets_1_1_scripts_1_1_experimental_1_1_i_analyzable.html">IAnalyzable</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_assets_1_1_scripts_1_1_experimental_1_1_i_labelable.html">ILabelable</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -105,15 +101,38 @@ Struktury danych</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Wyliczenia</h2></td></tr>
 <tr class="memitem:a4984d9d004480b71a4e0e0f6e2a39643"><td class="memItemLeft" align="right" valign="top"><a id="a4984d9d004480b71a4e0e0f6e2a39643" name="a4984d9d004480b71a4e0e0f6e2a39643"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>ExContext</b> { <br />
-&#160;&#160;<b>Idle</b>
+&#160;&#160;<b>Save</b>
+, <b>Load</b>
+, <b>LoadVisual</b>
+, <b>BackToMenu</b>
+, <br />
+&#160;&#160;<b>Const</b>
+, <b>BackToOpt</b>
 , <b>Point</b>
 , <b>BoldLine</b>
-, <b>Line</b>
 , <br />
-&#160;&#160;<b>PerpendicularLine</b>
+&#160;&#160;<b>Line</b>
+, <b>HelpLine</b>
+, <b>PerpendicularLine</b>
 , <b>ParallelLine</b>
+, <br />
+&#160;&#160;<b>Projection</b>
+, <b>FixedProjection</b>
 , <b>Circle</b>
-, <b>Projection</b>
+, <b>Wall</b>
+, <br />
+&#160;&#160;<b>Face</b>
+, <b>HelpPlane</b>
+, <b>ProjLine</b>
+, <b>Undo</b>
+, <br />
+&#160;&#160;<b>Redo</b>
+, <b>NextSolid</b>
+, <b>PrevSolid</b>
+, <b>RemoveWall</b>
+, <br />
+&#160;&#160;<b>AddWall</b>
+, <b>ShowProj</b>
 <br />
  }</td></tr>
 <tr class="separator:a4984d9d004480b71a4e0e0f6e2a39643"><td class="memSeparator" colspan="2">&#160;</td></tr>

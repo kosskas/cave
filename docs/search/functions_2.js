@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['edgeinfo_0',['EdgeInfo',['../struct_edge_info.html#a4119d2723db23ed3d0a1a8f9369c7091',1,'EdgeInfo']]],
-  ['edgeprojection_1',['EdgeProjection',['../class_edge_projection.html#a685af33733d13d400b9fb6519091468d',1,'EdgeProjection']]]
+  ['drawwall_0',['DrawWall',['../class_assets_1_1_scripts_1_1_experimental_1_1_items_controller.html#abdd8a967f4baaee3d3abf7f192edf5d7',1,'Assets::Scripts::Experimental::ItemsController']]]
 ];
