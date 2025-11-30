@@ -41,6 +41,8 @@ public class ModeExperimental : IMode
     private Line _relativeLine;
 
     private bool _showProjLines = true;
+
+    private GameObject _nFileText;
     /* * * * CONTEXT ACTIONS begin * * * */
 
     private void TryColorObject(IRaycastable obj, Color color)
@@ -146,6 +148,8 @@ public class ModeExperimental : IMode
         radialMenu.RemoveFromScene(); 
         radialMenu = null;
 
+        GameObject.Destroy(_nFileText);
+        _nFileText = null;
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.ModeMenu);
     }
@@ -181,6 +185,8 @@ public class ModeExperimental : IMode
         radialMenu.RemoveFromScene();
         radialMenu = null;
 
+        GameObject.Destroy(_nFileText);
+        _nFileText = null;
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
 
@@ -461,9 +467,19 @@ public class ModeExperimental : IMode
         
         AddRadialMenu();
 
+        _SetFileTextCavnas();
+
         _SceneChangedHandler();
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
+    }
+
+    private void _SetFileTextCavnas()
+    {
+        GameObject ceilingWall = GameObject.Find("Wall5");
+        GameObject prefab = Resources.Load<GameObject>("FileCanvas");
+        _nFileText = UnityEngine.Object.Instantiate(prefab);
+        _nFileText.transform.SetParent(ceilingWall.transform, false);
     }
 
     private void _SceneChangedHandler()
