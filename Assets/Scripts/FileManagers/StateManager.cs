@@ -6,7 +6,6 @@ using Assets.Scripts.Experimental;
 using Assets.Scripts.JsonConverters;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Assets.Scripts.FileManagers
 {
@@ -26,7 +25,6 @@ namespace Assets.Scripts.FileManagers
         private static String AngleObjectId = null;
         private static String AutoSaverObjectId = null;
         private static String ModeObjectId = null;
-        private static Text jsonText = GameObject.Find("FileText").GetComponent<Text>();
 
         public class Exp
         {
@@ -170,7 +168,6 @@ namespace Assets.Scripts.FileManagers
                         : JsonConvert.DeserializeObject<T>(json, settings);
 
                     Debug.Log($"LoadJson: Successfully loaded from file {fullPath}");
-                    UpdateFileText(fullPath);
                     return obj;
                 }
                 catch (JsonException jex)
@@ -183,16 +180,6 @@ namespace Assets.Scripts.FileManagers
                     Debug.LogError($"LoadJson: Failed to load '{fullPath}'. Exception: {ex}");
                     return default(T);
                 }
-            }
-
-            private static void UpdateFileText(string fullPath)
-            {
-                if (jsonText == null)
-                {
-                    jsonText = GameObject.Find("FileText").GetComponent<Text>();
-                }
-                String filePath = fullPath.Substring(fullPath.LastIndexOf("\\") + 1);
-                jsonText.text = filePath;
             }
 
 
