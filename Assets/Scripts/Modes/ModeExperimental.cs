@@ -596,6 +596,22 @@ public class ModeExperimental : IMode
             _TryGetNextLabelText();
         }
 
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("z"))
+            {
+                _Undo();
+            }
+        }
+
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("y"))
+            {
+                _Redo();
+            }
+        }
+
         //if (Input.GetKeyDown("l"))
         //{
         //    _RemoveWall();
