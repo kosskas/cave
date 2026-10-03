@@ -327,7 +327,10 @@ public class ModeExperimental : IMode
             _hm.Redo();
         }
     }
-
+    private void _ToggleView3D()
+    {
+        _mb.Toogle3DView();
+    }
     /* * * * INPUT HANDLERS end * * * */
 
     private void _ClearScene()
@@ -409,6 +412,7 @@ public class ModeExperimental : IMode
         _mb = mainObject.AddComponent<MeshBuilder>();
         _mb.Init(_showProjLines);
         _fc = mainObject.AddComponent<FacesGenerator>();
+        _fc.Init(_mb);
 
         _items = new ItemsController(_wc, _wcrt, _fc, _mb);
         _items.DrawingCompleted += (sender, drawOrigin) =>
@@ -455,6 +459,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Undo, _Undo),
                 new KeyValuePair<ExContext, Action>(ExContext.Redo, _Redo),
+                new KeyValuePair<ExContext, Action>(ExContext.View3D, _ToggleView3D),
             });
 
         _context = _optCtx;
@@ -591,7 +596,33 @@ public class ModeExperimental : IMode
             _TryGetNextLabelText();
         }
 
+        if (Input.GetKeyDown("t"))
+        {
+            _ToggleView3D();
+        }
+
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("z"))
+            {
+                _Undo();
+            }
+        }
+
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("y"))
+            {
+                _Redo();
+            }
+        }
+
         if (Input.GetKeyDown("l"))
+        {
+            _RemoveWall();
+        }
+
+        if (Input.GetKey("left ctrl"))
         {
             _RemoveWall();
         }
