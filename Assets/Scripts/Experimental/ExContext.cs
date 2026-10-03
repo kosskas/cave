@@ -66,6 +66,9 @@ namespace Assets.Scripts.Experimental
 
         [Description("Pon\u00F3w")]
         Redo,
+
+        [Description("Widok 3D")]
+        View3D,
         //---------WIZUALIZACJA-------------------
 
         [Description("Nastepna bryla")]
