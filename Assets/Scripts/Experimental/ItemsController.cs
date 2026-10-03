@@ -46,7 +46,9 @@ namespace Assets.Scripts.Experimental
 
         public event EventHandler<DrawType> DrawingCompleted;
 
-        protected virtual void OnDrawingCompleted(DrawType type)
+        protected virtual void OnDrawingCompleted(
+            DrawType type
+            )
         {
             DrawingCompleted?.Invoke(this, type);
         }
@@ -54,7 +56,12 @@ namespace Assets.Scripts.Experimental
 
         /*   C O N S T R U C T O R S   */
 
-        public ItemsController(WallController wCtrl, WallCreator wCrt, FacesGenerator fGen, MeshBuilder mB)
+        public ItemsController(
+            WallController wCtrl, 
+            WallCreator wCrt, 
+            FacesGenerator fGen, 
+            MeshBuilder mB
+            )
         {
             _workspace = GameObject.Find("WorkspaceExp") ?? new GameObject("WorkspaceExp");
 
@@ -85,7 +92,9 @@ namespace Assets.Scripts.Experimental
 
         /*   P R I V A T E   M E T H O D S   */
 
-        private static List<T> GetComponentsFromRepo<T>(GameObject repo) where T : Component
+        private static List<T> GetComponentsFromRepo<T>(
+            GameObject repo
+            ) where T : Component
         {
             var result = new List<T>();
 
@@ -100,7 +109,10 @@ namespace Assets.Scripts.Experimental
             return result;
         }
 
-        private Vector3 CalcProjectionOnAxis(Axis axis, Vector3 point)
+        private Vector3 CalcProjectionOnAxis(
+            Axis axis, 
+            Vector3 point
+            )
         {
             if (axis == null)
             {
@@ -110,7 +122,11 @@ namespace Assets.Scripts.Experimental
             return CalcProjectionOnAxis(axis.From, axis.To, point);
         }
 
-        private Vector3 CalcProjectionOnAxis(Vector3 startPoint, Vector3 endPoint, Vector3 point)
+        private Vector3 CalcProjectionOnAxis(
+            Vector3 startPoint, 
+            Vector3 endPoint, 
+            Vector3 point
+            )
         {
             Vector3 A = endPoint - startPoint;
             Vector3 B = point - startPoint;
@@ -123,13 +139,18 @@ namespace Assets.Scripts.Experimental
             return projectionPoint;
         }
 
-        private Axis GetAxis(WallInfo plane)
+        private Axis GetAxis(
+            WallInfo plane
+            )
         {
             var axis = _axisWalls.FirstOrDefault(e => e.Value.Item1.Equals(plane) || e.Value.Item2.Equals(plane)).Key;
             return axis;
         }
 
-        private Axis GetAxis(WallInfo planeA, WallInfo planeB)
+        private Axis GetAxis(
+            WallInfo planeA, 
+            WallInfo planeB
+            )
         {
             var axis = _axisWalls
                 .FirstOrDefault(e =>
@@ -139,7 +160,9 @@ namespace Assets.Scripts.Experimental
             return axis;
         }
 
-        private List<Axis> GetAllAxes(WallInfo plane)
+        private List<Axis> GetAllAxes(
+            WallInfo plane
+            )
         {
             var axes = _axisWalls
                 .Where(e => e.Value.Item1.Equals(plane) || e.Value.Item2.Equals(plane))
@@ -153,7 +176,11 @@ namespace Assets.Scripts.Experimental
         /// Kryterium: najwiêkszy dodatni cos(k¹ta) pomiêdzy kierunkiem line,
         /// a wektorem od lineFrom do najbli¿szego punktu na osi.
         /// </summary>
-        private Axis FindApproachingAxis(Vector3 lineFrom, Vector3 lineTo, List<Axis> axes)
+        private Axis FindApproachingAxis(
+            Vector3 lineFrom, 
+            Vector3 lineTo, 
+            List<Axis> axes
+            )
         {
             var dirLine = (lineTo - lineFrom).normalized;
 
@@ -179,12 +206,18 @@ namespace Assets.Scripts.Experimental
             return bestAxis;
         }
 
-        private WallInfo FindPlane(WallInfo hitPlane, IRaycastable hitObject)
+        private WallInfo FindPlane(
+            WallInfo hitPlane, 
+            IRaycastable hitObject
+            )
         {
             return hitPlane ?? (hitObject as IDrawable)?.Plane;
         }
 
-        private WallInfo FindEndPlane(Axis axis, WallInfo startPlane)
+        private WallInfo FindEndPlane(
+            Axis axis, 
+            WallInfo startPlane
+            )
         {
             var planes = _axisWalls[axis];
             var plane1 = planes.Item1;
@@ -193,30 +226,38 @@ namespace Assets.Scripts.Experimental
             return (plane1 == startPlane) ? plane2 : plane1;
         }
 
-        private Vector3 CalcPosition(WallInfo plane, Vector3 hitPosition, ExPoint hitPoint = null)
+        private Vector3 CalcPosition(
+            WallInfo plane, 
+            Vector3 hitPosition, 
+            ExPoint hitPoint = null
+            )
         {
             var planeNormal = plane.GetNormal();
             var planePosition = plane.gameObject.transform.position;
 
             var position = Vector3.zero;
 
-            if (Mathf.Approximately(Mathf.Abs(planeNormal.x), 1))
-                position.x = planePosition.x + Mathf.Sign(planeNormal.x) * _WALL_OFFSET;
-            else
-                position.x = hitPosition.x;
-
-            if (Mathf.Approximately(Mathf.Abs(planeNormal.y), 1))
-                position.y = planePosition.y + Mathf.Sign(planeNormal.y) * _WALL_OFFSET;
-            else
-                position.y = hitPosition.y;
-
-            if (Mathf.Approximately(Mathf.Abs(planeNormal.z), 1))
-                position.z = planePosition.z + Mathf.Sign(planeNormal.z) * _WALL_OFFSET;
-            else
-                position.z = hitPosition.z;
-
             if (hitPoint != null)
+            {
                 position = hitPoint.Position;
+            }
+            else
+            {
+                if (Mathf.Approximately(Mathf.Abs(planeNormal.x), 1))
+                    position.x = planePosition.x + Mathf.Sign(planeNormal.x) * _WALL_OFFSET;
+                else
+                    position.x = hitPosition.x;
+
+                if (Mathf.Approximately(Mathf.Abs(planeNormal.y), 1))
+                    position.y = planePosition.y + Mathf.Sign(planeNormal.y) * _WALL_OFFSET;
+                else
+                    position.y = hitPosition.y;
+
+                if (Mathf.Approximately(Mathf.Abs(planeNormal.z), 1))
+                    position.z = planePosition.z + Mathf.Sign(planeNormal.z) * _WALL_OFFSET;
+                else
+                    position.z = hitPosition.z;
+            }
 
             // Debug.Log($"hitPosition=({hitPosition.x:F9}, {hitPosition.y:F9}, {hitPosition.z:F9}) " +
             //           $"position=({position.x:F9}, {position.y:F9}, {position.z:F9}) " +
@@ -226,7 +267,11 @@ namespace Assets.Scripts.Experimental
             return position;
         }
 
-        Vector3 ScaleToLength(Vector3 from, Vector3 to, float length)
+        Vector3 ScaleToLength(
+            Vector3 from, 
+            Vector3 to, 
+            float length
+            )
         {
             var v = to - from;
             var d = v.magnitude;
@@ -239,7 +284,12 @@ namespace Assets.Scripts.Experimental
 
             return from + dir * length;
         }
-        private void HandleIntersectionStart(IRaycastable hitObject, HashSet<IAnalyzable> intersectedObjs, IRaycastable currentComponent)
+
+        private void HandleIntersectionStart(
+            IRaycastable hitObject, 
+            HashSet<IAnalyzable> intersectedObjs, 
+            IRaycastable currentComponent
+            )
         {
             if (hitObject is IAnalyzable && hitObject != currentComponent)
             {
@@ -254,7 +304,11 @@ namespace Assets.Scripts.Experimental
             }
         }
 
-        private void HandleIntersectionsEnd(WallInfo plane, HashSet<IAnalyzable> intersectedObjs, IAnalyzable drawableComponent)
+        private void HandleIntersectionsEnd(
+            WallInfo plane, 
+            HashSet<IAnalyzable> intersectedObjs, 
+            IAnalyzable drawableComponent
+            )
         {
             foreach (var intersected in intersectedObjs)
             {
@@ -276,12 +330,16 @@ namespace Assets.Scripts.Experimental
             }
         }
 
-        private bool NoPointOnPosition(Vector3 position)
+        private bool NoPointOnPosition(
+            Vector3 position
+            )
         {
             return !ExistsPointOnPosition(position);
         }
 
-        private bool ExistsPointOnPosition(Vector3 position)
+        private bool ExistsPointOnPosition(
+            Vector3 position
+            )
         {
             foreach (Collider collider in Physics.OverlapSphere(position, DescriptiveMathLib.EPS))
             {
@@ -303,7 +361,10 @@ namespace Assets.Scripts.Experimental
 
         /*   P U B L I C   M E T H O D S   */
 
-        public void AddAxisBetweenPlanes(WallInfo planeA, WallInfo planeB)
+        public void AddAxisBetweenPlanes(
+            WallInfo planeA, 
+            WallInfo planeB
+            )
         {
             var axis = new GameObject("AXIS");
             axis.transform.SetParent(_axisRepo.transform); 
@@ -344,7 +405,9 @@ namespace Assets.Scripts.Experimental
             _wCtrl.LinkConstructionToWall(planeB, axis);
         }
 
-        public void RemoveAxis(WallInfo wallToRem)
+        public void RemoveAxis(
+            WallInfo wallToRem
+            )
         {
             if (_axisWalls != null && _axisWalls.Count > 0 && _wCtrl != null)
             {
@@ -367,7 +430,8 @@ namespace Assets.Scripts.Experimental
             IRaycastable hitObject,
             Vector3 hitPosition, 
             WallInfo hitPlane,
-            IRaycastable relativeObject = null)
+            IRaycastable relativeObject = null
+            )
         {
             // FIND PLANE
 
@@ -410,7 +474,12 @@ namespace Assets.Scripts.Experimental
             }
         }
 
-        public DrawAction DrawPoint(WallInfo plane, Vector3 position, List<string> labels = null, DrawType type = DrawType.Full)
+        public DrawAction DrawPoint(
+            WallInfo plane, 
+            Vector3 position, 
+            List<string> labels = null, 
+            DrawType type = DrawType.Full
+            )
         {
             if (NoPointOnPosition(position))
             {
@@ -431,7 +500,9 @@ namespace Assets.Scripts.Experimental
             return null;
         }
 
-        public DrawAction DrawFace(ExPoint chosenPoint)
+        public DrawAction DrawFace(
+            ExPoint chosenPoint
+            )
         {
             if (chosenPoint == null)
             {
@@ -470,7 +541,10 @@ namespace Assets.Scripts.Experimental
             return null;
         }
 
-        private DrawAction DrawHelpPlane(ExPoint hitPoint, Line relativeLine)
+        private DrawAction DrawHelpPlane(
+            ExPoint hitPoint, 
+            Line relativeLine
+            )
         {
             if (hitPoint == null || relativeLine == null)
                 return null;
@@ -507,7 +581,14 @@ namespace Assets.Scripts.Experimental
             return null;
         }
 
-        public DrawAction DrawLine(WallInfo plane, Vector3 startPosition, ExPoint startPoint = null, float lineWidth = _HELP_LINE_WIDTH, List<string> labels = null, DrawType type = DrawType.Full)
+        public DrawAction DrawLine(
+            WallInfo plane, 
+            Vector3 startPosition, 
+            ExPoint startPoint = null, 
+            float lineWidth = _HELP_LINE_WIDTH, 
+            List<string> labels = null, 
+            DrawType type = DrawType.Full
+            )
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -557,7 +638,13 @@ namespace Assets.Scripts.Experimental
         }
 
         /// TODO Przeciecia sa niedostepne dla scian
-        public DrawAction DrawWall(WallInfo plane, Vector3 startPosition, Vector3 wallParentNormal, string fixedName = null, DrawType type = DrawType.Full)
+        public DrawAction DrawWall(
+            WallInfo plane, 
+            Vector3 startPosition, 
+            Vector3 wallParentNormal, 
+            string fixedName = null, 
+            DrawType type = DrawType.Full
+            )
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -595,7 +682,12 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public DrawAction DrawCircle(WallInfo plane, Vector3 startPosition, float lineWidth = _HELP_LINE_WIDTH, DrawType type = DrawType.Full)
+        public DrawAction DrawCircle(
+            WallInfo plane, 
+            Vector3 startPosition, 
+            float lineWidth = _HELP_LINE_WIDTH, 
+            DrawType type = DrawType.Full
+            )
         {
             var circle = new GameObject("CIRCLE");
             circle.transform.SetParent(_circleRepo.transform);
@@ -629,7 +721,11 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public DrawAction DrawFixedProjection(WallInfo startPlane, Vector3 startPosition, IRaycastable relativeObject = null)
+        public DrawAction DrawFixedProjection(
+            WallInfo startPlane, 
+            Vector3 startPosition, 
+            IRaycastable relativeObject = null
+            )
         {
             var relativeLine = relativeObject as Line;
             var relativePoint = relativeObject as ExPoint;
@@ -659,7 +755,13 @@ namespace Assets.Scripts.Experimental
 
         //return DrawProjection(plane, positionWithPointSensitivity);
 
-        public DrawAction DrawProjection(WallInfo startPlane, Vector3 startPosition, bool withFixedLength = false, float fixedLength = 0.0f, float lineWidth = _HELP_LINE_WIDTH)
+        public DrawAction DrawProjection(
+            WallInfo startPlane, 
+            Vector3 startPosition, 
+            bool withFixedLength = false, 
+            float fixedLength = 0.0f, 
+            float lineWidth = _HELP_LINE_WIDTH
+            )
         {
             // FIRST PART
             var projection1 = new GameObject("PROJECTION");
@@ -777,7 +879,11 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public DrawAction DrawLineParallelToLine(WallInfo plane, Vector3 startPosition, IRaycastable relativeObject = null)
+        public DrawAction DrawLineParallelToLine(
+            WallInfo plane, 
+            Vector3 startPosition, 
+            IRaycastable relativeObject = null
+            )
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -843,7 +949,11 @@ namespace Assets.Scripts.Experimental
             };
         }
 
-        public DrawAction DrawLinePerpendicularToLine(WallInfo plane, Vector3 startPosition, IRaycastable relativeObject = null)
+        public DrawAction DrawLinePerpendicularToLine(
+            WallInfo plane, 
+            Vector3 startPosition, 
+            IRaycastable relativeObject = null
+            )
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
@@ -929,12 +1039,23 @@ namespace Assets.Scripts.Experimental
 
         public static List<FaceInfo> GetFaces() => FacesGenerator.faceInfoList;
 
-        public static void AddPoint(List<string> pointLabels, string pointPlaneName, Vector3 pointPosition)
+        public static void AddPoint(
+            List<string> pointLabels, 
+            string pointPlaneName, 
+            Vector3 pointPosition
+            )
         {
             _ic?.DrawPoint(_ic._wCtrl.GetWallByName(pointPlaneName), pointPosition, pointLabels, DrawType.Part);
         }
 
-        public static void AddLine(List<string> lineBoundPointsByLabel, Vector3 lineEndPosition, List<string> lineLabels, float lineLineWidth, string linePlaneName, Vector3 lineStartPosition)
+        public static void AddLine(
+            List<string> lineBoundPointsByLabel, 
+            Vector3 lineEndPosition, 
+            List<string> lineLabels, 
+            float lineLineWidth, 
+            string linePlaneName, 
+            Vector3 lineStartPosition
+            )
         {
             if (_ic == null) return;
 
@@ -976,7 +1097,12 @@ namespace Assets.Scripts.Experimental
             da.Invoke(endPoint, lineEndPosition, plane, true);
         }
 
-        public static void AddCircle(Vector3 circleEndPosition, float circleLineWidth, string circlePlaneName, Vector3 circleStartPosition)
+        public static void AddCircle(
+            Vector3 circleEndPosition, 
+            float circleLineWidth, 
+            string circlePlaneName, 
+            Vector3 circleStartPosition
+            )
         {
             if (_ic == null) return;
 
@@ -986,7 +1112,13 @@ namespace Assets.Scripts.Experimental
             da.Invoke(null, circleEndPosition, plane, true);
         }
 
-        public static void AddWall(Vector3? wallConstPoint1, Vector3? wallConstPoint2, Vector3? wallParentNormal, string wallParentWallName, string wallWallName)
+        public static void AddWall(
+            Vector3? wallConstPoint1, 
+            Vector3? wallConstPoint2, 
+            Vector3? wallParentNormal, 
+            string wallParentWallName, 
+            string wallWallName
+            )
         {
             if (_ic == null) return;
             if (wallConstPoint1 == null) return;
@@ -1005,14 +1137,18 @@ namespace Assets.Scripts.Experimental
             }
         }
  
-        public static void AddFace(List<KeyValuePair<string, Vector3>> faceVertices)
+        public static void AddFace(
+            List<KeyValuePair<string, Vector3>> faceVertices
+            )
         {
             _ic?._fGen.GenerateFace(faceVertices);
         }
 
         //---
 
-        public void Clear(bool withAxis = true)
+        public void Clear(
+            bool withAxis = true
+            )
         {
             if (withAxis)
             {
