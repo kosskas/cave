@@ -1,7 +1,8 @@
+using Assets.Scripts.Experimental.Items;
+using Assets.Scripts.Experimental.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.Scripts.Experimental.Items;
 using UnityEngine;
 
 namespace Assets.Scripts.Experimental
@@ -253,25 +254,50 @@ namespace Assets.Scripts.Experimental
             }
         }
 
-        private void HandleIntersectionsEnd(WallInfo plane,HashSet<IAnalyzable> intersectedObjs, IAnalyzable drawableComponent, Vector3? excludePoint = null)
+        private void HandleIntersectionsEnd(WallInfo plane, HashSet<IAnalyzable> intersectedObjs, IAnalyzable drawableComponent)
         {
             foreach (var intersected in intersectedObjs)
             {
                 List<Vector3> crossings = intersected.FindCrossingPoints(drawableComponent);
+
                 if (crossings != null)
                 {
                     foreach (var point in crossings)
                     {
-                        if (excludePoint != null && Vector3.SqrMagnitude(excludePoint.Value - point) < 1e-5f) continue;
                         DrawPoint(plane, point, null, DrawType.Part);
                     }
                 }
+
                 if (intersected is IColorable)
                 {
                     IColorable cIntersected = (IColorable)intersected;
                     cIntersected.Color = ReconstructionInfo.NORMAL;
                 }
             }
+        }
+
+        private bool NoPointOnPosition(Vector3 position)
+        {
+            return !ExistsPointOnPosition(position);
+        }
+
+        private bool ExistsPointOnPosition(Vector3 position)
+        {
+            foreach (Collider collider in Physics.OverlapSphere(position, DescriptiveMathLib.EPS))
+            {
+                IRaycastable raycastable = collider.gameObject.GetComponent<IRaycastable>();
+                if (raycastable == null) continue;
+
+                ExPoint exPoint = raycastable as ExPoint;
+                if (exPoint == null) continue;
+
+                if (Vector3.SqrMagnitude(exPoint.Position - position) >= DescriptiveMathLib.EPS) continue;
+
+                // exists point relative to position closer than eps distance 
+                return true;
+            }
+
+            return false;
         }
 
 
@@ -386,16 +412,19 @@ namespace Assets.Scripts.Experimental
 
         public DrawAction DrawPoint(WallInfo plane, Vector3 position, List<string> labels = null, DrawType type = DrawType.Full)
         {
-            var point = new GameObject("POINT");
-            point.transform.SetParent(_pointRepo.transform);
-            _wCtrl.LinkConstructionToWall(plane, point);
+            if (NoPointOnPosition(position))
+            {
+                var point = new GameObject("POINT");
+                point.transform.SetParent(_pointRepo.transform);
+                _wCtrl.LinkConstructionToWall(plane, point);
 
-            var pointComponent = point.AddComponent<ExPoint>();
-            pointComponent.Draw(plane, position);
-            pointComponent.EnabledLabels = true;
+                var pointComponent = point.AddComponent<ExPoint>();
+                pointComponent.Draw(plane, position);
+                pointComponent.EnabledLabels = true;
 
-            labels?.ForEach(label => pointComponent.AddLabel(label));
-            pointComponent.Color = ReconstructionInfo.NORMAL;
+                labels?.ForEach(label => pointComponent.AddLabel(label));
+                pointComponent.Color = ReconstructionInfo.NORMAL;
+            }
 
             OnDrawingCompleted(type);
 
@@ -520,7 +549,7 @@ namespace Assets.Scripts.Experimental
                         lineComponent.BindPoints(startPoint, endPoint);
                     }
 
-                    HandleIntersectionsEnd(plane, intersectedObjs, lineComponent, endPositionWithPointSensitivity);
+                    HandleIntersectionsEnd(plane, intersectedObjs, lineComponent);
 
                     OnDrawingCompleted(type);
                 }
@@ -593,7 +622,7 @@ namespace Assets.Scripts.Experimental
                 if (isEnd)
                 {
                     circleComponent.ColliderEnabled = true;
-                    HandleIntersectionsEnd(plane, intersectedObjs, circleComponent, endPositionWithPointSensitivity);
+                    HandleIntersectionsEnd(plane, intersectedObjs, circleComponent);
 
                     OnDrawingCompleted(type);
                 }
