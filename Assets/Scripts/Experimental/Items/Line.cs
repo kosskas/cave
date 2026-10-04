@@ -34,6 +34,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public Vector3 EndPosition { get; private set; }
 
+        public float Length => Vector3.Distance(StartPosition, EndPosition);
+
         public bool ColliderEnabled { get; set; } = true;
 
         private LineRenderer _lineRenderer;

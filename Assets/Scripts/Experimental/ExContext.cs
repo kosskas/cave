@@ -34,6 +34,9 @@ namespace Assets.Scripts.Experimental
         [Description("Linia pomocznicza")]
         HelpLine,
 
+        [Description("Linia pomocznicza wskazanej d\u0142ugo\u015bci")]
+        FixedLine,
+
         [Description("Linia prostopad\u0142a")]
         PerpendicularLine,
 

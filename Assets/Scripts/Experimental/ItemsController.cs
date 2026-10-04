@@ -451,9 +451,11 @@ namespace Assets.Scripts.Experimental
             {
                 case ExContext.Point: return DrawPoint(plane, position);
 
-                case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, _BOLD_LINE_WIDTH);
+                case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, null, _BOLD_LINE_WIDTH);
                 
                 case ExContext.HelpLine: return DrawLine(plane, positionWithPointSensitivity);
+
+                case ExContext.FixedLine: return DrawLine(plane, positionWithPointSensitivity, null, relativeObject as Line);
 
                 case ExContext.PerpendicularLine: return DrawLinePerpendicularToLine(plane, positionWithPointSensitivity, relativeObject);
 
@@ -613,7 +615,8 @@ namespace Assets.Scripts.Experimental
         public DrawAction DrawLine(
             WallInfo plane, 
             Vector3 startPosition, 
-            ExPoint startPoint = null, 
+            ExPoint startPoint = null,
+            Line lineWithReferenceLength = null,
             float lineWidth = _HELP_LINE_WIDTH, 
             List<string> labels = null, 
             DrawType type = DrawType.Full
@@ -637,9 +640,24 @@ namespace Assets.Scripts.Experimental
                 if (plane != FindPlane(hitPlane, hitObject))
                     return;
 
-                var endPositionWithPointSensitivity = CalcPosition(plane, hitPosition, hitObject as ExPoint);
+                var endPosition = startPosition;
 
-                lineComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
+                if (lineWithReferenceLength != null) 
+                {
+                    var cursorPosition = CalcPosition(plane, hitPosition, null);
+                    if (cursorPosition != startPosition)
+                    {
+                        var length = lineWithReferenceLength.Length;
+                        var direction = (cursorPosition - startPosition).normalized;
+                        endPosition = startPosition + direction * length;
+                    }
+                }
+                else
+                {
+                    endPosition = CalcPosition(plane, hitPosition, hitObject as ExPoint);
+                }
+
+                lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
 
                 // lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
 
@@ -1122,7 +1140,7 @@ namespace Assets.Scripts.Experimental
                 }
             }
 
-            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, lineLineWidth, lineLabels, DrawType.Part);
+            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, null, lineLineWidth, lineLabels, DrawType.Part);
             da.Invoke(endPoint, lineEndPosition, plane, true);
         }
 
