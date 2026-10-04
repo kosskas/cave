@@ -425,6 +425,7 @@ namespace Assets.Scripts.Experimental
                 }
             }
         }
+
         public DrawAction Add(
             ExContext context, 
             IRaycastable hitObject,
@@ -468,7 +469,7 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.Face: return DrawFace(hitObject as ExPoint);
 
-                case ExContext.HelpPlane: return DrawHelpPlane(hitObject as ExPoint, relativeObject as Line);
+                case ExContext.HelpPlane: return DrawHelpPlane(hitObject, relativeObject);
 
                 default: return null;
             }
@@ -542,41 +543,69 @@ namespace Assets.Scripts.Experimental
         }
 
         private DrawAction DrawHelpPlane(
-            ExPoint hitPoint, 
-            Line relativeLine
+            IRaycastable firstItem,
+            IRaycastable secondItem
             )
         {
-            if (hitPoint == null || relativeLine == null)
+            ExPoint point;
+            Line line;
+
+            if (firstItem is ExPoint && secondItem is Line)
+            {
+                point = firstItem as ExPoint;
+                line = secondItem as Line;
+            }
+            else if (firstItem is Line && secondItem is ExPoint)
+            {
+                line = firstItem as Line;
+                point = secondItem as ExPoint;
+            }
+            else
+            {
+                return null;
+            }
+
+            Vector3? a;
+            Vector3? b;
+            Vector3? p;
+
+            p = _mB.GetPoint3DCoords(point.FocusedLabel);
+
+            var boundPoints = line.GetLabelsOfBoundPoints();
+            if (boundPoints.Count == 2)
+            {
+                a = _mB.GetPoint3DCoords(boundPoints[0]);
+                b = _mB.GetPoint3DCoords(boundPoints[1]);
+            }
+            else
+            {
+                var ab = _mB.GetEdge3DCoords(line.FocusedLabel);
+                a = ab?.Item1;
+                b = ab?.Item2;
+            }
+
+            if (a == null || b == null || p == null)
                 return null;
 
-            var coords = _mB.GetEdge3DCoords(relativeLine.FocusedLabel);
-            if (coords == null)
-                return null;
-
-            var f = _mB.GetPoint3DCoords(hitPoint.FocusedLabel);
-            if (f == null) 
-                return null;
-
-            var a = coords.Item1;
-            var b = coords.Item2;
-
-            var v = b - a;
+            var v = b.Value - a.Value;
             var vv = Vector3.Dot(v, v);
-            if (vv < 1e-9f)
+            if (vv < DescriptiveMathLib.EPS)
                 return null;
 
-            var c = f.Value + v * Vector3.Dot(b - f.Value, v) / vv;
-            var d = f.Value + v * Vector3.Dot(a - f.Value, v) / vv;
+            var c = p.Value + v * Vector3.Dot(b.Value - p.Value, v) / vv;
+            var d = p.Value + v * Vector3.Dot(a.Value - p.Value, v) / vv;
 
             _fGen.GenerateFace(new List<KeyValuePair<string, Vector3>>()
             {
-                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_a", a),
-                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_b", b),
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_a", a.Value),
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_b", b.Value),
                 new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_c", c),
                 new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_d", d)
             });
 
             hiddenLabelId++;
+
+            OnDrawingCompleted(DrawType.Full);
 
             return null;
         }
