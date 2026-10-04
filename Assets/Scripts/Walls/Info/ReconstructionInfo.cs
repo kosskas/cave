@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public static class ReconstructionInfo
 {
@@ -42,4 +43,8 @@ public static class ReconstructionInfo
     public static float WALL_LENGTH = 10.0f;
     public static float WALL_WIDTH = 0.0001f;
     public static float WALL_OPACITY = 0.5f;
+
+    // -- METADATA
+    public static String APP_NAME = "Descriptive3D_v1.0.0";
+    public static String GITHUB_LINK = "kosskas.github.io/cave";
 }
