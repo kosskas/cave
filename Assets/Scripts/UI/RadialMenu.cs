@@ -36,7 +36,18 @@ public class RadialMenu : MonoBehaviour
 
     public bool isMenuActive = false;
 
- 
+    private Vector3 originalPosition;
+    private Vector3 originalScale;
+    private bool isMinimized = false;
+
+    private float scrollCooldown = 0.15f;
+    private float lastScrollTime = 0f;
+
+    private String versionString = ReconstructionInfo.APP_NAME;
+    private Text versionText;
+    private GameObject versionTextGO;
+
+
     public static RadialMenu Create(Transform parent, GameObject prefab)
     {
         GameObject menuObject = new GameObject("RadialMenu");

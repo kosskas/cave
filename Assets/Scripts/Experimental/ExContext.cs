@@ -10,6 +10,9 @@ namespace Assets.Scripts.Experimental
         [Description("Wczytaj stan")]
         Load,
 
+        [Description("Drukuj do PDF")]
+        Print,
+
         [Description("Wizualizuj")]
         LoadVisual,
 

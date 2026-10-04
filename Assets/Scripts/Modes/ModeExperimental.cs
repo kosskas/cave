@@ -129,6 +129,11 @@ public class ModeExperimental : IMode
         StateManager.Exp.Save();
     }
 
+    private void _PrintState()
+    {
+        StateManager.Exp.Print();
+    }
+
     private void _LoadState()
     {
         _ClearScene();
@@ -468,7 +473,8 @@ public class ModeExperimental : IMode
             {
                 new KeyValuePair<ExContext, Action>(ExContext.Save, _SaveState),
                 new KeyValuePair<ExContext, Action>(ExContext.Load, _LoadState),
-                new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
+                new KeyValuePair<ExContext, Action>(ExContext.Print, _PrintState),
+                //new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
                 new KeyValuePair<ExContext, Action>(ExContext.BackToMenu, _BackToMenu),
                 new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Undo, _Undo),
