@@ -528,11 +528,36 @@ namespace Assets.Scripts.FileManagers
                 s.Append(fill ? "h f\n" : "h S\n");
             }
 
+            // Built-in conversion avoids Encoding.GetEncoding(1252), unavailable in some Unity builds.
+            private static byte[] MongeWinAnsiBytes(string text)
+            {
+                // Unicode counterparts of Windows-1252 bytes 0x80..0x9F.
+                const string special = "\u20AC\u0081\u201A\u0192\u201E\u2026\u2020\u2021"
+                    + "\u02C6\u2030\u0160\u2039\u0152\u008D\u017D\u008F"
+                    + "\u0090\u2018\u2019\u201C\u201D\u2022\u2013\u2014"
+                    + "\u02DC\u2122\u0161\u203A\u0153\u009D\u017E\u0178";
+                var bytes = new byte[text.Length];
+                for (int i = 0; i < text.Length; i++)
+                {
+                    char c = text[i];
+                    if (c <= 0x7F || (c >= 0xA0 && c <= 0xFF))
+                        bytes[i] = (byte)c;
+                    else
+                    {
+                        int index = special.IndexOf(c);
+                        if (index < 0)
+                            throw new ArgumentException("Character U+" + ((int)c).ToString("X4")
+                                + " is unsupported by the PDF Helvetica/WinAnsi font.");
+                        bytes[i] = (byte)(0x80 + index);
+                    }
+                }
+                return bytes;
+            }
+
             private static void MongePdfText(StringBuilder s, Vector2 p, string text, double fontSize = 9)
             {
                 // Octal escapes preserve WinAnsi bytes and protect PDF syntax.
-                Encoding enc = Encoding.GetEncoding(1252, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback);
-                byte[] bytes = enc.GetBytes(text);
+                byte[] bytes = MongeWinAnsiBytes(text);
                 string escaped = string.Concat(bytes.Select(b => "\\" + Convert.ToString(b, 8).PadLeft(3, '0')).ToArray());
                 s.Append("BT /F1 ").Append(MongeNumber(fontSize)).Append(" Tf 1 0 0 1 ").Append(MongeNumber(p.x)).Append(' ')
                     .Append(MongeNumber(p.y)).Append(" Tm (").Append(escaped).Append(") Tj ET\n");
@@ -564,8 +589,7 @@ namespace Assets.Scripts.FileManagers
             {
                 text = text.Replace("\r", " ").Replace("\n", " ");
                 if (text.Length == 0) return;
-                Encoding enc = Encoding.GetEncoding(1252, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback);
-                double widthAtOnePoint = enc.GetBytes(text).Sum(b => MongeHelveticaWidths[b]) / 1000.0;
+                double widthAtOnePoint = MongeWinAnsiBytes(text).Sum(b => MongeHelveticaWidths[b]) / 1000.0;
                 // Fit unusually long headers to the available page width.
                 if (widthAtOnePoint * fontSize > maxWidth)
                     fontSize = maxWidth / widthAtOnePoint;
@@ -776,9 +800,15 @@ namespace Assets.Scripts.FileManagers
                 var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 var fileName = $"monge_{timestamp}.pdf";
 
-                ExportMongePdf(ss, PathToFolderWithPrints, fileName);
-
-                Debug.Log($"State printed to PDF file: {fileName}");
+                try
+                {
+                    ExportMongePdf(ss, PathToFolderWithPrints, fileName);
+                    Debug.Log($"State printed to PDF file: {fileName}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError("PDF b³¹d:\n" + ex);
+                }
             }
 
             public static void Load(string fullFilePath = "")
