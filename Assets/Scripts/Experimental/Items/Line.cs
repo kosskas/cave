@@ -34,6 +34,8 @@ namespace Assets.Scripts.Experimental.Items
 
         public Vector3 EndPosition { get; private set; }
 
+        public float Length => Vector3.Distance(StartPosition, EndPosition);
+
         public bool ColliderEnabled { get; set; } = true;
 
         private LineRenderer _lineRenderer;
@@ -255,6 +257,7 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 _labelComponent = gameObject.AddComponent<IndexedLabel>();
 
+            _labelComponent.SetLabelOffset((EndPosition - StartPosition) * ReconstructionInfo.LABEL_2D_OFFSET_ALONG_LINE_LENGTH);
             _labelComponent.AddLabel("", new string('\'', Plane.constructionNumber), "");
 
             NextText();
@@ -358,9 +361,6 @@ namespace Assets.Scripts.Experimental.Items
             Mc.AddEdgeProjection(Plane, newLabelText, this);
         }
 
-
-
-
         // public void SetLabel(float value)
         // {
         //     if (!EnabledLabels)
@@ -380,22 +380,18 @@ namespace Assets.Scripts.Experimental.Items
         //     _labelComponent?.SetVisible(flag);
         // }
 
-        
-
-        
-
-        
-
-        
 
         // IAnalyzable interface
+
         public List<Vector3> FindCrossingPoints(IAnalyzable obj)
         {
             Line crossLineObj = null;
             Circle crossCircleObj = null;
+
             if (obj is Line)
             {
                 crossLineObj = (Line)obj;
+
                 Vector3 p1 = this.StartPosition;
                 Vector3 n1 = (this.EndPosition - this.StartPosition);
                 Vector3 p2 = crossLineObj.StartPosition;
@@ -409,17 +405,20 @@ namespace Assets.Scripts.Experimental.Items
 
                 Vector3 point1 = result.Item1;
                 Vector3 point2 = result.Item2;
-
                 Vector3 intersection = (point1 + point2) * 0.5f;
 
-                if(DescriptiveMathLib.IsPointOnSegment(intersection, this.StartPosition, this.EndPosition) && DescriptiveMathLib.IsPointOnSegment(intersection, crossLineObj.StartPosition, crossLineObj.EndPosition))
-                    return new List<Vector3> { intersection };
-                return null;
+                var intersectionBelongsToThisLine = DescriptiveMathLib.IsPointOnSegment(intersection, this.StartPosition, this.EndPosition);
+                var intersectionBelongsToCrossedLine = DescriptiveMathLib.IsPointOnSegment(intersection, crossLineObj.StartPosition, crossLineObj.EndPosition);
 
+                return (intersectionBelongsToThisLine && intersectionBelongsToCrossedLine)
+                    ? new List<Vector3> { intersection }
+                    : null;
             }
+
             if (obj is Circle)
             {
                 crossCircleObj = (Circle)obj;
+
                 Vector3 A = this.StartPosition;
                 Vector3 B = this.EndPosition;
                 Vector3 S = crossCircleObj.StartPosition;
@@ -431,8 +430,10 @@ namespace Assets.Scripts.Experimental.Items
 
                 return intersections;
             }
+
             return null;
         }
+
         public IAnalyzable GetElement()
         {
             return this;

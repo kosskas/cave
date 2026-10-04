@@ -123,14 +123,18 @@ namespace Assets.Scripts.Experimental.Items
                 _circleRenderer.material.color = _color;
         }
 
+
         // IAnalyzable interface
+
         public List<Vector3> FindCrossingPoints(IAnalyzable obj)
         {
             Line crossLineObj = null;
             Circle crossCircleObj = null;
+
             if (obj is Line)
             {
                 crossLineObj = (Line)obj;
+
                 Vector3 A = crossLineObj.StartPosition;
                 Vector3 B = crossLineObj.EndPosition;
                 Vector3 S = this.StartPosition;
@@ -143,6 +147,7 @@ namespace Assets.Scripts.Experimental.Items
                 return intersections;
 
             }
+
             if (obj is Circle)
             {
                 crossCircleObj = (Circle)obj;
@@ -154,8 +159,10 @@ namespace Assets.Scripts.Experimental.Items
 
                 return DescriptiveMathLib.FindCCIntersections(S1, A1, S2, B2, n);
             }
+
             return null;
         }
+
         public IAnalyzable GetElement()
         {
             return this;

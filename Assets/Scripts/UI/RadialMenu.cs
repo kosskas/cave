@@ -44,7 +44,7 @@ public class RadialMenu : MonoBehaviour
     private float scrollCooldown = 0.15f;
     private float lastScrollTime = 0f;
 
-    private String versionString = "Descriptive3D_v1.0.0";
+    private String versionString = ReconstructionInfo.APP_NAME;
     private Text versionText;
     private GameObject versionTextGO;
 

@@ -5,6 +5,7 @@ using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using Assets.Scripts.FileManagers;
 using UnityEngine;
+
 public class ModeExperimental : IMode
 {
     private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.55f );
@@ -41,10 +42,14 @@ public class ModeExperimental : IMode
     private Line _relativeLine;
 
     private bool _showProjLines = true;
+
+    private GameObject _nFileText;
     /* * * * CONTEXT ACTIONS begin * * * */
 
     private void TryColorObject(IRaycastable obj, Color color)
     {
+        if (obj == null) return;
+
         var line = obj as Line;
         var axis = obj as Axis;
         var point = obj as ExPoint;
@@ -77,18 +82,22 @@ public class ModeExperimental : IMode
         if (_drawAction == null)
         {
             _drawAction = _items.Add(_context.Current.Key, hitObject, hitPosition, hitWall, _relativeObject);
+
+            if (_drawAction == null)
+            {
+                TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
+
+                _relativeObject = null;
+            }
         }
         else
         {
             _drawAction(hitObject, hitPosition, hitWall, true);
             _drawAction = null;
 
-            if (_relativeObject != null)
-            {
-                TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
+            TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
 
-                _relativeObject = null;
-            }
+            _relativeObject = null;
         }
     }
 
@@ -120,6 +129,11 @@ public class ModeExperimental : IMode
         StateManager.Exp.Save();
     }
 
+    private void _PrintState()
+    {
+        StateManager.Exp.Print();
+    }
+
     private void _LoadState()
     {
         _ClearScene();
@@ -146,6 +160,8 @@ public class ModeExperimental : IMode
         radialMenu.RemoveFromScene(); 
         radialMenu = null;
 
+        GameObject.Destroy(_nFileText);
+        _nFileText = null;
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.ModeMenu);
     }
@@ -181,6 +197,8 @@ public class ModeExperimental : IMode
         radialMenu.RemoveFromScene();
         radialMenu = null;
 
+        GameObject.Destroy(_nFileText);
+        _nFileText = null;
         ///Zaladuj grupowy
         PCref.ChangeMode(PlayerController.Mode.Mode3Dto2D);
 
@@ -430,6 +448,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _ChangeToConstrCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.HelpLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.FixedLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
@@ -454,6 +473,7 @@ public class ModeExperimental : IMode
             {
                 new KeyValuePair<ExContext, Action>(ExContext.Save, _SaveState),
                 new KeyValuePair<ExContext, Action>(ExContext.Load, _LoadState),
+                new KeyValuePair<ExContext, Action>(ExContext.Print, _PrintState),
                 //new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
                 new KeyValuePair<ExContext, Action>(ExContext.BackToMenu, _BackToMenu),
                 new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
@@ -466,9 +486,19 @@ public class ModeExperimental : IMode
         
         AddRadialMenu();
 
+        _SetFileTextCavnas();
+
         _SceneChangedHandler();
 
         Debug.Log($"<color=blue> MODE experimental ON </color>");
+    }
+
+    private void _SetFileTextCavnas()
+    {
+        GameObject ceilingWall = GameObject.Find("Wall5");
+        GameObject prefab = Resources.Load<GameObject>("FileCanvas");
+        _nFileText = UnityEngine.Object.Instantiate(prefab);
+        _nFileText.transform.SetParent(ceilingWall.transform, false);
     }
 
     private void _SceneChangedHandler()

@@ -6,7 +6,8 @@ namespace Assets.Scripts.Experimental.Utils
 {
     public static class DescriptiveMathLib
     {
-        private const float EPS = 1e-5f;
+        public const float EPS = 1e-5f;
+
         private static Func<Vector3, float, Vector3, Vector3> line = (A, t, v) => A + t * v;
 
         public static Tuple<Vector3, Vector3> FindLLIntersections(Vector3 p1, Vector3 n1, Vector3 p2, Vector3 n2)
