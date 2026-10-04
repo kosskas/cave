@@ -87,9 +87,9 @@ public class WallController : MonoBehaviour {
         newWall.transform.position = point1;
 
         Vector3 currentScale = newWall.transform.localScale;
-        currentScale.x = 0.01f;
-        currentScale.y = 10.0f;
-        currentScale.z = 10.0f;
+        currentScale.x = ReconstructionInfo.WALL_WIDTH;
+        currentScale.y = ReconstructionInfo.WALL_LENGTH;
+        currentScale.z = ReconstructionInfo.WALL_LENGTH;
         newWall.transform.localScale = currentScale;
 
         newWall.transform.rotation = Quaternion.Euler(0, 0, 0);
@@ -102,7 +102,7 @@ public class WallController : MonoBehaviour {
         MeshRenderer meshRenderer = newWall.GetComponent<MeshRenderer>();
         meshRenderer.material = new Material(Shader.Find("Transparent/Diffuse"));
         Color color = meshRenderer.material.color;
-        color.a = 0.5f;
+        color.a = ReconstructionInfo.WALL_OPACITY;
         meshRenderer.material.color = color;
 
         BoxCollider boxCollider = newWall.GetComponent<BoxCollider>();
