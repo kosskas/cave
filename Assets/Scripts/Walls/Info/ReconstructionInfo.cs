@@ -36,5 +36,6 @@ public static class ReconstructionInfo
     // -- 2D LABEl
     public static float LABEL_2D_FONT_SIZE = 0.6f;
     public static float LABEL_2D_OFFSET = 0.08f;
+    public static float LABEL_2D_OFFSET_ALONG_LINE_LENGTH = 0.21f;
     public static Color LABEL_2D_COLOR = Color.black;
 }

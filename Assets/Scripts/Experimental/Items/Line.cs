@@ -255,6 +255,7 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelComponent == null)
                 _labelComponent = gameObject.AddComponent<IndexedLabel>();
 
+            _labelComponent.SetLabelOffset((EndPosition - StartPosition) * ReconstructionInfo.LABEL_2D_OFFSET_ALONG_LINE_LENGTH);
             _labelComponent.AddLabel("", new string('\'', Plane.constructionNumber), "");
 
             NextText();
