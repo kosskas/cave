@@ -5,6 +5,7 @@ using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using Assets.Scripts.FileManagers;
 using UnityEngine;
+
 public class ModeExperimental : IMode
 {
     private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.55f );
@@ -47,6 +48,8 @@ public class ModeExperimental : IMode
 
     private void TryColorObject(IRaycastable obj, Color color)
     {
+        if (obj == null) return;
+
         var line = obj as Line;
         var axis = obj as Axis;
         var point = obj as ExPoint;
@@ -79,18 +82,22 @@ public class ModeExperimental : IMode
         if (_drawAction == null)
         {
             _drawAction = _items.Add(_context.Current.Key, hitObject, hitPosition, hitWall, _relativeObject);
+
+            if (_drawAction == null)
+            {
+                TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
+
+                _relativeObject = null;
+            }
         }
         else
         {
             _drawAction(hitObject, hitPosition, hitWall, true);
             _drawAction = null;
 
-            if (_relativeObject != null)
-            {
-                TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
+            TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
 
-                _relativeObject = null;
-            }
+            _relativeObject = null;
         }
     }
 
