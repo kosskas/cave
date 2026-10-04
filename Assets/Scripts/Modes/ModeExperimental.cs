@@ -443,6 +443,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _ChangeToConstrCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.HelpLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.FixedLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
