@@ -5,6 +5,7 @@ using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using Assets.Scripts.FileManagers;
 using UnityEngine;
+
 public class ModeExperimental : IMode
 {
     private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.55f );
@@ -50,6 +51,8 @@ public class ModeExperimental : IMode
 
     private void TryColorObject(IRaycastable obj, Color color)
     {
+        if (obj == null) return;
+
         var line = obj as Line;
         var axis = obj as Axis;
         var point = obj as ExPoint;
@@ -90,18 +93,22 @@ public class ModeExperimental : IMode
         if (_drawAction == null)
         {
             _drawAction = _items.Add(_context.Current.Key, hitObject, hitPosition, hitWall, _relativeObject);
+
+            if (_drawAction == null)
+            {
+                TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
+
+                _relativeObject = null;
+            }
         }
         else
         {
             _drawAction(hitObject, hitPosition, hitWall, true);
             _drawAction = null;
 
-            if (_relativeObject != null)
-            {
-                TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
+            TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
 
-                _relativeObject = null;
-            }
+            _relativeObject = null;
         }
     }
 
@@ -131,6 +138,11 @@ public class ModeExperimental : IMode
     private void _SaveState()
     {
         StateManager.Exp.Save();
+    }
+
+    private void _PrintState()
+    {
+        StateManager.Exp.Print();
     }
 
     private void _LoadState()
@@ -356,7 +368,10 @@ public class ModeExperimental : IMode
             _hm.Redo();
         }
     }
-
+    private void _ToggleView3D()
+    {
+        _mb.Toogle3DView();
+    }
     /* * * * INPUT HANDLERS end * * * */
 
     private void _ClearScene()
@@ -444,6 +459,7 @@ public class ModeExperimental : IMode
         _mb = mainObject.AddComponent<MeshBuilder>();
         _mb.Init(_showProjLines);
         _fc = mainObject.AddComponent<FacesGenerator>();
+        _fc.Init(_mb);
 
         _items = new ItemsController(_wc, _wcrt, _fc, _mb);
         _items.DrawingCompleted += (sender, drawOrigin) =>
@@ -461,6 +477,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.BackToOpt, _ChangeToConstrCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.HelpLine, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.BoldLine, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.FixedLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.PerpendicularLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
@@ -485,11 +502,13 @@ public class ModeExperimental : IMode
             {
                 new KeyValuePair<ExContext, Action>(ExContext.Save, _SaveState),
                 new KeyValuePair<ExContext, Action>(ExContext.Load, _LoadState),
-                new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
+                new KeyValuePair<ExContext, Action>(ExContext.Print, _PrintState),
+                //new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
                 new KeyValuePair<ExContext, Action>(ExContext.BackToMenu, _BackToMenu),
                 new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Undo, _Undo),
                 new KeyValuePair<ExContext, Action>(ExContext.Redo, _Redo),
+                new KeyValuePair<ExContext, Action>(ExContext.View3D, _ToggleView3D),
             });
 
         _context = _optCtx;
@@ -658,7 +677,33 @@ public class ModeExperimental : IMode
             _TryGetNextLabelText();
         }
 
+        if (Input.GetKeyDown("t"))
+        {
+            _ToggleView3D();
+        }
+
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("z"))
+            {
+                _Undo();
+            }
+        }
+
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("y"))
+            {
+                _Redo();
+            }
+        }
+
         if (Input.GetKeyDown("l"))
+        {
+            _RemoveWall();
+        }
+
+        if (Input.GetKey("left ctrl"))
         {
             _RemoveWall();
         }
