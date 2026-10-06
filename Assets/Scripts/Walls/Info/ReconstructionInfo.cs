@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public static class ReconstructionInfo
 {
@@ -36,5 +37,14 @@ public static class ReconstructionInfo
     // -- 2D LABEl
     public static float LABEL_2D_FONT_SIZE = 0.6f;
     public static float LABEL_2D_OFFSET = 0.08f;
+    public static float LABEL_2D_OFFSET_ALONG_LINE_LENGTH = 0.21f;
     public static Color LABEL_2D_COLOR = Color.black;
+    // -- DYNAMIC WALL
+    public static float WALL_LENGTH = 10.0f;
+    public static float WALL_WIDTH = 0.0001f;
+    public static float WALL_OPACITY = 0.5f;
+
+    // -- METADATA
+    public static String APP_NAME = "Descriptive3D_v2.0.0";
+    public static String GITHUB_LINK = "kosskas.github.io/cave";
 }

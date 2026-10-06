@@ -8,8 +8,9 @@ public class FacesGenerator : MonoBehaviour {
     // Use this for initialization
     public List<KeyValuePair<string, Vector3>> points = new List<KeyValuePair<string, Vector3>>();
     public static List<FaceInfo> faceInfoList = new List<FaceInfo>();
-    void Start () {
-		
+    private MeshBuilder _mb;
+    public void Init (MeshBuilder mb) {
+		_mb = mb;
 	}
 	
 	// Update is called once per frame
@@ -19,6 +20,11 @@ public class FacesGenerator : MonoBehaviour {
         //    TestPunktow();
         //    
         //}
+        bool currentRule = _mb.Get3DViewRule();
+        foreach (var face in faceInfoList)
+        {
+            face.FaceObject.GetComponent<Renderer>().enabled = currentRule;
+        }
     }
 
     private bool CheckIfPointsAreOnTheSamePlane(List<KeyValuePair<string, Vector3>> points)

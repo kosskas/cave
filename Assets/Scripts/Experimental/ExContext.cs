@@ -10,6 +10,9 @@ namespace Assets.Scripts.Experimental
         [Description("Wczytaj stan")]
         Load,
 
+        [Description("Drukuj do PDF")]
+        Print,
+
         [Description("Wizualizuj")]
         LoadVisual,
 
@@ -33,6 +36,9 @@ namespace Assets.Scripts.Experimental
 
         [Description("Linia pomocznicza")]
         HelpLine,
+
+        [Description("Linia pomocznicza wskazanej d\u0142ugo\u015bci")]
+        FixedLine,
 
         [Description("Linia prostopad\u0142a")]
         PerpendicularLine,
@@ -66,6 +72,9 @@ namespace Assets.Scripts.Experimental
 
         [Description("Pon\u00F3w")]
         Redo,
+
+        [Description("Widok 3D")]
+        View3D,
         //---------WIZUALIZACJA-------------------
 
         [Description("Nastepna bryla")]

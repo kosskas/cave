@@ -194,6 +194,7 @@ public class MeshBuilder : MonoBehaviour
     bool blocked = false;
     bool showProjectionLines = true;
 
+    bool show3D = true;
 	// Update is called once per frame
 	void Update()
 	{        
@@ -784,7 +785,7 @@ public class MeshBuilder : MonoBehaviour
                     if (projLine != null)
                     {
                         projLine.SetCoordinates(vertexProj, vertices3D[label].gameObject.transform.position);
-                        projLine.SetEnable(showProjectionLines);
+                        projLine.SetEnable(showProjectionLines && show3D);
                     }
                 }
                 else //wolny pkt
@@ -795,7 +796,7 @@ public class MeshBuilder : MonoBehaviour
                     if (projLine != null)
                     {
                         projLine.SetCoordinates(vertexProj, vertexProj + LEN * direction);
-                        projLine.SetEnable(showProjectionLines);
+                        projLine.SetEnable(showProjectionLines && show3D);
                     }
                 }
             }
@@ -805,7 +806,7 @@ public class MeshBuilder : MonoBehaviour
     {
         foreach(string label in vertices3D.Keys)
         {
-            vertices3D[label].gameObject.SetActive(!(vertices3D[label].deleted || vertices3D[label].disabled));
+            vertices3D[label].gameObject.SetActive(!(vertices3D[label].deleted || vertices3D[label].disabled) && show3D);
         }
     }
     private void ShowEdges3D()
@@ -817,7 +818,7 @@ public class MeshBuilder : MonoBehaviour
             var v1 = vertices3D[edges3D[key].firstPoint];
             var v2 = vertices3D[edges3D[key].secondPoint];
 
-            line.SetEnable(!(v1.deleted || v2.deleted || (!isStandalone && (v1.disabled || v2.disabled))));
+            line.SetEnable(!(v1.deleted || v2.deleted || (!isStandalone && (v1.disabled || v2.disabled))) && show3D);
             line.SetCoordinates(vertices3D[edges3D[key].firstPoint].gameObject.transform.position, vertices3D[edges3D[key].secondPoint].gameObject.transform.position);
         }
     }
@@ -860,5 +861,15 @@ public class MeshBuilder : MonoBehaviour
             }
         }
         return pairs;
+    }
+
+    public void Toogle3DView()
+    {
+        show3D = !show3D;
+    }
+
+    public bool Get3DViewRule()
+    {
+        return show3D;
     }
 }

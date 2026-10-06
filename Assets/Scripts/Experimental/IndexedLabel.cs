@@ -9,11 +9,13 @@ namespace Assets.Scripts.Experimental
 {
     public class IndexedLabel : MonoBehaviour
     {
-        private Vector3 Offset(Transform t) => ReconstructionInfo.LABEL_2D_OFFSET * FontSize * t.up;
+        private Vector3 Offset(Transform t) => ReconstructionInfo.LABEL_2D_OFFSET * FontSize * t.up + _labelOffset;
 
         private static readonly float LabelFontSize = ReconstructionInfo.LABEL_2D_FONT_SIZE;
 
         private static readonly Color ColorNormal = ReconstructionInfo.NORMAL;
+
+        private Vector3 _labelOffset = Vector3.zero;
 
         private TextMeshPro _textMeshPro;
 
@@ -85,6 +87,13 @@ namespace Assets.Scripts.Experimental
         {
             _textMeshPro?.gameObject.SetActive(flag);
         }
+
+        public void SetLabelOffset(Vector3 offset)
+        {
+            _labelOffset = offset;
+        }
+
+
         // -------
 
         public float FontSize { get; set; } = LabelFontSize;
