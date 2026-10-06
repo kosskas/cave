@@ -5,14 +5,25 @@ Wymagana wersja Unity: **2018.1.9f2**
 | Branch                  | Przeznaczenie                                                                 |
 |-------------------------|----------------------------------------------------------------------|
 | [`main/`](https://github.com/kosskas/cave/tree/main) | Baza projektu                                             |
+| [`cave/main/`](https://github.com/kosskas/cave/tree/cave/main)     | Wersja na VR CAVE                                 |
 | [`dev/`](https://github.com/kosskas/cave/tree/dev)   | Do celów testowych przed scaleniem z main/                                           |
 | [`pc/`](https://github.com/kosskas/cave/tree/pc)     | Komputery osobiste                                                 |
 | `prv/<user>/*` | Prywatne branche                                           |
-| `lzwp/*`                  | VR CAVE, wymagana biblioteka LZWPLib |
+| `lzwp/base`                  | Szablon/Gameobiekty do VR CAVE, wymagana biblioteka LZWPLib |
 | `cave/study/*`     | Wersje użyte do badań w danym dniu                                  |
 
 
 ---
+## Budowanie projektu na LZWP
+1. Będąc na cave/main zrób scalenie z dev 
+2. W interfejscie do LZWPLib wszystko powinno być na zielono
+3. Dla BIGCave: wyłączyć Movement Controller w obiekcie LZWPOrigin_M
+
+
+### Znane problemy
+- Sprawdź czy załadowane są shadery
+- Wygenerowane pliki .json do łączenia z BigCAVE mają złe adresy IP (do techników LZWP)
+- Sprawdź czy w paczce wynikowej są wszyskie foldery potrzebne do działania
 
 ## O Projekcie
 
