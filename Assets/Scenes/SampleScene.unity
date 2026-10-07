@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311918, g: 0.3807398, b: 0.35872716, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -226,6 +226,11 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b6165818436e3294c9f7ce5e53106f44, type: 2}
   m_IsPrefabParent: 0
+--- !u!4 &43673825 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4072682885746650, guid: b6165818436e3294c9f7ce5e53106f44,
+    type: 2}
+  m_PrefabInternal: {fileID: 43673824}
 --- !u!1 &99689330
 GameObject:
   m_ObjectHideFlags: 0
@@ -1040,6 +1045,99 @@ Transform:
   m_Father: {fileID: 1761875548}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 45.000004, y: 45.467003, z: 0}
+--- !u!1 &1426140590
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1426140592}
+  - component: {fileID: 1426140591}
+  m_Layer: 0
+  m_Name: LZWP_Additional_Cameras
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1426140591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1426140590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e936fce211ebe449903030e0c0608a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectionTool: {fileID: 43673825}
+  selectionFlystickIdx: 0
+  selectionFlystickButton: 5
+  disabledIndicatorColor: {r: 1, g: 0, b: 0, a: 1}
+  hoveredIndicatorColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  enabledIndicatorColor: {r: 0, g: 1, b: 0, a: 1}
+  indicatorLayer: 20
+  keyToggleIndicators: 99
+  keyToggleIndicatorsAlt: 261
+  keyGroupPrev: 274
+  keyGroupNext: 273
+  keyCamPrev: 276
+  keyCamNext: 275
+  keyCam0: 49
+  keyCam1: 50
+  keyCam2: 51
+  keyCam3: 52
+  keyCam4: 53
+  keyCam5: 54
+  keyCam6: 55
+  keyCam7: 56
+  keyCam0Alt: 257
+  keyCam1Alt: 260
+  keyCam2Alt: 263
+  keyCam3Alt: 264
+  keyCam4Alt: 265
+  keyCam5Alt: 262
+  keyCam6Alt: 259
+  keyCam7Alt: 258
+  keyAdjustHorizontalMinus: 286
+  keyAdjustHorizontalPlus: 287
+  keyAdjustVerticalMinus: 288
+  keyAdjustVerticalPlus: 289
+  keyAdjustRollLeft: 290
+  keyAdjustRollRight: 291
+  keyAdjustFovMinus: 284
+  keyAdjustFovPlus: 285
+  keyAdjustmentSave: 283
+  keyAdjustmentStealViewport: 282
+  adjustmentAmountDeg: 1
+  adjustmentAmountFovDeg: 1
+  audViewport:
+    serializedVersion: 2
+    x: 0.75
+    y: 0.33333334
+    width: 0.25
+    height: 0.33333334
+  caveViewport:
+    serializedVersion: 2
+    x: 0.01
+    y: 0.6766667
+    width: 0.23
+    height: 0.31333333
+--- !u!4 &1426140592
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1426140590}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.8018678, y: -0.18742919, z: 1.6881582}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 14
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1459257734
 Prefab:
   m_ObjectHideFlags: 0
