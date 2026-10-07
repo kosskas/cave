@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Określa maksymalny kąt obrotu kamery wokół osi X, co pozwala na kontrolę ograniczenia skrętu w górę i w dół. 
     /// </summary>
-    public float lookXLimit = 45.0f;
+    public float lookXLimit = 90.0f;
 
     /// <summary>
     /// Zmienna warunkowa, określająca czy gracz może się poruszać.

@@ -671,7 +671,7 @@ MonoBehaviour:
   walkingSpeed: 7.5
   playerCamera: {fileID: 1608042725}
   lookSpeed: 2
-  lookXLimit: 45
+  lookXLimit: 90
   canMove: 1
 --- !u!4 &1203211524
 Transform:
