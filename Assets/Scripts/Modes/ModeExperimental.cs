@@ -12,7 +12,12 @@ public class ModeExperimental : IMode
     private static float Y_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : -0.30f );
     private static float RADIAL_1ST_MENU_RADIUS = 150f;
     private static float RADIAL_2ND_MENU_RADIUS = 25f;
+    private static float FLIGHT_SPEED = 0.03f;
+    private static float FLIGHT_MAX_HEIGHT = 2.815f;
+    private static float FLIGHT_MIN_HEIGHT = 0.515f;
     public PlayerController PCref { get; private set; }
+
+    private GameObject _playerGameObject;
 
     private WallController _wc;
 
@@ -418,6 +423,7 @@ public class ModeExperimental : IMode
     {
         _hm = new HistoryManager(1000);
 
+        _playerGameObject = GameObject.Find("FPSPlayer");
         PCref = pc;
         _wc = GameObject.Find("Walls").GetComponent<WallController>();
 
@@ -582,6 +588,24 @@ public class ModeExperimental : IMode
             Debug.LogError("Nie znaleziono fabrykatu z Resources/Canvas");
         }
     }
+
+    private void _FlyHigher()
+    {
+        if (_playerGameObject.transform.position.y <= FLIGHT_MAX_HEIGHT)
+        {
+            _playerGameObject.transform.position += new Vector3(0.0f, FLIGHT_SPEED, 0.0f);
+        }
+        
+    }
+
+    private void _FlyLower()
+    {
+        if (_playerGameObject.transform.position.y >= FLIGHT_MIN_HEIGHT)
+        {
+            _playerGameObject.transform.position -= new Vector3(0.0f, FLIGHT_SPEED, 0.0f);
+        }
+        
+    }
     public void HandleInput()
     {
         _MoveCursor();
@@ -650,6 +674,16 @@ public class ModeExperimental : IMode
             {
                 _Redo();
             }
+        }
+
+        if (Input.GetKey("space"))
+        {
+            _FlyHigher();
+        }
+
+        if (Input.GetKey("left shift"))
+        {
+            _FlyLower();
         }
 
         //if (Input.GetKeyDown("l"))
