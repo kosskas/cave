@@ -14,7 +14,7 @@ public class ModeExperimental : IMode
     private static float RADIAL_2ND_MENU_RADIUS = 25f;
     private static float FLIGHT_SPEED = 0.03f;
     private static float FLIGHT_MAX_HEIGHT = 2.815f;
-    private static float FLIGHT_MIN_HEIGHT = 0.515f;
+    private static float FLIGHT_MIN_HEIGHT = 0.59f;
     public PlayerController PCref { get; private set; }
 
     private GameObject _playerGameObject;
