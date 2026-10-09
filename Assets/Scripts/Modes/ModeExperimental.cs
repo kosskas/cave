@@ -44,8 +44,6 @@ public class ModeExperimental : IMode
 
     private IRaycastable _relativeObject;
     
-    private Line _relativeLine;
-
     private bool _showProjLines = true;
 
     private GameObject _nFileText;
@@ -124,9 +122,18 @@ public class ModeExperimental : IMode
     /* * * * CONTEXT ACTIONS end * * * */
 
     /* * * * INPUT HANDLERS begin * * * */
+
     private void _DrawAction()
     {
         _context.Current.Value();
+    }
+
+    private void _AbortDrawAction()
+    {
+        _drawAction = null;
+        _relativeObject = null;
+        _Undo();
+        _Redo();
     }
 
     private void _SaveState()
@@ -614,6 +621,11 @@ public class ModeExperimental : IMode
     public void HandleInput()
     {
         _MoveCursor();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            _AbortDrawAction();
+        }
 
         if (Input.GetKeyDown("1"))
         {
