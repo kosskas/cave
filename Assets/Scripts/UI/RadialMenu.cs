@@ -284,7 +284,7 @@ public class RadialMenu : MonoBehaviour
         RectTransform canvas = GetComponentInParent<Canvas>()?.GetComponent<RectTransform>();
         if (canvas)
         {
-            Vector2 corner = new Vector2(80f, 50f); //margines
+            Vector2 corner = new Vector2(100f, 60f); //margines
             Vector3 newPos = new Vector3(-canvas.rect.width / 2 + corner.x, -canvas.rect.height / 2 + corner.y, 0);
             transform.localPosition = newPos;
         }

@@ -10,7 +10,7 @@ public class ModeExperimental : IMode
 {
     private static float Z_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : 0.55f );
     private static float Y_RADIAL_MENU_OFFSET = ( GameObject.Find("TrackedObject") != null ? 0.0f : -0.30f );
-    private static float RADIAL_1ST_MENU_RADIUS = 150f;
+    private static float RADIAL_1ST_MENU_RADIUS = 190f;
     private static float RADIAL_2ND_MENU_RADIUS = 25f;
     private static float FLIGHT_SPEED = 0.03f;
     private static float FLIGHT_MAX_HEIGHT = 2.815f;
@@ -477,12 +477,12 @@ public class ModeExperimental : IMode
         _optCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
             {
+                new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Save, _SaveState),
                 new KeyValuePair<ExContext, Action>(ExContext.Load, _LoadState),
                 new KeyValuePair<ExContext, Action>(ExContext.Print, _PrintState),
                 //new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
                 new KeyValuePair<ExContext, Action>(ExContext.BackToMenu, _BackToMenu),
-                new KeyValuePair<ExContext, Action>(ExContext.Const, _ChangeToConstrCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Undo, _Undo),
                 new KeyValuePair<ExContext, Action>(ExContext.Redo, _Redo),
                 new KeyValuePair<ExContext, Action>(ExContext.View3D, _ToggleView3D),
