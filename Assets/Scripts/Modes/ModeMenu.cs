@@ -20,7 +20,7 @@ public class ModeMenu : IMode
         _context = new CircularIterator<KeyValuePair<ExContext, Action>>(
             new List<KeyValuePair<ExContext, Action>>()
             {
-                new KeyValuePair<ExContext, Action>(ExContext.Const, _LoadReconstruction),
+                new KeyValuePair<ExContext, Action>(ExContext.ConstMode, _LoadReconstruction),
                 new KeyValuePair<ExContext, Action>(ExContext.ExitApp, _QuitApp),
                 
             });

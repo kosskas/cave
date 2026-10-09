@@ -95,5 +95,8 @@ namespace Assets.Scripts.Experimental
         //MENU
         [Description("Wyjdz")]
         ExitApp,
+
+        [Description("Tryb konstrukcji")]
+        ConstMode,
     }
 }
