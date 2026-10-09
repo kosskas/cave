@@ -147,6 +147,11 @@ public class ModeExperimental : IMode
         StateManager.Exp.Load();
     }
 
+    private void _QuitApp()
+    {
+        Application.Quit();
+    }
+
     private void _BackToMenu()
     {
         //czyszcenie œcian obiektu
@@ -482,7 +487,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Load, _LoadState),
                 new KeyValuePair<ExContext, Action>(ExContext.Print, _PrintState),
                 //new KeyValuePair<ExContext, Action>(ExContext.LoadVisual, _SaveSolidAndSwitchToMode3Dto2D),
-                new KeyValuePair<ExContext, Action>(ExContext.BackToMenu, _BackToMenu),
+                new KeyValuePair<ExContext, Action>(ExContext.ExitApp, _QuitApp),
                 new KeyValuePair<ExContext, Action>(ExContext.Undo, _Undo),
                 new KeyValuePair<ExContext, Action>(ExContext.Redo, _Redo),
                 new KeyValuePair<ExContext, Action>(ExContext.View3D, _ToggleView3D),

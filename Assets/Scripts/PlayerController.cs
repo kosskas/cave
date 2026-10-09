@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController _characterController;
     private Ray _ray;
     private IMode _modeController;
-    private Mode _mode = Mode.ModeMenu;
+    private Mode _mode = Mode.ModeExperimental;
     private bool _isModeChanged = false;
 
 
