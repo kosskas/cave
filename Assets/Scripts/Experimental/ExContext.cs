@@ -16,13 +16,13 @@ namespace Assets.Scripts.Experimental
         [Description("Wizualizuj")]
         LoadVisual,
 
-        [Description("Wro\u0107 do menu")]
+        [Description("(WR\u00D3\u0106 DO MENU)")]
         BackToMenu,
 
         [Description("Konstruuj")]
         Const,
 
-        [Description("<Wr\u00F3\u0107>")]
+        [Description("(WR\u00D3\u0106)")]
         BackToOpt,
 
         [Description("Punkt")]
@@ -77,23 +77,23 @@ namespace Assets.Scripts.Experimental
         View3D,
         //---------WIZUALIZACJA-------------------
 
-        [Description("Nastepna bryla")]
+        [Description("Nastepna bry\u0142a")]
         NextSolid,
 
-        [Description("Poprzednia bryla")]
+        [Description("Poprzednia bry\u0142a")]
         PrevSolid,
 
-        [Description("Usun sciane")]
+        [Description("Usu\u0144 scian\u0119")]
         RemoveWall,
 
-        [Description("Dodaj sciane")]
+        [Description("Dodaj scian\u0119")]
         AddWall,
 
-        [Description("Pokaz rzut")]
+        [Description("Poka\u017C rzut")]
         ShowProj,
 
         //MENU
-        [Description("Wyjdz")]
+        [Description("(WYJD\u0179)")]
         ExitApp,
 
         [Description("Tryb konstrukcji")]
