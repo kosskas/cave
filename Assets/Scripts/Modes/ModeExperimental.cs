@@ -620,6 +620,11 @@ public class ModeExperimental : IMode
             _DrawAction();
         }
 
+        if (Input.GetMouseButtonDown(1)) //prawy
+        {
+            _DeleteHoveredObject();
+        }
+
         if (Input.GetKeyDown("2"))
         {
             _DeleteHoveredObject();
@@ -673,6 +678,30 @@ public class ModeExperimental : IMode
             if (Input.GetKeyDown("y"))
             {
                 _Redo();
+            }
+        }
+
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("s"))
+            {
+                _SaveState();
+            }
+        }
+
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("l"))
+            {
+                _LoadState();
+            }
+        }
+
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("p"))
+            {
+                _PrintState();
             }
         }
 
