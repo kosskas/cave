@@ -471,7 +471,6 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.ParallelLine, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.Projection, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.FixedProjection, ActRelativeToObject),
-                new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _SwitchRuleProjectionLine),
             });
 
         _creationCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
@@ -498,6 +497,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Undo, _Undo),
                 new KeyValuePair<ExContext, Action>(ExContext.Redo, _Redo),
                 new KeyValuePair<ExContext, Action>(ExContext.View3D, _ToggleView3D),
+                new KeyValuePair<ExContext, Action>(ExContext.ProjLine, _SwitchRuleProjectionLine),
             });
 
         _context = _optCtx;
