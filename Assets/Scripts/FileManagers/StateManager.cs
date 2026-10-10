@@ -480,7 +480,7 @@ namespace Assets.Scripts.FileManagers
                         MongeMap m = maps[l.PlaneName];
                         Vector2 xy = page((m.Apply(l.StartPosition) + m.Apply(l.EndPosition)) / 2);
                         MongePdfText(content, xy + new Vector2((float)(2 * mm), (float)(2 * mm)),
-                            string.Join(", ", l.Labels.ToArray()));
+                            string.Join(", ", l.Labels.Select(label => label + new string('\'', m.ProjectionNumber)).ToArray()));
                     }
                 if (!fileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) fileName += ".pdf";
                 Directory.CreateDirectory(path);
