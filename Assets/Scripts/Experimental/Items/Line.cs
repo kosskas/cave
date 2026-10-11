@@ -123,23 +123,8 @@ namespace Assets.Scripts.Experimental.Items
             _startPointLabel = startPoint.FocusedLabel;
             _endPointLabel = endPoint.FocusedLabel;
 
-            AddEdge3D(Width);
-
-            _isBoundToPoints = true;
-        }
-
-        public void BindPoints(ExPoint startPoint, string startPointLabel, ExPoint endPoint, string endPointLabel)
-        {
-            if (_isBoundToPoints)
-                return;
-
-            _startPoint = startPoint;
-            _endPoint = endPoint;
-
-            _startPointLabel = startPointLabel;
-            _endPointLabel = endPointLabel;
-
-            AddEdge3D(Width);
+            if (!string.IsNullOrEmpty(_startPointLabel) && !string.IsNullOrEmpty(_endPointLabel))
+                AddEdge3D(Width);
 
             _isBoundToPoints = true;
         }
@@ -153,16 +138,36 @@ namespace Assets.Scripts.Experimental.Items
 
         private void WatchBinding()
         {
-            if (
-                _startPoint != null &&
-                _endPoint != null &&
-                _startPoint.Labels.Contains(_startPointLabel) &&
-                _endPoint.Labels.Contains(_endPointLabel)
-                )
+            // jeśli któreś z punktów nie ma -> usuń krawędź
+            if (_startPoint == null || _endPoint == null)
+            {
+                RemoveEdge3D();
+                Destroy(gameObject);
                 return;
+            }
 
-            RemoveEdge3D();
-            Destroy(gameObject);
+            // jeśli zapamiętane etykiety obu punktów są puste, a teraz oba punkty już je mają, to zapamiętaj (dowiąż) etykiety i narysuj edge
+            if (
+                string.IsNullOrEmpty(_startPointLabel) && !string.IsNullOrEmpty(_startPoint.FocusedLabel) &&
+                string.IsNullOrEmpty(_endPointLabel) && !string.IsNullOrEmpty(_endPoint.FocusedLabel)
+                )
+            {
+                _startPointLabel = _startPoint.FocusedLabel;
+                _endPointLabel = _endPoint.FocusedLabel;
+                AddEdge3D(Width);
+                return;
+            }
+
+            // jeśli któraś z zapamiętanych (dowiązanych) i już realnych (niepustych) etykiet znikła, to usuń edge
+            if (
+                (!string.IsNullOrEmpty(_startPointLabel) && !_startPoint.Labels.Contains(_startPointLabel)) ||
+                (!string.IsNullOrEmpty(_endPointLabel) && !_endPoint.Labels.Contains(_endPointLabel))
+                )
+            {
+                RemoveEdge3D();
+                Destroy(gameObject);
+                return;
+            }                
         }
 
         private void RemoveEdge3D()
