@@ -123,7 +123,7 @@ namespace Assets.Scripts.Experimental.Items
             _startPointLabel = startPoint.FocusedLabel;
             _endPointLabel = endPoint.FocusedLabel;
 
-            AddEdge3D();
+            AddEdge3D(Width);
 
             _isBoundToPoints = true;
         }
@@ -139,7 +139,7 @@ namespace Assets.Scripts.Experimental.Items
             _startPointLabel = startPointLabel;
             _endPointLabel = endPointLabel;
 
-            AddEdge3D();
+            AddEdge3D(Width);
 
             _isBoundToPoints = true;
         }
@@ -170,9 +170,9 @@ namespace Assets.Scripts.Experimental.Items
             Mc?.RemoveEdge3D(_startPointLabel, _endPointLabel);
         }
 
-        private void AddEdge3D()
+        private void AddEdge3D(float width)
         {
-            Mc.CreateEdge3D(_startPointLabel, _endPointLabel);
+            Mc.CreateEdge3D(_startPointLabel, _endPointLabel, width);
         }
 
 

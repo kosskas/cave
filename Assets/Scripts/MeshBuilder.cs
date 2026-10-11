@@ -471,7 +471,7 @@ public class MeshBuilder : MonoBehaviour
     /// </summary>
     /// <param name="labelA">Etykieta punktu A</param>
     /// <param name="labelB">Etykieta punktu B</param>
-    public void CreateEdge3D(string labelA, string labelB)
+    public void CreateEdge3D(string labelA, string labelB, float width)
     {
         //sprawdz czy taka krawedz juz nie istnieje(zostala stworzona z innej sciany)
         //jesli tak to odnotuj to(przy usuwaniu bedzie przydatne)
@@ -506,7 +506,7 @@ public class MeshBuilder : MonoBehaviour
             edgeObj.transform.SetParent(edges3DDir.transform);
 
             LineSegment edge = edgeObj.AddComponent<LineSegment>();
-            edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, ReconstructionInfo.EDGE_3D_LINE_WIDTH);
+            edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, width);
             edge.SetCoordinates(
                 vertices3D[labelA].gameObject.transform.position,
                 vertices3D[labelB].gameObject.transform.position
