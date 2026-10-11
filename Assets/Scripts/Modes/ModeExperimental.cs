@@ -149,6 +149,8 @@ public class ModeExperimental : IMode
 
         //wczytanie pliku
         StateManager.Exp.Load();
+
+        _SceneChangedHandler();
     }
 
     private void _BackToMenu()
