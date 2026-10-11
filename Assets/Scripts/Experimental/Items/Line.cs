@@ -271,7 +271,7 @@ namespace Assets.Scripts.Experimental.Items
         {
             if (labelText.StartsWith("#"))
             {
-                Mc.AddEdgeProjection(Plane, labelText, this);
+                Mc.AddEdgeProjection(Plane, labelText, this.gameObject);
             }
             else
             {
@@ -358,7 +358,7 @@ namespace Assets.Scripts.Experimental.Items
             if (_labelTexts.Current.Equals(DefaultLabelText))
                 return;
 
-            Mc.AddEdgeProjection(Plane, newLabelText, this);
+            Mc.AddEdgeProjection(Plane, newLabelText, this.gameObject);
         }
 
         // public void SetLabel(float value)

@@ -204,5 +204,46 @@ namespace Assets.Scripts.Experimental.Utils
             }
             return new Tuple<Vector3, Vector3>(line(A1, start, dir), line(A1, end, dir));
         }
+
+
+        public static Tuple<Vector3, Vector3> ReconstructFromPointProjection(
+            Vector3 point,
+            Vector3 pointNormal,
+            Vector3 segmentStart,
+            Vector3 segmentEnd,
+            Vector3 segmentNormal)
+        {
+            const float epsilon = 1e-5f;
+            const float tolerance = 1e-3f;
+
+            Vector3 dir = (segmentEnd - segmentStart).normalized;
+            Vector3 normal = pointNormal.normalized;
+
+            float denominator = Vector3.Dot(normal, dir);
+
+            if (Mathf.Abs(denominator) < epsilon)
+                return null;
+
+            float t1 = Vector3.Dot(segmentStart - point, dir) / denominator;
+            float t2 = Vector3.Dot(segmentEnd - point, dir) / denominator;
+
+            Vector3 start3D = point + t1 * normal;
+            Vector3 end3D = point + t2 * normal;
+
+            // Sprawdzenie zgodności z drugim rzutem
+            Vector3 n = segmentNormal.normalized;
+
+            Vector3 diff1 = start3D - segmentStart;
+            Vector3 diff2 = end3D - segmentEnd;
+
+            if (Vector3.Cross(diff1, n).sqrMagnitude > tolerance * tolerance ||
+                Vector3.Cross(diff2, n).sqrMagnitude > tolerance * tolerance)
+            {
+                return null;
+            }
+
+            return new Tuple<Vector3, Vector3>(start3D, end3D);
+        }
+
     }
 }

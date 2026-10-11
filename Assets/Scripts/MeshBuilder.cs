@@ -148,13 +148,45 @@ public class MeshBuilder : MonoBehaviour
     }
     private class EdgeProjection
     {
-        public Line line; // Linia jako obiekt konstrukcji na rzutni
+        private Line _line; // Linia jako obiekt konstrukcji na rzutni
+        private ExPoint _point;
+
         public Vector3 wallNormal;
 
-        public EdgeProjection(Line line, Vector3 wallNormal)
+        public EdgeProjection(GameObject line, Vector3 wallNormal)
         {
-            this.line = line;
+            var projLine = line.GetComponent<Line>();
+            var projPoint = line.GetComponent<ExPoint>();
+
+            if (projLine != null)
+            {
+                _line = projLine;
+            }
+            else if(projPoint != null)
+            {
+                _point = projPoint;
+            }
+            else
+            {
+                Debug.LogError("projLine nie jest ani Line ani ExPoint");
+            }
+
             this.wallNormal = wallNormal;
+        }
+
+        public Vector3 GetStartPosition()
+        {
+            return (_line != null) ? _line.StartPosition : _point.Position;
+        }
+
+        public Vector3 GetEndPosition()
+        {
+            return (_line != null) ? _line.EndPosition : _point.Position;
+        }
+
+        public float GetWidth()
+        {
+            return (_line != null) ? _line.Width : 0.004f; // TODO: zrobić porządek z grubościami linii
         }
 
     }
@@ -489,7 +521,7 @@ public class MeshBuilder : MonoBehaviour
     /// </summary>
     /// <param name="wall">Rzutnia</param>
     /// <param name="label">Etykieta linii</param>
-    public void AddEdgeProjection(WallInfo wall, string label, Line line)
+    public void AddEdgeProjection(WallInfo wall, string label, GameObject line)
     {
         Debug.Log($"Lina {line} o et {label}; ");
         if (!edgesOnWalls.ContainsKey(wall))
@@ -523,14 +555,70 @@ public class MeshBuilder : MonoBehaviour
             string labelA = label + "_pointA";
             string labelB = label + "_pointB";
 
-            Vector3 t1a = DescriptiveMathLib.FindLinePlaneIntersections(e1.line.StartPosition, e1.wallNormal, e2.line.StartPosition, e2.line.StartPosition - e2.line.EndPosition, e2.wallNormal);
-            Vector3 t1b = DescriptiveMathLib.FindLinePlaneIntersections(e1.line.EndPosition, e1.wallNormal, e2.line.StartPosition, e2.line.StartPosition - e2.line.EndPosition, e2.wallNormal);
 
-            Vector3 t2a = DescriptiveMathLib.FindLinePlaneIntersections(e2.line.StartPosition, e2.wallNormal, e1.line.StartPosition, e1.line.StartPosition - e1.line.EndPosition, e1.wallNormal);
-            Vector3 t2b = DescriptiveMathLib.FindLinePlaneIntersections(e2.line.EndPosition, e2.wallNormal, e1.line.StartPosition, e1.line.StartPosition - e1.line.EndPosition, e1.wallNormal);
+            Vector3 e1Start = e1.GetStartPosition();
+            Vector3 e1End = e1.GetEndPosition();
+
+            Vector3 e2Start = e2.GetStartPosition();
+            Vector3 e2End = e2.GetEndPosition();
+
+            const float epsilon = 1e-5f;
+
+            bool e1IsPoint = (e1End - e1Start).sqrMagnitude < epsilon * epsilon;
+            bool e2IsPoint = (e2End - e2Start).sqrMagnitude < epsilon * epsilon;
+
+            Tuple<Vector3, Vector3> lcp;
+
+            if (e1IsPoint && e2IsPoint)
+            {
+                // Oba rzuty są punktami - brak odcinka o niezerowej długości
+                lcp = null;
+            }
+            else if (e1IsPoint)
+            {
+                lcp = DescriptiveMathLib.ReconstructFromPointProjection(
+                    e1Start,
+                    e1.wallNormal,
+                    e2Start,
+                    e2End,
+                    e2.wallNormal
+                );
+            }
+            else if (e2IsPoint)
+            {
+                lcp = DescriptiveMathLib.ReconstructFromPointProjection(
+                    e2Start,
+                    e2.wallNormal,
+                    e1Start,
+                    e1End,
+                    e1.wallNormal
+                );
+            }
+            else
+            {
+                // Dotychczasowy algorytm
+
+                Vector3 t1a = DescriptiveMathLib.FindLinePlaneIntersections(
+                    e1Start, e1.wallNormal,
+                    e2Start, e2Start - e2End, e2.wallNormal);
+
+                Vector3 t1b = DescriptiveMathLib.FindLinePlaneIntersections(
+                    e1End, e1.wallNormal,
+                    e2Start, e2Start - e2End, e2.wallNormal);
+
+                Vector3 t2a = DescriptiveMathLib.FindLinePlaneIntersections(
+                    e2Start, e2.wallNormal,
+                    e1Start, e1Start - e1End, e1.wallNormal);
+
+                Vector3 t2b = DescriptiveMathLib.FindLinePlaneIntersections(
+                    e2End, e2.wallNormal,
+                    e1Start, e1Start - e1End, e1.wallNormal);
+
+                lcp = DescriptiveMathLib.FindLeastCommonLinePart(
+                    t1a, t1b, t2a, t2b);
+            }
 
             /// find least common part
-            var lcp = DescriptiveMathLib.FindLeastCommonLinePart(t1a, t1b, t2a, t2b);
             if (lcp == null)
             {
                 Debug.Log($"Brak wspolnej czesci linii");
@@ -547,7 +635,7 @@ public class MeshBuilder : MonoBehaviour
             edgeObj.transform.SetParent(edges3DDir.transform);
 
             LineSegment edge = edgeObj.AddComponent<LineSegment>();
-            edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, e1.line.Width);
+            edge.SetStyle(ReconstructionInfo.EDGE_3D_COLOR, e1.GetWidth());
             edge.SetCoordinates(
                 vertices3D[labelA].gameObject.transform.position,
                 vertices3D[labelB].gameObject.transform.position
