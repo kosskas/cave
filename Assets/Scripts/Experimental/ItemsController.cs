@@ -453,7 +453,7 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, null, _BOLD_LINE_WIDTH);
                 
-                case ExContext.HelpLine: return DrawLine(plane, positionWithPointSensitivity);
+                case ExContext.HelpLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint);
 
                 case ExContext.FixedLine: return DrawLine(plane, positionWithPointSensitivity, null, relativeObject as Line);
 

@@ -88,6 +88,7 @@ namespace Assets.Scripts.Experimental.Items
             Labels?.ForEach(label =>
             {
                 Mc?.RemovePointProjection(Plane, label);
+                Mc?.RemoveEdgeProjection(Plane, label);
             });
         }
 
@@ -191,6 +192,7 @@ namespace Assets.Scripts.Experimental.Items
                 return;
 
             Mc.RemovePointProjection(Plane, FocusedLabel);
+            Mc.RemoveEdgeProjection(Plane, FocusedLabel);
 
             _labelComponent.RemoveFocusedLabel();
             if (string.IsNullOrEmpty(FocusedLabel))
@@ -250,6 +252,7 @@ namespace Assets.Scripts.Experimental.Items
             var newLabelText = _labelTexts.Current.ToString();
 
             Mc.RemovePointProjection(Plane, oldLabelText);
+            Mc.RemoveEdgeProjection(Plane, oldLabelText);
 
             FocusedLabel = newLabelText;
 
@@ -257,6 +260,7 @@ namespace Assets.Scripts.Experimental.Items
                 return;
 
             Mc.AddPointProjection(Plane, newLabelText, this.gameObject);
+            Mc.AddEdgeProjection(Plane, newLabelText, this.gameObject);
         }
 
     }
