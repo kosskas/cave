@@ -45,6 +45,8 @@ public class ModeExperimental : IMode
 
     private RadialMenu radialMenu;
 
+    private bool _isRadialMenu = true;
+
     private IRaycastable _relativeObject;
     
     private bool _showProjLines = true;
@@ -639,6 +641,33 @@ public class ModeExperimental : IMode
             PCref.playerCamera.fieldOfView += FOV_DELTA;
         }
     }
+
+    private void _SwitchToRadialMenu()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        _isRadialMenu = true;
+    }
+
+    private void _SwitchToPcUi()
+    {
+        Cursor.lockState = CursorLockMode.None; //moze zmienic na Confined, ale wtedy sie buguje w edytorze
+        Cursor.visible = true;
+
+        _isRadialMenu = false;
+    }
+    private void _SwitchUi()
+    {
+        if (_isRadialMenu)
+        {
+            _SwitchToPcUi();
+        }
+        else
+        {
+            _SwitchToRadialMenu();
+        }
+    }
     public void HandleInput()
     {
         _MoveCursor();
@@ -761,6 +790,11 @@ public class ModeExperimental : IMode
         if (Input.GetKey("="))
         {
             _ZoomOut();
+        }
+
+        if (Input.GetKeyDown("m"))
+        {
+            _SwitchUi();
         }
 
         //if (Input.GetKeyDown("l"))
