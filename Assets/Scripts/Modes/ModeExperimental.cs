@@ -15,6 +15,9 @@ public class ModeExperimental : IMode
     private static float FLIGHT_SPEED = 0.03f;
     private static float FLIGHT_MAX_HEIGHT = 2.815f;
     private static float FLIGHT_MIN_HEIGHT = 0.59f;
+    private static float FOV_DELTA = 1.0f;
+    private static float MAX_FOV = 65.0f;
+    private static float MIN_FOV = 10.0f;
     public PlayerController PCref { get; private set; }
 
     private GameObject _playerGameObject;
@@ -605,7 +608,7 @@ public class ModeExperimental : IMode
 
     private void _FlyHigher()
     {
-        if (_playerGameObject.transform.position.y <= FLIGHT_MAX_HEIGHT)
+        if (_playerGameObject.transform.position.y < FLIGHT_MAX_HEIGHT)
         {
             _playerGameObject.transform.position += new Vector3(0.0f, FLIGHT_SPEED, 0.0f);
         }
@@ -614,11 +617,27 @@ public class ModeExperimental : IMode
 
     private void _FlyLower()
     {
-        if (_playerGameObject.transform.position.y >= FLIGHT_MIN_HEIGHT)
+        if (_playerGameObject.transform.position.y > FLIGHT_MIN_HEIGHT)
         {
             _playerGameObject.transform.position -= new Vector3(0.0f, FLIGHT_SPEED, 0.0f);
         }
         
+    }
+
+    private void _ZoomIn()
+    {
+        if (PCref.playerCamera.fieldOfView > MIN_FOV)
+        {
+            PCref.playerCamera.fieldOfView -= FOV_DELTA;
+        }
+    }
+
+    private void _ZoomOut()
+    {
+        if (PCref.playerCamera.fieldOfView < MAX_FOV)
+        {
+            PCref.playerCamera.fieldOfView += FOV_DELTA;
+        }
     }
     public void HandleInput()
     {
@@ -732,6 +751,16 @@ public class ModeExperimental : IMode
         if (Input.GetKey("left shift"))
         {
             _FlyLower();
+        }
+
+        if (Input.GetKey("-"))
+        {
+            _ZoomIn();
+        }
+
+        if (Input.GetKey("="))
+        {
+            _ZoomOut();
         }
 
         //if (Input.GetKeyDown("l"))
