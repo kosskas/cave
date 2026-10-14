@@ -123,18 +123,18 @@ namespace Assets.Scripts.Experimental
         }
 
         private Vector3 CalcProjectionOnAxis(
-            Vector3 startPoint, 
-            Vector3 endPoint, 
+            Vector3 lineStart, 
+            Vector3 lineEnd, 
             Vector3 point
             )
         {
-            Vector3 A = endPoint - startPoint;
-            Vector3 B = point - startPoint;
+            Vector3 A = lineEnd - lineStart;
+            Vector3 B = point - lineStart;
 
-            // B*A = |B||A|cos(a) = |B||1|cos(a) = |B|cos(a) = distance from axis.To to point projection on axis 
+            // B*A = |B||A|cos(a) = |B||1|cos(a) = |B|cos(a) = distance from lineStart to point projection on axis A
             float projectionLength = Vector3.Dot(B, A.normalized);
 
-            Vector3 projectionPoint = startPoint + projectionLength * A.normalized;
+            Vector3 projectionPoint = lineStart + projectionLength * A.normalized;
 
             return projectionPoint;
         }
@@ -160,7 +160,7 @@ namespace Assets.Scripts.Experimental
             return axis;
         }
 
-        private List<Axis> GetAllAxes(
+        private List<Axis> GetAxesOnPlane(
             WallInfo plane
             )
         {
@@ -173,38 +173,88 @@ namespace Assets.Scripts.Experimental
 
         /// <summary>
         /// Zwraca oœ, w któr¹ najbardziej "wskazuje" strza³ka (lineFrom -> lineTo).
-        /// Kryterium: najwiêkszy dodatni cos(k¹ta) pomiêdzy kierunkiem line,
-        /// a wektorem od lineFrom do najbli¿szego punktu na osi.
+        /// Kryterium: spoœród osi, których kierunek odchylenia od najlepiej dopasowanego
+        /// nie przekracza zadanej tolerancji k¹towej (5 stopni), wybierana jest oœ najbli¿sza
+        /// punktowi 'to'. Uwzglêdniane s¹ wy³¹cznie osie znajduj¹ce siê w kierunku
+        /// wskazywanym przez strza³kê (dodatni cosinus k¹ta).
         /// </summary>
+        /// <returns>Zwraca null, jeœli nie zbli¿amy siê do ¿adnej osi.</returns>     
         private Axis FindApproachingAxis(
-            Vector3 lineFrom, 
-            Vector3 lineTo, 
+            Vector3 from,
+            Vector3 to,
             List<Axis> axes
             )
         {
-            var dirLine = (lineTo - lineFrom).normalized;
+            const float angleToleranceInDeg = 5f; // deg
 
-            var bestAxis = default(Axis);
-            var bestDot = 0f;
+            var dirVector = to - from;
+
+            if (dirVector.sqrMagnitude < DescriptiveMathLib.EPS)
+                return default(Axis);
+
+            var dirVectorNorm = dirVector.normalized;
+
+            // ZnajdŸ najlepszy kierunek
+            var maxDot = 0f;
 
             foreach (var axis in axes)
             {
-                var axisPoint = CalcProjectionOnAxis(axis, lineFrom);
-                var toAxis = (axisPoint - lineFrom).normalized;
+                var axisPoint = CalcProjectionOnAxis(axis, from);
+                var fromToAxisVector = axisPoint - from;
+                var fromToAxisDistanceSqr = fromToAxisVector.sqrMagnitude;
 
-                // cosinus k¹ta: 1 = idealnie w tê stronê, 0 = prostopadle, <0 = „za plecami”
-                var dot = Vector3.Dot(dirLine, toAxis);
+                if (fromToAxisDistanceSqr < DescriptiveMathLib.EPS)
+                    continue;
 
-                if (dot > bestDot)
+                // cosinus k¹ta: 1 = idealnie w stronê osi, 0 = prostopadle, <0 = „za plecami”
+                var dot = Vector3.Dot(dirVectorNorm, fromToAxisVector.normalized);
+
+                if (dot > maxDot)
+                    maxDot = dot;
+            }
+
+            // Nie zbli¿amy siê do ¿adnej osi
+            if (maxDot <= 0f)
+                return default(Axis);
+
+            // Wyznacz minimalny dopuszczalny dot (odpowiadaj¹cy tolerancji k¹towej 'angleToleranceInDeg')
+            var minDotAccepted = Mathf.Cos(
+                Mathf.Acos(Mathf.Clamp(maxDot, -1f, 1f)) +
+                angleToleranceInDeg * Mathf.Deg2Rad
+            );
+
+            // Wybierz najbli¿sz¹ oœ spoœród kierunkowo dopuszczalnych
+            var bestAxis = default(Axis);
+            var bestDistanceSqr = float.MaxValue;
+
+            foreach (var axis in axes)
+            {
+                var axisPoint = CalcProjectionOnAxis(axis, from);
+                var fromToAxisVector = axisPoint - from;
+                var fromToAxisDistanceSqr = fromToAxisVector.sqrMagnitude;
+                var toToAxisVector = axisPoint - to;
+                var toToAxisDistanceSqr = toToAxisVector.sqrMagnitude;
+
+                if (fromToAxisDistanceSqr < DescriptiveMathLib.EPS)
+                    continue;
+
+                if (toToAxisDistanceSqr < DescriptiveMathLib.EPS)
+                    continue;
+
+                // cosinus k¹ta: 1 = idealnie w stronê osi, 0 = prostopadle, <0 = „za plecami”
+                var dot = Vector3.Dot(dirVectorNorm, fromToAxisVector.normalized);
+
+                if (toToAxisDistanceSqr < bestDistanceSqr && dot > 0f && dot >= minDotAccepted)
                 {
-                    bestDot = dot;
                     bestAxis = axis;
+                    bestDistanceSqr = toToAxisDistanceSqr;
                 }
             }
 
-            // mo¿e byæ null, jeœli wszystkie s¹ „za plecami” (dot <= minDot)
             return bestAxis;
         }
+
+
 
         private WallInfo FindPlane(
             WallInfo hitPlane, 
@@ -274,15 +324,12 @@ namespace Assets.Scripts.Experimental
             )
         {
             var v = to - from;
-            var d = v.magnitude;
 
             // brak kierunku
-            if (d < 1e-6f) return from;    
-            
-            var dir = v / d;
-            length = Mathf.Max(0f, length);
+            if (v.sqrMagnitude < DescriptiveMathLib.EPS)
+                return from;    
 
-            return from + dir * length;
+            return from + v.normalized * Mathf.Max(0f, length);
         }
 
         private void HandleIntersectionStart(
@@ -322,6 +369,20 @@ namespace Assets.Scripts.Experimental
                     }
                 }
 
+                if (intersected is IColorable)
+                {
+                    IColorable cIntersected = (IColorable)intersected;
+                    cIntersected.Color = ReconstructionInfo.NORMAL;
+                }
+            }
+        }
+
+        private void HandleIntersectionsAbort(
+            HashSet<IAnalyzable> intersectedObjs
+            )
+        {
+            foreach (var intersected in intersectedObjs)
+            {
                 if (intersected is IColorable)
                 {
                     IColorable cIntersected = (IColorable)intersected;
@@ -461,9 +522,9 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.ParallelLine: return DrawLineParallelToLine(plane, positionWithPointSensitivity, relativeObject);
 
-                case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity);
+                case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity, hitObject as ExPoint);
 
-                case ExContext.FixedProjection: return DrawFixedProjection(plane, positionWithPointSensitivity, relativeObject);
+                case ExContext.FixedProjection: return DrawFixedProjection(plane, positionWithPointSensitivity, hitObject as ExPoint, relativeObject);
 
                 case ExContext.Circle: return DrawCircle(plane, positionWithPointSensitivity);
 
@@ -770,7 +831,8 @@ namespace Assets.Scripts.Experimental
 
         public DrawAction DrawFixedProjection(
             WallInfo startPlane, 
-            Vector3 startPosition, 
+            Vector3 startPosition,
+            ExPoint startPoint = null,
             IRaycastable relativeObject = null
             )
         {
@@ -780,7 +842,7 @@ namespace Assets.Scripts.Experimental
             if (relativeLine != null)
             {
                 var length = Vector3.Distance(relativeLine.StartPosition, relativeLine.EndPosition);
-                return DrawProjection(startPlane, startPosition, true, length);
+                return DrawProjection(startPlane, startPosition, startPoint, true, length);
             }
 
             if (relativePoint != null)
@@ -793,18 +855,17 @@ namespace Assets.Scripts.Experimental
                 {
                     var startProjectionPosition = CalcProjectionOnAxis(axis, relativePoint.Position);
                     var length = Vector3.Distance(startProjectionPosition, pointPosition);
-                    return DrawProjection(startPlane, startPosition, true, length);
+                    return DrawProjection(startPlane, startPosition, startPoint, true, length);
                 }
             }
 
             return null;
         }
 
-        //return DrawProjection(plane, positionWithPointSensitivity);
-
         public DrawAction DrawProjection(
             WallInfo startPlane, 
-            Vector3 startPosition, 
+            Vector3 startPosition,
+            ExPoint startPoint = null,
             bool withFixedLength = false, 
             float fixedLength = 0.0f, 
             float lineWidth = _HELP_LINE_WIDTH
@@ -819,7 +880,6 @@ namespace Assets.Scripts.Experimental
             projectionComponent1.EnabledLabels = true;
             projectionComponent1.Width = lineWidth;
             projectionComponent1.Draw(startPlane, startPosition, startPosition);
-            //projectionComponent1.SetLabelVisible(true);
 
             var intersectedObjsPl1 = new HashSet<IAnalyzable>();
 
@@ -832,28 +892,37 @@ namespace Assets.Scripts.Experimental
             projectionComponent2.EnabledLabels = true;
             projectionComponent2.Width = lineWidth;
             projectionComponent2.Draw(startPlane, startPosition, startPosition);
-            //projectionComponent1.SetLabelVisible(false);
 
             var intersectedObjsPl2 = new HashSet<IAnalyzable>();
 
+            // AXIS
+            var axis = default(Axis);
+
+            // END PLANE
+            var endPlane = default(WallInfo);
+
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
+                // START PLANE
                 if (startPlane == default(WallInfo))
                     return;
-
-                // CHOOSE AXIS
-                var axes = GetAllAxes(startPlane);
-                var axis = FindApproachingAxis(startPosition, hitPosition, axes);
-                if (axis == default(Axis))
-                    return;
-
-                // END PLANE
-                var endPlane = FindEndPlane(axis, startPlane);
 
                 // CURRENT PLANE
                 var currPlane = FindPlane(hitPlane, hitObject);
                 if (currPlane == default(WallInfo))
                     return;
+
+                // FIND END PLANE
+                if (startPlane == currPlane)
+                {
+                    // CHOOSE AXIS
+                    var axes = GetAxesOnPlane(startPlane);
+                    axis = FindApproachingAxis(startPosition, hitPosition, axes);
+                    if (axis == default(Axis))
+                        return;
+
+                    endPlane = FindEndPlane(axis, startPlane);
+                }
 
                 // PROJECTION OF START POSITION ON AXIS
                 var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
@@ -873,11 +942,8 @@ namespace Assets.Scripts.Experimental
                 if (startPlane == currPlane)
                 {
                     projectionComponent1.Draw(startPlane, startPosition, endPosition);
-                    // projectionComponent1.SetLabel(Vector3.Distance(startPosition, endPosition));
-                    //projectionComponent1.SetLabelVisible(true);
 
                     projectionComponent2.Draw(startPlane, startPosition, endPosition);
-                    //projectionComponent2.SetLabelVisible(false);
 
                     HandleIntersectionStart(hitObject, intersectedObjsPl1, projectionComponent1.GetComponent<IRaycastable>());
 
@@ -885,12 +951,13 @@ namespace Assets.Scripts.Experimental
                     {
                         UnityEngine.Object.Destroy(projection1);
                         UnityEngine.Object.Destroy(projection2);
+                        HandleIntersectionsAbort(intersectedObjsPl1);
+                        HandleIntersectionsAbort(intersectedObjsPl2);
                     }
                 }
-                else
+                else if (endPlane == currPlane)
                 {
                     projectionComponent1.Draw(startPlane, startPosition, startPositionProjection);
-                    //projectionComponent1.SetLabelVisible(false);
 
                     // FIXED LENGTH PROJECTION  
                     if (withFixedLength)
@@ -900,27 +967,36 @@ namespace Assets.Scripts.Experimental
                     }
 
                     projectionComponent2.Draw(endPlane, startPositionProjection, endPosition);
-                    // projectionComponent2.SetLabel(Vector3.Distance(startPositionProjection, endPosition));
-                    //projectionComponent2.SetLabelVisible(true);
 
                     HandleIntersectionStart(hitObject, intersectedObjsPl2, projectionComponent2.GetComponent<IRaycastable>());
 
                     if (isEnd)
                     {
-                        DrawPoint(endPlane, endPosition, null, DrawType.Part);
+                        var pointLabel = startPoint?.FocusedLabel;
+                        var labels = string.IsNullOrEmpty(pointLabel) ? null : new List<string>() { startPoint.FocusedLabel };
+
+                        DrawPoint(endPlane, endPosition, labels, DrawType.Part);
 
                         projectionComponent1.ColliderEnabled = true;
-                        //projectionComponent1.SetLabelVisible(false);
                         _wCtrl.LinkConstructionToWall(startPlane, projection1);
 
                         projectionComponent2.ColliderEnabled = true;
-                        //projectionComponent2.SetLabelVisible(false);
                         _wCtrl.LinkConstructionToWall(endPlane, projection2);
 
                         HandleIntersectionsEnd(startPlane, intersectedObjsPl1, projectionComponent1);
                         HandleIntersectionsEnd(endPlane, intersectedObjsPl2, projectionComponent2);
 
                         OnDrawingCompleted(DrawType.Full);
+                    }
+                }
+                else
+                {
+                    if (isEnd)
+                    {
+                        UnityEngine.Object.Destroy(projection1);
+                        UnityEngine.Object.Destroy(projection2);
+                        HandleIntersectionsAbort(intersectedObjsPl1);
+                        HandleIntersectionsAbort(intersectedObjsPl2);
                     }
                 }
             };
