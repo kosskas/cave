@@ -5,6 +5,7 @@ using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using Assets.Scripts.FileManagers;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ModeExperimental : IMode
 {
@@ -648,6 +649,7 @@ public class ModeExperimental : IMode
         Cursor.visible = false;
 
         _isRadialMenu = true;
+        AddRadialMenu();
     }
 
     private void _SwitchToPcUi()
@@ -656,6 +658,18 @@ public class ModeExperimental : IMode
         Cursor.visible = true;
 
         _isRadialMenu = false;
+        radialMenu.RemoveFromScene();
+        radialMenu = null;
+        GameObject btn = GameObject.Find("PcUICanvas");
+        var txt = btn.GetComponentInChildren<Text>();
+        foreach (var option in _context.All())
+        {
+            if (txt.text.Equals(option.Key.GetDescription()))
+            {
+                Debug.Log("widze btn");
+                Debug.Log(option);
+            }
+        }
     }
     private void _SwitchUi()
     {
