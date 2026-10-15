@@ -95,6 +95,8 @@ public class ModeExperimental : IMode
             _drawAction(hitObject, hitPosition, hitWall, true);
             _drawAction = null;
 
+            _items.TurnOffOnlyMainDirectionsDrawMode();
+
             TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
 
             _relativeObject = null;
@@ -122,6 +124,15 @@ public class ModeExperimental : IMode
     private void _DrawAction()
     {
         _context.Current.Value();
+    }
+
+    private void _AbortDrawAction()
+    {
+        _drawAction = null;
+        _relativeObject = null;
+        _items.TurnOffOnlyMainDirectionsDrawMode();
+        _Undo();
+        _Redo();
     }
 
     private void _SaveState()
@@ -349,6 +360,12 @@ public class ModeExperimental : IMode
     {
         _mb.Toogle3DView();
     }
+
+    private void _ToggleOnlyMainDirectionsDrawMode()
+    {
+        _items.ToggleOnlyMainDirectionsDrawMode();
+    }
+
     /* * * * INPUT HANDLERS end * * * */
 
     private void _ClearScene()
@@ -661,6 +678,24 @@ public class ModeExperimental : IMode
         {
             radialMenu.ToggleRadialMenuActive();
         }
+
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("q"))
+            {
+                _ToggleOnlyMainDirectionsDrawMode();
+            }
+        }
+
+        //if (Input.GetKeyDown("l"))
+        //{
+        //    _RemoveWall();
+        //}
+
+        //if (Input.GetKeyDown("m"))
+        //{
+        //    radialMenu.ToggleRadialMenuActive();
+        //}
     }
 }
 

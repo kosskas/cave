@@ -36,6 +36,8 @@ namespace Assets.Scripts.Experimental
 
         private int hiddenLabelId = 1;
 
+        private bool _allowedOnlyMainDirections = false;
+
         public enum DrawType
         {
             Full,
@@ -169,6 +171,16 @@ namespace Assets.Scripts.Experimental
                 .Select(e => e.Key)
                 .ToList();
             return axes;
+        }
+
+        private Axis GetAxisWithTheEarliestWall(WallInfo wall)
+        {
+            var axis = _axisWalls
+                .Where(kvp => kvp.Value.Item1 == wall || kvp.Value.Item2 == wall)
+                .OrderBy(kvp => (kvp.Value.Item1 == wall ? kvp.Value.Item2 : kvp.Value.Item1).constructionNumber)
+                .Select(kvp => kvp.Key)
+                .FirstOrDefault();
+            return axis;
         }
 
         /// <summary>
@@ -333,7 +345,51 @@ namespace Assets.Scripts.Experimental
             )
         {
             return pointOnPlane + Vector3.ProjectOnPlane(pointToCast - pointOnPlane, plane.GetNormal());
+        } 
+
+        private Vector3 SnapToAxisDirections(
+            Vector3 startPoint,
+            Vector3 targetPoint,
+            Vector3 axisStart,
+            Vector3 axisEnd,
+            Vector3 planeNormal
+            )
+        {
+            var parallel = Vector3.ProjectOnPlane(axisEnd - axisStart, planeNormal).normalized;
+            var perpendicular = Vector3.Cross(planeNormal, parallel).normalized;
+
+            // Four bidirectional axes (8 possible directions)
+            var directions = new[]
+            {
+                parallel,
+                perpendicular,
+                (parallel + perpendicular).normalized,
+                (parallel - perpendicular).normalized
+            };
+
+            var targetVector = Vector3.ProjectOnPlane(targetPoint - startPoint, planeNormal);
+
+            var bestDirection = Vector3.zero;
+            var bestProjection = 0f;
+            var bestDot = -1f;
+
+            // Find the closest direction
+            foreach (var direction in directions)
+            {
+                var projection = Vector3.Dot(targetVector, direction);
+                var dot = Mathf.Abs(projection);
+
+                if (dot > bestDot)
+                {
+                    bestDot = dot;
+                    bestProjection = projection;
+                    bestDirection = direction;
+                }
+            }
+
+            return startPoint + bestDirection * bestProjection;
         }
+
 
         private void HandleIntersectionStart(
             IRaycastable hitObject, 
@@ -695,7 +751,6 @@ namespace Assets.Scripts.Experimental
             lineComponent.Width = lineWidth;
             lineComponent.Draw(plane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
-            //lineComponent.SetLabelVisible(true);
 
             var intersectedObjs = new HashSet<IAnalyzable>();
 
@@ -704,33 +759,34 @@ namespace Assets.Scripts.Experimental
                 if (plane != FindPlane(hitPlane, hitObject))
                     return;
 
-                var endPosition = startPosition;
+                var cursorPosition = CalcPosition(plane, hitPosition, null);
+                var endPosition = cursorPosition;
+
+                if (_allowedOnlyMainDirections)
+                {
+                    var baseAxis = GetAxisWithTheEarliestWall(plane);
+                    if (baseAxis == null)
+                        return;
+
+                    endPosition = SnapToAxisDirections(startPosition, endPosition, baseAxis.From, baseAxis.To, plane.GetNormal());
+                }
 
                 if (lineWithReferenceLength != null) 
                 {
-                    var cursorPosition = CalcPosition(plane, hitPosition, null);
-                    if (cursorPosition != startPosition)
-                    {
-                        var length = lineWithReferenceLength.Length;
-                        var direction = (cursorPosition - startPosition).normalized;
-                        endPosition = startPosition + direction * length;
-                    }
+                    var length = lineWithReferenceLength.Length;
+                    var direction = (endPosition - startPosition).normalized;
+                    endPosition = startPosition + direction * length;
                 }
-                else
-                {
-                    endPosition = CalcPosition(plane, hitPosition, hitObject as ExPoint);
-                }
+
+                // add point sensitivity
+                endPosition = CalcPosition(plane, endPosition, hitObject as ExPoint);
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-
-                // lineComponent.SetLabel(Vector3.Distance(startPosition, endPositionWithPointSensitivity));
-
                 HandleIntersectionStart(hitObject, intersectedObjs, line.GetComponent<IRaycastable>());
                 
                 if (isEnd)
                 {
                     lineComponent.ColliderEnabled = true;
-                    //lineComponent.RemoveFocusedLabel();
                     labels?.ForEach(label => lineComponent.AddLabel(label));
                     lineComponent.Color = ReconstructionInfo.NORMAL;
 
@@ -1320,6 +1376,16 @@ namespace Assets.Scripts.Experimental
         {
             UnityEngine.Object.DestroyImmediate(_workspace);
             _workspace = new GameObject("WorkspaceExp");
+        }
+
+        public void ToggleOnlyMainDirectionsDrawMode()
+        {
+            _allowedOnlyMainDirections = !_allowedOnlyMainDirections;
+        }
+
+        public void TurnOffOnlyMainDirectionsDrawMode()
+        {
+            _allowedOnlyMainDirections = false;
         }
     }
 }
