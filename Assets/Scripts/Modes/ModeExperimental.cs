@@ -753,12 +753,12 @@ public class ModeExperimental : IMode
             _FlyLower();
         }
 
-        if (Input.GetKey("-"))
+        if (Input.GetKey("="))
         {
             _ZoomIn();
         }
 
-        if (Input.GetKey("="))
+        if (Input.GetKey("-"))
         {
             _ZoomOut();
         }
