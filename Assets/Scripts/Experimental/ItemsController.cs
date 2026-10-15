@@ -711,11 +711,26 @@ namespace Assets.Scripts.Experimental
 
             var v = b.Value - a.Value;
             var vv = Vector3.Dot(v, v);
+
             if (vv < DescriptiveMathLib.EPS)
                 return null;
 
-            var c = p.Value + v * Vector3.Dot(b.Value - p.Value, v) / vv;
-            var d = p.Value + v * Vector3.Dot(a.Value - p.Value, v) / vv;
+            var t = Vector3.Dot(p.Value - a.Value, v) / vv;
+
+            var c = p.Value + v * (1f - t);
+            var d = p.Value - v * t;
+
+            // Extend the rectangle if the point lies outside the opposite edge
+            if (t < 0f)
+            {
+                a = a.Value + v * t;
+                d = p.Value;
+            }
+            else if (t > 1f)
+            {
+                b = b.Value + v * (t - 1f);
+                c = p.Value;
+            }
 
             _fGen.GenerateFace(new List<KeyValuePair<string, Vector3>>()
             {
