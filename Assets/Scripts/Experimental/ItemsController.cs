@@ -878,6 +878,10 @@ namespace Assets.Scripts.Experimental
             if (startPlane == default(WallInfo))
                 return null;
 
+            // MUST START AT POINT
+            if (startPoint == null)
+                return null;
+
             // FIRST PART
             var projection1 = new GameObject("PROJECTION");
             projection1.transform.SetParent(_lineRepo.transform);
