@@ -323,13 +323,16 @@ namespace Assets.Scripts.Experimental
             float length
             )
         {
-            var v = to - from;
+            return from + (to - from).normalized * length;
+        }
 
-            // brak kierunku
-            if (v.sqrMagnitude < DescriptiveMathLib.EPS)
-                return from;    
-
-            return from + v.normalized * Mathf.Max(0f, length);
+        private Vector3 CastPointOnPlane(
+            Vector3 pointOnPlane,
+            Vector3 pointToCast,
+            WallInfo plane
+            )
+        {
+            return pointOnPlane + Vector3.ProjectOnPlane(pointToCast - pointOnPlane, plane.GetNormal());
         }
 
         private void HandleIntersectionStart(
@@ -871,6 +874,10 @@ namespace Assets.Scripts.Experimental
             float lineWidth = _HELP_LINE_WIDTH
             )
         {
+            // START BE A PLANE
+            if (startPlane == default(WallInfo))
+                return null;
+
             // FIRST PART
             var projection1 = new GameObject("PROJECTION");
             projection1.transform.SetParent(_lineRepo.transform);
@@ -901,50 +908,47 @@ namespace Assets.Scripts.Experimental
             // END PLANE
             var endPlane = default(WallInfo);
 
+            // PROJECTION OF START POSITION ON AXIS
+            var startPositionProjection = default(Vector3);
+
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
-                // START PLANE
-                if (startPlane == default(WallInfo))
-                    return;
-
                 // CURRENT PLANE
                 var currPlane = FindPlane(hitPlane, hitObject);
                 if (currPlane == default(WallInfo))
                     return;
 
-                // FIND END PLANE
+                Debug.Log($"CURR PLANE: {currPlane.constructionNumber}");
+
                 if (startPlane == currPlane)
                 {
-                    // CHOOSE AXIS
+                    // FIND AXIS
                     var axes = GetAxesOnPlane(startPlane);
                     axis = FindApproachingAxis(startPosition, hitPosition, axes);
                     if (axis == default(Axis))
                         return;
 
+                    // THEN FIND END PLANE
                     endPlane = FindEndPlane(axis, startPlane);
-                }
 
-                // PROJECTION OF START POSITION ON AXIS
-                var startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
+                    // PROJECTION OF START POSITION ON AXIS
+                    startPositionProjection = CalcProjectionOnAxis(axis, startPosition);
 
-                // CURRENT POSITION
-                var cursorPosition = CalcPosition(currPlane, hitPosition);
+                    // CURRENT POSITION
+                    var cursorPosition = CalcPosition(currPlane, hitPosition);
 
-                // PROJECTION OF CURRENT POSITION ON AXIS
-                var cursorPositionProjection = CalcProjectionOnAxis(axis, cursorPosition);
+                    // PROJECTION OF CURRENT POSITION ON AXIS
+                    var cursorPositionProjection = CalcProjectionOnAxis(axis, cursorPosition);
 
-                // DISPLACEMENT VECTOR
-                var vDisplacement = startPositionProjection - cursorPositionProjection;
+                    // DISPLACEMENT VECTOR
+                    var vDisplacement = startPositionProjection - cursorPositionProjection;
 
-                // ACTUAL END POSITION
-                var endPosition = cursorPosition + vDisplacement;
+                    // ACTUAL END POSITION
+                    var endPosition = cursorPosition + vDisplacement;
 
-                if (startPlane == currPlane)
-                {
+                    // DRAWING
                     projectionComponent1.Draw(startPlane, startPosition, endPosition);
-
                     projectionComponent2.Draw(startPlane, startPosition, endPosition);
-
                     HandleIntersectionStart(hitObject, intersectedObjsPl1, projectionComponent1.GetComponent<IRaycastable>());
 
                     if (isEnd)
@@ -957,17 +961,30 @@ namespace Assets.Scripts.Experimental
                 }
                 else if (endPlane == currPlane)
                 {
-                    projectionComponent1.Draw(startPlane, startPosition, startPositionProjection);
+                    // CURRENT POSITION
+                    var cursorPosition = CalcPosition(currPlane, hitPosition);
+
+                    // PROJECTION OF CURRENT POSITION ON AXIS
+                    var cursorPositionProjection = CalcProjectionOnAxis(axis, cursorPosition);
+
+                    // DISPLACEMENT VECTOR
+                    var vDisplacement = startPositionProjection - cursorPositionProjection;
+
+                    // ACTUAL END POSITION
+                    var endPosition = cursorPosition + vDisplacement;
 
                     // FIXED LENGTH PROJECTION  
                     if (withFixedLength)
                     {
-                        var scaledEnd = ScaleToLength(startPositionProjection, endPosition, fixedLength);
-                        endPosition = scaledEnd;
+                        endPosition = ScaleToLength(startPositionProjection, endPosition, fixedLength);
                     }
 
-                    projectionComponent2.Draw(endPlane, startPositionProjection, endPosition);
+                    // ENSURE END POSITION LIES ON END PLANE
+                    endPosition = CastPointOnPlane(startPositionProjection, endPosition, currPlane);
 
+                    // DRAWING
+                    projectionComponent1.Draw(startPlane, startPosition, startPositionProjection);
+                    projectionComponent2.Draw(endPlane, endPosition, startPositionProjection);
                     HandleIntersectionStart(hitObject, intersectedObjsPl2, projectionComponent2.GetComponent<IRaycastable>());
 
                     if (isEnd)
