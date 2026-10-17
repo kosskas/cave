@@ -101,6 +101,8 @@ public class ModeExperimental : IMode
             _drawAction(hitObject, hitPosition, hitWall, true);
             _drawAction = null;
 
+            _items.TurnOffOnlyMainDirectionsDrawMode();
+
             TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
 
             _relativeObject = null;
@@ -135,6 +137,7 @@ public class ModeExperimental : IMode
     {
         _drawAction = null;
         _relativeObject = null;
+        _items.TurnOffOnlyMainDirectionsDrawMode();
         _Undo();
         _Redo();
     }
@@ -166,7 +169,7 @@ public class ModeExperimental : IMode
 
     private void _BackToMenu()
     {
-        //czyszcenie œcian obiektu
+        //czyszcenie ï¿½cian obiektu
         _fc.Clear();
         GameObject.Destroy(_fc);
 
@@ -203,7 +206,7 @@ public class ModeExperimental : IMode
             Debug.LogError("Error - save failed");
         }
 
-        //czyszcenie œcian obiektu
+        //czyszcenie ï¿½cian obiektu
         _fc.Clear();
         GameObject.Destroy(_fc);
 
@@ -267,7 +270,7 @@ public class ModeExperimental : IMode
 
             l.NextText();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
             _SceneChangedHandler();
         });
     }
@@ -281,7 +284,7 @@ public class ModeExperimental : IMode
 
             l.PrevText();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
             _SceneChangedHandler();
         });
     }
@@ -295,7 +298,7 @@ public class ModeExperimental : IMode
 
             l.NextLabel();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
             _SceneChangedHandler();
         });
     }
@@ -309,7 +312,7 @@ public class ModeExperimental : IMode
 
             l.PrevLabel();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
             _SceneChangedHandler();
         });
     }
@@ -323,7 +326,7 @@ public class ModeExperimental : IMode
                 
             l.RemoveFocusedLabel();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE USUNIÊTO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE USUNIï¿½TO LABEL
             _SceneChangedHandler();
         });
     }
@@ -337,7 +340,7 @@ public class ModeExperimental : IMode
                 
             l.AddLabel();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE DODANO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE DODANO LABEL
             _SceneChangedHandler();
         });
     }
@@ -371,11 +374,17 @@ public class ModeExperimental : IMode
     {
         _mb.Toogle3DView();
     }
+
+    private void _ToggleOnlyMainDirectionsDrawMode()
+    {
+        _items.ToggleOnlyMainDirectionsDrawMode();
+    }
+
     /* * * * INPUT HANDLERS end * * * */
 
     private void _ClearScene()
     {
-        //czyszcenie œcian obiektu
+        //czyszcenie ï¿½cian obiektu
         _fc.Clear();
         
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
@@ -385,7 +394,7 @@ public class ModeExperimental : IMode
         _mb.ClearAndDisable();
         _mb.Init(true);
         _wc.SetBasicWalls();
-        //dodanie bazowej osi rzutuj¹cej
+        //dodanie bazowej osi rzutujï¿½cej
         _AddBaseAxis();
     }
 
@@ -462,7 +471,7 @@ public class ModeExperimental : IMode
                 _SceneChangedHandler();
         };
 
-        //dodanie bazowej osi rzutuj¹cej
+        //dodanie bazowej osi rzutujï¿½cej
         _AddBaseAxis();
 
         _lineCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
@@ -592,7 +601,7 @@ public class ModeExperimental : IMode
                 }
                 else
                 {
-                    Debug.LogError("Nie mo¿na za³adowaæ prefabrykatu MenuItem z Resources/RadialMenuItem");
+                    Debug.LogError("Nie moï¿½na zaï¿½adowaï¿½ prefabrykatu MenuItem z Resources/RadialMenuItem");
                 }
             }
             else
@@ -761,6 +770,14 @@ public class ModeExperimental : IMode
         if (Input.GetKey("-"))
         {
             _ZoomOut();
+        }
+        
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("q"))
+            {
+                _ToggleOnlyMainDirectionsDrawMode();
+            }
         }
 
         //if (Input.GetKeyDown("l"))
