@@ -3,6 +3,7 @@ using Assets.Scripts.Experimental.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Assets.Scripts.Experimental
@@ -18,7 +19,6 @@ namespace Assets.Scripts.Experimental
          
         private readonly WallController _wCtrl;
         private readonly WallCreator _wCrt;
-        private readonly FacesGenerator _fGen;
         private readonly MeshBuilder _mB;
 
         private static ItemsController _ic;
@@ -29,6 +29,7 @@ namespace Assets.Scripts.Experimental
         private static GameObject _lineRepo;
         private static GameObject _pointRepo;
         private static GameObject _circleRepo;
+        private static GameObject _faceRepo;
 
         private readonly Dictionary<Axis, Tuple<WallInfo, WallInfo>> _axisWalls;
 
@@ -61,7 +62,6 @@ namespace Assets.Scripts.Experimental
         public ItemsController(
             WallController wCtrl, 
             WallCreator wCrt, 
-            FacesGenerator fGen, 
             MeshBuilder mB
             )
         {
@@ -79,13 +79,15 @@ namespace Assets.Scripts.Experimental
             _circleRepo = new GameObject("CircleRepo");
             _circleRepo.transform.SetParent(_workspace.transform);
 
+            _faceRepo = new GameObject("CircleRepo");
+            _faceRepo.transform.SetParent(_workspace.transform);
+
             _axisWalls = new Dictionary<Axis, Tuple<WallInfo, WallInfo>>();
 
             _facePoints = new List<ExPoint>();
 
             _wCtrl = wCtrl;
             _wCrt = wCrt;
-            _fGen = fGen;
             _mB = mB;
 
             _ic = this;
@@ -643,12 +645,10 @@ namespace Assets.Scripts.Experimental
                     .Select(lbl => new KeyValuePair<string, Vector3>(lbl, points3DDict[lbl]))
                     .ToList();
 
-                _fGen.GenerateFace(points3D);
+                DrawFace(points3D);
 
                 _facePoints.ForEach(p => p.Color = ReconstructionInfo.NORMAL);
-                _facePoints.Clear();
-
-                OnDrawingCompleted(DrawType.Full);
+                _facePoints.Clear();                
             }
             else if(_facePoints.Contains(chosenPoint) || string.IsNullOrEmpty(chosenPoint.FocusedLabel))
             {
@@ -662,6 +662,27 @@ namespace Assets.Scripts.Experimental
             }
 
             return null;
+        }
+
+        public void DrawFace(
+            List<KeyValuePair<string, Vector3>> points3D
+            )
+        {
+            var face = new GameObject("FACE");
+            face.transform.SetParent(_faceRepo.transform);
+
+            var faceComponent = face.AddComponent<Face>();
+
+            if (faceComponent.CreateFace(points3D))
+            {
+                _mB.AddFace(face, faceComponent);
+                OnDrawingCompleted(DrawType.Full);
+            }
+            else
+            {
+                UnityEngine.Object.Destroy(face);
+                Debug.LogWarning("Failed to create face.");
+            }
         }
 
         private DrawAction DrawHelpPlane(
@@ -732,17 +753,17 @@ namespace Assets.Scripts.Experimental
                 c = p.Value;
             }
 
-            _fGen.GenerateFace(new List<KeyValuePair<string, Vector3>>()
+            var points3D = new List<KeyValuePair<string, Vector3>>()
             {
                 new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_a", a.Value),
                 new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_b", b.Value),
                 new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_c", c),
                 new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_d", d)
-            });
+            };
 
             hiddenLabelId++;
 
-            OnDrawingCompleted(DrawType.Full);
+            DrawFace(points3D);
 
             return null;
         }
@@ -1252,7 +1273,7 @@ namespace Assets.Scripts.Experimental
 
         public static List<WallInfo> GetWalls() => _ic?._wCtrl.GetWalls() ?? new List<WallInfo>();
 
-        public static List<FaceInfo> GetFaces() => FacesGenerator.faceInfoList;
+        public static List<Face> GetFaces() => GetComponentsFromRepo<Face>(_faceRepo);
 
         public static void AddPoint(
             List<string> pointLabels, 
@@ -1356,7 +1377,7 @@ namespace Assets.Scripts.Experimental
             List<KeyValuePair<string, Vector3>> faceVertices
             )
         {
-            _ic?._fGen.GenerateFace(faceVertices);
+            _ic?.DrawFace(faceVertices);
         }
 
         //---
@@ -1385,6 +1406,10 @@ namespace Assets.Scripts.Experimental
             UnityEngine.Object.DestroyImmediate(_pointRepo);
             _pointRepo = new GameObject("PointRepo");
             _pointRepo.transform.SetParent(_workspace.transform);
+
+            UnityEngine.Object.DestroyImmediate(_faceRepo);
+            _faceRepo = new GameObject("PointRepo");
+            _faceRepo.transform.SetParent(_workspace.transform);
         }
 
         public void RemoveWorkspace()

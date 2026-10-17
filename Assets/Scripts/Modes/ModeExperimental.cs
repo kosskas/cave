@@ -26,8 +26,6 @@ public class ModeExperimental : IMode
 
     private MeshBuilder _mb;
 
-    private FacesGenerator _fc;
-
     private WallCreator _wcrt;
 
     private ItemsController _items;
@@ -169,10 +167,6 @@ public class ModeExperimental : IMode
 
     private void _BackToMenu()
     {
-        //czyszcenie �cian obiektu
-        _fc.Clear();
-        GameObject.Destroy(_fc);
-
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
 
@@ -197,18 +191,14 @@ public class ModeExperimental : IMode
 
         //export solid
         string solid = SolidExporter.ExportSolid(
-            _mb.GetPoints3D(), 
-            _mb.GetEdges3D(), 
-            FacesGenerator.GetFaces());
+            _mb.GetPoints3D(),
+            _mb.GetEdges3D(),
+            _mb.GetFaces3D());
 
         if (solid == null)
         {
             Debug.LogError("Error - save failed");
         }
-
-        //czyszcenie �cian obiektu
-        _fc.Clear();
-        GameObject.Destroy(_fc);
 
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
@@ -383,10 +373,7 @@ public class ModeExperimental : IMode
     /* * * * INPUT HANDLERS end * * * */
 
     private void _ClearScene()
-    {
-        //czyszcenie �cian obiektu
-        _fc.Clear();
-        
+    {        
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
         
@@ -461,10 +448,8 @@ public class ModeExperimental : IMode
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
         _mb.Init(_showProjLines);
-        _fc = mainObject.AddComponent<FacesGenerator>();
-        _fc.Init(_mb);
 
-        _items = new ItemsController(_wc, _wcrt, _fc, _mb);
+        _items = new ItemsController(_wc, _wcrt, _mb);
         _items.DrawingCompleted += (sender, drawOrigin) =>
         {
             if (drawOrigin == ItemsController.DrawType.Full)

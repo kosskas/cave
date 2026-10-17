@@ -9,7 +9,8 @@ public static class ReconstructionInfo
     public static Color FOCUSED = Color.white;
     // -- FACE
     public static Color FACE_COLOR = Color.white;
-    public static float SOLID_FACE_TRANSPARENCY = 0.3f;
+    public static float SOLID_FACE_TRANSPARENCY = 0.1f;
+    public static float SOLID_FACE_TRANSPARENCY_FOCUSED = 0.5f;
     // -- PROJECTION LINE
     public static Color PROJECTION_LINE_COLOR = Color.blue;
     public static Color PROJECTION_LINE_ERROR_COLOR = Color.red;
@@ -42,7 +43,7 @@ public static class ReconstructionInfo
     // -- DYNAMIC WALL
     public static float WALL_LENGTH = 10.0f;
     public static float WALL_WIDTH = 0.0001f;
-    public static float WALL_OPACITY = 0.5f;
+    public static float WALL_OPACITY = 0.25f;
 
     // -- METADATA
     public static String APP_NAME = "Descriptive3D_v2.1.2";
