@@ -43,7 +43,7 @@ public static class ReconstructionInfo
     // -- DYNAMIC WALL
     public static float WALL_LENGTH = 10.0f;
     public static float WALL_WIDTH = 0.0001f;
-    public static float WALL_OPACITY = 0.5f;
+    public static float WALL_OPACITY = 0.25f;
 
     // -- METADATA
     public static String APP_NAME = "Descriptive3D_v2.0.0";
