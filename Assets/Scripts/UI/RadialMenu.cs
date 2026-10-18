@@ -9,6 +9,8 @@ using System.Runtime.Remoting.Contexts;
 
 public class RadialMenu : MonoBehaviour
 {
+    private static GameObject menuObject;
+
     private GameObject itemPrefab;
     private int itemCount;
     private float radius;
@@ -51,13 +53,22 @@ public class RadialMenu : MonoBehaviour
 
     public static RadialMenu Create(Transform parent, GameObject prefab)
     {
-        GameObject menuObject = new GameObject("RadialMenu");
+        menuObject = new GameObject("RadialMenu");
         menuObject.transform.SetParent(parent, false);
         menuObject.transform.localScale = new Vector3(0.55f, 0.34f, 0.13f);
         RadialMenu menu = menuObject.AddComponent<RadialMenu>();
         menu.itemPrefab = prefab;
         menu.initialMenuItemScale = prefab.GetComponent<RectTransform>().localScale;
         return menu;
+    }
+
+    private void Start()
+    {
+        if (AdditionalCameras.Instance != null)
+        {
+            AdditionalCameras.Instance.CameraBrowsingModeChanged += OnCameraBrowsingModeChanged;
+            OnCameraBrowsingModeChanged(AdditionalCameras.Instance.IsCameraBrowsingMode);
+        }
     }
 
     void Update()
@@ -95,6 +106,17 @@ public class RadialMenu : MonoBehaviour
                 lastScrollTime = Time.unscaledTime; //dół
             }
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (AdditionalCameras.Instance != null)
+            AdditionalCameras.Instance.CameraBrowsingModeChanged -= OnCameraBrowsingModeChanged;
+    }
+
+    private void OnCameraBrowsingModeChanged(bool enabled)
+    {
+        menuObject.SetActive(!enabled);
     }
 
     public void PreviousOption()
