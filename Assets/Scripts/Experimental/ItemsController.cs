@@ -659,6 +659,8 @@ namespace Assets.Scripts.Experimental
 
                 case ExContext.Circle: return DrawCircle(plane, positionWithPointSensitivity);
 
+                case ExContext.FixedCircle: return DrawCircle(plane, positionWithPointSensitivity, LineRef.ToTakeLength(relativeObject as Line));
+
                 case ExContext.Wall: return DrawWall(plane, positionWithPointSensitivity, plane.GetNormal());
 
                 case ExContext.Face: return DrawFace(hitObject as ExPoint);
@@ -999,6 +1001,7 @@ namespace Assets.Scripts.Experimental
         public DrawAction DrawCircle(
             WallInfo plane, 
             Vector3 startPosition, 
+            LineRef lineReference = null,
             float lineWidth = _HELP_LINE_WIDTH, 
             DrawType type = DrawType.Full
             )
@@ -1019,7 +1022,18 @@ namespace Assets.Scripts.Experimental
                 if (plane != FindPlane(hitPlane, hitObject))
                     return;
 
-                var endPositionWithPointSensitivity = CalcPosition(plane, hitPosition, hitObject as ExPoint);
+                var cursorPosition = CalcPosition(plane, hitPosition, null);
+                var endPosition = cursorPosition;
+
+                if (lineReference?.TakeLength ?? false)
+                {
+                    var length = lineReference.Line.Length;
+                    var direction = (endPosition - startPosition).normalized;
+                    endPosition = startPosition + direction * length;
+                }
+
+                // add point sensitivity
+                var endPositionWithPointSensitivity = CalcPosition(plane, endPosition, hitObject as ExPoint);
 
                 circleComponent.Draw(default(WallInfo), default(Vector3), endPositionWithPointSensitivity);
 
@@ -1309,7 +1323,7 @@ namespace Assets.Scripts.Experimental
 
             var plane = _ic._wCtrl.GetWallByName(circlePlaneName);
 
-            var da = _ic.DrawCircle(plane, circleStartPosition, circleLineWidth, DrawType.Part);
+            var da = _ic.DrawCircle(plane, circleStartPosition, null, circleLineWidth, DrawType.Part);
             da.Invoke(null, circleEndPosition, plane, true);
         }
 
