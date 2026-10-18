@@ -465,6 +465,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Line, _ChangeToLineCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.FixedCircle, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Face, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.HelpPlane, ActRelativeToObject),
