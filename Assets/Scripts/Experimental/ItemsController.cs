@@ -3,7 +3,6 @@ using Assets.Scripts.Experimental.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 
 namespace Assets.Scripts.Experimental
@@ -39,11 +38,56 @@ namespace Assets.Scripts.Experimental
 
         private bool _allowedOnlyMainDirections = false;
 
+
+        /*   E N U M S   */
+
         public enum DrawType
         {
             Full,
             Part
         }
+
+
+        /*   C L A S S E S   */
+
+        public class LineRef
+        {
+            public Line Line { get; private set; } = null;
+            public bool TakeLength { get; private set; } = false;
+            public bool BeParallel { get; private set; } = false;
+            public bool BePerpendicular { get; private set; } = false;
+
+            public static LineRef ToTakeLength(Line line)
+            {
+                if (line == null) return null;
+
+                var lr = new LineRef();
+                lr.Line = line;
+                lr.TakeLength = true;
+                return lr;
+            }
+
+            public static LineRef ToBeParallel(Line line)
+            {
+                if (line == null) return null;
+
+                var lr = new LineRef();
+                lr.Line = line;
+                lr.BeParallel = true;
+                return lr;
+            }
+
+            public static LineRef ToBePerpendicular(Line line)
+            {
+                if (line == null) return null;
+
+                var lr = new LineRef();
+                lr.Line = line;
+                lr.BePerpendicular = true;
+                return lr;
+            }
+        }
+
 
         /*   E V E N T S   */
 
@@ -456,10 +500,10 @@ namespace Assets.Scripts.Experimental
             Vector3 position
             )
         {
-            return !ExistsPointOnPosition(position);
+            return GetPointOnPosition(position) == null;
         }
 
-        private bool ExistsPointOnPosition(
+        private ExPoint GetPointOnPosition(
             Vector3 position
             )
         {
@@ -474,10 +518,36 @@ namespace Assets.Scripts.Experimental
                 if (Vector3.SqrMagnitude(exPoint.Position - position) >= DescriptiveMathLib.EPS) continue;
 
                 // exists point relative to position closer than eps distance 
-                return true;
+                return exPoint;
             }
 
-            return false;
+            return null;
+        }
+
+        private ExPoint DrawOrGetPoint(
+            WallInfo plane,
+            Vector3 position
+            )
+        {
+            var exPoint = GetPointOnPosition(position);
+
+            if (exPoint == null)
+            {
+                var point = new GameObject("POINT");
+                point.transform.SetParent(_pointRepo.transform);
+                _wCtrl.LinkConstructionToWall(plane, point);
+
+                var pointComponent = point.AddComponent<ExPoint>();
+                pointComponent.Draw(plane, position);
+                pointComponent.EnabledLabels = true;
+                pointComponent.Color = ReconstructionInfo.NORMAL;
+
+                return pointComponent;
+            }
+            else
+            {
+                return exPoint;
+            }
         }
 
 
@@ -577,11 +647,11 @@ namespace Assets.Scripts.Experimental
                 
                 case ExContext.HelpLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint);
 
-                case ExContext.FixedLine: return DrawLine(plane, positionWithPointSensitivity, null, relativeObject as Line);
+                case ExContext.FixedLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToTakeLength(relativeObject as Line));
 
-                case ExContext.PerpendicularLine: return DrawLinePerpendicularToLine(plane, positionWithPointSensitivity, relativeObject);
+                case ExContext.PerpendicularLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToBePerpendicular(relativeObject as Line));
 
-                case ExContext.ParallelLine: return DrawLineParallelToLine(plane, positionWithPointSensitivity, relativeObject);
+                case ExContext.ParallelLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToBeParallel(relativeObject as Line));
 
                 case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity, hitObject as ExPoint);
 
@@ -606,19 +676,9 @@ namespace Assets.Scripts.Experimental
             DrawType type = DrawType.Full
             )
         {
-            if (NoPointOnPosition(position))
-            {
-                var point = new GameObject("POINT");
-                point.transform.SetParent(_pointRepo.transform);
-                _wCtrl.LinkConstructionToWall(plane, point);
+            var exPoint = DrawOrGetPoint(plane, position);
 
-                var pointComponent = point.AddComponent<ExPoint>();
-                pointComponent.Draw(plane, position);
-                pointComponent.EnabledLabels = true;
-
-                labels?.ForEach(label => pointComponent.AddLabel(label));
-                pointComponent.Color = ReconstructionInfo.NORMAL;
-            }
+            labels?.ForEach(label => exPoint.AddLabel(label));
 
             OnDrawingCompleted(type);
 
@@ -769,10 +829,10 @@ namespace Assets.Scripts.Experimental
         }
 
         public DrawAction DrawLine(
-            WallInfo plane, 
+            WallInfo startPlane, 
             Vector3 startPosition, 
             ExPoint startPoint = null,
-            Line lineWithReferenceLength = null,
+            LineRef lineReference = null,
             float lineWidth = _HELP_LINE_WIDTH, 
             List<string> labels = null, 
             DrawType type = DrawType.Full
@@ -780,60 +840,111 @@ namespace Assets.Scripts.Experimental
         {
             var line = new GameObject("LINE");
             line.transform.SetParent(_lineRepo.transform);
-            _wCtrl.LinkConstructionToWall(plane, line);
+            _wCtrl.LinkConstructionToWall(startPlane, line);
 
             var lineComponent = line.AddComponent<Line>();
             lineComponent.ColliderEnabled = false;
             lineComponent.Width = lineWidth;
-            lineComponent.Draw(plane, startPosition, startPosition);
+            lineComponent.Draw(startPlane, startPosition, startPosition);
             lineComponent.EnabledLabels = true;
 
             var intersectedObjs = new HashSet<IAnalyzable>();
 
             return (hitObject, hitPosition, hitPlane, isEnd) =>
             {
-                if (plane != FindPlane(hitPlane, hitObject))
-                    return;
+                var currentPlane = FindPlane(hitPlane, hitObject);
 
-                var cursorPosition = CalcPosition(plane, hitPosition, null);
+                if (startPlane != currentPlane)
+                {
+                    if (isEnd)
+                    {
+                        UnityEngine.Object.Destroy(line);
+                        HandleIntersectionsAbort(intersectedObjs);
+                    }
+
+                    return;
+                }
+                    
+                var cursorPosition = CalcPosition(startPlane, hitPosition, null);
                 var endPosition = cursorPosition;
 
                 if (_allowedOnlyMainDirections)
                 {
-                    var baseAxis = GetAxisWithTheEarliestWall(plane);
+                    var baseAxis = GetAxisWithTheEarliestWall(startPlane);
                     if (baseAxis == null)
                         return;
 
-                    endPosition = SnapToAxisDirections(startPosition, endPosition, baseAxis.From, baseAxis.To, plane.GetNormal());
+                    endPosition = SnapToAxisDirections(
+                        startPosition, 
+                        endPosition, 
+                        baseAxis.From, 
+                        baseAxis.To, 
+                        startPlane.GetNormal()
+                    );
+                }
+                else if (lineReference?.BeParallel ?? false)
+                {
+                    // Project the reference direction onto the drawing plane
+                    var direction = Vector3.ProjectOnPlane(
+                        lineReference.Line.EndPosition - lineReference.Line.StartPosition,
+                        startPlane.GetNormal()
+                    );
+
+                    if (direction.sqrMagnitude < DescriptiveMathLib.EPS)
+                        return;
+
+                    direction.Normalize();
+
+                    // Project the cursor onto the parallel direction
+                    endPosition = startPosition + direction * Vector3.Dot(cursorPosition - startPosition, direction);
+                }
+                else if (lineReference?.BePerpendicular ?? false)
+                {
+                    // Calculate the perpendicular direction within the drawing plane
+                    var direction = Vector3.Cross(
+                        startPlane.GetNormal(),
+                        lineReference.Line.EndPosition - lineReference.Line.StartPosition
+                    );
+
+                    if (direction.sqrMagnitude < DescriptiveMathLib.EPS)
+                        return;
+
+                    direction.Normalize();
+
+                    // Project the cursor onto the perpendicular direction
+                    endPosition = startPosition + direction * Vector3.Dot(cursorPosition - startPosition, direction);
                 }
 
-                if (lineWithReferenceLength != null) 
+                if (lineReference?.TakeLength ?? false)
                 {
-                    var length = lineWithReferenceLength.Length;
+                    var length = lineReference.Line.Length;
                     var direction = (endPosition - startPosition).normalized;
                     endPosition = startPosition + direction * length;
                 }
 
                 // add point sensitivity
-                endPosition = CalcPosition(plane, endPosition, hitObject as ExPoint);
+                endPosition = CalcPosition(startPlane, endPosition, hitObject as ExPoint);
 
                 lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
                 HandleIntersectionStart(hitObject, intersectedObjs, line.GetComponent<IRaycastable>());
                 
                 if (isEnd)
                 {
+                    var endPoint = hitObject as ExPoint;
+
                     lineComponent.ColliderEnabled = true;
                     labels?.ForEach(label => lineComponent.AddLabel(label));
                     lineComponent.Color = ReconstructionInfo.NORMAL;
 
-                    var endPoint = hitObject as ExPoint;
+                    startPoint = DrawOrGetPoint(startPlane, startPosition);
+                    endPoint = DrawOrGetPoint(hitPlane, endPosition);
 
                     if (startPoint != null && endPoint != null)
                     {
                         lineComponent.BindPoints(startPoint, endPoint);
                     }
 
-                    HandleIntersectionsEnd(plane, intersectedObjs, lineComponent);
+                    HandleIntersectionsEnd(startPlane, intersectedObjs, lineComponent);
 
                     OnDrawingCompleted(type);
                 }
@@ -1111,152 +1222,6 @@ namespace Assets.Scripts.Experimental
                         HandleIntersectionsAbort(intersectedObjsPl1);
                         HandleIntersectionsAbort(intersectedObjsPl2);
                     }
-                }
-            };
-        }
-
-        public DrawAction DrawLineParallelToLine(
-            WallInfo plane, 
-            Vector3 startPosition, 
-            IRaycastable relativeObject = null
-            )
-        {
-            var line = new GameObject("LINE");
-            line.transform.SetParent(_lineRepo.transform);
-            _wCtrl.LinkConstructionToWall(plane, line);
-
-            var lineComponent = line.AddComponent<Line>();
-            lineComponent.ColliderEnabled = false;
-            lineComponent.Width = _HELP_LINE_WIDTH;
-            lineComponent.Draw(plane, startPosition, startPosition);
-            lineComponent.EnabledLabels = true;
-            //lineComponent.SetLabelVisible(true);
-
-            var relativeLine = relativeObject as Line;
-            var relativeAxis = relativeObject as Axis;
-            var fromPosition = Vector3.zero;
-            var toPosition = Vector3.zero;
-
-            if (relativeLine != null)
-            {
-                fromPosition = relativeLine.StartPosition;
-                toPosition = relativeLine.EndPosition;
-            }
-
-            if (relativeAxis != null)
-            {
-                fromPosition = relativeAxis.From;
-                toPosition = relativeAxis.To;
-            }
-
-            var intersectedObjs = new HashSet<IAnalyzable>();
-
-            return (hitObject, hitPosition, hitPlane, isEnd) =>
-            {
-                if (plane != FindPlane(hitPlane, hitObject))
-                    return;
-
-                if (fromPosition == Vector3.zero && toPosition == Vector3.zero)
-                    return;
-
-                var startPositionProjection = CalcProjectionOnAxis(fromPosition, toPosition, startPosition);
-                var startPositionOffsetFromAxis = startPosition - startPositionProjection;
-
-                var cursorPosition = CalcPosition(plane, hitPosition);
-
-                var cursorPositionProjection = CalcProjectionOnAxis(fromPosition, toPosition, cursorPosition);
-
-                var endPosition = cursorPositionProjection + startPositionOffsetFromAxis;
-
-                lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-                // lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
-
-                HandleIntersectionStart(hitObject, intersectedObjs, line.GetComponent<IRaycastable>());
-
-                if (isEnd)
-                {
-                    lineComponent.ColliderEnabled = true;
-                    //lineComponent.SetLabelVisible(false);
-
-                    HandleIntersectionsEnd(plane, intersectedObjs, lineComponent);
-
-                    OnDrawingCompleted(DrawType.Full);
-                }
-            };
-        }
-
-        public DrawAction DrawLinePerpendicularToLine(
-            WallInfo plane, 
-            Vector3 startPosition, 
-            IRaycastable relativeObject = null
-            )
-        {
-            var line = new GameObject("LINE");
-            line.transform.SetParent(_lineRepo.transform);
-            _wCtrl.LinkConstructionToWall(plane, line);
-
-            var lineComponent = line.AddComponent<Line>();
-            lineComponent.ColliderEnabled = false;
-            lineComponent.Width = _HELP_LINE_WIDTH;
-            lineComponent.Draw(plane, startPosition, startPosition);
-            lineComponent.EnabledLabels = true;
-            //lineComponent.SetLabelVisible(true);
-
-            var relativeLine = relativeObject as Line;
-            var relativeAxis = relativeObject as Axis;
-            var vRelativeLine = Vector3.zero;
-
-            if (relativeLine != null)
-                vRelativeLine = relativeLine.EndPosition - relativeLine.StartPosition;
-
-            if (relativeAxis != null)
-                vRelativeLine = relativeAxis.To - relativeAxis.From;
-
-            var intersectedObjs = new HashSet<IAnalyzable>();
-
-            return (hitObject, hitPosition, hitPlane, isEnd) =>
-            {
-                if (plane != FindPlane(hitPlane, hitObject))
-                    return;
-
-                if (vRelativeLine == Vector3.zero)
-                    return;
-
-                var cursorPosition = CalcPosition(plane, hitPosition);
-
-                var vDrawnLine = cursorPosition - startPosition;
-
-                if (vDrawnLine.magnitude < 1e-8f)
-                    return; // vDrawnLine zdegenerowany
-
-                if (vRelativeLine.sqrMagnitude < 1e-12f) 
-                    return; // vRelativeLine zdegenerowany
-
-                var dirRelativeLine = vRelativeLine.normalized;
-
-                // Usuñ sk³adow¹ vDrawnLine wzd³u¿ vRelativeLine (rzut na p³aszczyznê prostopad³¹ do vRelativeLine)
-                var vDrawnLinePerpendicular = vDrawnLine - Vector3.Dot(vDrawnLine, dirRelativeLine) * dirRelativeLine;
-
-                if (vDrawnLinePerpendicular.sqrMagnitude < 1e-12f)
-                    return; // gdy vDrawnLine by³ równoleg³y do vRelativeLine
-
-                vDrawnLinePerpendicular = vDrawnLinePerpendicular.normalized * vDrawnLine.magnitude;
-
-                var endPosition = startPosition + vDrawnLinePerpendicular;
-
-                lineComponent.Draw(default(WallInfo), default(Vector3), endPosition);
-                // lineComponent.SetLabel(Vector3.Distance(startPosition, endPosition));
-
-                HandleIntersectionStart(hitObject, intersectedObjs, line.GetComponent<IRaycastable>());
-
-                if (isEnd)
-                {
-                    lineComponent.ColliderEnabled = true;
-                    //lineComponent.SetLabelVisible(false);
-
-                    HandleIntersectionsEnd(plane, intersectedObjs, lineComponent);
-
-                    OnDrawingCompleted(DrawType.Full);
                 }
             };
         }
