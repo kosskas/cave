@@ -18,8 +18,6 @@ public class ModeExperimental : IMode
 
     private MeshBuilder _mb;
 
-    private FacesGenerator _fc;
-
     private WallCreator _wcrt;
 
     private ItemsController _items;
@@ -106,6 +104,8 @@ public class ModeExperimental : IMode
             _drawAction(hitObject, hitPosition, hitWall, true);
             _drawAction = null;
 
+            _items.TurnOffOnlyMainDirectionsDrawMode();
+
             TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
 
             _relativeObject = null;
@@ -135,6 +135,15 @@ public class ModeExperimental : IMode
         _context.Current.Value();
     }
 
+    private void _AbortDrawAction()
+    {
+        _drawAction = null;
+        _relativeObject = null;
+        _items.TurnOffOnlyMainDirectionsDrawMode();
+        _Undo();
+        _Redo();
+    }
+
     private void _SaveState()
     {
         StateManager.Exp.Save();
@@ -155,10 +164,6 @@ public class ModeExperimental : IMode
 
     private void _BackToMenu()
     {
-        //czyszcenie �cian obiektu
-        _fc.Clear();
-        GameObject.Destroy(_fc);
-
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
 
@@ -183,18 +188,14 @@ public class ModeExperimental : IMode
 
         //export solid
         string solid = SolidExporter.ExportSolid(
-            _mb.GetPoints3D(), 
-            _mb.GetEdges3D(), 
-            FacesGenerator.GetFaces());
+            _mb.GetPoints3D(),
+            _mb.GetEdges3D(),
+            _mb.GetFaces3D());
 
         if (solid == null)
         {
             Debug.LogError("Error - save failed");
         }
-
-        //czyszcenie �cian obiektu
-        _fc.Clear();
-        GameObject.Destroy(_fc);
 
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
@@ -372,13 +373,16 @@ public class ModeExperimental : IMode
     {
         _mb.Toogle3DView();
     }
+
+    private void _ToggleOnlyMainDirectionsDrawMode()
+    {
+        _items.ToggleOnlyMainDirectionsDrawMode();
+    }
+
     /* * * * INPUT HANDLERS end * * * */
 
     private void _ClearScene()
     {
-        //czyszcenie �cian obiektu
-        _fc.Clear();
-        
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
         
@@ -458,10 +462,8 @@ public class ModeExperimental : IMode
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
         _mb.Init(_showProjLines);
-        _fc = mainObject.AddComponent<FacesGenerator>();
-        _fc.Init(_mb);
 
-        _items = new ItemsController(_wc, _wcrt, _fc, _mb);
+        _items = new ItemsController(_wc, _wcrt, _mb);
         _items.DrawingCompleted += (sender, drawOrigin) =>
         {
             if (drawOrigin == ItemsController.DrawType.Full)
@@ -492,6 +494,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Line, _ChangeToLineCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.FixedCircle, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Face, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.HelpPlane, ActRelativeToObject),
@@ -717,6 +720,24 @@ public class ModeExperimental : IMode
         {
             _ToggleRaycastLock();
         }
+
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("q"))
+            {
+                _ToggleOnlyMainDirectionsDrawMode();
+            }
+        }
+
+        //if (Input.GetKeyDown("l"))
+        //{
+        //    _RemoveWall();
+        //}
+
+        //if (Input.GetKeyDown("m"))
+        //{
+        //    radialMenu.ToggleRadialMenuActive();
+        //}
     }
 
     public void SetUpFlystick()

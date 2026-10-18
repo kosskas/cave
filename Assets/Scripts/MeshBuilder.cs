@@ -211,6 +211,11 @@ public class MeshBuilder : MonoBehaviour
     Dictionary<string, Edge3D> edges3D = null;
 
     /// <summary>
+    /// Zbiór ścian rysowanych w 3D. (klucz to scalone etykiety wierzchołków posortowane leksykograficznie
+    /// </summary>
+    Dictionary<GameObject, Face> faces3D = null;
+
+    /// <summary>
     /// Folder z wierch. rysowanymi w 3D
     /// </summary>
 	GameObject reconstrVertDir = null;
@@ -234,6 +239,7 @@ public class MeshBuilder : MonoBehaviour
             return;
         ShowPoints3D();
         ShowEdges3D();
+        ShowFaces3D();
         ShowProjectionLines();
     }
     /// <summary>
@@ -250,6 +256,7 @@ public class MeshBuilder : MonoBehaviour
         edgesOnWalls = new Dictionary<WallInfo, Dictionary<string, EdgeProjection>>();
         vertices3D = new Dictionary<string, Vertice3D>();
         edges3D = new Dictionary<string, Edge3D>();
+        faces3D = new Dictionary<GameObject, Face>();
         blocked = false;
         this.showProjectionLines = showProjectionLines;
 
@@ -267,6 +274,7 @@ public class MeshBuilder : MonoBehaviour
         edgesOnWalls = null;
         vertices3D = null;
         edges3D = null;
+        faces3D = null;
     }
 
     /// <summary>
@@ -415,7 +423,7 @@ public class MeshBuilder : MonoBehaviour
             if (vertices3D.ContainsKey(label))
             {
                 vertices3D[label].deleted = true;
-                FacesGenerator.RemoveFacesFromPoint(label);
+                RemoveFacesFromPoint(label);
             }
             currPts[0].MarkOK();
             currPts[1].MarkOK();
@@ -435,7 +443,7 @@ public class MeshBuilder : MonoBehaviour
                 bool result = Create3DPoint(label, pair.Item1, pair.Item2);
                 if (result == true)
                 {
-                    FacesGenerator.RemoveFacesFromPoint(label);
+                    RemoveFacesFromPoint(label);
                     break;
                 }
             }
@@ -539,6 +547,17 @@ public class MeshBuilder : MonoBehaviour
         List<EdgeProjection> currEdges = GetCurrentEdgeProjections(label);
         ResolveAddEdgeProjection(wall, currEdges, label);
     }
+
+    public void AddFace(GameObject face, Face faceComponent)
+    {
+        faces3D.Add(face, faceComponent);
+    }
+
+    public void RemoveFace(GameObject face) 
+    { 
+        faces3D.Remove(face);
+    }
+
     private void ResolveAddEdgeProjection(WallInfo wall, List<EdgeProjection> currEdges, string label)
     {
         if (currEdges.Count == 1)
@@ -823,6 +842,14 @@ public class MeshBuilder : MonoBehaviour
         return tmp;
     }
 
+    public Dictionary<GameObject, List<string>> GetFaces3D()
+    {
+        return faces3D.ToDictionary(
+            kvp => kvp.Key,
+            kvp => kvp.Value.Points.Select(p => p.Key).ToList()
+        );
+    }
+
     private bool Create3DPoint(string label, PointProjection proj1, PointProjection proj2)
     {
         Vector3 pkt3D = proj1.GetIntersection(proj2);
@@ -910,6 +937,13 @@ public class MeshBuilder : MonoBehaviour
             line.SetCoordinates(vertices3D[edges3D[key].firstPoint].gameObject.transform.position, vertices3D[edges3D[key].secondPoint].gameObject.transform.position);
         }
     }
+    private void ShowFaces3D()
+    {
+        foreach (Face face in faces3D.Values) 
+        {
+            face.SetEnabled(show3D);
+        }
+    }
     private List<PointProjection> GetCurrentPointProjections(string label)
 	{
 		List<PointProjection> pointsInfo = new List<PointProjection>();
@@ -949,6 +983,20 @@ public class MeshBuilder : MonoBehaviour
             }
         }
         return pairs;
+    }
+
+    public void RemoveFacesFromPoint(string pointLabel)
+    {
+        var facesToRemove = faces3D
+            .Where(kvp => kvp.Value.Points != null && kvp.Value.Points.Any(p => p.Key == pointLabel))
+            .Select(kvp => kvp.Key)
+            .ToList();
+
+        foreach (var faceObject in facesToRemove)
+        {
+            faces3D.Remove(faceObject);
+            Destroy(faceObject);
+        }
     }
 
     public void Toogle3DView()
