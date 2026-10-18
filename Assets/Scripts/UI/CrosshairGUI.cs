@@ -9,6 +9,9 @@ public class CrosshairGUI : MonoBehaviour {
 
     void OnGUI()
     {
+        if (AdditionalCameras.Instance != null && AdditionalCameras.Instance.IsCameraBrowsingMode)
+            return;
+
         float x = Screen.width / 2f;
         float y = Screen.height / 2f;
         Texture2D tex = Texture2D.whiteTexture;
