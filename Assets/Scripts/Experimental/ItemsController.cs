@@ -643,15 +643,15 @@ namespace Assets.Scripts.Experimental
             {
                 case ExContext.Point: return DrawPoint(plane, position);
 
-                case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, null, _BOLD_LINE_WIDTH);
+                case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, null, true, _BOLD_LINE_WIDTH);
                 
-                case ExContext.HelpLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint);
+                case ExContext.HelpLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, null, true);
 
-                case ExContext.FixedLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToTakeLength(relativeObject as Line));
+                case ExContext.FixedLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToTakeLength(relativeObject as Line), true);
 
-                case ExContext.PerpendicularLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToBePerpendicular(relativeObject as Line));
+                case ExContext.PerpendicularLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToBePerpendicular(relativeObject as Line), true);
 
-                case ExContext.ParallelLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToBeParallel(relativeObject as Line));
+                case ExContext.ParallelLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToBeParallel(relativeObject as Line), true);
 
                 case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity, hitObject as ExPoint);
 
@@ -835,6 +835,7 @@ namespace Assets.Scripts.Experimental
             Vector3 startPosition, 
             ExPoint startPoint = null,
             LineRef lineReference = null,
+            bool forcePoints = false,
             float lineWidth = _HELP_LINE_WIDTH, 
             List<string> labels = null, 
             DrawType type = DrawType.Full
@@ -938,8 +939,18 @@ namespace Assets.Scripts.Experimental
                     labels?.ForEach(label => lineComponent.AddLabel(label));
                     lineComponent.Color = ReconstructionInfo.NORMAL;
 
-                    startPoint = DrawOrGetPoint(startPlane, startPosition);
-                    endPoint = DrawOrGetPoint(hitPlane, endPosition);
+                    if (forcePoints)
+                    {
+                        if (startPoint == null)
+                        {
+                            startPoint = DrawOrGetPoint(startPlane, startPosition);
+                        }
+
+                        if (endPoint == null)
+                        {
+                            endPoint = DrawOrGetPoint(hitPlane, endPosition);
+                        }  
+                    }
 
                     if (startPoint != null && endPoint != null)
                     {
@@ -1308,7 +1319,7 @@ namespace Assets.Scripts.Experimental
                 }
             }
 
-            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, null, lineLineWidth, lineLabels, DrawType.Part);
+            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, null, false, lineLineWidth, lineLabels, DrawType.Part);
             da.Invoke(endPoint, lineEndPosition, plane, true);
         }
 
