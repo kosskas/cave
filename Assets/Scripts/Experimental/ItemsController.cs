@@ -52,39 +52,88 @@ namespace Assets.Scripts.Experimental
 
         public class LineRef
         {
-            public Line Line { get; private set; } = null;
+            public Vector3 StartPosition { get; private set; } = Vector3.zero;
+            public Vector3 EndPosition { get; private set; } = Vector3.zero;
+            public float Length { get; private set; } = 0f;
             public bool TakeLength { get; private set; } = false;
             public bool BeParallel { get; private set; } = false;
             public bool BePerpendicular { get; private set; } = false;
 
-            public static LineRef ToTakeLength(Line line)
+            private void GetData(Line line)
             {
-                if (line == null) return null;
-
-                var lr = new LineRef();
-                lr.Line = line;
-                lr.TakeLength = true;
-                return lr;
+                StartPosition = line.StartPosition;
+                EndPosition = line.EndPosition;
+                Length = line.Length;
             }
 
-            public static LineRef ToBeParallel(Line line)
+            private void GetData(Axis axis)
             {
-                if (line == null) return null;
-
-                var lr = new LineRef();
-                lr.Line = line;
-                lr.BeParallel = true;
-                return lr;
+                StartPosition = axis.From;
+                EndPosition = axis.To;
+                Length = Vector3.Distance(StartPosition, EndPosition);
             }
 
-            public static LineRef ToBePerpendicular(Line line)
+            public static LineRef ToTakeLength(IRaycastable refObj)
             {
-                if (line == null) return null;
+                var line = refObj as Line;
 
-                var lr = new LineRef();
-                lr.Line = line;
-                lr.BePerpendicular = true;
-                return lr;
+                if (line != null)
+                {
+                    var lr = new LineRef();
+                    lr.GetData(line);
+                    lr.TakeLength = true;
+                    return lr;
+                }
+
+                return null;                
+            }
+
+            public static LineRef ToBeParallel(IRaycastable refObj)
+            {
+                var line = refObj as Line;
+                var axis = refObj as Axis;
+
+                if (line != null)
+                {
+                    var lr = new LineRef();
+                    lr.GetData(line);
+                    lr.BeParallel = true;
+                    return lr;
+                }
+                
+                if (axis != null)
+                {
+                    var lr = new LineRef();
+                    lr.GetData(axis);
+                    lr.BeParallel = true;
+                    return lr;
+                }
+
+                return null;
+            }
+
+            public static LineRef ToBePerpendicular(IRaycastable refObj)
+            {
+                var line = refObj as Line;
+                var axis = refObj as Axis;
+
+                if (line != null)
+                {
+                    var lr = new LineRef();
+                    lr.GetData(line);
+                    lr.BePerpendicular = true;
+                    return lr;
+                }
+
+                if (axis != null)
+                {
+                    var lr = new LineRef();
+                    lr.GetData(axis);
+                    lr.BePerpendicular = true;
+                    return lr;
+                }
+
+                return null;
             }
         }
 
@@ -641,33 +690,103 @@ namespace Assets.Scripts.Experimental
 
             switch (context)
             {
-                case ExContext.Point: return DrawPoint(plane, position);
+                case ExContext.Point: 
+                    return DrawPoint(
+                        plane, 
+                        position
+                        );
 
-                case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, null, _BOLD_LINE_WIDTH);
+                case ExContext.BoldLine: 
+                    return DrawLine(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        null, 
+                        false, 
+                        _BOLD_LINE_WIDTH
+                        );
                 
-                case ExContext.HelpLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint);
+                case ExContext.HelpLine: 
+                    return DrawLine(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        null
+                        );
 
-                case ExContext.FixedLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToTakeLength(relativeObject as Line));
+                case ExContext.FixedLine: 
+                    return DrawLine(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        LineRef.ToTakeLength(relativeObject), 
+                        true
+                        );
 
-                case ExContext.PerpendicularLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToBePerpendicular(relativeObject as Line));
+                case ExContext.PerpendicularLine: 
+                    return DrawLine(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        LineRef.ToBePerpendicular(relativeObject)
+                        );
 
-                case ExContext.ParallelLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToBeParallel(relativeObject as Line));
+                case ExContext.ParallelLine: 
+                    return DrawLine(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        LineRef.ToBeParallel(relativeObject)
+                        );
 
-                case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity, hitObject as ExPoint);
+                case ExContext.Projection: 
+                    return DrawProjection(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint
+                        );
 
-                case ExContext.FixedProjection: return DrawFixedProjection(plane, positionWithPointSensitivity, hitObject as ExPoint, relativeObject);
+                case ExContext.FixedProjection: 
+                    return DrawFixedProjection(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        relativeObject
+                        );
 
-                case ExContext.Circle: return DrawCircle(plane, positionWithPointSensitivity);
+                case ExContext.Circle: 
+                    return DrawCircle(
+                        plane, 
+                        positionWithPointSensitivity
+                        );
 
-                case ExContext.FixedCircle: return DrawCircle(plane, positionWithPointSensitivity, LineRef.ToTakeLength(relativeObject as Line));
+                case ExContext.FixedCircle: 
+                    return DrawCircle(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        LineRef.ToTakeLength(relativeObject as Line)
+                        );
 
-                case ExContext.Wall: return DrawWall(plane, positionWithPointSensitivity, plane.GetNormal());
+                case ExContext.Wall: 
+                    return DrawWall(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        plane.GetNormal()
+                        );
 
-                case ExContext.Face: return DrawFace(hitObject as ExPoint);
+                case ExContext.Face: 
+                    return DrawFace(
+                        hitObject as ExPoint
+                        );
 
-                case ExContext.HelpPlane: return DrawHelpPlane(hitObject, relativeObject);
+                case ExContext.HelpPlane: 
+                    return DrawHelpPlane(
+                        hitObject, 
+                        relativeObject
+                        );
 
-                default: return null;
+                default: 
+                    return null;
             }
         }
 
@@ -835,6 +954,7 @@ namespace Assets.Scripts.Experimental
             Vector3 startPosition, 
             ExPoint startPoint = null,
             LineRef lineReference = null,
+            bool forcePoints = false,
             float lineWidth = _HELP_LINE_WIDTH, 
             List<string> labels = null, 
             DrawType type = DrawType.Full
@@ -888,7 +1008,7 @@ namespace Assets.Scripts.Experimental
                 {
                     // Project the reference direction onto the drawing plane
                     var direction = Vector3.ProjectOnPlane(
-                        lineReference.Line.EndPosition - lineReference.Line.StartPosition,
+                        lineReference.EndPosition - lineReference.StartPosition,
                         startPlane.GetNormal()
                     );
 
@@ -905,7 +1025,7 @@ namespace Assets.Scripts.Experimental
                     // Calculate the perpendicular direction within the drawing plane
                     var direction = Vector3.Cross(
                         startPlane.GetNormal(),
-                        lineReference.Line.EndPosition - lineReference.Line.StartPosition
+                        lineReference.EndPosition - lineReference.StartPosition
                     );
 
                     if (direction.sqrMagnitude < DescriptiveMathLib.EPS)
@@ -919,7 +1039,7 @@ namespace Assets.Scripts.Experimental
 
                 if (lineReference?.TakeLength ?? false)
                 {
-                    var length = lineReference.Line.Length;
+                    var length = lineReference.Length;
                     var direction = (endPosition - startPosition).normalized;
                     endPosition = startPosition + direction * length;
                 }
@@ -938,8 +1058,18 @@ namespace Assets.Scripts.Experimental
                     labels?.ForEach(label => lineComponent.AddLabel(label));
                     lineComponent.Color = ReconstructionInfo.NORMAL;
 
-                    startPoint = DrawOrGetPoint(startPlane, startPosition);
-                    endPoint = DrawOrGetPoint(hitPlane, endPosition);
+                    if (forcePoints)
+                    {
+                        if (startPoint == null)
+                        {
+                            startPoint = DrawOrGetPoint(startPlane, startPosition);
+                        }
+
+                        if (endPoint == null)
+                        {
+                            endPoint = DrawOrGetPoint(hitPlane, endPosition);
+                        }  
+                    }
 
                     if (startPoint != null && endPoint != null)
                     {
@@ -1027,7 +1157,7 @@ namespace Assets.Scripts.Experimental
 
                 if (lineReference?.TakeLength ?? false)
                 {
-                    var length = lineReference.Line.Length;
+                    var length = lineReference.Length;
                     var direction = (endPosition - startPosition).normalized;
                     endPosition = startPosition + direction * length;
                 }
@@ -1308,7 +1438,7 @@ namespace Assets.Scripts.Experimental
                 }
             }
 
-            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, null, lineLineWidth, lineLabels, DrawType.Part);
+            var da = _ic.DrawLine(plane, lineStartPosition, startPoint, null, false, lineLineWidth, lineLabels, DrawType.Part);
             da.Invoke(endPoint, lineEndPosition, plane, true);
         }
 
