@@ -641,33 +641,103 @@ namespace Assets.Scripts.Experimental
 
             switch (context)
             {
-                case ExContext.Point: return DrawPoint(plane, position);
+                case ExContext.Point: 
+                    return DrawPoint(
+                        plane, 
+                        position
+                        );
 
-                case ExContext.BoldLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, null, false, _BOLD_LINE_WIDTH);
+                case ExContext.BoldLine: 
+                    return DrawLine(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        null, 
+                        false, 
+                        _BOLD_LINE_WIDTH
+                        );
                 
-                case ExContext.HelpLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, null, false);
+                case ExContext.HelpLine: 
+                    return DrawLine(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        null
+                        );
 
-                case ExContext.FixedLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToTakeLength(relativeObject as Line), true);
+                case ExContext.FixedLine: 
+                    return DrawLine(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        LineRef.ToTakeLength(relativeObject as Line), 
+                        true
+                        );
 
-                case ExContext.PerpendicularLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToBePerpendicular(relativeObject as Line), false);
+                case ExContext.PerpendicularLine: 
+                    return DrawLine(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        LineRef.ToBePerpendicular(relativeObject as Line)
+                        );
 
-                case ExContext.ParallelLine: return DrawLine(plane, positionWithPointSensitivity, hitObject as ExPoint, LineRef.ToBeParallel(relativeObject as Line), false);
+                case ExContext.ParallelLine: 
+                    return DrawLine(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        LineRef.ToBeParallel(relativeObject as Line)
+                        );
 
-                case ExContext.Projection: return DrawProjection(plane, positionWithPointSensitivity, hitObject as ExPoint);
+                case ExContext.Projection: 
+                    return DrawProjection(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint
+                        );
 
-                case ExContext.FixedProjection: return DrawFixedProjection(plane, positionWithPointSensitivity, hitObject as ExPoint, relativeObject);
+                case ExContext.FixedProjection: 
+                    return DrawFixedProjection(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        hitObject as ExPoint, 
+                        relativeObject
+                        );
 
-                case ExContext.Circle: return DrawCircle(plane, positionWithPointSensitivity);
+                case ExContext.Circle: 
+                    return DrawCircle(
+                        plane, 
+                        positionWithPointSensitivity
+                        );
 
-                case ExContext.FixedCircle: return DrawCircle(plane, positionWithPointSensitivity, LineRef.ToTakeLength(relativeObject as Line));
+                case ExContext.FixedCircle: 
+                    return DrawCircle(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        LineRef.ToTakeLength(relativeObject as Line)
+                        );
 
-                case ExContext.Wall: return DrawWall(plane, positionWithPointSensitivity, plane.GetNormal());
+                case ExContext.Wall: 
+                    return DrawWall(
+                        plane, 
+                        positionWithPointSensitivity, 
+                        plane.GetNormal()
+                        );
 
-                case ExContext.Face: return DrawFace(hitObject as ExPoint);
+                case ExContext.Face: 
+                    return DrawFace(
+                        hitObject as ExPoint
+                        );
 
-                case ExContext.HelpPlane: return DrawHelpPlane(hitObject, relativeObject);
+                case ExContext.HelpPlane: 
+                    return DrawHelpPlane(
+                        hitObject, 
+                        relativeObject
+                        );
 
-                default: return null;
+                default: 
+                    return null;
             }
         }
 
