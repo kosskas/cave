@@ -29,8 +29,6 @@ public class ModeExperimental : IMode
 
     private MeshBuilder _mb;
 
-    private FacesGenerator _fc;
-
     private WallCreator _wcrt;
 
     private ItemsController _items;
@@ -108,6 +106,8 @@ public class ModeExperimental : IMode
             _drawAction(hitObject, hitPosition, hitWall, true);
             _drawAction = null;
 
+            _items.TurnOffOnlyMainDirectionsDrawMode();
+
             TryColorObject(_relativeObject, ReconstructionInfo.NORMAL);
 
             _relativeObject = null;
@@ -142,6 +142,7 @@ public class ModeExperimental : IMode
     {
         _drawAction = null;
         _relativeObject = null;
+        _items.TurnOffOnlyMainDirectionsDrawMode();
         _Undo();
         _Redo();
     }
@@ -173,10 +174,6 @@ public class ModeExperimental : IMode
 
     private void _BackToMenu()
     {
-        //czyszcenie œcian obiektu
-        _fc.Clear();
-        GameObject.Destroy(_fc);
-
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
 
@@ -201,18 +198,14 @@ public class ModeExperimental : IMode
 
         //export solid
         string solid = SolidExporter.ExportSolid(
-            _mb.GetPoints3D(), 
-            _mb.GetEdges3D(), 
-            FacesGenerator.GetFaces());
+            _mb.GetPoints3D(),
+            _mb.GetEdges3D(),
+            _mb.GetFaces3D());
 
         if (solid == null)
         {
             Debug.LogError("Error - save failed");
         }
-
-        //czyszcenie œcian obiektu
-        _fc.Clear();
-        GameObject.Destroy(_fc);
 
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
@@ -274,7 +267,7 @@ public class ModeExperimental : IMode
 
             l.NextText();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
             _SceneChangedHandler();
         });
     }
@@ -288,7 +281,7 @@ public class ModeExperimental : IMode
 
             l.PrevText();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
             _SceneChangedHandler();
         });
     }
@@ -302,7 +295,7 @@ public class ModeExperimental : IMode
 
             l.NextLabel();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
             _SceneChangedHandler();
         });
     }
@@ -316,7 +309,7 @@ public class ModeExperimental : IMode
 
             l.PrevLabel();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE ZMIENIONO LABEL
             _SceneChangedHandler();
         });
     }
@@ -330,7 +323,7 @@ public class ModeExperimental : IMode
                 
             l.RemoveFocusedLabel();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE USUNIÊTO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE USUNIï¿½TO LABEL
             _SceneChangedHandler();
         });
     }
@@ -344,7 +337,7 @@ public class ModeExperimental : IMode
                 
             l.AddLabel();
 
-            // TODO: DODAÆ SPRAWDZANIE CZY FAKTYCZNIE DODANO LABEL
+            // TODO: DODAï¿½ SPRAWDZANIE CZY FAKTYCZNIE DODANO LABEL
             _SceneChangedHandler();
         });
     }
@@ -378,13 +371,16 @@ public class ModeExperimental : IMode
     {
         _mb.Toogle3DView();
     }
+
+    private void _ToggleOnlyMainDirectionsDrawMode()
+    {
+        _items.ToggleOnlyMainDirectionsDrawMode();
+    }
+
     /* * * * INPUT HANDLERS end * * * */
 
     private void _ClearScene()
-    {
-        //czyszcenie œcian obiektu
-        _fc.Clear();
-        
+    {        
         //Grid Clear powoduje usuniecie siatki i wszystkich rzutow punktow
         _items.Clear();
         
@@ -392,7 +388,7 @@ public class ModeExperimental : IMode
         _mb.ClearAndDisable();
         _mb.Init(true);
         _wc.SetBasicWalls();
-        //dodanie bazowej osi rzutuj¹cej
+        //dodanie bazowej osi rzutujï¿½cej
         _AddBaseAxis();
     }
 
@@ -461,17 +457,15 @@ public class ModeExperimental : IMode
         GameObject mainObject = GameObject.Find("MainObject");
         _mb = mainObject.AddComponent<MeshBuilder>();
         _mb.Init(_showProjLines);
-        _fc = mainObject.AddComponent<FacesGenerator>();
-        _fc.Init(_mb);
 
-        _items = new ItemsController(_wc, _wcrt, _fc, _mb);
+        _items = new ItemsController(_wc, _wcrt, _mb);
         _items.DrawingCompleted += (sender, drawOrigin) =>
         {
             if (drawOrigin == ItemsController.DrawType.Full)
                 _SceneChangedHandler();
         };
 
-        //dodanie bazowej osi rzutuj¹cej
+        //dodanie bazowej osi rzutujï¿½cej
         _AddBaseAxis();
 
         _lineCtx = new CircularIterator<KeyValuePair<ExContext, Action>>(
@@ -494,6 +488,7 @@ public class ModeExperimental : IMode
                 new KeyValuePair<ExContext, Action>(ExContext.Point, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Line, _ChangeToLineCtx),
                 new KeyValuePair<ExContext, Action>(ExContext.Circle, Act),
+                new KeyValuePair<ExContext, Action>(ExContext.FixedCircle, ActRelativeToObject),
                 new KeyValuePair<ExContext, Action>(ExContext.Wall, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.Face, Act),
                 new KeyValuePair<ExContext, Action>(ExContext.HelpPlane, ActRelativeToObject),
@@ -601,7 +596,7 @@ public class ModeExperimental : IMode
                 }
                 else
                 {
-                    Debug.LogError("Nie mo¿na za³adowaæ prefabrykatu MenuItem z Resources/RadialMenuItem");
+                    Debug.LogError("Nie moï¿½na zaï¿½adowaï¿½ prefabrykatu MenuItem z Resources/RadialMenuItem");
                 }
             }
             else
@@ -858,14 +853,22 @@ public class ModeExperimental : IMode
             _FlyLower();
         }
 
-        if (Input.GetKey("-"))
+        if (Input.GetKey("="))
         {
             _ZoomIn();
         }
 
-        if (Input.GetKey("="))
+        if (Input.GetKey("-"))
         {
             _ZoomOut();
+        }
+        
+        if (Input.GetKey("left ctrl"))
+        {
+            if (Input.GetKeyDown("q"))
+            {
+                _ToggleOnlyMainDirectionsDrawMode();
+            }
         }
 
         if (Input.GetKeyDown("m"))

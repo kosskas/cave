@@ -68,6 +68,9 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (AdditionalCameras.Instance != null && AdditionalCameras.Instance.IsCameraBrowsingMode)
+            return;
+
         _UpdateRaycasting();        
         _UpdateMovement();
         _UpdateMode();

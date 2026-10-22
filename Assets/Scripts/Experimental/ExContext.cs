@@ -55,6 +55,9 @@ namespace Assets.Scripts.Experimental
         [Description("Okr\u0105g")]
         Circle,
 
+        [Description("Okr\u0105g o wskazanym promieniu")]
+        FixedCircle,
+
         [Description("Rzutnia")]
         Wall,
 

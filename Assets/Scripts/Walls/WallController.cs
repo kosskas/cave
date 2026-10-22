@@ -100,7 +100,7 @@ public class WallController : MonoBehaviour {
         // newWall.transform.RotateAround(point1, Vector3.right, 15);
 
         MeshRenderer meshRenderer = newWall.GetComponent<MeshRenderer>();
-        meshRenderer.material = new Material(Shader.Find("Transparent/Diffuse"));
+        meshRenderer.material = new Material(GetShader());
         Color color = meshRenderer.material.color;
         color.a = ReconstructionInfo.WALL_OPACITY;
         meshRenderer.material.color = color;
@@ -117,6 +117,11 @@ public class WallController : MonoBehaviour {
         ResetProjection();
 
         return wall;
+    }
+    private Shader GetShader()
+    {
+        var shader = Resources.Load<Shader>("Shaders/UnlitTransparentColor");
+        return shader == null ? Shader.Find("Transparent/Diffuse") : shader;
     }
     private Vector3 FindVectorFromPlaneTowardsSolid(Vector3 point1, Vector3 point2)
     {
