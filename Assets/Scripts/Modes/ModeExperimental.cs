@@ -1,11 +1,13 @@
 using Assets.Scripts.Experimental;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using Assets.Scripts.Experimental.Items;
 using Assets.Scripts.Experimental.Utils;
 using Assets.Scripts.FileManagers;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Runtime.Remoting.Contexts;
 
 public class ModeExperimental : IMode
 {
@@ -53,6 +55,8 @@ public class ModeExperimental : IMode
     private bool _showProjLines = true;
 
     private GameObject _nFileText;
+
+    private PcUi _pcUi;
     /* * * * CONTEXT ACTIONS begin * * * */
 
     private void TryColorObject(IRaycastable obj, Color color)
@@ -447,6 +451,8 @@ public class ModeExperimental : IMode
         PCref = pc;
         _wc = GameObject.Find("Walls").GetComponent<WallController>();
 
+        _pcUi = GameObject.Find("PcUICanvas").GetComponent<PcUi>();
+
         _drawAction = null;
         _hitObject = null;
 
@@ -509,7 +515,7 @@ public class ModeExperimental : IMode
             });
 
         _context = _optCtx;
-        
+
         AddRadialMenu();
 
         _SetFileTextCavnas();
@@ -650,8 +656,60 @@ public class ModeExperimental : IMode
 
         _isRadialMenu = true;
         AddRadialMenu();
+        _pcUi.SetButtonsInactive();
+        _pcUi.contextText.gameObject.SetActive(false);
     }
 
+    public void SetContext(string context)
+    {
+        _context = _creationCtx;
+        var startContext = _context.Current;
+        do
+        {
+            _context.Next();
+            if (_context.Current.Key.GetDescription() == context)
+            {
+                return;
+            }
+            if (startContext.Key == _context.Current.Key)
+            {
+                break;
+            }
+        } while (true);
+
+        _context = _lineCtx;
+        startContext = _context.Current;
+        do
+        {
+            _context.Next();
+            if (_context.Current.Key.GetDescription() == context)
+            {
+                return;
+            }
+            if (startContext.Key == _context.Current.Key)
+            {
+                break;
+            }
+        } while (true);
+        
+        _context = _optCtx;
+        startContext = _context.Current;
+        do
+        {
+            _context.Next();
+            if (_context.Current.Key.GetDescription() == context)
+            {
+                _DrawAction();
+                return;
+            }
+            if (startContext.Key == _context.Current.Key)
+            {
+                break;
+            }
+        } while (true);
+    }
+
+    
     private void _SwitchToPcUi()
     {
         Cursor.lockState = CursorLockMode.None; //moze zmienic na Confined, ale wtedy sie buguje w edytorze
@@ -660,16 +718,17 @@ public class ModeExperimental : IMode
         _isRadialMenu = false;
         radialMenu.RemoveFromScene();
         radialMenu = null;
-        GameObject btn = GameObject.Find("PcUICanvas");
-        var txt = btn.GetComponentInChildren<Text>();
-        foreach (var option in _context.All())
-        {
-            if (txt.text.Equals(option.Key.GetDescription()))
-            {
-                Debug.Log("widze btn");
-                Debug.Log(option);
-            }
-        }
+        _pcUi.SetButtonsActive();
+        // GameObject btn = GameObject.Find("PcUICanvas");
+        // var txt = btn.GetComponentInChildren<Text>();
+        // foreach (var option in _context.All())
+        // {
+        //     if (txt.text.Equals(option.Key.GetDescription()))
+        //     {
+        //         Debug.Log("widze btn");
+        //         Debug.Log(option);
+        //     }
+        // }
     }
     private void _SwitchUi()
     {
@@ -691,14 +750,17 @@ public class ModeExperimental : IMode
             _AbortDrawAction();
         }
 
-        if (Input.GetKeyDown("1"))
+        if (!_pcUi.areButtonsActive)
         {
-            _DrawAction();
-        }
+            if (Input.GetKeyDown("1"))
+            {
+                _DrawAction();
+            }
 
-        if (Input.GetMouseButtonDown(0)) //lewy
-        {
-            _DrawAction();
+            if (Input.GetMouseButtonDown(0)) //lewy
+            {
+                _DrawAction();
+            }
         }
 
         if (Input.GetMouseButtonDown(1)) //prawy
@@ -809,6 +871,14 @@ public class ModeExperimental : IMode
         if (Input.GetKeyDown("m"))
         {
             _SwitchUi();
+        }
+
+        if (_isRadialMenu == false)
+        {
+            if (Input.GetKeyDown("tab"))
+            {
+                _pcUi.SwitchButtonsActive();
+            }
         }
 
         //if (Input.GetKeyDown("l"))

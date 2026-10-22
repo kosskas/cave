@@ -135,6 +135,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public IMode GetModeController()
+    {
+        return _modeController;
+    }
+
 
     public void ChangeMode(Mode mode)
     {
