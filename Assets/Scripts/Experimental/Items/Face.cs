@@ -63,12 +63,14 @@ namespace Assets.Scripts.Experimental.Items
             var color = ReconstructionInfo.FOCUSED;
             color.a = ReconstructionInfo.SOLID_FACE_TRANSPARENCY_FOCUSED;
 
-            _material.color = color;
+            if (_material != null)
+                _material.color = color;
         }
 
         public void OnHoverExit()
         {
-            _material.color = _color;
+            if (_material != null)
+                _material.color = _color;
         }
 
 
