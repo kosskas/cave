@@ -229,23 +229,27 @@ public class ModeExperimental : IMode
 
     private void _DeleteHoveredObject()
     {
-        if (_context.Current.Key == ExContext.Wall)
-        {
-            _RemoveWall();
-            _SceneChangedHandler();
-            return;
-        }
-
         GameObject hitGameObject = null;
         _hitObject?.OnHoverAction(gameObject => hitGameObject = gameObject);
-        //Debug.Log("Objekt " + hitGameObject.name);
-        if (hitGameObject == null) return;
 
-        UnityEngine.Object.DestroyImmediate(hitGameObject);
+        if (hitGameObject != null)
+        {
+            UnityEngine.Object.DestroyImmediate(hitGameObject);
+            _hitObject = null;
 
-        _hitObject = null;
+            _SceneChangedHandler();
+        }
+        else // CHECK IF USER WANT TO DELETE WALL
+        {
+            WallInfo wall = _wc.FindWallInfoByGameObject(PCref.Hit.collider.gameObject);
+            if (wall != null) 
+            {
+                _wc.RemoveWall(wall);
+                _items.RemoveAxis(wall);
 
-        _SceneChangedHandler();
+                _SceneChangedHandler();
+            }
+        } 
     }
 
     private void _TryGetNextLabelText()
@@ -342,14 +346,6 @@ public class ModeExperimental : IMode
             // TODO: DODA� SPRAWDZANIE CZY FAKTYCZNIE DODANO LABEL
             _SceneChangedHandler();
         });
-    }
-
-    private void _RemoveWall()
-    {
-        WallInfo wallToRem = _wc.FindWallInfoByGameObject(PCref.Hit.collider.gameObject);
-        _wc.RemoveWall(wallToRem);
-        _items.RemoveAxis(wallToRem);
-        _SceneChangedHandler();
     }
 
     private void _Undo()
@@ -699,16 +695,6 @@ public class ModeExperimental : IMode
             {
                 _Redo();
             }
-        }
-
-        if (Input.GetKeyDown("l"))
-        {
-            _RemoveWall();
-        }
-
-        if (Input.GetKey("left ctrl"))
-        {
-            _RemoveWall();
         }
 
         if (Input.GetKeyDown("m"))

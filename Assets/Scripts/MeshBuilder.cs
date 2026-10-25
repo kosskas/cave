@@ -782,26 +782,18 @@ public class MeshBuilder : MonoBehaviour
 
 
     /// <summary>
-    /// Sprawdza czy na scianie znajduje juz sie rzut punktu
+    /// Sprawdza czy na scianie znajduje juz sie rzut punktu bądź krawedzi
     /// </summary>
     /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
     /// <param name="label">Etykieta</param>
     /// <returns>Prawda jeśli już taki rzut jest, Fałsz jeżeli nie ma</returns>
     public bool CheckIfAlreadyExist(WallInfo wall, string label)
     {
-        return verticesOnWalls.ContainsKey(wall) && verticesOnWalls[wall].ContainsKey(label);       
+        return 
+            (verticesOnWalls.ContainsKey(wall) && verticesOnWalls[wall].ContainsKey(label)) 
+            || (edgesOnWalls.ContainsKey(wall) && edgesOnWalls[wall].ContainsKey(label));       
     }
 
-    /// <summary>
-    /// Sprawdza czy na scianie znajduje juz sie rzut krawedzi
-    /// </summary>
-    /// <param name="wall">Metadane ściany, na której znajduje się rzut</param>
-    /// <param name="label">Etykieta</param>
-    /// <returns>Prawda jeśli już taki rzut jest, Fałsz jeżeli nie ma</returns>
-    public bool CheckIfEdgeAlreadyExist(WallInfo wall, string label)
-    {
-        return edgesOnWalls.ContainsKey(wall) && edgesOnWalls[wall].ContainsKey(label);
-    }
     /// <summary>
     /// Pobiera przechowywane aktywne punkty 3D
     /// </summary>
