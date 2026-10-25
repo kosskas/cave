@@ -599,6 +599,44 @@ namespace Assets.Scripts.Experimental
             }
         }
 
+        private bool TryGetLine3DCoords(
+            Line line,
+            out Vector3 a,
+            out Vector3 b
+            )
+        {
+            a = Vector3.zero;
+            b = Vector3.zero;
+
+            if (line == null)
+                return false;
+
+            var boundPoints = line.GetLabelsOfBoundPoints();
+
+            if (boundPoints != null && boundPoints.Count == 2)
+            {
+                var pointA = _mB.GetPoint3DCoords(boundPoints[0]);
+                var pointB = _mB.GetPoint3DCoords(boundPoints[1]);
+
+                if (pointA != null && pointB != null)
+                {
+                    a = pointA.Value;
+                    b = pointB.Value;
+                    return true;
+                }
+            }
+
+            var edge = _mB.GetEdge3DCoords(line.FocusedLabel);
+
+            if (edge == null)
+                return false;
+
+            a = edge.Item1;
+            b = edge.Item2;
+
+            return true;
+        }
+
 
         /*   P U B L I C   M E T H O D S   */
 
@@ -866,78 +904,126 @@ namespace Assets.Scripts.Experimental
             }
         }
 
-        private DrawAction DrawHelpPlane(
+        public DrawAction DrawHelpPlane(
             IRaycastable firstItem,
             IRaycastable secondItem
             )
         {
-            ExPoint point;
-            Line line;
+            var firstLine = firstItem as Line;
+            var secondLine = secondItem as Line;
 
-            if (firstItem is ExPoint && secondItem is Line)
+            Vector3 a, b, c, d;
+
+            if (firstLine != null && secondLine != null)
             {
-                point = firstItem as ExPoint;
-                line = secondItem as Line;
-            }
-            else if (firstItem is Line && secondItem is ExPoint)
-            {
-                line = firstItem as Line;
-                point = secondItem as ExPoint;
+                // Line + Line
+                Vector3 e, f;
+
+                if (!TryGetLine3DCoords(firstLine, out a, out b) ||
+                    !TryGetLine3DCoords(secondLine, out e, out f))
+                    return null;
+
+                const float eps = DescriptiveMathLib.EPS;
+                const float parallelTolerance = 1e-4f;
+                const float planeTolerance = 1e-4f;
+
+                var ab = b - a;
+                var ef = f - e;
+
+                if (ab.sqrMagnitude < eps * eps ||
+                    ef.sqrMagnitude < eps * eps)
+                    return null;
+
+                var direction = ab.normalized;
+                var secondDirection = ef.normalized;
+
+                // Both lines must be parallel
+                if (Vector3.Cross(direction, secondDirection).sqrMagnitude >
+                    parallelTolerance * parallelTolerance)
+                    return null;
+
+                // Calculate the perpendicular offset between the lines
+                var ae = e - a;
+                var offset = ae - direction * Vector3.Dot(ae, direction);
+
+                // Collinear lines cannot form a rectangle
+                if (offset.sqrMagnitude < eps * eps)
+                    return null;
+
+                // Check whether both lines lie on the same plane
+                var planeNormal = Vector3.Cross(direction, offset).normalized;
+
+                if (Mathf.Abs(Vector3.Dot(f - a, planeNormal)) > planeTolerance)
+                    return null;
+
+                // Project both segments onto the direction of the first line
+                var firstLength = ab.magnitude;
+
+                var tE = Vector3.Dot(e - a, direction);
+                var tF = Vector3.Dot(f - a, direction);
+
+                // Check whether the segments overlap along their common direction
+                var overlapStart = Mathf.Max(0f, Mathf.Min(tE, tF));
+                var overlapEnd = Mathf.Min(firstLength, Mathf.Max(tE, tF));
+
+                if (overlapEnd - overlapStart <= eps)
+                    return null;
+
+                // Find the outermost endpoints of both segments
+                var tStart = Mathf.Min(0f, Mathf.Min(tE, tF));
+                var tEnd = Mathf.Max(firstLength, Mathf.Max(tE, tF));
+
+                // Construct the largest possible rectangle
+                var origin = a;
+
+                a = origin + direction * tStart;
+                b = origin + direction * tEnd;
+
+                c = b + offset;
+                d = a + offset;
             }
             else
             {
-                return null;
-            }
+                // ExPoint + Line or Line + ExPoint
+                var point = firstItem as ExPoint ?? secondItem as ExPoint;
+                var line = firstLine ?? secondLine;
 
-            Vector3? a;
-            Vector3? b;
-            Vector3? p;
+                if (point == null || line == null)
+                    return null;
 
-            p = _mB.GetPoint3DCoords(point.FocusedLabel);
+                var p = _mB.GetPoint3DCoords(point.FocusedLabel);
 
-            var boundPoints = line.GetLabelsOfBoundPoints();
-            if (boundPoints.Count == 2)
-            {
-                a = _mB.GetPoint3DCoords(boundPoints[0]);
-                b = _mB.GetPoint3DCoords(boundPoints[1]);
-            }
-            else
-            {
-                var ab = _mB.GetEdge3DCoords(line.FocusedLabel);
-                a = ab?.Item1;
-                b = ab?.Item2;
-            }
+                if (p == null || !TryGetLine3DCoords(line, out a, out b))
+                    return null;
 
-            if (a == null || b == null || p == null)
-                return null;
+                var v = b - a;
+                var vv = Vector3.Dot(v, v);
 
-            var v = b.Value - a.Value;
-            var vv = Vector3.Dot(v, v);
+                if (vv < DescriptiveMathLib.EPS)
+                    return null;
 
-            if (vv < DescriptiveMathLib.EPS)
-                return null;
+                var t = Vector3.Dot(p.Value - a, v) / vv;
 
-            var t = Vector3.Dot(p.Value - a.Value, v) / vv;
+                c = p.Value + v * (1f - t);
+                d = p.Value - v * t;
 
-            var c = p.Value + v * (1f - t);
-            var d = p.Value - v * t;
-
-            // Extend the rectangle if the point lies outside the opposite edge
-            if (t < 0f)
-            {
-                a = a.Value + v * t;
-                d = p.Value;
-            }
-            else if (t > 1f)
-            {
-                b = b.Value + v * (t - 1f);
-                c = p.Value;
+                // Extend the rectangle if the point lies outside the opposite edge
+                if (t < 0f)
+                {
+                    a += v * t;
+                    d = p.Value;
+                }
+                else if (t > 1f)
+                {
+                    b += v * (t - 1f);
+                    c = p.Value;
+                }
             }
 
             var points3D = new List<KeyValuePair<string, Vector3>>()
             {
-                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_a", a.Value),
-                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_b", b.Value),
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_a", a),
+                new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_b", b),
                 new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_c", c),
                 new KeyValuePair<string, Vector3>($"#{hiddenLabelId}_d", d)
             };
