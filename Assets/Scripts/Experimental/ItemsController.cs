@@ -884,7 +884,8 @@ namespace Assets.Scripts.Experimental
         }
 
         public void DrawFace(
-            List<KeyValuePair<string, Vector3>> points3D
+            List<KeyValuePair<string, Vector3>> points3D,
+            DrawType type = DrawType.Full
             )
         {
             var face = new GameObject("FACE");
@@ -895,7 +896,7 @@ namespace Assets.Scripts.Experimental
             if (faceComponent.CreateFace(points3D))
             {
                 _mB.AddFace(face, faceComponent);
-                OnDrawingCompleted(DrawType.Full);
+                OnDrawingCompleted(type);
             }
             else
             {
@@ -1572,7 +1573,7 @@ namespace Assets.Scripts.Experimental
             List<KeyValuePair<string, Vector3>> faceVertices
             )
         {
-            _ic?.DrawFace(faceVertices);
+            _ic?.DrawFace(faceVertices, DrawType.Part);
         }
 
         //---
