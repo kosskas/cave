@@ -46,6 +46,6 @@ public static class ReconstructionInfo
     public static float WALL_OPACITY = 0.25f;
 
     // -- METADATA
-    public static String APP_NAME = "Descriptive3D_v2.1.5";
+    public static String APP_NAME = "Descriptive3D_v2.1.6";
     public static String GITHUB_LINK = "kosskas.github.io/cave";
 }
