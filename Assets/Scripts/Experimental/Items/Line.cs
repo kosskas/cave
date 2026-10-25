@@ -318,7 +318,7 @@ namespace Assets.Scripts.Experimental.Items
                 return;
 
             var found = _labelTexts.NextWhile(
-                current => Mc.CheckIfEdgeAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
+                current => Mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
 
             if (found)
                 UpdateText();
@@ -334,7 +334,7 @@ namespace Assets.Scripts.Experimental.Items
                 return;
 
             var found = _labelTexts.PreviousWhile(
-                current => Mc.CheckIfEdgeAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
+                current => Mc.CheckIfAlreadyExist(Plane, current.ToString()) || current == DefaultLabelText);
 
             if (found)
                 UpdateText();
@@ -348,7 +348,7 @@ namespace Assets.Scripts.Experimental.Items
                 return;
 
             var found = _labelTexts.NextWhile(
-                current => Mc.CheckIfEdgeAlreadyExist(Plane, current.ToString()) || current.ToString() != text);
+                current => Mc.CheckIfAlreadyExist(Plane, current.ToString()) || current.ToString() != text);
 
             if (found)
                 UpdateText();

@@ -410,8 +410,11 @@ namespace Assets.Scripts.FileManagers
                 const double mm = 72.0 / 25.4;
                 const double pageWidth = 210 * mm, pageHeight = 297 * mm;
                 // Reserve margins for labels, point radius and fixed stroke thickness.
-                double maxStrokeMm = lines.Select(l => (double)l.LineWidth * 100)
-                    .Concat(circles.Select(c => (double)c.LineWidth * 100)).DefaultIfEmpty(0).Max();
+                double maxStrokeMm = lines
+                    .Select(l => MongeLineWidthMm(l.LineWidth))
+                    .Concat(circles.Select(c => MongeLineWidthMm(c.LineWidth)))
+                    .DefaultIfEmpty(0)
+                    .Max();
                 double marginMm = 28 + maxStrokeMm / 2;
                 double availableW = pageWidth - 2 * marginMm * mm;
                 const double headerHeight = 18 * mm;
@@ -434,12 +437,12 @@ namespace Assets.Scripts.FileManagers
                     ReconstructionInfo.GITHUB_LINK ?? string.Empty, 8, pageWidth - 20 * mm);
                 foreach (var l in lines)
                     MongePdfLine(content, page(maps[l.PlaneName].Apply(l.StartPosition)),
-                        page(maps[l.PlaneName].Apply(l.EndPosition)), l.LineWidth * 100.0 * mm);
+                        page(maps[l.PlaneName].Apply(l.EndPosition)), MongeLineWidthMm(l.LineWidth) * mm);
                 foreach (var c in circles)
                 {
                     MongeMap m = maps[c.PlaneName];
                     Vector2 a = m.Apply(c.StartPosition), b = m.Apply(c.EndPosition);
-                    MongePdfCircle(content, page(a), Vector2.Distance(a, b) * scale, c.LineWidth * 100.0 * mm, false);
+                    MongePdfCircle(content, page(a), Vector2.Distance(a, b) * scale, MongeLineWidthMm(c.LineWidth) * mm, false);
                 }
                 foreach (var axis in axes)
                 {
@@ -497,6 +500,17 @@ namespace Assets.Scripts.FileManagers
             {
                 if (v.sqrMagnitude < 1e-12f) throw new ArgumentException("Degenerate plane basis.");
                 return v.normalized;
+            }
+
+            private static double MongeLineWidthMm(float width)
+            {
+                const float epsilon = 0.000001f;
+
+                if (Math.Abs(width - 0.02f) <= epsilon) return 0.2;
+                if (Math.Abs(width - 0.004f) <= epsilon) return 0.1;
+                if (Math.Abs(width - 0.008f) <= epsilon) return 0.8;
+
+                return width * 100.0;
             }
 
             private static void MongeCheckWidth(float width)
