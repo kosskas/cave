@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311918, g: 0.3807398, b: 0.35872716, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1075,10 +1075,11 @@ MonoBehaviour:
   selectionTool: {fileID: 43673825}
   selectionFlystickIdx: 0
   selectionFlystickButton: 5
-  disabledIndicatorColor: {r: 1, g: 0, b: 0, a: 1}
+  indicatorColor: {r: 1, g: 0, b: 0, a: 1}
   hoveredIndicatorColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  enabledIndicatorColor: {r: 0, g: 1, b: 0, a: 1}
+  activeIndicatorColor: {r: 0, g: 1, b: 0, a: 1}
   indicatorLayer: 20
+  warningsLayer: 25
   keyToggleIndicators: 99
   keyToggleIndicatorsAlt: 261
   keyGroupPrev: 274
@@ -1101,16 +1102,18 @@ MonoBehaviour:
   keyCam5Alt: 262
   keyCam6Alt: 259
   keyCam7Alt: 258
+  keyToggleAdjustmentMode: 284
+  keyAdjustmentSave: 283
+  keyAdjustmentStealViewport: 282
+  keyAdjustDistanceMinus: 284
+  keyAdjustDistancePlus: 285
   keyAdjustHorizontalMinus: 286
   keyAdjustHorizontalPlus: 287
   keyAdjustVerticalMinus: 288
   keyAdjustVerticalPlus: 289
   keyAdjustRollLeft: 290
   keyAdjustRollRight: 291
-  keyAdjustFovMinus: 284
-  keyAdjustFovPlus: 285
-  keyAdjustmentSave: 283
-  keyAdjustmentStealViewport: 282
+  adjustmentAmountMeters: 0.05
   adjustmentAmountDeg: 1
   adjustmentAmountFovDeg: 1
   audViewport:
