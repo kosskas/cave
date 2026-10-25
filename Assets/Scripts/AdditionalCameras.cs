@@ -26,7 +26,7 @@ public class AdditionalCameras : MonoBehaviour
     Camera camR;
 
     public Transform selectionTool;
-    public int selectionFlystickIdx = 0;
+    public int selectionFlystickIdx = 1;
     public LzwpInput.Flystick.ButtonID selectionFlystickButton = LzwpInput.Flystick.ButtonID.Joystick;
     bool selecting = false;
     int lastHoveredIdx = -1;
@@ -35,10 +35,11 @@ public class AdditionalCameras : MonoBehaviour
     List<GameObject> indicators = new List<GameObject>();
     List<Renderer> indicatorRenderers = new List<Renderer>();
     bool indicatorsVisible = false;
-    public Color disabledIndicatorColor = Color.red;
+    public Color indicatorColor = Color.red;
     public Color hoveredIndicatorColor = Color.yellow;
-    public Color enabledIndicatorColor = Color.green;
+    public Color activeIndicatorColor = Color.green;
     [LayerField] public int indicatorLayer;
+    [LayerField] public int warningsLayer;
 
     int currentGroupIdx = -1;
     int currentCameraInGroupIdx = -1;
@@ -51,7 +52,6 @@ public class AdditionalCameras : MonoBehaviour
     public KeyCode keyGroupNext = KeyCode.UpArrow;
     public KeyCode keyCamPrev = KeyCode.LeftArrow;
     public KeyCode keyCamNext = KeyCode.RightArrow;
-    //public bool stopOnLastGroup = true;
 
     [Header("Cameras in group")]
     public KeyCode keyCam0 = KeyCode.Alpha1;
@@ -74,22 +74,28 @@ public class AdditionalCameras : MonoBehaviour
     public KeyCode keyCam7Alt = KeyCode.Keypad2;
 
     [Header("Adjustment")]
+    public KeyCode keyToggleAdjustmentMode = KeyCode.F3;
+    public KeyCode keyAdjustmentSave = KeyCode.F2;
+    public KeyCode keyAdjustmentStealViewport = KeyCode.F1;
+    [Space]
+    public KeyCode keyAdjustDistanceMinus = KeyCode.F3;
+    public KeyCode keyAdjustDistancePlus = KeyCode.F4;
     public KeyCode keyAdjustHorizontalMinus = KeyCode.F5;
     public KeyCode keyAdjustHorizontalPlus = KeyCode.F6;
     public KeyCode keyAdjustVerticalMinus = KeyCode.F7;
     public KeyCode keyAdjustVerticalPlus = KeyCode.F8;
     public KeyCode keyAdjustRollLeft = KeyCode.F9;
     public KeyCode keyAdjustRollRight = KeyCode.F10;
-    public KeyCode keyAdjustFovMinus = KeyCode.F3;
-    public KeyCode keyAdjustFovPlus = KeyCode.F4;
-    public KeyCode keyAdjustmentSave = KeyCode.F2;
-    public KeyCode keyAdjustmentStealViewport = KeyCode.F1;
+    //public KeyCode keyAdjustFovMinus = KeyCode.F3;
+    //public KeyCode keyAdjustFovPlus = KeyCode.F4;
+    public float adjustmentAmountMeters = 0.05f;
     public float adjustmentAmountDeg = 1f;
     public float adjustmentAmountFovDeg = 1f;
+    
     bool viewportStolen = false;
     static readonly float STOLEN_VIEWPORT_MARGIN = 0.01f;
+    [Header("Viewports")]
     public Rect audViewport = new Rect(0.75f, 0.33333333f, 0.25f, 0.33333333f);
-    //public Rect caveViewport = new Rect(0.0f, 0.66666666f, 0.25f, 0.33333333f);
     public Rect caveViewport = new Rect(STOLEN_VIEWPORT_MARGIN, 0.66666666f + STOLEN_VIEWPORT_MARGIN, 0.25f - 2f * STOLEN_VIEWPORT_MARGIN, 0.33333333f - 2f * STOLEN_VIEWPORT_MARGIN);
 
     void Reset()
@@ -134,6 +140,8 @@ public class AdditionalCameras : MonoBehaviour
         camL = camLObj.AddComponent<Camera>();
         camR = camRObj.AddComponent<Camera>();
 
+        camL.cullingMask &= ~(1 << warningsLayer);
+        camL.cullingMask &= ~(1 << indicatorLayer);
         camL.clearFlags = CameraClearFlags.SolidColor;
         camL.backgroundColor = new Color(0.3f, 0.3f, 0.3f);
         camL.nearClipPlane = 0.1f;
@@ -147,6 +155,8 @@ public class AdditionalCameras : MonoBehaviour
         camL.stereoSeparation = cfg.useCustomStereoHandling ? 0 : cfg.stereoSeparation;
         camL.stereoConvergence = cfg.stereoConvergence;
 
+        camR.cullingMask &= ~(1 << warningsLayer);
+        camR.cullingMask &= ~(1 << indicatorLayer);
         camR.clearFlags = CameraClearFlags.SolidColor;
         camR.backgroundColor = new Color(0.3f, 0.3f, 0.3f);
         camR.nearClipPlane = 0.1f;
@@ -160,13 +170,20 @@ public class AdditionalCameras : MonoBehaviour
         camR.stereoSeparation = cfg.useCustomStereoHandling ? 0 : cfg.stereoSeparation;
         camR.stereoConvergence = cfg.stereoConvergence;
 
-
-
         if (cfg.useCustomStereoHandling)
         {
             camLObj.transform.localPosition = Vector3.right * cfg.stereoSeparation / (cfg.swapEyes ? 2f : -2f);
             camRObj.transform.localPosition = Vector3.right * cfg.stereoSeparation / (cfg.swapEyes ? -2f : 2f);
             UpdateCameras();
+        }
+
+        // set layer of the warning screens
+        var originTr = LzwpOrigin.Instance.transform;
+        for (int i = 0; i < originTr.childCount; i++)
+        {
+            var child = originTr.GetChild(i);
+            if (child.name == "Quad")
+                child.gameObject.layer = warningsLayer;
         }
 
         SpawnIndicators();
@@ -198,8 +215,11 @@ public class AdditionalCameras : MonoBehaviour
         if (Input.GetKeyDown(keyAdjustRollLeft)) AdjustAngle(0, 0, -adjustmentAmountDeg);
         if (Input.GetKeyDown(keyAdjustRollRight)) AdjustAngle(0, 0, adjustmentAmountDeg);
 
-        if (Input.GetKeyDown(keyAdjustFovMinus)) AdjustFov(-adjustmentAmountFovDeg);
-        if (Input.GetKeyDown(keyAdjustFovPlus)) AdjustFov(adjustmentAmountFovDeg);
+        if (Input.GetKeyDown(keyAdjustDistanceMinus)) AdjustDistance(-adjustmentAmountMeters);
+        if (Input.GetKeyDown(keyAdjustDistancePlus)) AdjustDistance(adjustmentAmountMeters);
+
+        //if (Input.GetKeyDown(keyAdjustFovMinus)) AdjustFov(-adjustmentAmountFovDeg);
+        //if (Input.GetKeyDown(keyAdjustFovPlus)) AdjustFov(adjustmentAmountFovDeg);
 
         if (Input.GetKeyDown(keyAdjustmentSave)) cfg.Save();
         if (Input.GetKeyDown(keyAdjustmentStealViewport)) ToggleViewportStealing();
@@ -274,7 +294,7 @@ public class AdditionalCameras : MonoBehaviour
 
     void SpawnIndicators()
     {
-        propertyBlock.SetColor(ColorProperty, disabledIndicatorColor);
+        propertyBlock.SetColor(ColorProperty, indicatorColor);
 
         for (int i = 0; i < cfg.cameras.Length; i++)
         {
@@ -301,6 +321,7 @@ public class AdditionalCameras : MonoBehaviour
             label.transform.SetParent(indicator.transform);
             label.transform.localPosition = Vector3.zero;
             label.transform.localRotation = Quaternion.Euler(0, 180f, 0);
+            label.layer = indicatorLayer;
 
             var textMesh = label.AddComponent<TextMesh>();
             textMesh.text = camCfg.label;
@@ -353,7 +374,7 @@ public class AdditionalCameras : MonoBehaviour
         if (idx == lastHoveredIdx)
             SetIndicatorColor(idx, hoveredIndicatorColor);
 
-        SetIndicatorColor(idx, idx == GetCurrentIdx() ? enabledIndicatorColor : disabledIndicatorColor);
+        SetIndicatorColor(idx, idx == GetCurrentIdx() ? activeIndicatorColor : indicatorColor);
     }
 
     void SetIndicatorsVisibility(bool visible)
@@ -391,7 +412,7 @@ public class AdditionalCameras : MonoBehaviour
             return;
 
         if (lastHoveredIdx > -1)
-            SetIndicatorColor(lastHoveredIdx, GetCurrentIdx() == lastHoveredIdx ? enabledIndicatorColor : disabledIndicatorColor);
+            SetIndicatorColor(lastHoveredIdx, GetCurrentIdx() == lastHoveredIdx ? activeIndicatorColor : indicatorColor);
 
         if (hIdx > -1)
             SetIndicatorColor(hIdx, hoveredIndicatorColor);
@@ -448,16 +469,22 @@ public class AdditionalCameras : MonoBehaviour
         Debug.Log("[Additional cameras] Set GROUP <b>" + gIdx + "</b> and CAMERA <b>" + cIdx + "</b> --> " + cfg.cameras[idx].label);
 
         if (oldIdx >= 0)
-            SetIndicatorColor(oldIdx, oldIdx != lastHoveredIdx ? disabledIndicatorColor : hoveredIndicatorColor);
+            SetIndicatorColor(oldIdx, oldIdx != lastHoveredIdx ? indicatorColor : hoveredIndicatorColor);
 
-        SetIndicatorColor(idx, idx != lastHoveredIdx ? enabledIndicatorColor : hoveredIndicatorColor);
+        SetIndicatorColor(idx, idx != lastHoveredIdx ? activeIndicatorColor : hoveredIndicatorColor);
 
 
-        camWrapper.transform.SetPositionAndRotation(indicators[idx].transform.position, indicators[idx].transform.rotation);
+        UpdateCamTransform();
         camL.fieldOfView = cfg.cameras[idx].fov;
         camR.fieldOfView = cfg.cameras[idx].fov;
 
         UpdateCameras();
+    }
+
+    void UpdateCamTransform()
+    {
+        int idx = GetCurrentIdx();
+        camWrapper.transform.SetPositionAndRotation(indicators[idx].transform.position + indicators[idx].transform.forward * -cfg.cameras[idx].distanceCorrection, indicators[idx].transform.rotation);
     }
 
     void SelectionToolButtonPressed()
@@ -516,6 +543,20 @@ public class AdditionalCameras : MonoBehaviour
         }
     }
 
+    void AdjustDistance(float delta)
+    {
+        if (!cfg.adjustingEnabled)
+            return;
+
+        cfg.cameras[GetCurrentIdx()].distanceCorrection += delta;
+
+        UpdateCamTransform();
+        UpdateCameras();
+
+        if (cfg.autoSaveChanges)
+            cfg.Save();
+    }
+
     void AdjustAngle(float hDelta, float vDelta, float rollDelta)
     {
         if (!cfg.adjustingEnabled)
@@ -534,7 +575,11 @@ public class AdditionalCameras : MonoBehaviour
 
         cfg.cameras[GetCurrentIdx()].rotationCorrection = corr;
 
+        UpdateCamTransform();
         UpdateCameras();
+
+        if (cfg.autoSaveChanges)
+            cfg.Save();
     }
 
     void AdjustFov(float delta)
@@ -546,6 +591,9 @@ public class AdditionalCameras : MonoBehaviour
         camL.fieldOfView = fov;
         camR.fieldOfView = fov;
         cfg.cameras[GetCurrentIdx()].fov = fov;
+
+        if (cfg.autoSaveChanges)
+            cfg.Save();
     }
 }
 
@@ -563,6 +611,8 @@ public class AdditionalCamerasConfig
         [JsonConverter(typeof(LzwpUtils.Converters.Vector3Converter))]
         public Vector3 position = Vector3.zero;
 
+        public float distanceCorrection = 0;
+
         [JsonConverter(typeof(LzwpUtils.Converters.Vector3Converter))]
         public Vector3 rotationCorrection = Vector3.zero;
 
@@ -572,6 +622,7 @@ public class AdditionalCamerasConfig
     public int initialCameraInGroupIdx = 0;
     public bool stopOnLastGroup = true;
     public bool adjustingEnabled = false;
+    public bool autoSaveChanges = false;
     public bool viewportStealingEnabled = false;
 
     public float stereoSeparation = 0.05f;
