@@ -135,6 +135,57 @@ namespace Assets.Scripts.FileManagers
                 }
             }
 
+            private struct MongeRect
+            {
+                public double MinX, MinY, MaxX, MaxY;
+
+                public double Width { get { return MaxX - MinX; } }
+                public double Height { get { return MaxY - MinY; } }
+
+                public MongeRect Inflate(double pad)
+                {
+                    return new MongeRect
+                    {
+                        MinX = MinX - pad,
+                        MinY = MinY - pad,
+                        MaxX = MaxX + pad,
+                        MaxY = MaxY + pad
+                    };
+                }
+
+                public Vector2 Baseline(double fontSize)
+                {
+                    return new Vector2((float)MinX, (float)(MinY + 0.22 * fontSize));
+                }
+            }
+
+            private struct MongeSegmentObstacle
+            {
+                public Vector2 A, B;
+                public double HalfWidth;
+            }
+
+            private struct MongeCircleObstacle
+            {
+                public Vector2 Center;
+                public double Radius;
+                public double HalfWidth;
+            }
+
+            private struct MongePointObstacle
+            {
+                public Vector2 Center;
+                public double Radius;
+            }
+
+            private sealed class MongePointLabelItem
+            {
+                public int PointIndex;
+                public Vector2 Position;
+                public string Text;
+                public int CrowdingScore;
+            }
+
 
             /*   P R I V A T E   M E T H O D S  :  [ JSON ]   */
 
@@ -149,7 +200,7 @@ namespace Assets.Scripts.FileManagers
 
                 try
                 {
-                    // Upewnij siê, ¿e katalog istnieje
+                    // Upewnij sie, ze katalog istnieje
                     Directory.CreateDirectory(dirPath);
 
                     File.WriteAllText(fullPath, json);
@@ -435,15 +486,52 @@ namespace Assets.Scripts.FileManagers
                     ReconstructionInfo.APP_NAME ?? string.Empty, 9, pageWidth - 20 * mm);
                 MongePdfTextRight(content, pageWidth - 10 * mm, pageHeight - 17 * mm,
                     ReconstructionInfo.GITHUB_LINK ?? string.Empty, 8, pageWidth - 20 * mm);
+
+                var segmentObstacles = new List<MongeSegmentObstacle>();
+                var circleObstacles = new List<MongeCircleObstacle>();
+                var pointObstacles = new List<MongePointObstacle>();
+                var placedLabels = new List<MongeRect>();
+
+                // 1. Draw lines and register line obstacles
+                var pageLines = new List<KeyValuePair<MongeSegmentObstacle, string>>();
                 foreach (var l in lines)
-                    MongePdfLine(content, page(maps[l.PlaneName].Apply(l.StartPosition)),
-                        page(maps[l.PlaneName].Apply(l.EndPosition)), MongeLineWidthMm(l.LineWidth) * mm);
+                {
+                    Vector2 a = page(maps[l.PlaneName].Apply(l.StartPosition));
+                    Vector2 b = page(maps[l.PlaneName].Apply(l.EndPosition));
+                    double strokePt = MongeLineWidthMm(l.LineWidth) * mm;
+                    MongePdfLine(content, a, b, strokePt);
+
+                    var seg = new MongeSegmentObstacle { A = a, B = b, HalfWidth = strokePt * 0.5 };
+                    segmentObstacles.Add(seg);
+
+                    if (l.Labels != null && l.Labels.Count > 0)
+                    {
+                        var nonEmpty = l.Labels.Where(lbl => !string.IsNullOrEmpty(lbl)).ToArray();
+                        if (nonEmpty.Length > 0)
+                            pageLines.Add(new KeyValuePair<MongeSegmentObstacle, string>(seg, string.Join(", ", nonEmpty)));
+                    }
+                }
+
+                // 2. Draw circles and register circle obstacles
                 foreach (var c in circles)
                 {
                     MongeMap m = maps[c.PlaneName];
                     Vector2 a = m.Apply(c.StartPosition), b = m.Apply(c.EndPosition);
-                    MongePdfCircle(content, page(a), Vector2.Distance(a, b) * scale, MongeLineWidthMm(c.LineWidth) * mm, false);
+                    Vector2 center = page(a);
+                    double radius = Vector2.Distance(a, b) * scale;
+                    double strokePt = MongeLineWidthMm(c.LineWidth) * mm;
+                    MongePdfCircle(content, center, radius, strokePt, false);
+
+                    circleObstacles.Add(new MongeCircleObstacle
+                    {
+                        Center = center,
+                        Radius = radius,
+                        HalfWidth = strokePt * 0.5
+                    });
                 }
+
+                // 3. Draw axis lines and register axis obstacles
+                var pageAxes = new List<KeyValuePair<MongeSegmentObstacle, string>>();
                 foreach (var axis in axes)
                 {
                     Vector2 a = page(axis.A), b = page(axis.B);
@@ -451,10 +539,16 @@ namespace Assets.Scripts.FileManagers
                     if (u.sqrMagnitude < 1e-12f) u = Vector2.right;
                     // Always extend BOTH ends by 8 mm on paper, regardless of drawing scale.
                     a -= u * (float)(8 * mm); b += u * (float)(8 * mm);
-                    MongePdfLine(content, a, b, .2 * mm);
-                    MongePdfText(content, b + new Vector2((float)(2 * mm), (float)(2 * mm)), axis.Label);
+                    double strokePt = 0.2 * mm;
+                    MongePdfLine(content, a, b, strokePt);
+
+                    var seg = new MongeSegmentObstacle { A = a, B = b, HalfWidth = strokePt * 0.5 };
+                    segmentObstacles.Add(seg);
+                    if (!string.IsNullOrEmpty(axis.Label))
+                        pageAxes.Add(new KeyValuePair<MongeSegmentObstacle, string>(seg, axis.Label));
                 }
-                // Merge coincident points only within the same plane (epsilon in world units).
+
+                // 4. Merge coincident points within the same plane and draw them (white fill + black outline)
                 const float pointMergeEps = 0.00001f;
                 var groups = new List<List<PointJson>>();
                 foreach (var p in points)
@@ -465,29 +559,522 @@ namespace Assets.Scripts.FileManagers
                     if (group == null) { group = new List<PointJson>(); groups.Add(group); }
                     group.Add(p);
                 }
+
+                const double pointRadiusPt = 0.75 * mm;
+                const double pointStrokePt = 0.22 * mm;
+                var pointLabelItems = new List<MongePointLabelItem>();
+
                 foreach (var group in groups)
                 {
                     PointJson p = group[0];
                     Vector2 xy = page(maps[p.PlaneName].Apply(p.Position));
-                    MongePdfCircle(content, xy, .75 * mm, 0, true);
+                    MongePdfCircle(content, xy, pointRadiusPt, pointStrokePt, true);
+
+                    int ptIdx = pointObstacles.Count;
+                    pointObstacles.Add(new MongePointObstacle
+                    {
+                        Center = xy,
+                        Radius = pointRadiusPt + pointStrokePt * 0.5
+                    });
+
                     string suffix = new string('\'', maps[p.PlaneName].ProjectionNumber);
                     var labels = group.SelectMany(q => q.Labels ?? new List<string>())
                         .Where(label => !string.IsNullOrEmpty(label)).Distinct().Select(label => label + suffix).ToArray();
                     if (labels.Length > 0)
-                        MongePdfText(content, xy + new Vector2((float)(2 * mm), (float)(2 * mm)),
-                            string.Join(" = ", labels));
-                }
-                foreach (var l in lines)
-                    if (l.Labels != null && l.Labels.Count > 0)
                     {
-                        MongeMap m = maps[l.PlaneName];
-                        Vector2 xy = page((m.Apply(l.StartPosition) + m.Apply(l.EndPosition)) / 2);
-                        MongePdfText(content, xy + new Vector2((float)(2 * mm), (float)(2 * mm)),
-                            string.Join(", ", l.Labels.ToArray()));
+                        pointLabelItems.Add(new MongePointLabelItem
+                        {
+                            PointIndex = ptIdx,
+                            Position = xy,
+                            Text = string.Join(" = ", labels)
+                        });
                     }
+                }
+
+                // 5. Place and draw labels without overlapping lines, circles, points or other labels
+                const double labelFontSize = 9.0;
+                var safePageBounds = new MongeRect
+                {
+                    MinX = 4 * mm,
+                    MinY = 4 * mm,
+                    MaxX = pageWidth - 4 * mm,
+                    MaxY = pageHeight - headerHeight - 2 * mm
+                };
+
+                // Sort point labels so points in tighter/crowded areas claim free space first
+                double neighborhoodRadius = 8.0 * mm;
+                foreach (var item in pointLabelItems)
+                {
+                    int crowd = 0;
+                    foreach (var seg in segmentObstacles)
+                        if (MongeDistPointToSegment(item.Position, seg.A, seg.B) <= neighborhoodRadius) crowd += 2;
+                    foreach (var pt in pointObstacles)
+                        if (Vector2.Distance(item.Position, pt.Center) <= neighborhoodRadius) crowd += 3;
+                    item.CrowdingScore = crowd;
+                }
+
+                foreach (var item in pointLabelItems.OrderByDescending(i => i.CrowdingScore))
+                {
+                    MongeRect rect = MongePlacePointLabel(
+                        item.Position, item.PointIndex, item.Text, labelFontSize,
+                        segmentObstacles, circleObstacles, pointObstacles, placedLabels, safePageBounds);
+                    placedLabels.Add(rect);
+                    MongePdfText(content, rect.Baseline(labelFontSize), item.Text, labelFontSize);
+                }
+
+                foreach (var lineLabel in pageLines)
+                {
+                    MongeRect rect = MongePlaceLineLabel(
+                        lineLabel.Key, lineLabel.Value, labelFontSize,
+                        segmentObstacles, circleObstacles, pointObstacles, placedLabels, safePageBounds);
+                    placedLabels.Add(rect);
+                    MongePdfText(content, rect.Baseline(labelFontSize), lineLabel.Value, labelFontSize);
+                }
+
+                foreach (var axisLabel in pageAxes)
+                {
+                    MongeRect rect = MongePlaceAxisLabel(
+                        axisLabel.Key, axisLabel.Value, labelFontSize,
+                        segmentObstacles, circleObstacles, pointObstacles, placedLabels, safePageBounds);
+                    placedLabels.Add(rect);
+                    MongePdfText(content, rect.Baseline(labelFontSize), axisLabel.Value, labelFontSize);
+                }
+
                 if (!fileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) fileName += ".pdf";
                 Directory.CreateDirectory(path);
                 MongeWritePdf(Path.Combine(path, fileName), content.ToString(), pageWidth, pageHeight);
+            }
+
+            /*   P R I V A T E   M E T H O D S  :  [ PDF LABEL PLACEMENT ]   */
+
+            private static double MongeTextWidth(string text, double fontSize)
+            {
+                return MongeWinAnsiBytes(text).Sum(b => MongeHelveticaWidths[b]) / 1000.0 * fontSize;
+            }
+
+            private static MongeRect MongeMakePointCandidateRect(Vector2 anchor, Vector2 dir, double gap, double w, double h)
+            {
+                double hw = w * 0.5, hh = h * 0.5;
+                double ax = Math.Max(-1.0, Math.Min(1.0, dir.x * 1.41421356));
+                double ay = Math.Max(-1.0, Math.Min(1.0, dir.y * 1.41421356));
+                double cx = anchor.x + dir.x * gap + ax * hw;
+                double cy = anchor.y + dir.y * gap + ay * hh;
+                return new MongeRect { MinX = cx - hw, MaxX = cx + hw, MinY = cy - hh, MaxY = cy + hh };
+            }
+
+            private static MongeRect MongeMakeLineCandidateRect(Vector2 anchor, Vector2 normalDir, double gap, double w, double h)
+            {
+                double hw = w * 0.5, hh = h * 0.5;
+                double offset = gap + Math.Abs(normalDir.x) * hw + Math.Abs(normalDir.y) * hh;
+                double cx = anchor.x + normalDir.x * offset;
+                double cy = anchor.y + normalDir.y * offset;
+                return new MongeRect { MinX = cx - hw, MaxX = cx + hw, MinY = cy - hh, MaxY = cy + hh };
+            }
+
+            private static MongeRect MongePlacePointLabel(
+                Vector2 pt, int ownPointIndex, string text, double fontSize,
+                List<MongeSegmentObstacle> segments,
+                List<MongeCircleObstacle> circles,
+                List<MongePointObstacle> points,
+                List<MongeRect> placedLabels,
+                MongeRect pageBounds)
+            {
+                const double mm = 72.0 / 25.4;
+                double w = Math.Max(MongeTextWidth(text, fontSize), 1.0);
+                double h = 0.97 * fontSize;
+
+                // Collect angles of lines incident to or passing very close to this point
+                var incidentAngles = new List<double>();
+                foreach (var seg in segments)
+                {
+                    if (MongeDistPointToSegment(pt, seg.A, seg.B) <= 2.2 * mm)
+                    {
+                        if ((seg.A - pt).sqrMagnitude > 1.0f)
+                            incidentAngles.Add(Math.Atan2(seg.A.y - pt.y, seg.A.x - pt.x));
+                        if ((seg.B - pt).sqrMagnitude > 1.0f)
+                            incidentAngles.Add(Math.Atan2(seg.B.y - pt.y, seg.B.x - pt.x));
+                    }
+                }
+
+                var candidateAngles = new List<double>();
+                // Sector bisectors between adjacent incident lines get highest priority
+                if (incidentAngles.Count >= 2)
+                {
+                    incidentAngles.Sort();
+                    for (int i = 0; i < incidentAngles.Count; i++)
+                    {
+                        double a1 = incidentAngles[i];
+                        double a2 = (i + 1 < incidentAngles.Count)
+                            ? incidentAngles[i + 1]
+                            : incidentAngles[0] + 2.0 * Math.PI;
+                        double span = a2 - a1;
+                        if (span > 0.25)
+                        {
+                            candidateAngles.Add(a1 + span * 0.5);
+                            if (span > 0.9)
+                            {
+                                candidateAngles.Add(a1 + span * 0.35);
+                                candidateAngles.Add(a1 + span * 0.65);
+                            }
+                        }
+                    }
+                }
+
+                // Standard 36 directions around the point (starting from top-right 45 deg)
+                double[] preferredDeg = new double[]
+                {
+                    45, 135, -45, -135, 30, 60, 120, 150, -30, -60, -120, -150,
+                    90, 0, 180, -90, 15, 75, 105, 165, -15, -75, -105, -165,
+                    10, 20, 50, 70, 80, 100, 110, 140, 160, 170,
+                    -10, -20, -50, -70, -80, -100, -110, -140, -160, -170
+                };
+                foreach (double deg in preferredDeg)
+                    candidateAngles.Add(deg * Math.PI / 180.0);
+
+                double[] gaps = new double[]
+                {
+                    1.35 * mm, 1.85 * mm, 2.45 * mm, 3.2 * mm, 4.1 * mm, 5.2 * mm, 6.5 * mm
+                };
+
+                MongeRect bestRect = MongeMakePointCandidateRect(pt, new Vector2(0.7071f, 0.7071f), 1.5 * mm, w, h);
+                double bestScore = double.PositiveInfinity;
+
+                foreach (double gap in gaps)
+                {
+                    for (int i = 0; i < candidateAngles.Count; i++)
+                    {
+                        double ang = candidateAngles[i];
+                        Vector2 dir = new Vector2((float)Math.Cos(ang), (float)Math.Sin(ang));
+                        MongeRect rect = MongeMakePointCandidateRect(pt, dir, gap, w, h);
+
+                        double score = MongeScoreRect(rect, segments, circles, points, placedLabels, pageBounds, -1);
+
+                        // Distance & association cost: keep label close to its own point and away from other points
+                        double distOwn = MongeDistPointToRect(pt, rect);
+                        score += (gap / mm) * 14.0;
+
+                        for (int j = 0; j < points.Count; j++)
+                        {
+                            if (j == ownPointIndex) continue;
+                            double distOther = MongeDistPointToRect(points[j].Center, rect);
+                            if (distOther < distOwn + 0.8 * mm)
+                                score += 6000.0 * Math.Pow((distOwn + 0.8 * mm - distOther) / mm, 2);
+                        }
+
+                        // Slight preference for sector bisectors and diagonal placements
+                        if (i >= preferredDeg.Length) score += 2.0;
+
+                        if (score < bestScore)
+                        {
+                            bestScore = score;
+                            bestRect = rect;
+                        }
+                    }
+
+                    // Early exit if a completely collision-free spot near the point was found
+                    if (bestScore < 80.0) break;
+                }
+
+                return bestRect;
+            }
+
+            private static MongeRect MongePlaceLineLabel(
+                MongeSegmentObstacle ownSeg, string text, double fontSize,
+                List<MongeSegmentObstacle> segments,
+                List<MongeCircleObstacle> circles,
+                List<MongePointObstacle> points,
+                List<MongeRect> placedLabels,
+                MongeRect pageBounds)
+            {
+                const double mm = 72.0 / 25.4;
+                double w = Math.Max(MongeTextWidth(text, fontSize), 1.0);
+                double h = 0.97 * fontSize;
+
+                Vector2 ab = ownSeg.B - ownSeg.A;
+                float len = ab.magnitude;
+                if (len < 1e-3f)
+                    return MongePlacePointLabel(ownSeg.A, -1, text, fontSize, segments, circles, points, placedLabels, pageBounds);
+
+                Vector2 u = ab / len;
+                Vector2 n = new Vector2(-u.y, u.x);
+
+                int ownSegIndex = -1;
+                for (int i = 0; i < segments.Count; i++)
+                {
+                    if ((segments[i].A - ownSeg.A).sqrMagnitude < 1e-4f && (segments[i].B - ownSeg.B).sqrMagnitude < 1e-4f)
+                    {
+                        ownSegIndex = i;
+                        break;
+                    }
+                }
+
+                double[] tSamples = new double[] { 0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74, 0.18, 0.82, 0.12, 0.88 };
+                double[] gaps = new double[] { 0.9 * mm + ownSeg.HalfWidth, 1.5 * mm + ownSeg.HalfWidth, 2.3 * mm + ownSeg.HalfWidth, 3.3 * mm + ownSeg.HalfWidth };
+                float[] sides = new float[] { 1f, -1f };
+
+                MongeRect bestRect = MongeMakeLineCandidateRect(ownSeg.A + u * (0.5f * len), n, gaps[0], w, h);
+                double bestScore = double.PositiveInfinity;
+
+                foreach (double gap in gaps)
+                {
+                    foreach (double t in tSamples)
+                    {
+                        Vector2 anchor = ownSeg.A + u * (float)(t * len);
+                        foreach (float side in sides)
+                        {
+                            Vector2 normalDir = n * side;
+                            MongeRect rect = MongeMakeLineCandidateRect(anchor, normalDir, gap, w, h);
+
+                            double score = MongeScoreRect(rect, segments, circles, points, placedLabels, pageBounds, ownSegIndex);
+                            score += Math.Abs(t - 0.5) * 40.0 + (gap / mm) * 15.0;
+
+                            if (score < bestScore)
+                            {
+                                bestScore = score;
+                                bestRect = rect;
+                            }
+                        }
+                    }
+                    if (bestScore < 60.0) break;
+                }
+
+                return bestRect;
+            }
+
+            private static MongeRect MongePlaceAxisLabel(
+                MongeSegmentObstacle axisSeg, string text, double fontSize,
+                List<MongeSegmentObstacle> segments,
+                List<MongeCircleObstacle> circles,
+                List<MongePointObstacle> points,
+                List<MongeRect> placedLabels,
+                MongeRect pageBounds)
+            {
+                const double mm = 72.0 / 25.4;
+                double w = Math.Max(MongeTextWidth(text, fontSize), 1.0);
+                double h = 0.97 * fontSize;
+
+                Vector2 ab = axisSeg.B - axisSeg.A;
+                float len = ab.magnitude;
+                Vector2 u = len > 1e-4f ? ab / len : Vector2.right;
+                Vector2 n = new Vector2(-u.y, u.x);
+                if (n.y < 0) n = -n;
+
+                int ownSegIndex = -1;
+                for (int i = 0; i < segments.Count; i++)
+                {
+                    if ((segments[i].A - axisSeg.A).sqrMagnitude < 1e-4f && (segments[i].B - axisSeg.B).sqrMagnitude < 1e-4f)
+                    {
+                        ownSegIndex = i;
+                        break;
+                    }
+                }
+
+                // Prefer near end B (above/below tip, pulled slightly inward so it stays within margins), fallback toward A
+                double[] backOffsets = new double[] { 0.5 * w, 1.0 * w, 0.0, 2.0 * w, 3.5 * w };
+                double[] gaps = new double[] { 1.1 * mm, 1.8 * mm, 2.6 * mm };
+                float[] sides = new float[] { 1f, -1f };
+
+                MongeRect bestRect = MongeMakeLineCandidateRect(axisSeg.B - u * (float)(0.5 * w), n, 1.1 * mm, w, h);
+                double bestScore = double.PositiveInfinity;
+
+                for (int end = 0; end < 2; end++)
+                {
+                    Vector2 tip = end == 0 ? axisSeg.B : axisSeg.A;
+                    Vector2 inward = end == 0 ? -u : u;
+
+                    foreach (double back in backOffsets)
+                    {
+                        if (back > len * 0.45) continue;
+                        Vector2 anchor = tip + inward * (float)back;
+                        foreach (double gap in gaps)
+                        {
+                            foreach (float side in sides)
+                            {
+                                MongeRect rect = MongeMakeLineCandidateRect(anchor, n * side, gap, w, h);
+                                double score = MongeScoreRect(rect, segments, circles, points, placedLabels, pageBounds, ownSegIndex);
+                                score += end * 80.0 + (back / mm) * 3.0 + (gap / mm) * 10.0;
+                                if (side < 0) score += 5.0;
+
+                                if (score < bestScore)
+                                {
+                                    bestScore = score;
+                                    bestRect = rect;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return bestRect;
+            }
+
+            private static double MongeScoreRect(
+                MongeRect rect,
+                List<MongeSegmentObstacle> segments,
+                List<MongeCircleObstacle> circles,
+                List<MongePointObstacle> points,
+                List<MongeRect> placedLabels,
+                MongeRect pageBounds,
+                int ignoreSegmentIndex)
+            {
+                const double mm = 72.0 / 25.4;
+                const double hardPad = 0.55 * mm;
+                const double softPad = 1.65 * mm;
+
+                double score = 0;
+
+                // 1. Keep label inside page margins
+                if (rect.MinX < pageBounds.MinX) score += 300000.0 + (pageBounds.MinX - rect.MinX) * 5000.0;
+                if (rect.MaxX > pageBounds.MaxX) score += 300000.0 + (rect.MaxX - pageBounds.MaxX) * 5000.0;
+                if (rect.MinY < pageBounds.MinY) score += 300000.0 + (pageBounds.MinY - rect.MinY) * 5000.0;
+                if (rect.MaxY > pageBounds.MaxY) score += 300000.0 + (rect.MaxY - pageBounds.MaxY) * 5000.0;
+
+                // 2. Check against line & axis segments
+                MongeRect paddedRect = rect.Inflate(hardPad);
+                for (int i = 0; i < segments.Count; i++)
+                {
+                    var seg = segments[i];
+                    double d = MongeDistSegmentToRect(seg.A, seg.B, rect) - seg.HalfWidth;
+                    if (d <= 0)
+                    {
+                        double clipLen = MongeClippedSegmentLength(seg.A, seg.B, paddedRect);
+                        score += 120000.0 + clipLen * 4000.0 + Math.Abs(d) * 5000.0;
+                    }
+                    else if (d < hardPad)
+                    {
+                        if (i != ignoreSegmentIndex)
+                            score += 8000.0 * Math.Pow((hardPad - d) / hardPad, 2);
+                    }
+                    else if (d < softPad && i != ignoreSegmentIndex)
+                    {
+                        score += 45.0 * Math.Pow((softPad - d) / (softPad - hardPad), 2);
+                    }
+                }
+
+                // 3. Check against circles
+                foreach (var c in circles)
+                {
+                    double d = MongeDistCircleToRect(c.Center, c.Radius, rect) - c.HalfWidth;
+                    if (d <= 0)
+                        score += 120000.0 + Math.Abs(d) * 5000.0;
+                    else if (d < hardPad)
+                        score += 8000.0 * Math.Pow((hardPad - d) / hardPad, 2);
+                    else if (d < softPad)
+                        score += 45.0 * Math.Pow((softPad - d) / (softPad - hardPad), 2);
+                }
+
+                // 4. Check against points
+                foreach (var pt in points)
+                {
+                    double d = MongeDistPointToRect(pt.Center, rect) - pt.Radius;
+                    if (d <= 0)
+                        score += 160000.0 + Math.Abs(d) * 8000.0;
+                    else if (d < hardPad)
+                        score += 9000.0 * Math.Pow((hardPad - d) / hardPad, 2);
+                    else if (d < softPad)
+                        score += 35.0 * Math.Pow((softPad - d) / (softPad - hardPad), 2);
+                }
+
+                // 5. Check against already placed labels
+                foreach (var other in placedLabels)
+                {
+                    double d = MongeDistRectToRect(rect, other);
+                    if (d <= 0)
+                    {
+                        double ox = Math.Max(0.0, Math.Min(rect.MaxX, other.MaxX) - Math.Max(rect.MinX, other.MinX));
+                        double oy = Math.Max(0.0, Math.Min(rect.MaxY, other.MaxY) - Math.Max(rect.MinY, other.MinY));
+                        score += 220000.0 + (ox * oy) * 5000.0;
+                    }
+                    else if (d < 0.75 * mm)
+                    {
+                        score += 10000.0 * Math.Pow((0.75 * mm - d) / (0.75 * mm), 2);
+                    }
+                    else if (d < 1.5 * mm)
+                    {
+                        score += 40.0 * Math.Pow((1.5 * mm - d) / (0.75 * mm), 2);
+                    }
+                }
+
+                return score;
+            }
+
+            private static double MongeDistPointToRect(Vector2 p, MongeRect r)
+            {
+                double dx = Math.Max(r.MinX - p.x, Math.Max(0.0, p.x - r.MaxX));
+                double dy = Math.Max(r.MinY - p.y, Math.Max(0.0, p.y - r.MaxY));
+                return Math.Sqrt(dx * dx + dy * dy);
+            }
+
+            private static double MongeDistRectToRect(MongeRect a, MongeRect b)
+            {
+                double dx = Math.Max(a.MinX - b.MaxX, Math.Max(0.0, b.MinX - a.MaxX));
+                double dy = Math.Max(a.MinY - b.MaxY, Math.Max(0.0, b.MinY - a.MaxY));
+                return Math.Sqrt(dx * dx + dy * dy);
+            }
+
+            private static double MongeDistPointToSegment(Vector2 p, Vector2 a, Vector2 b)
+            {
+                Vector2 ab = b - a;
+                float lenSq = ab.sqrMagnitude;
+                if (lenSq < 1e-12f) return Vector2.Distance(p, a);
+                float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / lenSq);
+                return Vector2.Distance(p, a + ab * t);
+            }
+
+            private static double MongeClippedSegmentLength(Vector2 a, Vector2 b, MongeRect r)
+            {
+                double t0 = 0.0, t1 = 1.0;
+                double dx = b.x - a.x, dy = b.y - a.y;
+                double[] p = new double[] { -dx, dx, -dy, dy };
+                double[] q = new double[] { a.x - r.MinX, r.MaxX - a.x, a.y - r.MinY, r.MaxY - a.y };
+
+                for (int i = 0; i < 4; i++)
+                {
+                    if (Math.Abs(p[i]) < 1e-12)
+                    {
+                        if (q[i] < 0) return 0.0;
+                    }
+                    else
+                    {
+                        double t = q[i] / p[i];
+                        if (p[i] < 0)
+                        {
+                            if (t > t1) return 0.0;
+                            if (t > t0) t0 = t;
+                        }
+                        else
+                        {
+                            if (t < t0) return 0.0;
+                            if (t < t1) t1 = t;
+                        }
+                    }
+                }
+                if (t0 > t1) return 0.0;
+                double len = Math.Sqrt(dx * dx + dy * dy);
+                return Math.Max(1e-3, (t1 - t0) * len);
+            }
+
+            private static double MongeDistSegmentToRect(Vector2 a, Vector2 b, MongeRect r)
+            {
+                if (MongeClippedSegmentLength(a, b, r) > 0.0) return 0.0;
+
+                double d = Math.Min(MongeDistPointToRect(a, r), MongeDistPointToRect(b, r));
+                d = Math.Min(d, MongeDistPointToSegment(new Vector2((float)r.MinX, (float)r.MinY), a, b));
+                d = Math.Min(d, MongeDistPointToSegment(new Vector2((float)r.MaxX, (float)r.MinY), a, b));
+                d = Math.Min(d, MongeDistPointToSegment(new Vector2((float)r.MinX, (float)r.MaxY), a, b));
+                d = Math.Min(d, MongeDistPointToSegment(new Vector2((float)r.MaxX, (float)r.MaxY), a, b));
+                return d;
+            }
+
+            private static double MongeDistCircleToRect(Vector2 center, double radius, MongeRect r)
+            {
+                double dMin = MongeDistPointToRect(center, r);
+                double dxMax = Math.Max(Math.Abs(center.x - r.MinX), Math.Abs(center.x - r.MaxX));
+                double dyMax = Math.Max(Math.Abs(center.y - r.MinY), Math.Abs(center.y - r.MaxY));
+                double dMax = Math.Sqrt(dxMax * dxMax + dyMax * dyMax);
+
+                if (dMin <= radius && radius <= dMax) return 0.0;
+                return Math.Min(Math.Abs(dMin - radius), Math.Abs(dMax - radius));
             }
 
             private static float MongeMedian(IEnumerable<float> values)
@@ -519,9 +1106,9 @@ namespace Assets.Scripts.FileManagers
                     throw new ArgumentException("LineWidth must be finite and positive.");
             }
 
-            private static string MongeNumber(double v) 
-            { 
-                return v.ToString("0.######", CultureInfo.InvariantCulture); 
+            private static string MongeNumber(double v)
+            {
+                return v.ToString("0.######", CultureInfo.InvariantCulture);
             }
 
             private static void MongePdfLine(StringBuilder s, Vector2 a, Vector2 b, double width)
@@ -533,13 +1120,22 @@ namespace Assets.Scripts.FileManagers
             private static void MongePdfCircle(StringBuilder s, Vector2 p, double r, double width, bool fill)
             {
                 double x = p.x, y = p.y, k = r * .5522847498307936;
-                s.Append(MongeNumber(width)).Append(" w\n");
+                if (fill)
+                {
+                    // Bialy srodek (1 g) i czarna obwódka (0 G)
+                    double strokeWidth = width > 0 ? width : 0.22 * (72.0 / 25.4);
+                    s.Append("1 g 0 G ").Append(MongeNumber(strokeWidth)).Append(" w\n");
+                }
+                else
+                {
+                    s.Append(MongeNumber(width)).Append(" w\n");
+                }
                 s.Append(MongeNumber(x + r)).Append(' ').Append(MongeNumber(y)).Append(" m\n");
                 Action<double, double, double, double, double, double> curve = (a, b, c, d, e, f) =>
                     s.Append(string.Join(" ", new[] { MongeNumber(a), MongeNumber(b), MongeNumber(c), MongeNumber(d), MongeNumber(e), MongeNumber(f) })).Append(" c\n");
                 curve(x + r, y + k, x + k, y + r, x, y + r); curve(x - k, y + r, x - r, y + k, x - r, y);
                 curve(x - r, y - k, x - k, y - r, x, y - r); curve(x + k, y - r, x + r, y - k, x + r, y);
-                s.Append(fill ? "h f\n" : "h S\n");
+                s.Append(fill ? "h B\n0 g\n" : "h S\n");
             }
 
             // Built-in conversion avoids Encoding.GetEncoding(1252), unavailable in some Unity builds.
@@ -821,7 +1417,7 @@ namespace Assets.Scripts.FileManagers
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError("PDF b³¹d:\n" + ex);
+                    Debug.LogError("PDF blad:\n" + ex);
                 }
             }
 
