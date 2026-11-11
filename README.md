@@ -33,7 +33,7 @@ Repozytorium [`CAVE`](https://github.com/kosskas/cave/)
 
 ## Projekt grupowy 2023-2024 -- Przestrzeń rzutowa i metody rzutowania w wirtualnej przestrzeni. Jak powstają rzuty obiektów 3D na płaszczyznę?
 
-Celem projektu jest stworzenie aplikacji, która ułatwi studentom zrozumienie, jak powstają rzuty obiektów 3D na płaszczyznę i wyjaśni geometryczne metody rozwiązywania zadań w przestrzeni. Pomoże ona studentom odróżnić rzut środkowy od równoległego, aksonometrię od perspektywy oraz rozwinie wyobraźnię przestrzenną. Symulacje geometrycznych metod rzutowania obiektów przestrzennych na płaszczyznę rzutni. Wizualizacja tworzenia płaskich obrazów obiektów 3D w czasie rzeczywistym. Wizualizacja konstrukcji geometrycznych wykorzystywanych w badaniu wzajemnych relacji obiektów w przestrzeni.
+Celem projektu było stworzenie aplikacji, która ułatwi studentom zrozumienie, jak powstają rzuty obiektów 3D na płaszczyznę i wyjaśni geometryczne metody rozwiązywania zadań w przestrzeni. Pomoże ona studentom odróżnić rzut środkowy od równoległego, aksonometrię od perspektywy oraz rozwinie wyobraźnię przestrzenną. Symulacje geometrycznych metod rzutowania obiektów przestrzennych na płaszczyznę rzutni. Wizualizacja tworzenia płaskich obrazów obiektów 3D w czasie rzeczywistym. Wizualizacja konstrukcji geometrycznych wykorzystywanych w badaniu wzajemnych relacji obiektów w przestrzeni.
 
 ### Osiągnięte rezultaty w 1 semestrze
 
@@ -73,7 +73,7 @@ postawione przez siebie płaszczyzny.
 
 ## Projekt inżynierski 2024-2025 -- Rekonstrukcja brył w środowisku VR CAVE na podstawie ich rzutów na zadane płaszczyzny
 
-Celem projektu jest wykonanie aplikacji dla jaskiń rzeczywistości wirtualnej w Laboratorium Zanurzonej Wizualizacji Przestrzennej, które pozwolą na prezentację w przestrzeni trójwymiarowej zadanych płaszczyzn rzutni wraz z rzutami i następnie nadzorowane przez użytkownika odtworzenie wyglądu bryły. Aplikacja ta, dzięki współpracy z Wydziałem Architektury PG, powinna w przyszłości wspomóc kształtowanie wyobraźni przestrzennej u studentów uczęszczających na przedmiot „Geometria wykreślna”.
+Celem projektu było wykonanie aplikacji dla jaskiń rzeczywistości wirtualnej w Laboratorium Zanurzonej Wizualizacji Przestrzennej, które pozwolą na prezentację w przestrzeni trójwymiarowej zadanych płaszczyzn rzutni wraz z rzutami i następnie nadzorowane przez użytkownika odtworzenie wyglądu bryły. Aplikacja ta, dzięki współpracy z Wydziałem Architektury PG, powinna w przyszłości wspomóc kształtowanie wyobraźni przestrzennej u studentów uczęszczających na przedmiot „Geometria wykreślna”.
 
 ### Osiągnięte rezultaty
 
@@ -87,7 +87,7 @@ Po dwóch semestrach pracy nad aplikacją udało się stworzyć kompleksowe narz
 
 ## Projekt badawczy 2025-2026 -- Badania skuteczności edukacyjnej rzeczywistości wirtualnej w nauczaniu geometrii wykreślnej
 
-Celem projektu jest przeprowadzenie z udziałem studentów różnych kierunków dogłębnych badań dotyczących skuteczności edukacyjnej aplikacji opracowanej z myślą o wsparciu procesu nauczania geometrii wykreślnej dla jaskiń rzeczywistości wirtualnej dostępnych w Laboratorium Zanurzonej Wizualizacji Przestrzennej.
+Celem projektu było przeprowadzenie z udziałem studentów różnych kierunków dogłębnych badań dotyczących skuteczności edukacyjnej aplikacji opracowanej z myślą o wsparciu procesu nauczania geometrii wykreślnej dla jaskiń rzeczywistości wirtualnej dostępnych w Laboratorium Zanurzonej Wizualizacji Przestrzennej.
 
 ### Osiągnięte rezultaty w 1 semestrze
 
@@ -105,6 +105,30 @@ Badanie użyteczności i wrażeń z aplikacji podczas wydarzenia [Politechnika T
 
 ## Praca magisterska 2025-2026 -- Kompleksowa analiza możliwości wykorzystania rzeczywistości wirtualnej w kształtowaniu wyobraźni przestrzennej dla potrzeb przedmiotu akademickiego Geometria wykreślna
 
-Celem pracy jest zbadanie na grupie przynajmniej 128 osób (studentów I roku kierunków, na których wymagana jest wyobraźnia przestrzenna), możliwości kształtowania wyobraźni przestrzennej w wyniku użytkowania specjalnie przygotowanej przy współpracy z adiunktem prowadzącym przedmiot Geometria wykreślna aplikacji rzeczywistości wirtualnej do wykonywania zadań przewidzianych w programie tego przedmiotu akademickiego. Badania prowadzone byłyby w jaskini rzeczywistości wirtualnej dostępnej w Laboratorium Zanurzonej Wizualizacji Przestrzennej.
+Celem pracy było zbadanie na grupie przynajmniej 64 osób (studentów I roku kierunków, na których wymagana jest wyobraźnia przestrzenna), możliwości kształtowania wyobraźni przestrzennej w wyniku użytkowania specjalnie przygotowanej przy współpracy z adiunktem prowadzącym przedmiot Geometria wykreślna aplikacji rzeczywistości wirtualnej do wykonywania zadań przewidzianych w programie tego przedmiotu akademickiego. Badania prowadzone byłyby w jaskini rzeczywistości wirtualnej dostępnej w Laboratorium Zanurzonej Wizualizacji Przestrzennej.
 
+
+### Osiągnięte rezultaty
+
+
+Celem pracy było zbadanie możliwości wykorzystania środowiska VR CAVE w nauczaniu
+geometrii wykreślnej oraz ocena jego wpływu na rozwój wyobraźni przestrzennej studentów.
+Badania przeprowadzono w dwóch edycjach zajęć z Geometrii wykreślnej z użyciem aplikacji
+dostosowanej do realizacji zadań zgodnych z programem tego przedmiotu, dostępnej zarówno
+w wersji desktopowej do samodzielnego wykonywania konstrukcji, jak i w wersji VR CAVE do ich
+prezentacji w przestrzeni trójwymiarowej.
+W drugiej edycji studenci wykonujący konstrukcje w aplikacji desktopowej uzyskali nieco
+wyższe wyniki z kolokwium niż uczestnicy tradycyjnych ćwiczeń, choć różnica nie była istotna
+statystycznie. W obu próbach tej edycji stwierdzono istotną poprawę wyników testu Vandenberga.
+Przyrosty były również istotnie większe niż w pierwszej edycji.
+Studenci pozytywnie oceniali przede wszystkim atrakcyjność zajęć, ich wartość edukacyjną
+oraz przydatność. Doceniali możliwość oglądania konstrukcji w przestrzeni trójwymiarowej i wykorzystania
+aplikacji podczas ćwiczeń.
+
+
+![CAVE9](docs/konsultacje_cave.jpg)
+
+![CAVE10](docs/wykladvr4.jpg)
+
+![CAVE11](docs/mgr_final.jpg)
 ---
