@@ -126,9 +126,9 @@ oraz przydatność. Doceniali możliwość oglądania konstrukcji w przestrzeni 
 aplikacji podczas ćwiczeń.
 
 
-![CAVE9](docs/konsultacje_cave.jpg)
+![CAVE9](docs/konsultacje_cave.png)
 
-![CAVE10](docs/wykladvr4.jpg)
+![CAVE10](docs/wykladvr4.png)
 
-![CAVE11](docs/mgr_final.jpg)
+![CAVE11](docs/mgr_final.png)
 ---
