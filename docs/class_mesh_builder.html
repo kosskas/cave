@@ -1,0 +1,507 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pl">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.7"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Rekonstrukcja rzutów 2D: Dokumentacja klasy MeshBuilder</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="weti.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">Rekonstrukcja rzutów 2D
+   </div>
+   <div id="projectbrief">VR CAVE - Projekt</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Wygenerowano przez Doxygen 1.9.7 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Szukaj');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Wczytywanie...</div>
+<div class="SRStatus" id="Searching">Szukanie...</div>
+<div class="SRStatus" id="NoMatches">Brak dopasowań</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">Struktury danych</a> &#124;
+<a href="#pub-methods">Metody publiczne</a>  </div>
+  <div class="headertitle"><div class="title">Dokumentacja klasy MeshBuilder</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Klasa <a class="el" href="class_mesh_builder.html" title="Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyś...">MeshBuilder</a> zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi.  
+ <a href="class_mesh_builder.html#details">Więcej...</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Metody publiczne</h2></td></tr>
+<tr class="memitem:a420ca68ee64e3b098f7ccf691c96a1ac"><td class="memItemLeft" align="right" valign="top"><a id="a420ca68ee64e3b098f7ccf691c96a1ac" name="a420ca68ee64e3b098f7ccf691c96a1ac"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Init</b> (bool showProjectionLines)</td></tr>
+<tr class="memdesc:a420ca68ee64e3b098f7ccf691c96a1ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inicjalizuje klasę, tworzy katalogi do przechowywania punktów i krawędzi 3D. <br /></td></tr>
+<tr class="separator:a420ca68ee64e3b098f7ccf691c96a1ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27e5fb55cb4060228546c45f9652f9e9"><td class="memItemLeft" align="right" valign="top"><a id="a27e5fb55cb4060228546c45f9652f9e9" name="a27e5fb55cb4060228546c45f9652f9e9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>ClearAndDisable</b> ()</td></tr>
+<tr class="memdesc:a27e5fb55cb4060228546c45f9652f9e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Czyści klasę i blokuje jej działanie. <br /></td></tr>
+<tr class="separator:a27e5fb55cb4060228546c45f9652f9e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15522f8797cdc3cf01a6809568f140e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mesh_builder.html#a15522f8797cdc3cf01a6809568f140e9">AddPointProjection</a> (<a class="el" href="class_wall_info.html">WallInfo</a> wall, string label, GameObject pointObj)</td></tr>
+<tr class="memdesc:a15522f8797cdc3cf01a6809568f140e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dodaje rzut punktu do listy punktów odtwarzanego obiektu 3D. Jeśli jest wystarczająco informacji to próbuje stworzyć go w 3D.  <br /></td></tr>
+<tr class="separator:a15522f8797cdc3cf01a6809568f140e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaad53d4bf96306c6e5f3fa4cfc82fbd0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mesh_builder.html#aaad53d4bf96306c6e5f3fa4cfc82fbd0">RemovePointProjection</a> (<a class="el" href="class_wall_info.html">WallInfo</a> wall, string label)</td></tr>
+<tr class="memdesc:aaad53d4bf96306c6e5f3fa4cfc82fbd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D. Jeśli istnieje pkt w 3D to następuje ponownw obliczenie jego pozycji lub usunięcie.  <br /></td></tr>
+<tr class="separator:aaad53d4bf96306c6e5f3fa4cfc82fbd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01182cebc275d3d9bb3fa296b2dd3352"><td class="memItemLeft" align="right" valign="top"><a id="a01182cebc275d3d9bb3fa296b2dd3352" name="a01182cebc275d3d9bb3fa296b2dd3352"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveProjectionLine</b> (GameObject pointObj)</td></tr>
+<tr class="separator:a01182cebc275d3d9bb3fa296b2dd3352"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0fc67d54db901227a17b02a6bbe8553"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mesh_builder.html#ac0fc67d54db901227a17b02a6bbe8553">CreateEdge3D</a> (string labelA, string labelB, float width)</td></tr>
+<tr class="memdesc:ac0fc67d54db901227a17b02a6bbe8553"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tworzy krawędź w 3D i jeśli jest odpowiednia ilość informacji wyświetla ją  <br /></td></tr>
+<tr class="separator:ac0fc67d54db901227a17b02a6bbe8553"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30beaad005219963fad5559355f03956"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mesh_builder.html#a30beaad005219963fad5559355f03956">AddEdgeProjection</a> (<a class="el" href="class_wall_info.html">WallInfo</a> wall, string label, GameObject line)</td></tr>
+<tr class="memdesc:a30beaad005219963fad5559355f03956"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tworzy krawędź w 3D na postawie rzutów i jeśli jest odpowiednia ilość informacji wyświetla ją  <br /></td></tr>
+<tr class="separator:a30beaad005219963fad5559355f03956"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9105a470a73461ef66a6cdbbb6a68c40"><td class="memItemLeft" align="right" valign="top"><a id="a9105a470a73461ef66a6cdbbb6a68c40" name="a9105a470a73461ef66a6cdbbb6a68c40"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>AddFace</b> (GameObject face, <a class="el" href="class_assets_1_1_scripts_1_1_experimental_1_1_items_1_1_face.html">Face</a> faceComponent)</td></tr>
+<tr class="separator:a9105a470a73461ef66a6cdbbb6a68c40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a568a8e3fb39c650a0094a4dfa1abe86f"><td class="memItemLeft" align="right" valign="top"><a id="a568a8e3fb39c650a0094a4dfa1abe86f" name="a568a8e3fb39c650a0094a4dfa1abe86f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveFace</b> (GameObject face)</td></tr>
+<tr class="separator:a568a8e3fb39c650a0094a4dfa1abe86f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a672c10c24e32bbdfe4e16848c56957d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mesh_builder.html#a672c10c24e32bbdfe4e16848c56957d4">RemoveEdge3D</a> (string labelA, string labelB)</td></tr>
+<tr class="memdesc:a672c10c24e32bbdfe4e16848c56957d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Usuwa informację o krawędzi w 3D. Jeżeli krawędź istnieje na wielu ścianach to krawędź w 3D zostanie usunięta jeśli nie będzie jej na żadnej ścianie.  <br /></td></tr>
+<tr class="separator:a672c10c24e32bbdfe4e16848c56957d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45a98d050035ca9f8b57d29584b8d67d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mesh_builder.html#a45a98d050035ca9f8b57d29584b8d67d">RemoveEdgeProjection</a> (<a class="el" href="class_wall_info.html">WallInfo</a> wall, string label)</td></tr>
+<tr class="memdesc:a45a98d050035ca9f8b57d29584b8d67d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Usuwa informację o krawędzi w 3D. Jeżeli krawędź istnieje na wielu ścianach to krawędź w 3D zostanie usunięta jeśli nie będzie jej na żadnej ścianie.  <br /></td></tr>
+<tr class="separator:a45a98d050035ca9f8b57d29584b8d67d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7368db1d6c17eea8c673d3065919bcb8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mesh_builder.html#a7368db1d6c17eea8c673d3065919bcb8">SetShowRulesProjectionLine</a> (bool rule)</td></tr>
+<tr class="memdesc:a7368db1d6c17eea8c673d3065919bcb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ustawia widoczność linii rzutujących.  <br /></td></tr>
+<tr class="separator:a7368db1d6c17eea8c673d3065919bcb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0eef9705342d79991aa9df7570acbab"><td class="memItemLeft" align="right" valign="top"><a id="ab0eef9705342d79991aa9df7570acbab" name="ab0eef9705342d79991aa9df7570acbab"></a>
+Tuple&lt; Vector3, Vector3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>GetEdge3DCoords</b> (string label)</td></tr>
+<tr class="separator:ab0eef9705342d79991aa9df7570acbab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae72546069e18fae6e544029e4613bbc2"><td class="memItemLeft" align="right" valign="top"><a id="ae72546069e18fae6e544029e4613bbc2" name="ae72546069e18fae6e544029e4613bbc2"></a>
+Vector3?&#160;</td><td class="memItemRight" valign="bottom"><b>GetPoint3DCoords</b> (string label)</td></tr>
+<tr class="separator:ae72546069e18fae6e544029e4613bbc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e6d4933855d5169f6d3526e10a8163f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mesh_builder.html#a3e6d4933855d5169f6d3526e10a8163f">CheckIfAlreadyExist</a> (<a class="el" href="class_wall_info.html">WallInfo</a> wall, string label)</td></tr>
+<tr class="memdesc:a3e6d4933855d5169f6d3526e10a8163f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprawdza czy na scianie znajduje juz sie rzut punktu bądź krawedzi.  <br /></td></tr>
+<tr class="separator:a3e6d4933855d5169f6d3526e10a8163f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2729370be15b0070ca8dd6be4a4ca330"><td class="memItemLeft" align="right" valign="top">Dictionary&lt; string, Vector3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mesh_builder.html#a2729370be15b0070ca8dd6be4a4ca330">GetPoints3D</a> ()</td></tr>
+<tr class="memdesc:a2729370be15b0070ca8dd6be4a4ca330"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pobiera przechowywane aktywne punkty 3D.  <br /></td></tr>
+<tr class="separator:a2729370be15b0070ca8dd6be4a4ca330"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c2d994574a9f86c597a2cda9aa463b7"><td class="memItemLeft" align="right" valign="top">List&lt; Tuple&lt; string, string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mesh_builder.html#a1c2d994574a9f86c597a2cda9aa463b7">GetEdges3D</a> ()</td></tr>
+<tr class="memdesc:a1c2d994574a9f86c597a2cda9aa463b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pobiera przechowywaną listę krawędzi wierzchołków 3D.  <br /></td></tr>
+<tr class="separator:a1c2d994574a9f86c597a2cda9aa463b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94760513380b19b2c3822c019f79423e"><td class="memItemLeft" align="right" valign="top"><a id="a94760513380b19b2c3822c019f79423e" name="a94760513380b19b2c3822c019f79423e"></a>
+Dictionary&lt; GameObject, List&lt; string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>GetFaces3D</b> ()</td></tr>
+<tr class="separator:a94760513380b19b2c3822c019f79423e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48916cff747f85d6b7f31f728ba663e6"><td class="memItemLeft" align="right" valign="top"><a id="a48916cff747f85d6b7f31f728ba663e6" name="a48916cff747f85d6b7f31f728ba663e6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveFacesFromPoint</b> (string pointLabel)</td></tr>
+<tr class="separator:a48916cff747f85d6b7f31f728ba663e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ec14744d8f7a64e1bc43c8d0a36a27b"><td class="memItemLeft" align="right" valign="top"><a id="a2ec14744d8f7a64e1bc43c8d0a36a27b" name="a2ec14744d8f7a64e1bc43c8d0a36a27b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Toogle3DView</b> ()</td></tr>
+<tr class="separator:a2ec14744d8f7a64e1bc43c8d0a36a27b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9930fd70a41fd57fec7d748e86edc8c"><td class="memItemLeft" align="right" valign="top"><a id="ad9930fd70a41fd57fec7d748e86edc8c" name="ad9930fd70a41fd57fec7d748e86edc8c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Get3DViewRule</b> ()</td></tr>
+<tr class="separator:ad9930fd70a41fd57fec7d748e86edc8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Opis szczegółowy</h2>
+<div class="textblock"><p>Klasa <a class="el" href="class_mesh_builder.html" title="Klasa MeshBuilder zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyś...">MeshBuilder</a> zawiera informację o odtwarzanych punktach i krawędziach w 3D. Jej zadaniem jej wyświetlanie tych obiektów na scenie w sposób poprawny wraz z liniami z nimi związanymi. </p>
+</div><h2 class="groupheader">Dokumentacja funkcji składowych</h2>
+<a id="a30beaad005219963fad5559355f03956" name="a30beaad005219963fad5559355f03956"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30beaad005219963fad5559355f03956">&#9670;&#160;</a></span>AddEdgeProjection()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshBuilder.AddEdgeProjection </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td>
+          <td class="paramname"><em>wall</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>label</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GameObject&#160;</td>
+          <td class="paramname"><em>line</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Tworzy krawędź w 3D na postawie rzutów i jeśli jest odpowiednia ilość informacji wyświetla ją </p>
+<dl class="params"><dt>Parametry</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">wall</td><td>Rzutnia</td></tr>
+    <tr><td class="paramname">label</td><td>Etykieta linii</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a15522f8797cdc3cf01a6809568f140e9" name="a15522f8797cdc3cf01a6809568f140e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15522f8797cdc3cf01a6809568f140e9">&#9670;&#160;</a></span>AddPointProjection()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshBuilder.AddPointProjection </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td>
+          <td class="paramname"><em>wall</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>label</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GameObject&#160;</td>
+          <td class="paramname"><em>pointObj</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Dodaje rzut punktu do listy punktów odtwarzanego obiektu 3D. Jeśli jest wystarczająco informacji to próbuje stworzyć go w 3D. </p>
+<dl class="params"><dt>Parametry</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">wall</td><td>Metadane ściany, na której znajduje się rzut</td></tr>
+    <tr><td class="paramname">label</td><td>Etykieta rzutu</td></tr>
+    <tr><td class="paramname">pointObj</td><td>Metadana o rzucie: etykieta, połozenie(position) jest takie jakie ma rodzic</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3e6d4933855d5169f6d3526e10a8163f" name="a3e6d4933855d5169f6d3526e10a8163f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e6d4933855d5169f6d3526e10a8163f">&#9670;&#160;</a></span>CheckIfAlreadyExist()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MeshBuilder.CheckIfAlreadyExist </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td>
+          <td class="paramname"><em>wall</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>label</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sprawdza czy na scianie znajduje juz sie rzut punktu bądź krawedzi. </p>
+<dl class="params"><dt>Parametry</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">wall</td><td>Metadane ściany, na której znajduje się rzut</td></tr>
+    <tr><td class="paramname">label</td><td>Etykieta</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Zwraca</dt><dd>Prawda jeśli już taki rzut jest, Fałsz jeżeli nie ma</dd></dl>
+
+</div>
+</div>
+<a id="ac0fc67d54db901227a17b02a6bbe8553" name="ac0fc67d54db901227a17b02a6bbe8553"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0fc67d54db901227a17b02a6bbe8553">&#9670;&#160;</a></span>CreateEdge3D()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshBuilder.CreateEdge3D </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>labelA</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>labelB</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>width</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Tworzy krawędź w 3D i jeśli jest odpowiednia ilość informacji wyświetla ją </p>
+<dl class="params"><dt>Parametry</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">labelA</td><td>Etykieta punktu A</td></tr>
+    <tr><td class="paramname">labelB</td><td>Etykieta punktu B</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1c2d994574a9f86c597a2cda9aa463b7" name="a1c2d994574a9f86c597a2cda9aa463b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c2d994574a9f86c597a2cda9aa463b7">&#9670;&#160;</a></span>GetEdges3D()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">List&lt; Tuple&lt; string, string &gt; &gt; MeshBuilder.GetEdges3D </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Pobiera przechowywaną listę krawędzi wierzchołków 3D. </p>
+<dl class="section return"><dt>Zwraca</dt><dd>Zbiór par krawędzi</dd></dl>
+
+</div>
+</div>
+<a id="a2729370be15b0070ca8dd6be4a4ca330" name="a2729370be15b0070ca8dd6be4a4ca330"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2729370be15b0070ca8dd6be4a4ca330">&#9670;&#160;</a></span>GetPoints3D()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Dictionary&lt; string, Vector3 &gt; MeshBuilder.GetPoints3D </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Pobiera przechowywane aktywne punkty 3D. </p>
+<dl class="section return"><dt>Zwraca</dt><dd>Zbiór par etykiet i pozycji w 3D</dd></dl>
+
+</div>
+</div>
+<a id="a672c10c24e32bbdfe4e16848c56957d4" name="a672c10c24e32bbdfe4e16848c56957d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a672c10c24e32bbdfe4e16848c56957d4">&#9670;&#160;</a></span>RemoveEdge3D()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshBuilder.RemoveEdge3D </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>labelA</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>labelB</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Usuwa informację o krawędzi w 3D. Jeżeli krawędź istnieje na wielu ścianach to krawędź w 3D zostanie usunięta jeśli nie będzie jej na żadnej ścianie. </p>
+<dl class="params"><dt>Parametry</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">labelA</td><td>Etykieta punktu A</td></tr>
+    <tr><td class="paramname">labelB</td><td>Etykieta punktu B</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a45a98d050035ca9f8b57d29584b8d67d" name="a45a98d050035ca9f8b57d29584b8d67d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45a98d050035ca9f8b57d29584b8d67d">&#9670;&#160;</a></span>RemoveEdgeProjection()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshBuilder.RemoveEdgeProjection </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td>
+          <td class="paramname"><em>wall</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>label</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Usuwa informację o krawędzi w 3D. Jeżeli krawędź istnieje na wielu ścianach to krawędź w 3D zostanie usunięta jeśli nie będzie jej na żadnej ścianie. </p>
+<dl class="params"><dt>Parametry</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">wall</td><td>Rzutnia</td></tr>
+    <tr><td class="paramname">label</td><td>Etykieta linii</td></tr>
+    <tr><td class="paramname">line</td><td>Komponent rysowania</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aaad53d4bf96306c6e5f3fa4cfc82fbd0" name="aaad53d4bf96306c6e5f3fa4cfc82fbd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaad53d4bf96306c6e5f3fa4cfc82fbd0">&#9670;&#160;</a></span>RemovePointProjection()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshBuilder.RemovePointProjection </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_wall_info.html">WallInfo</a>&#160;</td>
+          <td class="paramname"><em>wall</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>label</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Usuwa rzut punktu z listy punktów odtwarzanego obiektu 3D. Jeśli istnieje pkt w 3D to następuje ponownw obliczenie jego pozycji lub usunięcie. </p>
+<dl class="params"><dt>Parametry</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">wall</td><td>Metadane ściany, na której znajduje się rzut</td></tr>
+    <tr><td class="paramname">label</td><td>Etykieta</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7368db1d6c17eea8c673d3065919bcb8" name="a7368db1d6c17eea8c673d3065919bcb8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7368db1d6c17eea8c673d3065919bcb8">&#9670;&#160;</a></span>SetShowRulesProjectionLine()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshBuilder.SetShowRulesProjectionLine </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>rule</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Ustawia widoczność linii rzutujących. </p>
+<dl class="params"><dt>Parametry</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rule</td><td>Zadada wyświetlania. True - wyświetlanie, False - brak</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Wygenerowano przez&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.7
+</small></address>
+</body>
+</html>
