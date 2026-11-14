@@ -837,7 +837,10 @@ namespace Assets.Scripts.Experimental
         {
             var exPoint = DrawOrGetPoint(plane, position);
 
-            labels?.ForEach(label => exPoint.AddLabel(label));
+            if (labels != null) {
+                labels.ForEach(label => exPoint.AddLabel(label));
+                exPoint.Color = ReconstructionInfo.NORMAL;
+            }
 
             OnDrawingCompleted(type);
 
