@@ -937,51 +937,100 @@ namespace Assets.Scripts.Experimental
 
                 var direction = ab.normalized;
                 var secondDirection = ef.normalized;
-
-                // Both lines must be parallel
-                if (Vector3.Cross(direction, secondDirection).sqrMagnitude >
-                    parallelTolerance * parallelTolerance)
-                    return null;
-
-                // Calculate the perpendicular offset between the lines
-                var ae = e - a;
-                var offset = ae - direction * Vector3.Dot(ae, direction);
-
-                // Collinear lines cannot form a rectangle
-                if (offset.sqrMagnitude < eps * eps)
-                    return null;
-
-                // Check whether both lines lie on the same plane
-                var planeNormal = Vector3.Cross(direction, offset).normalized;
-
-                if (Mathf.Abs(Vector3.Dot(f - a, planeNormal)) > planeTolerance)
-                    return null;
-
-                // Project both segments onto the direction of the first line
                 var firstLength = ab.magnitude;
 
-                var tE = Vector3.Dot(e - a, direction);
-                var tF = Vector3.Dot(f - a, direction);
+                // Determine whether the lines are parallel
+                var cross = Vector3.Cross(direction, secondDirection);
+                var areParallel = cross.sqrMagnitude <= parallelTolerance * parallelTolerance;
 
-                // Check whether the segments overlap along their common direction
-                var overlapStart = Mathf.Max(0f, Mathf.Min(tE, tF));
-                var overlapEnd = Mathf.Min(firstLength, Mathf.Max(tE, tF));
+                Vector3 planeNormal;
 
-                if (overlapEnd - overlapStart <= eps)
-                    return null;
+                if (areParallel)
+                {
+                    // Calculate the perpendicular offset between the lines
+                    var ae = e - a;
+                    var offset = ae - direction * Vector3.Dot(ae, direction);
 
-                // Find the outermost endpoints of both segments
+                    // Collinear lines cannot form a rectangle
+                    if (offset.sqrMagnitude < eps * eps)
+                        return null;
+
+                    planeNormal = Vector3.Cross(direction, offset).normalized;
+
+                    // Check coplanarity
+                    if (Mathf.Abs(Vector3.Dot(f - a, planeNormal)) > planeTolerance)
+                        return null;
+                }
+                else
+                {
+                    // Determine the plane defined by both line directions
+                    planeNormal = cross.normalized;
+
+                    // Reject skew lines
+                    if (Mathf.Abs(Vector3.Dot(e - a, planeNormal)) > planeTolerance)
+                        return null;
+                }
+
+                // Calculate the perpendicular direction within the plane
+                var perpendicular = Vector3.Cross(
+                    planeNormal, direction
+                ).normalized;
+
+                // Project the second segment onto the local plane axes
+                var aeVector = e - a;
+                var afVector = f - a;
+
+                var tE = Vector3.Dot(aeVector, direction);
+                var tF = Vector3.Dot(afVector, direction);
+
+                var sE = Vector3.Dot(aeVector, perpendicular);
+                var sF = Vector3.Dot(afVector, perpendicular);
+
+                if (areParallel)
+                {
+                    // Parallel segments must overlap along their direction
+                    var overlapStart = Mathf.Max(0f, Mathf.Min(tE, tF));
+                    var overlapEnd = Mathf.Min(firstLength, Mathf.Max(tE, tF));
+
+                    if (overlapEnd - overlapStart <= eps)
+                        return null;
+                }
+                else
+                {
+                    // Non-parallel segments must intersect
+                    var denominator = sF - sE;
+
+                    if (Mathf.Abs(denominator) < eps)
+                        return null;
+
+                    // Find the intersection along the second segment
+                    var t = -sE / denominator;
+                    var intersection = tE + t * (tF - tE);
+
+                    if (t < -eps || t > 1f + eps ||
+                        intersection < -eps ||
+                        intersection > firstLength + eps)
+                        return null;
+                }
+
+                // Find the outermost projections of all four endpoints
                 var tStart = Mathf.Min(0f, Mathf.Min(tE, tF));
                 var tEnd = Mathf.Max(firstLength, Mathf.Max(tE, tF));
 
-                // Construct the largest possible rectangle
+                var sStart = Mathf.Min(0f, Mathf.Min(sE, sF));
+                var sEnd = Mathf.Max(0f, Mathf.Max(sE, sF));
+
+                if (tEnd - tStart <= eps ||
+                    sEnd - sStart <= eps)
+                    return null;
+
+                // Construct the bounding rectangle on the common plane
                 var origin = a;
 
-                a = origin + direction * tStart;
-                b = origin + direction * tEnd;
-
-                c = b + offset;
-                d = a + offset;
+                a = origin + direction * tStart + perpendicular * sStart;
+                b = origin + direction * tEnd + perpendicular * sStart;
+                c = origin + direction * tEnd + perpendicular * sEnd;
+                d = origin + direction * tStart + perpendicular * sEnd;
             }
             else
             {
